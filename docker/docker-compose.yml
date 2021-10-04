@@ -1,0 +1,9 @@
+version: "3"
+services:
+  builder:
+    command: "sleep infinity"
+    image: phusion/baseimage:focal-1.0.0
+    ports:
+      - "80:80"
+    volumes:
+      - ./:/massbit/massbitroute:rw
