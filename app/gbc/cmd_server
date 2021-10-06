@@ -1,0 +1,6 @@
+#!/bin/bash
+declare -i DEBUG=0
+ROOT_DIR=$(cd "$(dirname $0)" && pwd)
+source $ROOT_DIR/bin/shell_func.sh
+updateConfigs
+$ROOT_DIR/bin/python_env/gbc/bin/supervisorctl -c $ROOT_DIR/tmp/supervisord.conf $@

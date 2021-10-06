@@ -1,0 +1,18 @@
+[package]
+name = "nginx-rust-function"
+version = "0.1.0"
+authors = ["akatsuki-chan <nakano@fusic.co.jp>"]
+edition = "2018"
+build = "src/build.rs"
+
+[lib]
+name = "librustfunction"
+crate-type = ["dylib"]
+path = "src/lib.rs"
+
+[dependencies]
+libc = "*"
+
+[build-dependencies]
+gcc = "*"
+bindgen = "*"
