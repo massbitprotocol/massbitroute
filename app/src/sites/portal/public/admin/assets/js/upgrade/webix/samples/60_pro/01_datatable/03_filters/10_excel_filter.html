@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Excel like filter in the DataTable</title>
+		<link rel="stylesheet" href="../../../../codebase/webix.css?v=8.0.5" type="text/css" charset="utf-8">
+		<script src="../../../../codebase/webix.js?v=8.0.5" type="text/javascript" charset="utf-8"></script>
+
+		<link rel="stylesheet" type="text/css" href="../../common/samples.css?v=8.0.5">
+		<script src="../../common/testdata.js?v=8.0.5" type="text/javascript" charset="utf-8"></script>
+	</head>
+	<body>
+		<div class='header_comment'>Excel filter in the DataTable</div>
+		<div id="testA"></div>
+
+		<script type="text/javascript" charset="utf-8">
+		webix.ready(function(){
+			webix.ui({
+				container:"testA",
+				view:"datatable",
+				columns:[
+					{ id:"rank",	header:"", width:50, sort:"int"},
+					{ id:"title",	header:[{text:"Film title", content:"excelFilter", mode:"text"}], width:200,	sort:"string"},
+					{ id:"year",	header:[{text:"Released", content:"excelFilter", mode:"date"}], width:200,	sort:"date",
+						format:webix.Date.dateToStr("%Y")
+					},
+					{ id:"votes",	header:[{text:"Votes", content:"textFilter"}], 	width:100}
+				],
+				autoheight:true,
+				autowidth:true,
+				data:small_film_set,
+
+				scheme:{
+					$init:function(obj){
+						obj.year = new Date(obj.year, 0);
+					}
+				}
+			});
+		});
+		</script>
+	</body>
+</html>

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>Document Manager: Flat Skin</title>
+		<!-- Webix Library -->
+		<script type="text/javascript" src="../../codebase/webix/webix.js"></script>
+		<link
+			rel="stylesheet"
+			type="text/css"
+			href="../../codebase/webix/skins/flat.css"
+		/>
+
+		<!-- App -->
+		<script type="text/javascript" src="../../codebase/docmanager.js"></script>
+		<link
+			rel="stylesheet"
+			type="text/css"
+			href="../../codebase/skins/flat.css"
+		/>
+	</head>
+	<body>
+		<script>
+			webix.ready(function() {
+				// use custom scrolls, optional
+				if (!webix.env.touch && webix.env.scrollSize) webix.CustomScroll.init();
+
+				webix.ui({
+					view: "docmanager",
+					url: "https://docs.webix.com/docmanager-backend/",
+				});
+			});
+		</script>
+	</body>
+</html>

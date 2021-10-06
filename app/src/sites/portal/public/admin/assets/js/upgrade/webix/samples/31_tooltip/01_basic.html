@@ -1,0 +1,55 @@
+<!doctype html>
+<html>
+<head>
+    <title>Tooltip:: Basic Init</title>
+    <meta  name = "viewport" content = "initial-scale = 1.0, maximum-scale = 1.0, user-scalable = no">
+
+    <script type="text/javascript" src="../../codebase/webix.js?v=8.0.5"></script>
+    <link rel="stylesheet" type="text/css" href="../../codebase/webix.css?v=8.0.5">
+    <script src="../common/testdata.js?v=8.0.5" type="text/javascript" charset="utf-8"></script>
+
+    <style>
+        #areaA{
+            margin: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div id="areaA"></div>
+
+    <script type="text/javascript">
+        webix.ready(function(){
+            webix.ui({
+                container:"areaA",  width:700, 
+                rows:[
+                    { view:"toolbar", css:"webix_dark", cols:[
+                        { view:"label", label:"My App"},
+                        { view:"icon", icon:"wxi-pencil", tooltip:"Edit"},
+                        { view:"icon", icon:"wxi-alert", tooltip:"Messages"},
+                        { view:"icon", icon:"wxi-user", tooltip:"Personal settings"}
+                    ]},
+                    { cols:[
+                        {
+                            view:"list",
+                            width:150,
+                            select:true,
+                            scroll:false,
+                            tooltip:"Click here to open #value# area",
+                            data:[ "Dashboard", "Data", "Admin" ]
+                        },
+                        {
+                            view:"datatable", 
+                            tooltip:true,
+                            autoConfig:true,
+                            scrollX:false,
+                            autoheight:true,
+                            data:small_film_set
+
+                        }
+                    ]}
+                ]
+            });
+        });
+    </script>
+</body>
+</html>

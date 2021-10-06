@@ -1,0 +1,79 @@
+<!doctype html>
+<html>
+<head>
+	<title>Swimlanes: multiple columns</title>
+	<meta  name = "viewport" content = "initial-scale = 1.0, maximum-scale = 1.0, user-scalable = no">
+
+	<link rel="stylesheet" type="text/css" href="https://cdn.materialdesignicons.com/2.8.94/css/materialdesignicons.css?v=7.3.5">
+
+	<script src="../../codebase/webix/webix.js?v=7.3.5" type="text/javascript"></script>
+	<script src="../../codebase/kanban.js?v=7.3.5" type="text/javascript"></script>
+
+	<link rel="stylesheet" type="text/css" href="../../codebase/webix/webix.css?v=7.3.5">
+	<link rel="stylesheet" type="text/css" href="../../codebase/kanban.css?v=7.3.5">
+
+	<link rel="stylesheet" type="text/css" href="../common/style.css?v=7.3.5">
+	<script src="../common/data.js?v=7.3.5"></script>
+
+	<script src="../common/types.js?v=7.3.5"></script>
+</head>
+<body>
+<script type="text/javascript">
+	webix.ready(function(){
+		if (!webix.env.touch && webix.env.scrollSize)
+			webix.CustomScroll.init();
+
+		var staff= [
+			{id:1, name:"Paul"},
+			{id:2, name:"Vera"},
+			{id:3, name:"Tomas"}
+		];
+
+		var getRows = function(statuses){
+			var rows = [];
+			for(var i=0;i < staff.length; i++){
+                rows.push({ height:8 });
+				rows.push({ view:"kanbanheader", label:staff[i].name, type:"sub"});
+				var cols = [];
+				for(var j=0; j< statuses.length; j++){
+					cols.push({ view:"kanbanlist", type: "users", status:{ status: statuses[j], user: staff[i].id }})
+				}
+				rows.push({type:"clean", margin:8, cols: cols});
+			}
+			return rows;
+		};
+
+		webix.ui({
+			view:"kanban",
+			id: "board",
+			cols:[
+				{ header:"Backlog",
+					body:{ view:"kanbanlist", status:"new", type: "users" }},
+				{
+					gravity:2,
+					rows:[
+						{
+							cols:[
+								{ template: "In Progress", type: "header"},
+								{ template: "Testing", type: "header"}
+							]
+						},
+						{ paddingX:8,
+							rows: getRows(["work","test"]), margin:0
+						}
+					]
+
+				}
+				,
+				{ header:"Done",
+					body:{ view:"kanbanlist", status:"done", type: "users" }}
+			],
+			data: user_task_set
+		});
+
+
+
+	});
+</script>
+</body>
+</html>

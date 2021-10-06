@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Datatable: Pessimistic Data Saving</title>
+		<link rel="stylesheet" href="../../../codebase/webix.css?v=8.0.5" type="text/css" charset="utf-8">
+		<script src="../../../codebase/webix.js?v=8.0.5" type="text/javascript" charset="utf-8"></script>
+
+		<link rel="stylesheet" type="text/css" href="../common/samples.css?v=8.0.5">
+	</head>
+	<body>
+		<div class='header_comment'>Pessimistic Data Saving</div>
+		<div id='testA'></div>
+
+		<script type="text/javascript" charset="utf-8">
+
+		var grid = {
+			view:"datatable", id:"grid",
+			columns:[
+				{ id:"rank",	editor:"text",  header:"", css:"rank",  width:50},
+				{ id:"title",	editor:"text",  header:"Film title",	width:200},
+				{ id:"year",	editor:"text",  header:"Released" , 	width:80},
+				{ id:"votes",	editor:"text",  header:"Votes", 		width:100}
+			],
+			autoheight:true,
+			autowidth:true,
+			select:"row", editable:true, editaction:"dblclick",
+			url: "/samples/server/films",
+			save:{
+				url:"rest->/samples/server/films",
+				autoupdate:false
+			}
+		};
+
+		var buttons = {
+			view:"toolbar", elements:[
+				{
+					view:"button", value:"Add Row",
+					click:function(){
+						var data = {
+							rank:99, title:"New", year:"2012", votes:"100"
+						};
+						webix.dp("grid").save(
+							webix.uid(),
+							"insert",
+							data
+						).then(function(obj){
+							data.id = obj.id; //server id
+							$$("grid").add(data);
+							$$("grid").select(data.id);
+						}, function(){
+							webix.message("Data was not saved");
+						});
+					}
+				},
+				{
+					view:"button", value:"Delete Row", id:"delBtn",
+					click:function(){
+						var id = $$("grid").getSelectedId();
+						if (id){
+							var data = $$("grid").getItem(id.id);
+							webix.dp("grid").save(
+								data.id,
+								"delete",
+								data
+							).then(function(){
+								$$("grid").remove(id);
+							}, function(){
+								webix.message("Data was not saved");
+							});
+						}
+					}
+				},
+				{}
+			]
+		};
+
+		webix.ready(function(){
+			webix.ui({
+				container:"testA",
+				rows:[
+					buttons, grid
+				]
+			});
+
+			$$("grid").attachEvent("onBeforeEditStop",function(values, editor){
+				var record = webix.copy(this.getItem(editor.row));
+				record[editor.column] = values.value;
+
+				webix.dp("grid").save(
+					editor.row,
+					"update",
+					record
+				).then(function(obj){
+					// close the editor
+					$$("grid").blockEvent();
+					$$("grid").editStop();
+					$$("grid").unblockEvent();
+				}, function(){
+					webix.message("Data was not saved");
+				});
+
+				return false;
+			});
+
+		});
+		</script>
+	</body>
+</html>

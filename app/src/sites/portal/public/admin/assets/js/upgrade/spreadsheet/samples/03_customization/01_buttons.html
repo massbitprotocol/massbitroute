@@ -1,0 +1,42 @@
+<!doctype html>
+<html>
+<head>
+    <title>Toolbar buttons</title>
+    <meta  name = "viewport" content = "initial-scale = 1.0, maximum-scale = 1.0, user-scalable = no">
+
+    <script src="../../codebase/webix/webix.js?v=8.0.5" type="text/javascript"></script>
+    <script src="../../codebase/spreadsheet.js?v=8.0.5" type="text/javascript"></script>
+
+    <link rel="stylesheet" type="text/css" href="../../codebase/webix/webix.css?v=8.0.5">
+    <link rel="stylesheet" type="text/css" href="../../codebase/spreadsheet.css?v=8.0.5">
+
+    <script src="../common/data.js?v=8.0.5"></script>
+</head>
+<body>
+<script type="text/javascript">
+
+
+
+    webix.ready(function(){
+        webix.ui({
+            view:"spreadsheet",
+            data: base_data,
+            buttons: {
+                "$title": [{
+                    view: "label", width: 150, label: "My SpreadSheet"
+                }],
+                "undo-redo": ["undo","redo"],
+                "font": ["font-family","font-size","font-weight","font-style","text-decoration","color"],
+                "cell": ["background","borders","span"],
+                "align": ["text-align","vertical-align","wrap"],
+				"format":["format"],
+                "My Block": [{
+                    view: "button", name: "my-button", width: 100, label: "My Button",
+                    tooltip: "Click this button", click: function(){webix.message("Click")}
+                }]
+            }
+        });
+    });
+</script>
+</body>
+</html>

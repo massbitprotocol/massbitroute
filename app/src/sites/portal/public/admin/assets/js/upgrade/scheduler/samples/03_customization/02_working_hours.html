@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Working Hours</title>
+		<!-- Webix Library -->
+		<script type="text/javascript" src="../../codebase/webix/webix.js"></script>
+		<link
+			rel="stylesheet"
+			type="text/css"
+			href="../../codebase/webix/webix.css"
+		/>
+
+		<!-- Scheduler -->
+		<script type="text/javascript" src="../../codebase/scheduler.js"></script>
+		<link
+			rel="stylesheet"
+			type="text/css"
+			href="../../codebase/scheduler.css"
+		/>
+	</head>
+	<body>
+		<script type="text/javascript" charset="utf-8">
+			webix.ready(function() {
+				// use custom scrolls, optional
+				if (!webix.env.touch && webix.env.scrollSize) webix.CustomScroll.init();
+
+				class CustomHours extends scheduler.views["modes/common/hourscale"] {
+					config() {
+						const ui = super.config();
+						ui.type.height = 60;
+						return ui;
+					}
+					ParseHours() {
+						const data = [];
+						for (let h = 0; h < 24; h++) {
+							if (h > 7 && h < 22) data.push({ id: h + "" });
+						}
+						this.List.parse(data);
+					}
+				}
+
+				class CustomDayEvents extends scheduler.views["modes/day/events"] {
+					config() {
+						const ui = super.config();
+						ui.type.height = 60;
+						return ui;
+					}
+					ParseHours() {
+						const data = [];
+						for (let h = 0; h < 24; h++) {
+							if (h > 7 && h < 22) data.push({ id: h + "" });
+						}
+						this.List.parse(data);
+					}
+					//adjust out-of-scale eventss
+					RenderEvents() {
+						const evs = this.Events;
+						if (evs && evs.length) {
+							for (let i = 0; i < evs.length; i++) {
+								if (evs[i].start_date.getHours() < 8) {
+									evs[i].start_date.setHours(8);
+									evs[i].start_date.setMinutes(0);
+								}
+								if (evs[i].end_date.getHours() >= 22) {
+									evs[i].end_date.setHours(22);
+									evs[i].start_date.setMinutes(0);
+								}
+							}
+						}
+
+						super.RenderEvents();
+					}
+				}
+
+				webix.ui({
+					view: "scheduler",
+					date: new Date(2020, 9, 7, 0, 0, 0),
+					url: "https://docs.webix.com/calendar-backend/",
+					mode: "week",
+					override: new Map([
+						[scheduler.views["modes/common/hourscale"], CustomHours],
+						[scheduler.views["modes/day/events"], CustomDayEvents],
+					]),
+				});
+			});
+		</script>
+	</body>
+</html>

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Working Days in Week</title>
+		<!-- Webix Library -->
+		<script type="text/javascript" src="../../codebase/webix/webix.js"></script>
+		<link
+			rel="stylesheet"
+			type="text/css"
+			href="../../codebase/webix/webix.css"
+		/>
+
+		<!-- Scheduler -->
+		<script type="text/javascript" src="../../codebase/scheduler.js"></script>
+		<link
+			rel="stylesheet"
+			type="text/css"
+			href="../../codebase/scheduler.css"
+		/>
+	</head>
+	<body>
+		<script type="text/javascript" charset="utf-8">
+			webix.ready(function() {
+				// use custom scrolls, optional
+				if (!webix.env.touch && webix.env.scrollSize) webix.CustomScroll.init();
+				webix.Date.startOnMonday = true;
+
+				class CustomWeekView extends scheduler.views["modes/week"] {
+					config() {
+						const ui = super.config();
+						if (!this.Compact) ui.rows[2].body.cols.length = 6; //scale + 5 days
+						return ui;
+					}
+					GetWeek(start, end) {
+						if (!this.Compact) end = webix.Date.add(end, -2, "day");
+						return super.GetWeek(start, end);
+					}
+				}
+
+				class CustomWeekHeader extends scheduler.views["modes/week/header"] {
+					config() {
+						const ui = super.config();
+						ui.cols[1].xCount = 5;
+						return ui;
+					}
+				}
+
+				class CustomWeekMultiDay extends scheduler
+					.views["modes/week/multiday"] {
+					config() {
+						const ui = super.config();
+						ui.cols[1].xCount = 5;
+						return ui;
+					}
+				}
+
+				webix.ui({
+					view: "scheduler",
+					date: new Date(2020, 9, 7, 0, 0, 0),
+					url: "https://docs.webix.com/calendar-backend/",
+					mode: "week",
+					override: new Map([
+						[scheduler.views["modes/week"], CustomWeekView],
+						[scheduler.views["modes/week/header"], CustomWeekHeader],
+						[scheduler.views["modes/week/multiday"], CustomWeekMultiDay],
+					]),
+				});
+			});
+		</script>
+	</body>
+</html>

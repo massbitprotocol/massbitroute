@@ -1,0 +1,105 @@
+<!doctype html>
+<html>
+<head>
+    <title>External UI::Custom Views</title>
+    <meta  name = "viewport" content = "initial-scale = 1.0, maximum-scale = 1.0, user-scalable = no">
+
+    <script src="../../codebase/webix/webix.js?v=8.0.5" type="text/javascript"></script>
+    <script src="../../codebase/spreadsheet.js?v=8.0.5" type="text/javascript"></script>
+
+    <link rel="stylesheet" type="text/css" href="../../codebase/webix/webix.css?v=8.0.5">
+    <link rel="stylesheet" type="text/css" href="../../codebase/spreadsheet.css?v=8.0.5">
+
+    <script src="../common/data.js?v=8.0.5"></script>
+</head>
+<body>
+<script type="text/javascript">
+
+
+    webix.ready(function(){
+
+        var s = webix.ui({
+            view:"spreadsheet",
+            data: base_data,
+            toolbar: "full",
+            menu:true
+        });
+
+        //adding
+        var type = "table";
+
+        s.views.register(type, (node, conf, data) => {
+            const config = { view:"datatable", autoConfig:true, scroll:false};
+            return webix.ui(config, node);
+        }, (view, data) => {
+            view.clearAll();
+            if(webix.isArray(data))
+                view.parse(data);
+        });
+
+        s.views.add(100,150,type,"B3:E7",{ width:550, height:230 });
+
+        //editing
+        var d = webix.ui({
+            view: "ssheet-dialog",
+            head: "Edit data",
+            position: "center",
+            body: {
+                view: "form",
+                elements:[
+                    {view: "text", name:"data", label: "Data", placeholder: "Enter data"}
+                ]
+            },
+            on: {
+                onSaveClick: function () {
+                    var values = this.getBody().getValues();
+                    values.data = values.data.toUpperCase();
+                    s.views.update(values.viewid, values.data, values.config)
+                    this.hide();
+                },
+                onCancelClick: function () {
+                    this.hide();
+                },
+                onHideClick: function () {
+                    this.hide();
+                },
+                onHide: function(){
+                    //better focus handling
+                    s.callEvent("onUIEditStop", [d.viewid, type]);
+                }
+            }
+        });
+
+
+        s.attachEvent("onCommand", function(obj){
+            if(obj.id == "table"){
+                console.log(obj.viewid, obj.config);
+                obj.data = obj.config.data;
+
+                //save external ui id on edit window to have a possibility to check if it was removed (on onAction event)
+                d.viewid = obj.viewid;
+
+                //better focus handling
+                s.callEvent("onUIEditStart", [d.viewid, type]);
+
+                d.getBody().setValues(obj);
+                d.show();
+            }
+            else if(obj.id == "close-ui-editor")
+                d.hide();
+        });
+
+        s.attachEvent("onAction", function(id, values){
+            if(id == "add-view" && !values.newValue && d.viewid == values.row)
+                d.hide(); //hide the edit window when the external ui is removed
+        });
+
+        s.attachEvent("onUIEditStart", (id, uiType)=>{
+            if(d.isVisible() && uiType != type) //hide if any other external ui is in edit status
+                d.hide();
+        });
+    });
+
+</script>
+</body>
+</html>

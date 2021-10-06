@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>Localization: Switching Locales</title>
+		<!-- Webix Library -->
+		<script type="text/javascript" src="../../codebase/webix/webix.js"></script>
+		<link
+			rel="stylesheet"
+			type="text/css"
+			href="../../codebase/webix/webix.css"
+		/>
+
+		<!-- Scheduler -->
+		<script type="text/javascript" src="../../codebase/scheduler.js"></script>
+		<link
+			rel="stylesheet"
+			type="text/css"
+			href="../../codebase/scheduler.css"
+		/>
+
+		<script src="../common/ruLocale.js"></script>
+	</head>
+	<body>
+		<script>
+			webix.ready(function() {
+				// use custom scrolls, optional
+				if (!webix.env.touch && webix.env.scrollSize) webix.CustomScroll.init();
+
+				const sch = {
+					view: "scheduler",
+					id: "scheduler",
+					url: "https://docs.webix.com/calendar-backend/",
+					date: new Date(2020, 9, 7, 0, 0, 0),
+					locale: {
+						lang: "en",
+						webix: {
+							// switch all webix widgets to the selected locale
+							en: "en-US",
+							ru: "ru-RU",
+						},
+					},
+				};
+
+				scheduler.locales.ru = ruLocale;
+
+				const toolbar = {
+					cols: [
+						{
+							view: "segmented",
+							options: ["en", "ru"],
+							width: 250,
+							click: function() {
+								const locale = $$("scheduler").getService("locale");
+								locale.setLang(this.getValue());
+							},
+						},
+					],
+				};
+
+				webix.ui({
+					type: "wide",
+					rows: [toolbar, sch],
+				});
+			});
+		</script>
+	</body>
+</html>

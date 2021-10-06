@@ -1,0 +1,356 @@
+[
+	{
+		"start_date": "2020-10-08 17:00:00",
+		"end_date": "2020-10-08 20:00:00",
+		"id": 1,
+		"text": " Zentralstadion - Leipzig ",
+		"details": " Leipzig, GER ",
+		"color": "#91E4A6",
+		"calendar": 2
+	},
+	{
+		"start_date": "2020-10-22 19:00:00",
+		"end_date": "2020-10-22 22:00:00",
+		"id": 2,
+		"text": " Inter Stadion Slovakia ",
+		"details": " Bratislava, Slovakia ",
+		"color": "#74B1A7",
+		"calendar": 2
+	},
+	{
+		"start_date": "2020-10-10 00:00:00",
+		"end_date": "2020-10-13 00:00:00",
+		"id": 3,
+		"all_day": 1,
+		"text": "Aegon Championship",
+		"details": "The Queens Club \nLondon, ENG",
+		"calendar": 2
+	},
+	{
+		"start_date": "2020-10-05 12:00:00",
+		"end_date": "2020-10-05 15:00:00",
+		"id": 4,
+		"text": " LTU Arena ",
+		"details": " Dusseldorf, GER ",
+		"color": "#ADD579",
+		"calendar": 2
+	},
+	{
+		"start_date": "2020-10-07 20:00:00",
+		"end_date": "2020-10-07 23:00:00",
+		"id": 5,
+		"text": " Zentralstadion - Leipzig ",
+		"details": " Leipzig, GER ",
+		"calendar": 2
+	},
+	{
+		"start_date": "2020-10-27 19:00:00",
+		"end_date": "2020-10-27 22:00:00",
+		"id": 6,
+		"text": " Stade de France - Paris ",
+		"details": " Paris, FRA ",
+		"color": "#91E4A6",
+		"calendar": 2
+	},
+	{
+		"start_date": "2020-10-24 00:00:00",
+		"end_date": "2020-10-08 00:00:00",
+		"id": 7,
+		"all_day": 1,
+		"text": "French Open",
+		"details": "Philippe-Chatrier Court \nParis, FRA",
+		"calendar": 1
+	},
+	{
+		"start_date": "2020-10-02 10:00:00",
+		"end_date": "2020-10-02 13:00:00",
+		"id": 8,
+		"text": " HSH Nordbank Arena (formerly AOL Arena) ",
+		"details": " Hamburg, GER ",
+		"color": "#6BA8CB",
+		"calendar": 2
+	},
+	{
+		"start_date": "2020-10-16 19:00:00",
+		"end_date": "2020-10-16 22:00:00",
+		"id": 9,
+		"text": " Stadio Olimpico ",
+		"details": " Rome, Italy ",
+		"calendar": 2
+	},
+	{
+		"start_date": "2020-10-12 14:00:00",
+		"end_date": "2020-10-12 17:00:00",
+		"id": 10,
+		"text": " Commerz Bank Arena ",
+		"details": " Frankfurt, GER ",
+		"color": "#F68896",
+		"calendar": 2
+	},
+	{
+		"start_date": "2020-10-04 11:00:00",
+		"end_date": "2020-10-04 14:00:00",
+		"id": 11,
+		"text": " LTU Arena ",
+		"details": " Dusseldorf, GER "
+	},
+	{
+		"start_date": "2020-10-10 14:00:00",
+		"end_date": "2020-10-10 17:00:00",
+		"id": 12,
+		"text": " Olympiastadion - Berlin ",
+		"details": " Berlin, GER ",
+		"color": "#01C2A5",
+		"calendar": 2
+	},
+	{
+		"start_date": "2020-10-13 11:00:00",
+		"end_date": "2020-10-13 14:00:00",
+		"id": 13,
+		"text": " Olympic Stadium - Munich ",
+		"details": " Munich, GER",
+		"calendar": 2
+	},
+	{
+		"start_date": "2020-10-23 14:00:00",
+		"end_date": "2020-10-23 17:00:00",
+		"id": 14,
+		"text": " Puskas Ferenc Stadium ",
+		"details": " Budapest, Hungary ",
+		"color": "#74B1A7",
+		"calendar": 2
+	},
+	{
+		"start_date": "2020-10-25 10:00:00",
+		"end_date": "2020-10-25 13:00:00",
+		"id": 15,
+		"text": " Slavia Stadion ",
+		"details": " Prague, Czech Republic",
+		"calendar": 2
+	},
+	{
+		"start_date": "2020-10-21 20:00:00",
+		"end_date": "2020-10-21 23:00:00",
+		"id": 16,
+		"text": " Comunale Giuseppe Meazza - San Siro ",
+		"details": " Milan, Italy ",
+		"color": "#CF89D5",
+		"calendar": 1
+	},
+	{
+		"start_date": "2020-10-21 00:00:00",
+		"end_date": "2020-11-05 00:00:00",
+		"id": 17,
+		"all_day": 1,
+		"text": "Wimbledon",
+		"details": "Wimbledon\nJune 21, 2014 - July 5, 2014",
+		"color": "#CF89D5",
+		"calendar": 2
+	},
+	{
+		"start_date": "2020-10-30 18:00:00",
+		"end_date": "2020-10-30 21:00:00",
+		"id": 18,
+		"text": " Parken Stadium ",
+		"details": " Copenhagen, DK ",
+		"color": "#F68896",
+		"calendar": 2
+	},
+	{
+		"start_date": "2020-09-12 00:00",
+		"end_date": "2020-09-13 00:00",
+		"id": 19,
+		"text": "Interstellar Cruise",
+		"details": "An awesome VR session with my buddies at the Jason's place",
+		"recurring": "FREQ=YEARLY;BYMONTH=9;BYMONTHDAY=12",
+		"color": "#D2FB9E",
+		"calendar": 1
+	},
+
+	{
+		"start_date": "2020-09-20 09:00",
+		"end_date": "2020-09-20 11:00",
+		"id": 20,
+		"text": "Panda Weekly Summit",
+		"details": "The Panda club meeting, discussing the latest situation and solutions; planning.",
+		"recurring": "FREQ=DAILY;INTERVAL=3;UNTIL=20211023T000000Z",
+		"calendar": 1
+	},
+	{
+		"start_date": "2020-09-02 00:00",
+		"end_date": "2020-09-04 00:00",
+		"id": 21,
+		"text": "Biweekly Horror Book Club",
+		"details": "Discussing the latest book of the fortnight; genres: mostly horror, both pure and within other genres like fantasy and sci-fi",
+		"color": "#CF89D5",
+		"recurring": "FREQ=DAILY;INTERVAL=14;UNTIL=20211103T000000Z",
+		"calendar": 1
+	},
+	{
+		"start_date": "2020-09-13 03:00",
+		"end_date": "2020-09-15 05:00",
+		"id": 22,
+		"text": "Speculative Fiction Discussion Club",
+		"details": "Contemporary speculative fiction by young authors",
+		"recurring": "FREQ=DAILY;INTERVAL=14;UNTIL=20210905T000000Z",
+		"calendar": 1
+	},
+	{
+		"start_date": "2020-09-20 20:01",
+		"end_date": "2020-09-21 20:01",
+		"id": 23,
+		"text": "My 30th Birthday",
+		"details": "Me and my few cronies at my place. DO NOT forget about the pre-order of foods.",
+		"color": "#CF89D5",
+		"calendar": 1
+	},
+	{
+		"start_date": "2020-09-21 20:01",
+		"end_date": "2020-09-22 20:01",
+		"id": 24,
+		"text": "A day with a hero",
+		"details": "An all-nighter watching Marvel films",
+		"color": "#74B1A7",
+		"recurring": "FREQ=WEEKLY;BYDAY=MO,WE,TH;INTERVAL=2;UNTIL=20210422T000000Z"
+	},
+	{
+		"start_date": "2020-09-21 10:00",
+		"end_date": "2020-09-21 18:00",
+		"id": 25,
+		"text": "Women and aliens",
+		"details": "A discussion of our club dedicated to the sci-fi works written by female authors, both contemporary literature and classics",
+		"color": "#EF9C80",
+		"recurring": "FREQ=MONTHLY;UNTIL=20210922T000000Z",
+		"calendar": 1
+	},
+	{
+		"start_date": "2020-09-18 15:01",
+		"end_date": "2020-09-18 18:01",
+		"id": 26,
+		"text": "Grandmother's shopping",
+		"details": "List: \n- bananas\n- apples\n- pancake flour\n- books (at least three) by Shirley Jackson",
+		"color": "#997CEB",
+		"recurring": "FREQ=WEEKLY;INTERVAL=3;UNTIL=20210322T000000Z",
+		"calendar": 1
+	},
+	{
+		"start_date": "2020-09-19 20:01",
+		"end_date": "2020-09-20 04:01",
+		"id": 27,
+		"text": "A day with a hero",
+		"details": "An all-nighter with DC films",
+		"recurring": "FREQ=WEEKLY;INTERVAL=2;UNTIL=20210323T000000Z",
+		"calendar": 2
+	},
+	{
+		"start_date": "2020-09-12 21:01",
+		"end_date": "2020-09-22 21:01",
+		"id": 28,
+		"text": "Animals are also people",
+		"details": "A festival organized by our volunteering community. \n\nActivities:\n- public donations; \n- animal adoption;\n- exhibition and fair of children's artwork;\n- volunteer recruitment;\n- community education",
+		"color": "#6BA8CB",
+		"recurring": "FREQ=MONTHLY;INTERVAL=2;UNTIL=20210501T000000Z",
+		"calendar": 2
+	},
+	{
+		"start_date": "2020-09-22 21:01",
+		"end_date": "2020-09-25 21:01",
+		"id": 29,
+		"text": "Galaxy Match",
+		"details": "A match between best galaxy sky-fighters",
+		"color": "#6BA8CB",
+		"recurring": "FREQ=WEEKLY;INTERVAL=3;UNTIL=20210422T000000Z",
+		"calendar": 2
+	},
+	{
+		"start_date": "2020-09-19 10:30",
+		"end_date": "2020-09-19 12:30",
+		"id": 30,
+		"text": "Dance club",
+		"details": "Teaching dancing at the community center",
+		"color": "#DD89AF",
+		"recurring": "FREQ=WEEKLY;BYDAY=TU,SA;UNTIL=20210910T000000Z",
+		"calendar": 1
+	},
+
+	{
+		"start_date": "1986-09-15 00:00:00",
+		"end_date": "1986-09-16 00:00:00",
+		"id": 31,
+		"text": "Brother's Birthday",
+		"recurring": "FREQ=YEARLY;BYMONTH=9;BYMONTHDAY=15;",
+		"calendar": 3
+	},
+	{
+		"start_date": "1995-10-25 00:00:00",
+		"end_date": "1995-10-26 00:00:00",
+		"id": 32,
+		"text": "Sister's Birthday",
+		"recurring": "FREQ=YEARLY;BYMONTH=10;BYMONTHDAY=25;",
+		"calendar": 3
+	},
+	{
+		"start_date": "2012-10-05 00:00:00",
+		"end_date": "2012-10-06 00:00:00",
+		"id": 33,
+		"text": "Cat's Birthday",
+		"recurring": "FREQ=YEARLY;BYMONTH=10;BYMONTHDAY=5;",
+		"calendar": 3
+	},
+	{
+		"start_date": "1986-10-04 00:00:00",
+		"end_date": "1986-10-04 00:00:00",
+		"id": 34,
+		"all_day": 1,
+		"text": "Kate Middleton's Birthday",
+		"recurring": "FREQ=YEARLY;BYMONTH=10;BYMONTHDAY=4;",
+		"calendar": 3
+	},
+	{
+		"start_date": "2013-10-22 00:00:00",
+		"end_date": "2013-10-22 00:00:00",
+		"id": 35,
+		"all_day": 1,
+		"text": "Prince George's Birthday",
+		"recurring": "FREQ=YEARLY;BYMONTH=10;BYMONTHDAY=22;",
+		"calendar": 3
+	},
+
+	{
+		"start_date": "1945-05-08 00:00:00",
+		"end_date": "1945-05-08 00:00:00",
+		"id": 36,
+		"all_day": 1,
+		"text": "Victory Day",
+		"color": "#DD89AF",
+		"recurring": "FREQ=YEARLY;BYMONTH=5;BYMONTHDAY=9;UNTIL=20450509T000000Z",
+		"calendar": 4
+	},
+	{
+		"start_date": "1996-07-03 00:00:00",
+		"end_date": "1996-07-03 00:00:00",
+		"all_day": 1,
+		"id": 37,
+		"text": "Independence Day in Belarus",
+		"recurring": "FREQ=YEARLY;BYMONTH=7;BYMONTHDAY=3",
+		"calendar": 4
+	},
+	{
+		"start_date": "1900-01-01 00:00:00",
+		"end_date": "1900-01-01 00:00:00",
+		"id": 38,
+		"all_day": 1,
+		"text": "New Year",
+		"recurring": "FREQ=YEARLY;BYMONTH=1;BYMONTHDAY=1",
+		"calendar": 4
+	},
+	{
+		"start_date": "1900-12-25 00:00:00",
+		"end_date": "1900-12-25 00:00:00",
+		"id": 39,
+		"all_day": 1,
+		"text": "Christmas",
+		"recurring": "FREQ=YEARLY;BYMONTH=12;BYMONTHDAY=25",
+		"calendar": 4
+	}
+]

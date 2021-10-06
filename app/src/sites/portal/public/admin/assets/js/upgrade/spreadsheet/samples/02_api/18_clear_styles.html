@@ -1,0 +1,67 @@
+<!doctype html>
+<html>
+<head>
+	<title>Removing unused styles</title>
+	<meta  name = "viewport" content = "initial-scale = 1.0, maximum-scale = 1.0, user-scalable = no">
+
+	<script src="../../codebase/webix/webix.js?v=8.0.5" type="text/javascript"></script>
+	<script src="../../codebase/spreadsheet.js?v=8.0.5" type="text/javascript"></script>
+
+	<link rel="stylesheet" type="text/css" href="../../codebase/webix/webix.css?v=8.0.5">
+	<link rel="stylesheet" type="text/css" href="../../codebase/spreadsheet.css?v=8.0.5">
+
+	<script src="../common/data.js?v=8.0.5"></script>
+</head>
+<body>
+	<script type="text/javascript">
+
+		function getData(){
+			var data = $$("ss").serialize();
+			var text = JSON.stringify({data:data.data, styles:data.styles}, null, "  ");
+			$$("txt").setValue( text );
+		}
+
+		webix.ready(function(){
+			
+			var buttons = { width:350, rows:[
+				{ view:"button", value:"Serialize data", click:getData },
+				{ view:"button", value:"Remove unused styles", click:function(){
+					 $$("ss").compactStyles();
+					 getData();
+				} },
+				{ view:"textarea", id:"txt" },
+			]};
+
+			webix.ui({ 
+				type:"space",
+				cols:[
+					buttons,
+					{
+						view:"spreadsheet",
+						id:"ss",
+						toolbar: "full",
+						data:{
+							styles: [
+								[ "blue", "#FFFFFF;#2244DE;" ],
+								[ "red",  "#FFFFFF;#DE2244;" ]
+							],
+							sizes: [
+								[ 0, 2, 64 ]
+							],
+							data: [
+								[ 3, 2, "Webix", "blue" ],
+								[ 3, 3, "SpreadSheet", "blue" ]
+							]
+						},
+						on:{
+							onAfterLoad: getData,
+							onStyleChange:getData
+						}
+					}
+				]
+			});
+		});
+
+	</script>
+</body>
+</html>

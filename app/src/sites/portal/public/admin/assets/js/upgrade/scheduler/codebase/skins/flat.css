@@ -1,0 +1,944 @@
+@charset "UTF-8";
+/**
+scheduler-webfont Webfont
+*/
+@font-face {
+  font-family: "scheduler-webfont";
+  src: url("../fonts/scheduler-webfont.woff2") format("woff2"), url("../fonts/scheduler-webfont.woff") format("woff");
+  font-weight: normal;
+  font-style: normal;
+}
+[class^=shi-]:before,
+[class*=shi-]:before {
+  font-family: "scheduler-webfont";
+  display: inline-block;
+  font-style: normal;
+  font-weight: normal;
+  line-height: 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transform: translate(0, 0);
+}
+
+/*
+Glyphs list
+*/
+.shi-agenda:before {
+  content: "";
+}
+
+.shi-day:before {
+  content: "";
+}
+
+.shi-month:before {
+  content: "";
+}
+
+.shi-week:before {
+  content: "";
+}
+
+.shi-back:before {
+  content: "";
+}
+
+.shi-menu:before {
+  content: "";
+}
+
+/* Preview */
+.webix_scheduler_info .webix_template {
+  overflow: auto;
+  padding: 0 0 0 2px;
+}
+.webix_scheduler_info .webix_template .webix_scheduler_event_title {
+  color: #4a4a4a;
+  font-weight: bold;
+  margin-top: 7px;
+  margin-bottom: 20px;
+}
+.webix_scheduler_info .webix_template .webix_scheduler_event_from_to,
+.webix_scheduler_info .webix_template .webix_scheduler_event_recurring_pattern {
+  margin-bottom: 20px;
+  line-height: 20px;
+}
+.webix_scheduler_info .webix_template .webix_scheduler_event_details_title {
+  color: #4a4a4a;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+.webix_scheduler_info .webix_template .webix_scheduler_event_text {
+  line-height: 20px;
+}
+
+/* Form */
+.webix_scheduler_cal_color .webix_inp_static {
+  padding-right: 50px;
+}
+
+.webix_scheduler_cal_color_suggest .webix_list_item,
+.webix_scheduler_cal_color_suggest .webix_list_item.webix_selected {
+  position: relative;
+  padding-right: 32px;
+}
+.webix_scheduler_cal_color_suggest .webix_scheduler_cal_marker {
+  right: 4px;
+}
+
+.webix_scheduler_cal_marker {
+  display: block;
+  width: 24px;
+  height: 24px;
+  border-radius: 2px;
+  position: absolute;
+  right: 26px;
+  top: 50%;
+  margin-top: -12px;
+}
+
+.webix_scheduler_counter .webix_inp_counter_value {
+  width: calc(100% - 60px);
+}
+
+.webix_scheduler_subform_popup {
+  border-width: 1px;
+}
+.webix_scheduler_subform_popup .webix_win_head {
+  border-bottom-color: transparent;
+}
+
+.webix_scheduler_cal_disabled {
+  color: #a4b4bf;
+}
+.webix_scheduler_cal_disabled .webix_scheduler_calendar_marker {
+  opacity: 0.6;
+}
+
+.webix_scheduler_day_events {
+  border-color: #ddd;
+  position: relative;
+}
+.webix_scheduler_day_events .webix_list_item {
+  padding: 0;
+  cursor: default;
+  padding: 0;
+}
+
+.webix_scheduler_day_event {
+  padding: 8px 8px 16px;
+  overflow: hidden;
+  cursor: pointer;
+  position: absolute;
+  border-radius: 2px;
+  border-left: 3px solid;
+  box-sizing: border-box;
+  transition: box-shadow 0.15s;
+}
+
+.webix_scheduler_day_event:hover {
+  z-index: 1;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3), 1px 1px 2px rgba(0, 0, 0, 0.2);
+}
+.webix_scheduler_day_event:hover .webix_scheduler_resizer {
+  visibility: visible;
+}
+
+.webix_active_resize .webix_scheduler_day_events .webix_scheduler_day_event,
+.webix_active_resize .webix_scheduler_day_events .webix_list_item {
+  cursor: ns-resize;
+}
+
+.webix_drag_event,
+.webix_drag_event:hover {
+  border-radius: 2px;
+  box-shadow: 3px 3px 7px rgba(0, 0, 0, 0.3), 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.webix_resize_event,
+.webix_resize_event:hover,
+.webix_active_resize .webix_scheduler_day_event:hover,
+.webix_noselect .webix_scheduler_day_event:hover {
+  box-shadow: none;
+}
+
+.webix_active_resize .webix_scheduler_day_event:hover .webix_scheduler_resizer,
+.webix_noselect .webix_scheduler_day_event:hover .webix_scheduler_resizer {
+  visibility: hidden;
+}
+
+.webix_active_resize .webix_scheduler_day_event.webix_resize_event:hover .webix_scheduler_resizer {
+  visibility: visible;
+}
+
+.webix_resize_event {
+  border-radius: 2px;
+}
+.webix_resize_event .webix_scheduler_resizer {
+  visibility: visible;
+}
+
+.webix_scheduler_resizer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 16px;
+  font-size: 16px;
+  visibility: hidden;
+  cursor: ns-resize;
+}
+
+.webix_scheduler_resizer::before {
+  content: "";
+  transform: rotate(90deg);
+  position: absolute;
+  margin-left: -10px;
+}
+
+.webix_scheduler_multilist {
+  border-left-color: #ddd;
+  border-bottom-color: transparent;
+}
+.webix_scheduler_multilist .webix_list_item {
+  cursor: default;
+  padding: 0;
+  line-height: normal;
+  font-weight: bold;
+  position: relative;
+  border-color: transparent;
+}
+.webix_scheduler_multilist .webix_scheduler_multi_more .webix_scheduler_multiday_event {
+  transition: background-color 0.3s;
+  background-color: #f4f4f4;
+  text-align: center;
+  border: none;
+}
+.webix_scheduler_multilist .webix_scheduler_multi_more .webix_scheduler_multiday_event:hover {
+  background-color: #eaeaea;
+  box-shadow: none;
+}
+.webix_scheduler_multilist .webix_scheduler_multiday_event {
+  top: 1px;
+  left: 1px;
+}
+
+.webix_scheduler_multiday_event {
+  cursor: pointer;
+  position: absolute;
+  border-radius: 2px;
+  border-left: 3px solid;
+  padding: 0 8px;
+  box-sizing: border-box;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: box-shadow 0.15s;
+}
+
+.webix_scheduler_multiday_event:hover {
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3), 1px 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.webix_scheduler_event_break_left.webix_scheduler_event_break_right:hover,
+.webix_scheduler_event_break_left.webix_scheduler_event_break_right.webix_scheduler_event_selected {
+  box-shadow: 3px 9px 5px -7px rgba(0, 0, 0, 0.3), 2px 8px 2px -7px rgba(0, 0, 0, 0.2);
+}
+
+.webix_scheduler_event_name {
+  display: inline-block;
+  line-height: 20px;
+  font-weight: bold;
+  font-size: 15px;
+}
+
+.webix_scheduler_event_time {
+  line-height: 14px;
+  margin-top: 4px;
+  font-size: 13px;
+}
+
+.webix_scheduler_scale .webix_list_item {
+  cursor: default;
+  padding: 0;
+  border-bottom-color: transparent;
+  text-align: center;
+}
+
+.webix_scheduler_inner_day {
+  height: 100%;
+  overflow: hidden;
+}
+
+.webix_scheduler_day_scroll {
+  border-top-color: #ddd;
+  position: relative;
+}
+
+.webix_scheduler_day_header .webix_template {
+  font-weight: bold;
+  line-height: 32px;
+  text-align: center;
+  padding: 0 0 0 50px;
+}
+
+.webix_scheduler_today_marker {
+  z-index: 2;
+  position: absolute;
+  background-color: #ea764f;
+  width: 100%;
+  height: 2px;
+  margin-top: -1px;
+  pointer-events: none;
+}
+
+.webix_scheduler_today_marker:before {
+  content: "";
+  display: block;
+  background: inherit;
+  width: 12px;
+  height: 12px;
+  margin-top: -5px;
+  border-radius: 50%;
+}
+
+.webix_scheduler_day_header .webix_dataview_item {
+  border-color: transparent;
+  text-align: center;
+  line-height: 31px;
+  padding: 0;
+  cursor: default;
+}
+.webix_scheduler_day_header .webix_dataview_item .webix_scheduler_weekday {
+  font-size: 13px;
+}
+.webix_scheduler_day_header .webix_dataview_item .webix_scheduler_monthday {
+  font-size: 17px;
+  font-weight: bold;
+}
+.webix_scheduler_day_header .webix_dataview_item.webix_scheduler_list_today .webix_scheduler_monthday {
+  width: 22px;
+  height: 22px;
+  line-height: 22px;
+}
+
+.webix_scheduler_week_days {
+  border-top-color: #ddd;
+  position: relative;
+}
+
+/* weekevents */
+.webix_scheduler_week .webix_unit_header {
+  color: #4a4a4a;
+  border-color: transparent;
+  font-weight: normal;
+  line-height: 28px;
+}
+.webix_scheduler_week .webix_unit_header_inner {
+  margin-right: 8px;
+}
+.webix_scheduler_week .webix_scheduler_monthday {
+  font-size: 17px;
+  font-weight: bold;
+}
+.webix_scheduler_week .webix_scheduler_monthday.webix_scheduler_today {
+  width: 22px;
+  height: 22px;
+  line-height: 22px;
+}
+
+/* multidayevents */
+.webix_scheduler_multidays {
+  border-left-color: #ddd;
+  border-bottom-color: transparent;
+}
+.webix_scheduler_multidays .webix_dataview_item {
+  border-color: transparent;
+  cursor: default;
+}
+.webix_scheduler_multidays .webix_scheduler_multiday_event {
+  font-weight: bold;
+}
+.webix_scheduler_multidays .webix_scheduler_multi_more {
+  transition: background-color 0.3s;
+  background-color: #f4f4f4;
+  text-align: center;
+  border: none;
+}
+.webix_scheduler_multidays .webix_scheduler_multi_more:hover {
+  background-color: #eaeaea;
+  box-shadow: none;
+}
+
+.webix_drag_event .webix_scheduler_multiday_event:hover,
+.webix_noselect .webix_scheduler_multiday_event:hover {
+  box-shadow: none;
+}
+.webix_drag_event .webix_scheduler_multiday_event.webix_scheduler_multi_more,
+.webix_noselect .webix_scheduler_multiday_event.webix_scheduler_multi_more {
+  background-color: #eaeaea;
+}
+
+.webix_scheduler_list_today .webix_scheduler_monthday,
+.webix_scheduler_monthday.webix_scheduler_today {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  line-height: 20px;
+  border-radius: 50%;
+  border: 1px solid #1ca1c1;
+  text-align: center;
+}
+
+.webix_cal_day_with_event .webix_cal_day_inner {
+  position: relative;
+}
+
+.webix_cal_day_with_event .webix_cal_day_inner::after {
+  content: "";
+  position: absolute;
+  display: block;
+  top: 70%;
+  left: 50%;
+  width: 4px;
+  height: 4px;
+  margin-left: -2px;
+  border-radius: 50%;
+  background-color: #3498db;
+}
+
+.webix_cal_select.webix_cal_day_with_event .webix_cal_day_inner::after {
+  background-color: #ffffff;
+}
+
+.webix_cal_outside.webix_cal_day_with_event .webix_cal_day_inner::after {
+  background-color: #a4b4bf;
+}
+
+.webix_scheduler_calendar .webix_cal_day {
+  position: relative;
+  padding: 2px 0 0 2px;
+  line-height: 20px;
+  font-size: 15px;
+  cursor: default;
+}
+.webix_scheduler_calendar .webix_cal_day:nth-child(7n) {
+  border-right-color: transparent;
+}
+.webix_scheduler_calendar .webix_cal_event {
+  color: #3498db;
+  font-weight: normal;
+}
+.webix_scheduler_calendar .webix_event_marker {
+  width: 16px;
+  margin-right: 2px;
+}
+.webix_scheduler_calendar .webix_event_marker_inner {
+  margin: 0 3px;
+  vertical-align: middle;
+}
+.webix_scheduler_calendar .webix_cal_date {
+  display: inline-block;
+  line-height: 24px;
+  height: 24px;
+  width: 24px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  text-align: center;
+  border-radius: 50%;
+}
+.webix_scheduler_calendar .webix_cal_date:hover {
+  background-color: #f4f4f4;
+  color: #3498db;
+  font-weight: bold;
+}
+.webix_scheduler_calendar .webix_cal_today .webix_cal_date {
+  border-color: #3498db;
+}
+.webix_scheduler_calendar .webix_event_time {
+  font-weight: bold;
+  margin-right: 4px;
+}
+
+.webix_drag_event .webix_scheduler_month_event:hover,
+.webix_noselect .webix_scheduler_month_event:hover {
+  box-shadow: none;
+}
+.webix_drag_event .webix_scheduler_month_event_single:hover,
+.webix_noselect .webix_scheduler_month_event_single:hover {
+  background-color: transparent;
+}
+
+.webix_drag_event.webix_scheduler_more_list .webix_scheduler_month_event,
+.webix_drag_event.webix_scheduler_more_list .webix_scheduler_month_event_single {
+  width: 100%;
+}
+
+.webix_scheduler_calendar_header .webix_dataview_item {
+  text-align: center;
+  line-height: 32px;
+  border-color: transparent;
+  cursor: default;
+}
+
+.webix_scheduler_month_events {
+  position: relative;
+}
+
+.webix_scheduler_month_event,
+.webix_scheduler_month_event_single {
+  z-index: 1;
+  position: absolute;
+  box-sizing: border-box;
+  border-radius: 2px;
+  padding: 0 8px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  user-select: none;
+  cursor: pointer;
+}
+
+.webix_scheduler_month_event {
+  border-left: 3px solid;
+  transition: box-shadow 0.15s;
+}
+
+.webix_scheduler_month_event_single {
+  transition: background 0.15s;
+  padding: 0 8px 0 4px;
+}
+
+.webix_scheduler_month_event:hover {
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3), 1px 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.webix_scheduler_month_event_single:hover {
+  background-color: #f4f4f4;
+}
+
+.webix_scheduler_more {
+  display: inline-block;
+  border-radius: 20px;
+  height: 20px;
+  width: auto;
+  padding: 0 8px;
+  color: #666666;
+  font-size: 15px;
+  font-weight: bold;
+  transition: background 0.15s;
+  position: absolute;
+  right: 8px;
+  top: 5px;
+}
+
+.webix_scheduler_more:hover {
+  background-color: #f4f4f4;
+}
+
+.webix_scheduler_more_list .webix_scheduler_month_event,
+.webix_scheduler_more_list .webix_scheduler_month_event_single {
+  box-sizing: border-box;
+  width: calc(100% - 8px);
+  display: block;
+  border-radius: 2px;
+  line-height: 20px;
+}
+.webix_scheduler_more_list .webix_scheduler_month_event {
+  padding: 4px 8px;
+}
+.webix_scheduler_more_list .webix_scheduler_month_event .webix_event_text {
+  width: 100%;
+}
+.webix_scheduler_more_list .webix_scheduler_month_event_single {
+  padding: 4px 8px 4px 4px;
+}
+.webix_scheduler_more_list .webix_scheduler_month_event_single .webix_event_text {
+  width: calc(100% - 14px);
+}
+.webix_scheduler_more_list .webix_list_item {
+  padding: 4px;
+  border: none;
+}
+.webix_scheduler_more_list .webix_event_marker {
+  float: left;
+  height: 40px;
+  margin-right: 4px;
+}
+.webix_scheduler_more_list .webix_event_marker_inner {
+  margin-top: 4px;
+}
+.webix_scheduler_more_list .webix_event_text {
+  float: left;
+  font-weight: bold;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+.webix_scheduler_more_list .webix_event_time {
+  float: left;
+  font-size: 13px;
+  line-height: 16px;
+  margin-top: 4px;
+}
+
+.webix_scheduler_month_event_single.webix_scheduler_event_selected {
+  background-color: #f4f4f4;
+  box-shadow: none;
+}
+
+.webix_scheduler_event_break_left::before,
+.webix_scheduler_event_break_right::after {
+  content: "";
+  height: 100%;
+  display: block;
+  position: absolute;
+  top: 0;
+  box-sizing: border-box;
+  border-top: 12px solid transparent;
+  border-bottom: 12px solid transparent;
+  border-right: 8px solid;
+}
+
+.webix_scheduler_event_break_left {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  border-left-width: 0;
+  padding-left: 11px;
+}
+
+.webix_scheduler_event_break_left::before {
+  left: 0;
+  border-right-color: inherit;
+  border-top-color: #ffffff;
+  border-bottom-color: #ffffff;
+}
+
+.webix_scheduler_event_break_right::after {
+  right: 0;
+  border-right-color: #ffffff;
+}
+
+.webix_scheduler_event_break_left:hover,
+.webix_scheduler_event_break_left.webix_scheduler_event_selected {
+  box-shadow: 6px 6px 5px -4px rgba(0, 0, 0, 0.3), 5px 5px 2px -4px rgba(0, 0, 0, 0.2);
+}
+
+.webix_scheduler_event_break_right:hover,
+.webix_scheduler_event_break_right.webix_scheduler_event_selected {
+  box-shadow: -1px 5px 5px -3px rgba(0, 0, 0, 0.3), -2px 4px 2px -3px rgba(0, 0, 0, 0.2);
+}
+
+.webix_drag_zone .webix_scheduler_event_break_left::before,
+.webix_drag_zone .webix_scheduler_event_break_right::after {
+  visibility: hidden;
+}
+.webix_drag_zone .webix_scheduler_event_break_left {
+  border-radius: 2px;
+  border-left-width: 3px;
+  padding-left: 8px;
+}
+
+.webix_scheduler_dnd_1 .webix_scheduler_event_break_left::before {
+  border-top-color: #f4f4f4;
+  border-bottom-color: #f4f4f4;
+}
+
+.webix_scheduler_dnd_n .webix_scheduler_event_break_right::after {
+  border-right-color: #f4f4f4;
+}
+
+.webix_scheduler_absbutton {
+  border-radius: 50%;
+  z-index: 91;
+}
+.webix_scheduler_absbutton .webix_el_box {
+  background-color: #3498db;
+}
+.webix_scheduler_absbutton .webix_el_box .webix_icon_button:hover:before {
+  background-color: #1992af;
+}
+.webix_scheduler_absbutton .webix_el_box .webix_icon {
+  color: #ffffff;
+}
+
+.webix_scheduler_navlist .webix_icon {
+  color: #a4b4bf;
+}
+.webix_scheduler_navlist .webix_selected .webix_icon {
+  color: #3498db;
+}
+.webix_scheduler_navlist .webix_list_item,
+.webix_scheduler_navlist .webix_list_item.webix_selected {
+  border-bottom-color: transparent;
+}
+.webix_scheduler_navlist .webix_list_item:hover,
+.webix_scheduler_navlist .webix_list_item.webix_selected:hover {
+  background-color: #f4f4f4;
+}
+.webix_scheduler_navlist .webix_list_item.webix_selected {
+  color: #666666;
+  background-color: #f4f4f4;
+}
+
+.webix_scheduler_cal_list .webix_list_item {
+  padding: 2px 8px 2px 0;
+}
+.webix_scheduler_cal_list .webix_list_item span {
+  float: left;
+}
+.webix_scheduler_cal_list .webix_list_item .webix_icon {
+  line-height: inherit;
+}
+.webix_scheduler_cal_list .webix_list_item:hover .webix_scheduler_cal_edit {
+  color: #a4b4bf;
+}
+.webix_scheduler_cal_list .webix_list_item.webix_selected {
+  box-shadow: none;
+  padding: 2px 8px 2px 0;
+  background-color: transparent;
+}
+.webix_scheduler_cal_list .webix_list_item.webix_selected .webix_scheduler_cal_edit {
+  color: #3498db;
+}
+.webix_scheduler_cal_list .webix_list_item.webix_selected .webix_scheduler_cal_edit::before {
+  content: "";
+}
+.webix_scheduler_cal_list .webix_dt_editor input {
+  padding-left: 23px;
+  border-color: transparent;
+  border-bottom-color: #3498db;
+}
+
+.webix_scheduler_cal_popup .webix_win_head {
+  border-bottom-color: transparent;
+}
+
+.webix_scheduler_active {
+  margin-right: 4px;
+}
+
+.webix_scheduler_cal_title {
+  overflow: hidden;
+  width: calc(100% - 24px - 29px - 4px);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.webix_scheduler_cal_edit {
+  color: transparent;
+  font-size: 18px;
+  width: 29px;
+  line-height: 29px;
+  border-radius: 50%;
+}
+.webix_scheduler_cal_edit:hover {
+  color: #3498db;
+  background-color: #f4f4f4;
+}
+.webix_scheduler_cal_edit.webix_scheduler_cal_visible {
+  color: #a4b4bf;
+}
+
+.webix_scheduler_settings .webix_template {
+  padding: 0;
+  text-align: center;
+  font-weight: bold;
+  line-height: 38px;
+}
+.webix_scheduler_settings .webix_template:hover {
+  background-color: #f4f4f4;
+}
+
+.webix_event_overall {
+  padding: 0 8px 0 20px;
+  height: 100%;
+  line-height: 49px;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-align-items: center;
+}
+
+.webix_event_overall .webix_event_time {
+  flex-basis: 70px;
+  flex-shrink: 0;
+  display: block;
+  text-align: center;
+}
+.webix_event_overall .webix_event_time .start,
+.webix_event_overall .webix_event_time .end {
+  font-size: 13px;
+  line-height: 16px;
+}
+.webix_event_overall .webix_event_time .end {
+  color: #a4b4bf;
+}
+
+.webix_list_item .webix_event_text {
+  padding-left: 10px;
+  display: block;
+  -webkit-box-flex: 1;
+  -webkit-flex: 1;
+  flex: 1;
+  white-space: nowrap;
+  box-sizing: border-box;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.webix_event_marker {
+  display: inline-block;
+  width: 10px;
+}
+
+.webix_event_marker_inner {
+  display: inline-block;
+  border-radius: 50%;
+  width: 10px;
+  height: 10px;
+}
+
+.webix_scheduler_event_selected {
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3), 1px 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.webix_scheduler_multi_space {
+  text-align: center;
+}
+.webix_scheduler_multi_space .webix_template {
+  padding: 0;
+}
+.webix_scheduler_multi_space .webix_scheduler_more_icon {
+  cursor: pointer;
+  color: #a4b4bf;
+  transition: color 0.3s;
+  position: relative;
+  top: calc(100% - 26px);
+  height: 26px;
+  width: 26px;
+}
+.webix_scheduler_multi_space .webix_scheduler_more_icon:hover {
+  color: #666666;
+}
+.webix_scheduler_multi_space .webix_scheduler_more_icon:after {
+  content: "";
+  transition: background-color 0.3s;
+  height: 26px;
+  width: 26px;
+  border-radius: 50%;
+  position: absolute;
+  top: -4px;
+  left: 0;
+  z-index: -1;
+}
+.webix_scheduler_multi_space .webix_scheduler_more_icon:hover:after {
+  background-color: rgba(164, 180, 191, 0.1);
+}
+
+.webix_scheduler_agenda .webix_scroll_cont {
+  padding-left: 120px;
+}
+.webix_scheduler_agenda .webix_list_item {
+  border-color: transparent;
+  padding: 0px;
+  width: calc(100% - 120px) !important;
+}
+.webix_scheduler_agenda .webix_event_overall {
+  line-height: 40px;
+  height: 40px;
+}
+.webix_scheduler_agenda .webix_event_overall:hover {
+  background-color: #f4f4f4;
+}
+.webix_scheduler_agenda .webix_event_first {
+  padding-top: 8px;
+}
+.webix_scheduler_agenda .webix_event_last {
+  padding-bottom: 8px;
+}
+.webix_scheduler_agenda .webix_event_last:not(:last-child) {
+  border-color: #ddd;
+}
+.webix_scheduler_agenda .webix_agenda_selected {
+  background-color: #f4f4f4;
+}
+.webix_scheduler_agenda .webix_unit_header {
+  float: left;
+  margin-left: -120px;
+  width: 120px !important;
+  background-color: transparent;
+  border-bottom-width: 0px;
+  line-height: 18px;
+  padding: 6px 8px;
+  box-sizing: border-box;
+}
+.webix_scheduler_agenda .webix_unit_header:not(:first-child) {
+  border-top: 1px solid #ddd;
+  margin-top: -1px;
+}
+.webix_scheduler_agenda .webix_unit_header .webix_scheduler_dayofweek {
+  color: #a4b4bf;
+  font-weight: normal;
+  font-size: 13px;
+}
+
+.webix_scheduler .webix_progress_top {
+  z-index: 10000;
+}
+
+/* action popup for dnd of recurring */
+.webix_scheduler_action_popup .webix_win_head {
+  border-bottom-color: transparent;
+}
+
+.webix_toolbar.webix_scheduler_toolbar {
+  border-color: transparent;
+}
+.webix_toolbar.webix_scheduler_toolbar .webix_view,
+.webix_toolbar.webix_scheduler_toolbar .webix_control.webix_el_tabbar {
+  background-color: transparent;
+}
+.webix_toolbar.webix_scheduler_toolbar .webix_tab_filler {
+  border-bottom-color: transparent;
+}
+.webix_toolbar.webix_scheduler_toolbar .webix_item_tab {
+  background: transparent;
+  border-left-width: 1px;
+  border-color: transparent;
+}
+.webix_toolbar.webix_scheduler_toolbar .webix_control.webix_el_tabbar .webix_item_tab:first-child {
+  border-left-width: 1px;
+}
+.webix_toolbar.webix_scheduler_toolbar .webix_item_tab.webix_selected {
+  border-bottom-width: 1px;
+  border-color: #ffffff;
+  outline: none;
+}
+.webix_toolbar.webix_scheduler_toolbar .webix_item_tab:active {
+  background-color: rgba(0, 0, 0, 0.07);
+  box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
+  outline: none;
+}
+
+.webix_scheduler_sidemenu.webix_sidemenu.webix_sidemenu_left {
+  border-width: 0;
+}
+
+.webix_scheduler_cal_marker {
+  right: 34px;
+}
+
+.webix_scheduler_day_checkbox .webix_el_box {
+  padding: 3px 5px;
+}
+
+.webix_scheduler_cal_color_suggest .webix_list_item.webix_selected {
+  color: #666666;
+  background-color: #f4f4f4;
+}
+
+.webix_scheduler_cal_color .webix_inp_static {
+  padding-right: 58px;
+}

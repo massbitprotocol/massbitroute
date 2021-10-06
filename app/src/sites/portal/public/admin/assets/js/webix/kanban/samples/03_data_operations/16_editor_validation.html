@@ -1,0 +1,66 @@
+<!doctype html>
+<html>
+<head>
+    <title>Custom Editor:: Validation</title>
+    <meta  name = "viewport" content = "initial-scale = 1.0, maximum-scale = 1.0, user-scalable = no">
+
+    <script src="../../codebase/webix/webix.js?v=7.3.5" type="text/javascript"></script>
+    <script src="../../codebase/kanban.js?v=7.3.5" type="text/javascript"></script>
+
+    <link rel="stylesheet" type="text/css" href="../../codebase/webix/webix.css?v=7.3.5">
+    <link rel="stylesheet" type="text/css" href="../../codebase/kanban.css?v=7.3.5">
+
+    <script src="../common/data.js?v=7.3.5"></script>
+</head>
+<body>
+<script type="text/javascript">
+    webix.ready(function(){
+        if (!webix.env.touch && webix.env.scrollSize)
+            webix.CustomScroll.init();
+
+        let kanban = webix.ui({
+            view:"kanban",
+            cols:[
+                { rows:[
+                    { view:"kanbanheader", label:"Backlog", link:"new" },
+                    { id:"new", view:"kanbanlist", status:"new" }
+                ]},
+                { header:"In Progress",
+                    body:{ view:"kanbanlist", status:"work" }},
+                { header:"Testing",
+                    body:{ view:"kanbanlist", status:"test" }},
+                { header:"Done",
+                    body:{ view:"kanbanlist", status:"done" }}
+            ],
+            editor:{
+                elements:[
+                    { view:"textarea", name:"text", label:"Task", height:90 },
+                    { margin:10,
+                        cols:[
+                            { view:"multicombo", name:"tags", label:"Tags", options:tags_set },
+                            { view:"combo", name:"user_id", label:"Assign to", options:users_set }
+                        ]
+                    }
+                ],
+                rules:{
+                    text: webix.rules.isNotEmpty,
+                    user_id: webix.rules.isNotEmpty
+                }
+            },
+            data: full_task_set,
+            tags: tags_set,
+            users: users_set
+        });
+
+        kanban.attachEvent("onBeforeEditorAction", function(action, editor, obj){
+            if (action === "save" && !editor.getForm().validate())
+                return false;
+        });
+        kanban.getEditor().attachEvent("onHide", function(){
+            this.getForm().clearValidation();
+        });
+
+    });
+</script>
+</body>
+</html>

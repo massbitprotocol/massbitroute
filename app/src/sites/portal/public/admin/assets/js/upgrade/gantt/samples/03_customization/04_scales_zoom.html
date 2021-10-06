@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>Gantt: Zooming</title>
+		<!-- Webix Library -->
+		<script type="text/javascript" src="../../codebase/webix/webix.js"></script>
+		<link
+			rel="stylesheet"
+			type="text/css"
+			href="../../codebase/webix/webix.css"
+		/>
+
+		<!-- App -->
+		<script type="text/javascript" src="../../codebase/gantt.js"></script>
+		<link rel="stylesheet" type="text/css" href="../../codebase/gantt.css" />
+
+		<script type="text/javascript" src="../common/data.js"></script>
+	</head>
+	<body>
+		<script>
+			webix.ready(function() {
+				if (webix.env.touch) webix.ui.fullScreen();
+				else if (webix.env.scrollSize) webix.CustomScroll.init();
+
+				function resetScales(v) {
+					let scales, cellWidth;
+
+					if (v == "1") {
+						scales = [{ unit: "day", format: "%d" }];
+						cellWidth = 200;
+					} else {
+						scales = [
+							{
+								unit: "week",
+								format: function(start) {
+									var parser = webix.Date.dateToStr("%d %M");
+									var end = webix.Date.add(
+										webix.Date.add(start, 1, "week", true),
+										-1,
+										"day",
+										true
+									);
+									return parser(start) + " - " + parser(end);
+								},
+							},
+							{ unit: "day", format: "%d" },
+						];
+						cellWidth = 70;
+					}
+
+					const current = $$("gantt1")
+						.getService("local")
+						.getScales();
+
+					$$("gantt1")
+						.getService("local")
+						.setScales(
+							current.start,
+							current.end,
+							cellWidth,
+							current.cellHeight,
+							scales
+						);
+					$$("gantt1").$app.refresh();
+				}
+
+				//client-side data for example purposes only
+				class MyBackend extends gantt.services.Backend {
+					tasks() {
+						return webix.promise.resolve(tasks);
+					}
+					links() {
+						return webix.promise.resolve(links);
+					}
+				}
+
+				webix.ui({
+					rows: [
+						{
+							view: "toolbar",
+							css: "webix_dark",
+							paddingX: 10,
+							elements: [
+								{
+									view: "radio",
+									label: "Zoom:",
+									value: 1,
+									options: [
+										{ id: "1", value: "days" },
+										{ id: "2", value: "weeks" },
+									],
+									on: {
+										onChange: resetScales,
+									},
+								},
+							],
+						},
+						{
+							view: "gantt",
+							id: "gantt1",
+							url: "https://docs.webix.com/gantt-backend/",
+							override: new Map([[gantt.services.Backend, MyBackend]]),
+						},
+					],
+				});
+			});
+		</script>
+	</body>
+</html>

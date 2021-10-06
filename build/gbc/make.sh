@@ -334,6 +334,7 @@ make
 cp -f process.so $DEST_BIN_DIR/openresty/lualib
 cp -f process.so $DEST_BIN_DIR/openresty/luajit/lib/lua/5.1
 
+_2() {
 # ----
 #install redis
 echo ""
@@ -388,6 +389,6 @@ fi
 
 # done
 # rm -rf $BUILD_DIR
-
+}
 echo "DONE!"
 echo ""

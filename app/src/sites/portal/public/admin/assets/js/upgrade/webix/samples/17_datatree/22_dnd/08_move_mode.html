@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>The 'move' DnD Mode</title>
+        <link rel="stylesheet" href="../../../codebase/webix.css?v=8.0.5" type="text/css" charset="utf-8">
+        <script src="../../../codebase/webix.js?v=8.0.5" type="text/javascript" charset="utf-8"></script>
+
+        <link rel="stylesheet" type="text/css" href="../common/samples.css?v=8.0.5">
+        <script src="../common/treedata.js?v=8.0.5" type="text/javascript" charset="utf-8"></script>
+    </head>
+    <style type="text/css">
+        html, body{
+            height:100%;
+        }
+        #testA, #testB{
+            float: left;
+            line-height: 20px;
+        }
+        .webix_tree_item{
+            background:white;
+        }
+    </style>
+    <body class='webix_full_screen'>
+        <div class='header_comment'>The 'move' dnd mode</div>
+
+        <div class='sample_comment'>The sample shows how DataTree behaves in the 'move' dnd mode.<br>
+            <div id="testA" style='width:300px; height:300px'>Multiple selection</div>
+            <div id="testB" style='width:300px; height:300px'>Single selection</div>
+        </div>
+
+        <script type="text/javascript" charset="utf-8">
+
+            webix.ready(function(){
+
+                webix.ui({
+                    container:"testA",
+                    view:"tree",
+
+                    select:true, multiselect:"level",
+                    drag:"move",
+
+                    data: webix.copy(smalltreedata)
+                });
+
+                webix.ui({
+                    container:"testB",
+                    view:"tree",
+
+                    select:true,
+                    drag:"move",
+
+                    data: smalltreedata
+                });
+
+            });
+
+        </script>
+    </body>
+</html>

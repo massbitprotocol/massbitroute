@@ -41,7 +41,7 @@ function updateConfigs()
 
 function startSupervisord()
 {
-    echo "[CMD] supervisord -c $VAR_SUPERVISORD_CONF_PATH"
+    echo "[CMD] supervisord -n -c $VAR_SUPERVISORD_CONF_PATH"
     echo ""
     cd $ROOT_DIR/bin/python_env/gbc
     source bin/activate

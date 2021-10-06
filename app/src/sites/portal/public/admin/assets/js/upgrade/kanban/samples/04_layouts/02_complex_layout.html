@@ -1,0 +1,52 @@
+<!doctype html>
+<html>
+<head>
+	<title>Rows and Columns</title>
+	<meta  name = "viewport" content = "initial-scale = 1.0, maximum-scale = 1.0, user-scalable = no">
+
+	<script src="../../codebase/webix/webix.js?v=8.0.5" type="text/javascript"></script>
+	<script src="../../codebase/kanban.js?v=8.0.5" type="text/javascript"></script>
+
+	<link rel="stylesheet" type="text/css" href="../../codebase/webix/webix.css?v=8.0.5">
+	<link rel="stylesheet" type="text/css" href="../../codebase/kanban.css?v=8.0.5">
+
+	<link rel="stylesheet" type="text/css" href="../common/style.css?v=8.0.5">
+	<script src="../common/data.js?v=8.0.5"></script>
+</head>
+<body>
+<script type="text/javascript">
+	webix.ready(function(){
+		if (!webix.env.touch && webix.env.scrollSize)
+			webix.CustomScroll.init();
+
+		webix.ui({
+			view:"kanban",
+			cols:[
+				{ header:"Backlog",
+					body:{ view:"kanbanlist", status:"new"}},
+				{ header:"Ready", gravity: 3,
+					body:{ type:"clean", margin:8,
+						rows:[
+							{ view:"kanbandataview", status:"ready", gravity: 0.3  },
+							{ paddingX:8, margin:6,
+								cols:[
+									{ header:"In Progress",
+										body:{ view:"kanbanlist", status:"work" }},
+									{ header:"Testing",
+										body:{ view:"kanbanlist", status:"test" }},
+									{ header:"Done",
+										body:{ view:"kanbanlist", status:"done" }}
+								]
+							}
+						]
+					}
+				},
+				{ header:"Done",
+					body:{ view:"kanbanlist", status:"complete" }}
+			],
+			data:task_set
+		});
+	});
+</script>
+</body>
+</html>

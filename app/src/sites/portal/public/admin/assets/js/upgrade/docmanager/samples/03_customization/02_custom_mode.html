@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>Document Manager: Custom Mode</title>
+		<!-- Webix Library -->
+		<script type="text/javascript" src="../../codebase/webix/webix.js"></script>
+		<link
+			rel="stylesheet"
+			type="text/css"
+			href="../../codebase/webix/webix.css"
+		/>
+
+		<!-- App -->
+		<script type="text/javascript" src="../../codebase/docmanager.js"></script>
+		<link
+			rel="stylesheet"
+			type="text/css"
+			href="../../codebase/docmanager.css"
+		/>
+	</head>
+	<body>
+		<script>
+			webix.ready(function() {
+				if (!webix.env.touch && webix.env.scrollSize) webix.CustomScroll.init();
+
+				class SpaceChartView extends docManager.views.JetView {
+					config() {
+						return {
+							view: "treemap",
+							id: "space",
+							template: a => a.value,
+							value: a => a.size,
+						};
+					}
+					init() {
+						const state = this.getParam("state");
+						this.on(state.$changes, "path", v => {
+							this.app
+								.getService("local")
+								.files(v)
+								.then(fs => this.$$("space").sync(fs));
+						});
+					}
+				}
+
+				// customize the top bar, to use the above new mode
+				class CustomTop extends docManager.views.top {
+					ShowMode(value, old) {
+						const state = this.getParam("state");
+
+						if (value === "space") {
+							this.Tree.show();
+							this.show("custom.space", {
+								target: "center",
+								params: { state },
+							});
+						} else {
+							super.ShowMode(value, old);
+						}
+					}
+				}
+
+				// add new option to modes selector
+				class CustomTopBar extends docManager.views.topbar {
+					config(value, old) {
+						const ui = super.config();
+						const modes = ui.cols[ui.cols.length - 1];
+
+						modes.width += 40;
+						modes.options.push({ value: "S", id: "space" });
+						return ui;
+					}
+				}
+
+				var app = new docManager.App({
+					url: "https://docs.webix.com/docmanager-backend/",
+					mode: "space",
+					views: { "custom.space": SpaceChartView },
+					override: new Map([
+						[docManager.views.top, CustomTop],
+						[docManager.views.topbar, CustomTopBar],
+					]),
+				});
+
+				app.render(document.body);
+			});
+		</script>
+	</body>
+</html>

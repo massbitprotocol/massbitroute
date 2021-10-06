@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>Local Data</title>
+		<!-- Webix Library -->
+		<script type="text/javascript" src="../../codebase/webix/webix.js"></script>
+		<link
+			rel="stylesheet"
+			type="text/css"
+			href="../../codebase/webix/webix.css"
+		/>
+
+		<!-- Scheduler -->
+		<script type="text/javascript" src="../../codebase/scheduler.js"></script>
+		<link
+			rel="stylesheet"
+			type="text/css"
+			href="../../codebase/scheduler.css"
+		/>
+	</head>
+	<body>
+		<script>
+			webix.ready(function() {
+				if (!webix.env.touch && webix.env.scrollSize) webix.CustomScroll.init();
+
+				class MyBackend extends scheduler.services.Backend {
+					events(params) {
+						return webix
+							.ajax("../common/data/data.json")
+							.then(res => res.json());
+					}
+					calendars() {
+						return webix
+							.ajax("../common/data/calendars.json")
+							.then(res => res.json());
+					}
+					//temp
+					addCalendar(obj) {
+						return webix.promise.resolve(obj);
+					}
+					updateCalendar(id, obj) {
+						return webix.promise.resolve(obj);
+					}
+					removeCalendar(id) {
+						return webix.promise.resolve({});
+					}
+					addEvent(obj) {
+						return webix.promise.resolve(obj);
+					}
+					updateEvent(id, obj) {
+						return webix.promise.resolve(obj);
+					}
+					removeEvent(id) {
+						return webix.promise.resolve({});
+					}
+				}
+
+				webix.ui({
+					view: "scheduler",
+					date: new Date(2020, 9, 7, 0, 0, 0),
+					override: new Map([[scheduler.services.Backend, MyBackend]]),
+				});
+			});
+		</script>
+	</body>
+</html>

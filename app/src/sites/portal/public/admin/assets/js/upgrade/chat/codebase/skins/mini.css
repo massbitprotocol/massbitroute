@@ -1,0 +1,480 @@
+@charset "UTF-8";
+.webix_chat_avatar {
+  height: 40px;
+  line-height: 40px;
+  width: 40px;
+  font-size: 16px;
+  font-weight: 500;
+  border-radius: 50%;
+  color: #1ca1c1;
+  display: block;
+  text-align: center;
+  letter-spacing: -0.5px;
+  position: relative;
+  top: 2px;
+  left: 2px;
+  background-color: #dfe2e6;
+}
+
+.webix_chat_avatar.webix_chat_no_name {
+  background: #f7e2bc;
+}
+
+.webix_chat_status {
+  border-radius: 50%;
+  border: 1.5px solid #ffffff;
+  position: absolute;
+  height: 13px;
+  width: 13px;
+  box-sizing: border-box;
+  top: 30px;
+  left: 30px;
+  z-index: 1;
+}
+
+.webix_chat_status_active {
+  background-color: #27ae60;
+}
+
+.webix_chat_status_busy {
+  background-color: #ce5545;
+}
+
+.webix_chat_status_away {
+  background-color: #ffd21a;
+}
+
+.webix_chat_status_none {
+  background-color: #a4b4bf;
+}
+
+.webix_chat_list_avatar,
+.webix_chat_toolbar_avatar,
+.webix_chat_people_avatar {
+  float: left;
+  position: relative;
+  height: 44px;
+  width: 44px;
+  margin-top: 5.5px;
+  margin-right: 10px;
+}
+
+.webix_chat_toolbar_avatar {
+  margin-top: -3px;
+  margin-left: -2px;
+}
+
+.webix_chat_people_avatar {
+  margin-top: 8px;
+}
+
+.webix_chat_list {
+  border-top-color: transparent;
+}
+.webix_chat_list .webix_list_item {
+  line-height: 59px;
+  padding-left: 8px;
+}
+.webix_chat_list .webix_list_item.webix_selected {
+  background: #ceedf5;
+  box-shadow: none;
+  padding-left: 8px;
+}
+.webix_chat_list .webix_list_item.webix_selected:hover {
+  background: #ceedf5;
+}
+.webix_chat_list .webix_list_item:hover {
+  background: #e3ffff;
+}
+
+.webix_chat_listitem_block {
+  position: relative;
+  line-height: 30px;
+}
+
+.webix_chat_listitem_date {
+  position: absolute;
+  z-index: 1;
+  right: 0px;
+  top: 0px;
+  color: #959595;
+  font-size: 12px;
+}
+
+.webix_chat_listitem_name {
+  font-weight: 500;
+  width: 170px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.webix_chat_listitem_message {
+  line-height: 20px;
+  width: 170px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.webix_chat_listitem_number {
+  position: absolute;
+  z-index: 1;
+  right: 0px;
+  bottom: 0px;
+  background: #1ca1c1;
+  color: #fff;
+  border-radius: 10px;
+  font-size: 13px;
+  line-height: 20px;
+  min-width: 20px;
+  text-align: center;
+  font-weight: 500;
+}
+
+.webix_chat_listitem_number_wide {
+  padding: 0 7px;
+}
+
+.webix_chat_search_mark {
+  background: yellow;
+  color: black;
+}
+
+.webix_chat_sidebar {
+  background-color: #f2f2f2;
+}
+.webix_chat_sidebar .webix_view.webix_control.webix_el_tabbar {
+  background: #f2f2f2;
+}
+.webix_chat_sidebar .webix_item_tab {
+  background: #f2f2f2;
+}
+.webix_chat_sidebar .webix_view:not(.webix_button) {
+  background: #f2f2f2;
+}
+.webix_chat_sidebar .webix_el_search input {
+  background: #f2f2f2;
+}
+.webix_chat_sidebar .webix_el_search input:focus {
+  background: #fff;
+}
+.webix_chat_sidebar .webix_input_icon {
+  color: #94a1b3;
+}
+
+.webix_chat_tabbar .webixtype_icon .webix_item_tab.webix_selected {
+  background: #f2f2f2;
+}
+
+.webix_chat_add_button .webix_button {
+  padding-right: 10px;
+}
+
+.webix_chat_uploader .webix_button,
+.webix_chat_uploader .webix_icon_btn::before {
+  color: #1ca1c1;
+}
+
+.webix_chat_form_avatar .webix_template {
+  padding: 0;
+}
+.webix_chat_form_avatar .webix_chat_avatar {
+  width: 130px;
+  height: 130px;
+  margin: 0;
+  font-size: 90px;
+  line-height: 134px;
+  position: static;
+  border-radius: 5px;
+}
+.webix_chat_form_avatar .webix_chat_avatar.webix_icon {
+  color: #a4b4bf;
+}
+
+.webix_chat_newchat_form .webix_el_text input {
+  border-top-color: transparent;
+  border-left-color: transparent;
+  border-right-color: transparent;
+}
+.webix_chat_newchat_form .webix_el_text input:focus {
+  border-top-color: transparent;
+  border-left-color: transparent;
+  border-right-color: transparent;
+}
+.webix_chat_newchat_form .webix_el_text input::placeholder {
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.webix_primary .chi-next {
+  float: right;
+  position: relative;
+  top: 6px;
+  right: 10px;
+}
+
+.webix_chat_next_text {
+  margin-left: 24px;
+}
+
+webix_chat_newchat_toolbar .webix_el_label .webix_el_box {
+  text-align: center;
+}
+
+.webix_chat_wizard_title {
+  text-align: center;
+}
+.webix_chat_wizard_title .webix_chat_wizard_title1 {
+  margin-left: -38px;
+}
+.webix_chat_wizard_title .webix_chat_wizard_title2 {
+  margin-right: -90px;
+}
+
+.webix_chat_no_new_members .webix_template {
+  color: #94a1b3;
+  text-align: center;
+  padding-top: 30px;
+}
+
+/* custom checkboxes in datatable*/
+.webix_chat_people_table .wxi-checkbox-marked {
+  font-size: 18px;
+  color: #1ca1c1;
+}
+.webix_chat_people_table .wxi-checkbox-blank {
+  color: #a4b4bf;
+  font-size: 18px;
+}
+.webix_chat_people_table .webix_cell .wxi-checkbox-marked,
+.webix_chat_people_table .webix_cell .wxi-checkbox-blank {
+  line-height: 59px;
+}
+.webix_chat_people_table .webix_hcell .wxi-checkbox-marked,
+.webix_chat_people_table .webix_hcell .wxi-checkbox-blank {
+  line-height: inherit;
+}
+.webix_chat_people_table .webix_hcell.webix_ss_filter {
+  padding: 0 14px;
+}
+.webix_chat_people_table .webix_ss_filter input {
+  padding: 0 7px;
+  height: 32px;
+}
+
+.webix_chat_row_select {
+  background: #f4f5f9;
+}
+
+.webix_chat_row_group_user {
+  background: #f4f5f9;
+}
+.webix_chat_row_group_user .wxi-checkbox-marked {
+  color: #27ae60;
+}
+
+ul.webix_chat_peoplelist {
+  list-style-type: none;
+  padding-left: 0px;
+  margin-top: 0;
+  margin-bottom: 3px;
+  white-space: nowrap;
+}
+
+.webix_chat_peoplelist_item {
+  display: inline-block;
+  padding-top: 5px;
+  width: 69px;
+  text-align: center;
+  margin-right: 5px;
+}
+.webix_chat_peoplelist_item .webix_chat_avatar {
+  left: 0;
+  margin: 0 auto;
+}
+
+.webix_chat_peoplelist_item_name {
+  display: inline-block;
+  vertical-align: middle;
+  line-height: normal;
+  white-space: normal;
+  font-size: 12px;
+  height: 30px;
+}
+
+.webix_chat_peoplelist_avatar {
+  position: relative;
+}
+
+.webix_chat_group_user_marker {
+  position: absolute;
+  right: 9px;
+  top: 1px;
+  background: #27ae60;
+  width: 16px;
+  height: 16px;
+  line-height: 16px;
+  border-radius: 50%;
+}
+.webix_chat_group_user_marker .webix_icon {
+  width: 16px;
+  height: 16px;
+  line-height: 16px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #fff;
+  float: left;
+}
+
+.webix_chat_peoplelist_delete_icon {
+  position: absolute;
+  left: 2px;
+  bottom: 0;
+  background: #a4b4bf;
+  width: 17px;
+  height: 17px;
+  border: 1px solid #fff;
+  border-radius: 50%;
+}
+.webix_chat_peoplelist_delete_icon .webix_icon {
+  width: 17px;
+  height: 17px;
+  line-height: 17px;
+  font-size: 15px;
+  color: #fff;
+}
+
+/**
+usermanager-webfont Webfont
+*/
+@font-face {
+  font-family: "chat-webfont";
+  src: url("../fonts/chat-webfont.woff2?1587733428103") format("woff2"), url("../fonts/chat-webfont.woff?1587733428103") format("woff");
+  font-weight: normal;
+  font-style: normal;
+}
+[class^=chi-]:before,
+[class*=chi-]:before {
+  font-family: "chat-webfont";
+  display: inline-block;
+  font-style: normal;
+  font-weight: normal;
+  line-height: 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transform: translate(0, 0);
+}
+
+/*
+Glyphs list
+*/
+.chi-back:before {
+  content: "";
+}
+
+.chi-next:before {
+  content: "";
+}
+
+.chi-camera:before {
+  content: "";
+}
+
+.chi-account-plus:before {
+  content: "";
+}
+
+.chi-menu:before {
+  content: "";
+}
+
+.chi-chats:before {
+  content: "";
+}
+
+.chi-users:before {
+  content: "";
+}
+
+.webix_chat_toolbar_tmpl {
+  text-align: center;
+}
+
+.webix_chat_title {
+  cursor: pointer;
+  padding-top: 2px;
+}
+
+.webix_chat_messages_groupchat_name,
+.webix_chat_messages_chat_name,
+.webix_chat_messages_user_name {
+  font-weight: 500;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  color: #475466;
+  font-size: 14px;
+}
+
+.webix_chat_messages_groupchat_name,
+.webix_chat_messages_chat_name {
+  line-height: 20px;
+}
+.webix_chat_messages_groupchat_name:hover,
+.webix_chat_messages_chat_name:hover {
+  color: #1ca1c1;
+}
+
+.webix_chat_messages_chat_name,
+.webix_chat_messages_user_name {
+  line-height: 38px;
+}
+
+.webix_chat_messages_groupchat_members {
+  line-height: 15px;
+  font-size: 12px;
+}
+.webix_chat_messages_groupchat_members:hover {
+  color: #1ca1c1;
+}
+
+.webix_chat_list_item_delete {
+  float: right;
+  margin-top: 10px;
+  width: 38px;
+  height: 38px;
+}
+
+.webix_chat_list_item_delete:hover:before {
+  background-color: #ceedf5;
+}
+
+.webix_list_item:hover .webix_chat_list_item_delete .webix_icon {
+  color: #475466;
+}
+
+.webix_chat_list_you_text {
+  color: #27ae60;
+}
+
+.webix_chat_delete_button .webix_button {
+  color: #ce5545;
+}
+
+.webix_chat_show_all_tmpl .webix_template {
+  text-align: center;
+  padding: 0;
+  color: #94a1b3;
+}
+.webix_chat_show_all_tmpl .webix_template:hover {
+  color: #17839d;
+}
+
+.webix_chat_add_button .webix_button {
+  background: #f2f2f2;
+}
+
+.webix_primary .chi-next {
+  top: 1px;
+}

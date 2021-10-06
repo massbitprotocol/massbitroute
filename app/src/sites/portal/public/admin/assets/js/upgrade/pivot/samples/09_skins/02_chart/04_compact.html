@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Pivot Chart::Compact Skin</title>
+		<link rel="stylesheet" href="../../../codebase/webix/skins/compact.css?v=8.0.5" type="text/css" charset="utf-8">
+		<script src="../../../codebase/webix/webix.js?v=8.0.5" type="text/javascript" charset="utf-8"></script>
+        <link rel="stylesheet" href="../../../codebase/skins/compact.css?v=8.0.5" type="text/css" charset="utf-8">
+		<script src="../../../codebase/pivot.js?v=8.0.5" type="text/javascript" charset="utf-8"></script>
+
+		<link rel="stylesheet" href="../../common/samples.css?v=8.0.5" type="text/css" charset="utf-8">
+		<script src="../../common/testdata.js?v=8.0.5" type="text/javascript" charset="utf-8"></script>
+	</head>
+	<body>
+		<div id="testA"></div>
+
+        <style type="text/css">
+            html, body {
+                width: 100%;
+                height: 100%;
+                padding: 0;
+                margin: 0;
+            }
+        </style>
+
+		<script type="text/javascript" charset="utf-8">
+
+		webix.ready(function(){
+            webix.ui({
+                container:"testA",
+                id:"pivot",
+                view:"pivot-chart",
+                height:300,
+                width:800,
+                separateLabel: true,
+
+                structure:{
+                    groupBy: "year",
+                    values: [{name:"balance", operation:"max"},{name:"oil", operation:"max"}],
+                    filters:[{name:"name", type:"select"}]
+                },
+                data:pivot_dataset
+
+
+            });
+        });
+		</script>
+	</body>
+</html>

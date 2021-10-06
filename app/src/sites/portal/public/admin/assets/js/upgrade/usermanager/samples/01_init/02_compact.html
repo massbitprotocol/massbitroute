@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>User Manager: Compact</title>
+		<!-- Webix Library -->
+		<script type="text/javascript" src="../../codebase/webix/webix.js"></script>
+		<link
+			rel="stylesheet"
+			type="text/css"
+			href="../../codebase/webix/webix.css"
+		/>
+
+		<!-- App -->
+		<script type="text/javascript" src="../../codebase/usermanager.js"></script>
+		<link
+			rel="stylesheet"
+			type="text/css"
+			href="../../codebase/usermanager.css"
+		/>
+	</head>
+	<body>
+		<script>
+			webix.ready(function() {
+				if (!webix.env.touch && webix.env.scrollSize) webix.CustomScroll.init();
+
+				webix.ui({
+					type: "wide",
+					rows: [
+						{
+							view: "toolbar",
+							elements: [
+								{
+									view: "label",
+									label: "Compact mode",
+								},
+							],
+						},
+
+						{
+							type: "wide",
+							cols: [
+								{
+									view: "usermanager",
+									minWidth: 400,
+									minHeight: 500,
+									compact: true,
+									url: "https://docs.webix.com/usermanager-backend/",
+								},
+								{ template: " " },
+							],
+						},
+						{ template: " " },
+					],
+				});
+			});
+		</script>
+	</body>
+</html>

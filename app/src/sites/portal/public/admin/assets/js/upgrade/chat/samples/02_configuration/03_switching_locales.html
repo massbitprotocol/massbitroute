@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>Chat: Switching Locale</title>
+		<!-- Webix Library -->
+		<script type="text/javascript" src="../../codebase/webix/webix.js"></script>
+		<link
+			rel="stylesheet"
+			type="text/css"
+			href="../../codebase/webix/webix.css"
+		/>
+
+		<!-- App -->
+		<script type="text/javascript" src="../../codebase/chat.js"></script>
+		<script type="text/javascript" src="./locales/zh.js"></script>
+		<script type="text/javascript" src="./locales/ru.js"></script>
+		<link rel="stylesheet" type="text/css" href="../../codebase/chat.css" />
+
+		<!-- Helpers, necessary for demo only -->
+		<script type="text/javascript" src="../common/login.js"></script>
+	</head>
+	<body>
+		<script>
+			var server = "https://docs.webix.com/chat-backend/";
+
+			function start(token) {
+				webix.ready(function() {
+					if (webix.env.touch) webix.ui.fullScreen();
+					else if (webix.env.scrollSize) webix.CustomScroll.init();
+
+					const toolbar = {
+						cols: [
+							{
+								view: "segmented",
+								options: ["en", "ru", "zh"],
+								width: 250,
+								click: function() {
+									const locale = $$("ch1").getService("locale");
+									locale.setLang(this.getValue());
+								},
+							},
+						],
+					};
+
+					const ch = {
+						view: "chat",
+						id: "ch1",
+						locale: {
+							lang: "en",
+							webix: {
+								// switch all webix widgets to the selected locale
+								en: "en-US",
+								zh: "zh-CN",
+								ru: "ru-RU",
+							},
+						},
+						token,
+						url: server + "api/v1",
+					};
+
+					webix.ui({
+						rows: [toolbar, ch],
+					});
+				});
+			}
+
+			chat.locales.ru = ruLocale;
+			chat.locales.zh = zhLocale;
+
+			login(server).then(start);
+		</script>
+	</body>
+</html>

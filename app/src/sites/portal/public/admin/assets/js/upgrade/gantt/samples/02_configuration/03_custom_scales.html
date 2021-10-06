@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>Gantt: Custom Scales</title>
+		<!-- Webix Library -->
+		<script type="text/javascript" src="../../codebase/webix/webix.js"></script>
+		<link
+			rel="stylesheet"
+			type="text/css"
+			href="../../codebase/webix/webix.css"
+		/>
+
+		<!-- App -->
+		<script type="text/javascript" src="../../codebase/gantt.js"></script>
+		<link rel="stylesheet" type="text/css" href="../../codebase/gantt.css" />
+	</head>
+	<body>
+		<script>
+			webix.ready(function() {
+				if (webix.env.touch) webix.ui.fullScreen();
+				else if (webix.env.scrollSize) webix.CustomScroll.init();
+
+				webix.ui({
+					view: "gantt",
+					scales: [
+						{
+							unit: "month",
+							format: "%F, %Y",
+						},
+						{
+							unit: "week",
+							format: function(start) {
+								var parser = webix.Date.dateToStr("%d %M");
+								var end = webix.Date.add(
+									webix.Date.add(start, 1, "week", true),
+									-1,
+									"day",
+									true
+								);
+								return parser(start) + " - " + parser(end);
+							},
+						},
+						{ unit: "day", format: "%d" },
+					],
+					url: "https://docs.webix.com/gantt-backend/",
+				});
+			});
+		</script>
+	</body>
+</html>

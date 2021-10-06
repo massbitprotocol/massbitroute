@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>Gantt: Local Data</title>
+		<!-- Webix Library -->
+		<script type="text/javascript" src="../../codebase/webix/webix.js"></script>
+		<link
+			rel="stylesheet"
+			type="text/css"
+			href="../../codebase/webix/webix.css"
+		/>
+
+		<!-- App -->
+		<script type="text/javascript" src="../../codebase/gantt.js"></script>
+		<link rel="stylesheet" type="text/css" href="../../codebase/gantt.css" />
+
+		<script type="text/javascript" src="../common/data.js"></script>
+	</head>
+	<body>
+		<script>
+			class MyBackend extends gantt.services.Backend {
+				tasks() {
+					return webix.promise.resolve(tasks);
+				}
+				links() {
+					return webix.promise.resolve(links);
+				}
+			}
+
+			webix.ready(function() {
+				if (webix.env.touch) webix.ui.fullScreen();
+				else if (webix.env.scrollSize) webix.CustomScroll.init();
+
+				webix.ui({
+					view: "gantt",
+					override: new Map([[gantt.services.Backend, MyBackend]]),
+				});
+			});
+		</script>
+	</body>
+</html>

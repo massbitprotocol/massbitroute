@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<link rel="stylesheet" href="../../../codebase/webix.css?v=8.0.5" type="text/css"   charset="utf-8">
+		<script src="../../../codebase/webix.js?v=8.0.5" type="text/javascript" charset="utf-8"></script>
+
+		<link rel="stylesheet" type="text/css" href="../../common/samples.css?v=8.0.5">
+		<style type="text/css">body, html{ height:100%;}</style>
+		<title>Texthighlight: Basic</title>
+		<style>
+			.mark{
+				color: white;
+				background: green;
+			}
+		</style>
+	</head>
+<body>
+	<div id="data_container1" style="margin:20px"></div>
+	<script>
+		function highlight(text, separator){
+			text = webix.template.escape(text);
+			return text.split(separator).map(word => "<span class='mark'>"+word+"</span>").join(separator);
+		}
+
+		webix.ui({
+			width: 700,
+			view:"form", scroll:false,
+			container:"data_container1",
+			rows:[
+				{ view:"texthighlight", label:"Basic", value:"1 2 3", highlight:function(text){
+					return highlight(text, " ");
+				}},
+				{ view:"texthighlight", height:200, value:"1 2 3\n\n1 2 3", label:"Multiline", type:"textarea", highlight:function(text){
+					return highlight(text, "\n");
+				}}
+			]
+		});
+	</script>
+</body>
+</html>

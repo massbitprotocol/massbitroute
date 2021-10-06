@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" href="../../../codebase/webix.css?v=8.0.5" type="text/css"   charset="utf-8">
+    <script src="../../../codebase/webix.js?v=8.0.5" type="text/javascript" charset="utf-8"></script>
+
+    <title>Save: All at once</title>
+    <style>
+      #areaA{
+        margin:20px 0;
+        height:400px;
+        width:700px;
+      }
+    </style>
+  </head>
+  <body>
+      <div id="areaA"></div>
+    <script type="text/javascript">
+
+    webix.proxy.all = {  
+      $proxy:true, 
+      saveAll:function(view, updates, dp){
+        return webix.ajax().post(this.source, {data:updates});
+      }
+    };
+  
+    webix.ui({
+      container:"areaA",
+      margin:5, 
+      rows:[
+        { margin:10, cols:[
+          { view:"button", value:"Add Row", click:function(){
+            $$("datatable1").add({
+              rank:99,
+              title:"",
+              year:"2012",
+              votes:"100"
+            });
+          }},
+          { view:"button", value:"Delete Row", click:function(){
+            var id = $$("datatable1").getSelectedId();
+            if (id)
+              $$("datatable1").remove(id);
+          }}
+        ]},
+        {
+          view:"datatable", 
+          id:"datatable1",
+          autoConfig:true,  
+          editable:true,
+          editAction:"dblclick",
+          scrollX:false,
+          url: "/samples/server/films",
+          save:{
+            autoupdate:false,
+            url:"all->/samples/server/films_all",
+            on:{
+              onAfterSync:function(state, text, data, loader ){
+                webix.message("all saved");
+              }
+            }
+          }
+        },
+        { view:"button", value:"Save all changes", css:"webix_primary", click:function(){
+          $$("datatable1").editStop();
+          webix.dp($$("datatable1")).send();
+        }}
+      ]
+    });
+    </script>
+  </body>
+</html>

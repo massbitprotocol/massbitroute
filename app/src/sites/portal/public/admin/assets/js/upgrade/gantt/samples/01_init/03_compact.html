@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>Gantt: Compact mode</title>
+		<!-- Webix Library -->
+		<script type="text/javascript" src="../../codebase/webix/webix.js"></script>
+		<link
+			rel="stylesheet"
+			type="text/css"
+			href="../../codebase/webix/webix.css"
+		/>
+
+		<!-- App -->
+		<script type="text/javascript" src="../../codebase/gantt.js"></script>
+		<link rel="stylesheet" type="text/css" href="../../codebase/gantt.css" />
+	</head>
+	<body>
+		<script>
+			webix.ready(function() {
+				if (webix.env.touch) webix.ui.fullScreen();
+				else if (webix.env.scrollSize) webix.CustomScroll.init();
+
+				webix.ui({
+					type: "wide",
+					rows: [
+						{ type: "header", template: "Compact mode" },
+						{
+							type: "wide",
+							cols: [
+								{
+									view: "gantt",
+									width: 600,
+									compact: true,
+									url: "https://docs.webix.com/gantt-backend/",
+								},
+								{ view: "resizer" },
+								{},
+							],
+						},
+					],
+				});
+			});
+		</script>
+	</body>
+</html>

@@ -1,0 +1,239 @@
+Check the full list of changes in SpreadSheet at https://docs.webix.com/spreadsheet__whats_new.html
+
+Version 8.0.5 (November 2020)
+------------------
+
+### Fixes
+
+- upper case for ranges in sparklines and charts
+- cell borders cannot be removed via border menu 
+- regression with comments adding
+- italic text is partially partially hidden when combined with large font size
+
+
+Version 8.0.3 (November 2020)
+------------------
+
+### Fixes
+
+- exporting multiple sheets with charts
+- correct borders loading in case if their type is not defined
+- ignore empty cells while printing
+- HYPERLINK method: attributes to avoid tabnabbing vulnerability
+
+Version 8.0.2 (October 2020)
+------------------
+
+### Fixes
+
+- regression with Colorpicker styling
+- borders and frozen rows/columns should be visible with disabled gridlines
+
+Version 8.0 (October 2020)
+------------------
+
+### Major features
+
+- number formats: red styling within brackets as a negative
+- export toPDF with styles
+- "border type" option for border menu
+- "reset to default" option for row/column resize menus
+
+Version 7.4 (July 2020)
+-----------------
+
+### Major features
+
+- Advanced wizard for embedded charts
+- Ability to export embedded charts and images
+
+Version 7.3 (April 2020)
+-----------------
+
+### Major features
+
+- Ability to embed Charts and imaged above cells
+- Ability to filter dates
+- Stabilizing date and filtering functionality
+
+
+Version 7.2 (February 2020)
+-----------------
+
+### Major Features
+
+- possibility to assign a cell type during loading and import
+- date and text cell formats
+- date-related math methods
+
+
+Version 7.0 (September 2019)
+-----------------
+
+### Major Features
+
+- coloring cells used in the active formula
+- entering multi-sheet formulas by cell selection
+
+
+Version 6.4 (June 2019)
+--------------
+
+### Major Features
+
+- resize row/column dialog added
+
+
+Version 6.2 (February 2019)
+--------------
+### Major Features
+
+- sheets can be reorderd by drag-n-drop
+- additional events to control data saving
+- default icons updated
+
+[Check the full list of changes](https://docs.webix.com/spreadsheet__whats_new_6_2.html) 
+
+Version 6.1 (November 2018)
+--------------
+### Major Features
+
+- localized delimiters for number formats
+- optional advanced comments functionality
+- works with all core webix skins ( flat, compact, material, mini, compact )
+
+[Check the full list of changes](https://docs.webix.com/spreadsheet__whats_new_6_1.html) 
+
+Version 6.0 (October 2018)
+--------------
+### Major Features
+
+- UI and API for increasing/decreasing decimal places
+- Ability to add comments into cells
+- The clipboardDecimalDelimiter configuration option
+
+[Check the full list of changes](https://docs.webix.com/spreadsheet__whats_new_6_0.html) 
+
+Version 5.4 (June 2018)
+----------
+### Major Features
+
+- Handy interface for working with number formats
+
+### Updates
+
+- sorting of conditional formats
+- caching of formulas
+- update multi-sheet formulas on sheet rename
+- extra hotkeys for macOS
+- dynamically increase rows and columns according to pasted data size
+
+[Check the full list of changes](https://docs.webix.com/spreadsheet__whats_new_5_4.html) 
+
+
+Version 5.3 (April 2018)
+----------
+### Updates
+
+- SpreadSheet is filtered during data loading according to values in filter cells
+- selective Clear functionality 
+- possibility to pick any cell to insert its reference into the conditional format dialog
+- the "not equal" mode is added for conditional cells formatting
+- the last selected border color is saved in the color picker
+
+[Check the full list of changes](https://docs.webix.com/spreadsheet__whats_new_5_3.html) 
+
+Version 5.2 (February 2018)
+----------
+### Fixes
+
+- SpreadSheet with no initial data or URL
+
+
+Version 5.1 (November 2017)
+--------------------
+### Fixes
+
+- Spreadsheet refreshes after adding a locked CSS to a single cell during data loading
+- check columns and rows existence before setting Excel sizes to them
+- IE8 compatibility
+
+[Check the full list of changes](https://docs.webix.com/spreadsheet__whats_new_5_1.html) 
+
+Version 5.0 (September 2017)
+--------------------
+### Major Features
+
+- extended export to Excel
+- extended import from Excel
+- loading CSV data
+- Sheet selection dialog during export to Excel
+- getSheetData API to access data and ranges on all sheets
+
+[Check the full list of changes](https://docs.webix.com/spreadsheet__whats_new_5_0.html) 
+
+Version 4.4 (June 2017)
+--------------------
+### Major Features
+
+The ability to print SpreadSheet or a part of it.
+
+
+Version 4.3 (April 2017)
+-----------------------------
+
+### Fixes
+
+- Improved serialization logic
+- Stable row and column deletion
+- Stable hotkey performance
+
+[Check the full list of changes](https://docs.webix.com/spreadsheet__whats_new_4_3.html) 
+
+
+Version 4.2 (February 2017)
+---------------------------
+
+### Major Features
+
+- ability to define custom math methods
+- cross-sheet math
+- string math methods
+- visual improvement - highlighting row and column's headers on cell selection
+- Shift+Arrow keys navigation for area selection
+
+[Check the full list of changes](https://docs.webix.com/spreadsheet__whats_new_4_2.html) 
+
+Version 4.0 (September 2016)
+----------------------------
+
+### Major Features
+
+- Multiple sheets per widgets
+- Conditional formatting
+- Custom number formats
+- Ribbon like toolbar
+- Named ranges
+- Images and Charts in the spreadsheet
+- Configurable context menu
+- Configurable top level menu
+- Split-columns and split-rows functionality
+- Extended math operations
+- Links in the spreadsheet
+
+
+
+Version 3.2 (February 2016)
+---------------------------
+
+### Major Features
+
+- Editable data sheet
+- Merging and splitting cells
+- Column and row resizing
+- Block selection and block operations
+- Colors, Fonts, Borders and text styling
+- Undo and Redo functionality
+- Fully client side math implementation
+- Ability to load and save to server side
+- Ability to load and export excel files

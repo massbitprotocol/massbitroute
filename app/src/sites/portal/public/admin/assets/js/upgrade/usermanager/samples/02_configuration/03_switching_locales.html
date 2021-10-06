@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>User Manager: Switching Locales</title>
+		<!-- Webix Library -->
+		<script type="text/javascript" src="../../codebase/webix/webix.js"></script>
+		<link
+			rel="stylesheet"
+			type="text/css"
+			href="../../codebase/webix/webix.css"
+		/>
+
+		<!-- App -->
+		<script type="text/javascript" src="../../codebase/usermanager.js"></script>
+		<link
+			rel="stylesheet"
+			type="text/css"
+			href="../../codebase/usermanager.css"
+		/>
+		<script type="text/javascript" src="./locales/ru.js"></script>
+	</head>
+	<body>
+		<script>
+			webix.ready(function() {
+				if (webix.env.touch) webix.ui.fullScreen();
+				else if (webix.env.scrollSize) webix.CustomScroll.init();
+
+				var um = {
+					view: "usermanager",
+					id: "um1",
+					url: "https://docs.webix.com/usermanager-backend/",
+					locale: {
+						lang: "en",
+						webix: {
+							// switch all webix widgets to the selected locale
+							en: "en-US",
+							ru: "ru-RU",
+						},
+					},
+				};
+
+				userManager.locales.ru = ruLocale;
+
+				const toolbar = {
+					cols: [
+						{
+							view: "segmented",
+							options: ["en", "ru"],
+							width: 250,
+							click: function() {
+								const locale = $$("um1").getService("locale");
+								locale.setLang(this.getValue());
+							},
+						},
+					],
+				};
+
+				webix.ui({
+					type: "wide",
+					rows: [toolbar, um],
+				});
+			});
+		</script>
+	</body>
+</html>

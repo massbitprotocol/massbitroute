@@ -1,0 +1,72 @@
+<!doctype html>
+<html>
+<head>
+	<title>Templates</title>
+	<meta  name = "viewport" content = "initial-scale = 1.0, maximum-scale = 1.0, user-scalable = no">
+
+	<link rel="stylesheet" type="text/css" href="https://cdn.materialdesignicons.com/2.8.94/css/materialdesignicons.css?v=7.3.5">
+
+	<script src="../../codebase/webix/webix.js?v=7.3.5" type="text/javascript"></script>
+	<script src="../../codebase/kanban.js?v=7.3.5" type="text/javascript"></script>
+
+	<link rel="stylesheet" type="text/css" href="../../codebase/webix/webix.css?v=7.3.5">
+	<link rel="stylesheet" type="text/css" href="../../codebase/kanban.css?v=7.3.5">
+
+	<script src="../common/data.js?v=7.3.5"></script>
+	<script src="../common/types.js?v=7.3.5"></script>
+	<link rel="stylesheet" type="text/css" href="../common/style.css?v=7.3.5">
+
+</head>
+<body>
+<script type="text/javascript">
+
+
+	webix.type(webix.ui.kanbanlist,{
+		name: "cards",
+		// avatar template
+		templateAvatar: function(obj){
+			if(obj.personId){
+				var name = "";
+				for(var i=0; i < staff.length && !name;i++){
+					if(staff[i].id == obj.personId){
+						name = staff[i].name;
+					}
+				}
+				return '<img class="avatar" src="../common/imgs/'+obj.personId+'.jpg" title="'+name+'"/>';
+			}
+			return "<span class='webix_icon mdi mdi-account'></span>";
+		},
+		// template for item body
+		// show item image and text
+		templateBody: function(obj){
+			var html = "";
+			if(obj.image)
+				html += "<img class='image' src='../common/imgs/attachments/"+obj.image+"'/>";
+			html += "<div>"+obj.text+"</div>";
+			return html;
+		}
+	});
+
+	webix.ready(function(){
+		if (!webix.env.touch && webix.env.scrollSize)
+			webix.CustomScroll.init();
+
+		webix.ui({
+			view:"kanban",
+			cols:[
+				{ header:"Backlog",
+					body:{ view:"kanbanlist", status:"new", type: "cards" }},
+				{ header:"In Progress",
+					body:{ view:"kanbanlist", status:"work", type: "cards"}
+				},
+				{ header:"Testing",
+					body:{ view:"kanbanlist", status:"test", type: "cards" }},
+				{ header:"Done",
+					body:{ view:"kanbanlist", status:"done", type: "cards" }}
+			],
+			data: base_task_set
+		});
+	});
+</script>
+</body>
+</html>

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Limited tabs</title>
+		<!-- Webix Library -->
+		<script type="text/javascript" src="../../codebase/webix/webix.js"></script>
+		<link
+			rel="stylesheet"
+			type="text/css"
+			href="../../codebase/webix/webix.css"
+		/>
+
+		<!-- Scheduler -->
+		<script type="text/javascript" src="../../codebase/scheduler.js"></script>
+		<link
+			rel="stylesheet"
+			type="text/css"
+			href="../../codebase/scheduler.css"
+		/>
+	</head>
+	<body>
+		<script type="text/javascript" charset="utf-8">
+			webix.ready(function() {
+				// use custom scrolls, optional
+				if (!webix.env.touch && webix.env.scrollSize) webix.CustomScroll.init();
+
+				//settings tabs for toolbar: desktop mode
+				class CustomBarsView extends scheduler.views["bars/nav"] {
+					config() {
+						const ui = super.config();
+						ui.width = 160;
+						ui.options = [
+							{ id: "week", value: "Week" },
+							{ id: "month", value: "Month" },
+						];
+						return ui;
+					}
+				}
+
+				//setting options in sidebar: compact mode
+				class CustomNavPopupView extends scheduler.views["bars/navpopup"] {
+					config() {
+						const ui = super.config();
+
+						const options = [
+							{ id: "week", value: "Week", icon: "shi-week" },
+							{ id: "month", value: "Month", icon: "shi-month" },
+						];
+
+						if (this.app.config.calendars) ui.body.rows[0].data = options;
+						else ui.body.data = options;
+
+						return ui;
+					}
+				}
+
+				webix.ui({
+					view: "scheduler",
+					date: new Date(2020, 9, 7, 0, 0, 0),
+					url: "https://docs.webix.com/calendar-backend/",
+					override: new Map([
+						[scheduler.views["bars/nav"], CustomBarsView],
+						[scheduler.views["bars/navpopup"], CustomNavPopupView],
+					]),
+				});
+			});
+		</script>
+	</body>
+</html>

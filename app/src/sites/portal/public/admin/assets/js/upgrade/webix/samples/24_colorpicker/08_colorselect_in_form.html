@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<script type="text/javascript" src="../../codebase/webix.js?v=8.0.5"></script>
+	<link href="../../codebase/webix.css?v=8.0.5" rel="stylesheet"/>
+	<title>Color Selector in Form</title>
+</head>
+<body>
+
+<script>
+	webix.ready(function(){
+		webix.ui({ 
+			view:"form", width:380, rows:[
+				{view:"colorpicker", label:"Color", value:"#751FE0", suggest:{
+					padding:0, //for Flat skins
+					type:"colorselect", body: {
+						button:true
+					}
+				}},
+				{}
+			]
+		});
+	});
+</script>
+</body>
+</html>
+

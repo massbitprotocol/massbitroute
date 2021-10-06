@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>Chat: Flat Skin</title>
+		<!-- Webix Library -->
+		<script type="text/javascript" src="../../codebase/webix/webix.js"></script>
+		<link
+			rel="stylesheet"
+			type="text/css"
+			href="../../codebase/webix/skins/flat.css"
+		/>
+
+		<!-- App -->
+		<script type="text/javascript" src="../../codebase/chat.js"></script>
+		<link
+			rel="stylesheet"
+			type="text/css"
+			href="../../codebase/skins/flat.css"
+		/>
+
+		<!-- Helpers, necessary for demo only -->
+		<script type="text/javascript" src="../common/login.js"></script>
+	</head>
+	<body>
+		<script>
+			var server = "https://docs.webix.com/chat-backend/";
+
+			function start(token) {
+				webix.ready(function() {
+					if (webix.env.touch) webix.ui.fullScreen();
+					else if (webix.env.scrollSize) webix.CustomScroll.init();
+
+					var app = new chat.App({
+						token,
+						url: server + "api/v1",
+					});
+					app.render(document.body);
+				});
+			}
+
+			login(server).then(start);
+		</script>
+	</body>
+</html>

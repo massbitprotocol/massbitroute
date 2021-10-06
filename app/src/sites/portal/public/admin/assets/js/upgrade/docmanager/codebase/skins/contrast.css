@@ -1,0 +1,1134 @@
+@charset "UTF-8";
+/* card sizes */
+@font-face {
+  font-family: "filemanager-webfont";
+  src: url("../fonts/filemanager-webfont.woff2") format("woff2"), url("../fonts/filemanager-webfont.woff") format("woff");
+  font-weight: normal;
+  font-style: normal;
+}
+[class^=fmi-]:before,
+[class*=fmi-]:before {
+  font-family: "filemanager-webfont";
+  display: inline-block;
+  font-style: normal;
+  font-weight: normal;
+  line-height: 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transform: translate(0, 0);
+}
+
+/*
+Glyphs list
+*/
+.fmi-check:before {
+  content: "";
+}
+
+.fmi-circle:before {
+  content: "";
+}
+
+.fmi-file-plus-outline:before {
+  content: "";
+}
+
+.fmi-file-tree:before {
+  content: "";
+}
+
+.fmi-file-upload-outline:before {
+  content: "";
+}
+
+.fmi-folder-plus-outline:before {
+  content: "";
+}
+
+.fmi-information-outline:before {
+  content: "";
+}
+
+.fmi-open-in-new:before {
+  content: "";
+}
+
+.fmi-view-array:before {
+  content: "";
+}
+
+.fmi-view-grid:before {
+  content: "";
+}
+
+.fmi-view-list:before {
+  content: "";
+}
+
+.fmi-content-copy:before {
+  content: "";
+}
+
+.fmi-content-cut:before {
+  content: "";
+}
+
+.fmi-content-paste:before {
+  content: "";
+}
+
+.fmi-rename-box:before {
+  content: "";
+}
+
+.webix_fmanager_cards {
+  background-color: #ebedf0;
+}
+
+.webix_fmanager_cards .webix_dataview_item.tiles {
+  padding: 0;
+  border-radius: 3px;
+  background-color: #191919;
+  border-color: #818181;
+}
+
+.webix_fmanager_cards .webix_dataview_item.tiles.webix_selected {
+  border-color: #28b263;
+}
+
+.webix_fmanager_cards .webix_dataview_item.tiles.webix_drag_over {
+  background-color: #f4f5f9;
+}
+
+.webix_fmanager_cards .webix_dataview_item.tiles.webix_drag_over.webix_selected {
+  background-color: #191919;
+}
+
+.webix_fmanager_cards .webix_dataview_item.tiles .webix_fmanager_folder_icon {
+  margin-left: 4px;
+  color: #28b263;
+  font-size: 90px;
+}
+
+.webix_fmanager_cards .webix_dataview_item.tiles .webix_fmanager_folder_icon:before {
+  margin-left: 8px;
+}
+
+.webix_fmanager_card_label {
+  color: #828d9c;
+  font-size: 12px;
+  line-height: 12px;
+  display: block;
+}
+
+.webix_fmanager_card_preview {
+  position: relative;
+  height: 119px;
+}
+
+.webix_fmanager_card_preview.file {
+  background-color: #212121;
+  height: 124px;
+}
+
+.webix_fmanager_card_preview.file:before {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(transparent 80%, rgba(134, 134, 134, 0.3));
+}
+
+.webix_fmanager_card_panel {
+  position: relative;
+  padding: 10px 12px;
+  height: 36px;
+}
+
+.webix_fmanager_card_panel.file {
+  height: 30px;
+  border-top: 1px solid #818181;
+}
+
+.webix_fmanager_card_name {
+  display: inline-block;
+  white-space: nowrap;
+  font-weight: 500;
+  width: 155px;
+  height: 29px;
+  line-height: 30px;
+  color: #ffffff;
+}
+
+.webix_fmanager_card_name.folder {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.webix_fmanager_card_name .webix_fmanager_file-type-icon {
+  margin: 0;
+  height: 27px;
+}
+
+.webix_fmanager_menu_icon {
+  position: absolute;
+  padding: 4px;
+  width: 20px;
+  border-radius: 100px;
+  right: 12px;
+  bottom: 10px;
+  color: #ffffff;
+  font-size: 20px;
+}
+
+.webix_fmanager_menu_icon:hover {
+  background-color: #ebedf0;
+}
+
+.file_name_text {
+  margin-left: 8px;
+  display: inline-block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 125px;
+}
+
+.webix_fmanager_search_mark {
+  background: yellow;
+  color: #313131;
+}
+
+.webix_fmanager_preview_name .webix_el_box {
+  padding: 3px 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.webix_fmanager_preview {
+  border-top-color: transparent;
+}
+
+.webix_fmanager_preview .webix_template {
+  padding: 0px;
+}
+
+.webix_fmanager_preview .webix_template img {
+  display: inline-block;
+  width: 100%;
+  height: 100%;
+}
+
+.webix_fmanager_preview .webix_template img.webix_fmanager_preview_icon {
+  margin: 20px;
+  width: 90%;
+  height: 90%;
+}
+
+.webix_fmanager_info_tab .webix_item_tab.webix_selected {
+  cursor: default;
+}
+
+.webix_fmanager_info_tab .webix_item_tab.webix_selected:focus {
+  box-shadow: inset 0 -2px #cd00cc;
+  color: #cd00cc;
+}
+
+.webix_fmanager_preview_info.extra {
+  border-color: #ebedf0 transparent transparent;
+}
+
+.webix_fmanager_preview_info .webix_template {
+  padding: 0;
+}
+
+.webix_fmanager_preview_info .key_col {
+  float: left;
+  width: 40%;
+  font-weight: 500;
+  text-align: right;
+}
+
+.webix_fmanager_preview_info .value_col {
+  float: right;
+  width: 60%;
+  white-space: nowrap;
+}
+
+.webix_fmanager_preview_info .key_value_cell {
+  padding: 6px;
+}
+
+.webix_fmanager_preview_info .key_value_cell.key {
+  width: 160px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.webix_fmanager_id3tags-unknown {
+  color: #cccccc;
+}
+
+.webix_fmanager_info_header {
+  margin: 8px 0;
+}
+
+.webix_fmanager_info_header .webix_fmanager_icon {
+  color: #cccccc;
+  line-height: 1.5;
+}
+
+.webix_fmanager_info_title {
+  color: #ffffff;
+  font-weight: 500;
+}
+
+/* plyr player style */
+.webix_fmanager_player .plyr--audio .plyr__controls {
+  background: #191919;
+}
+
+.webix_fmanager_player .plyr__video-wrapper {
+  background: #191919;
+}
+
+.webix_fmanager_player .plyr--video .plyr__controls {
+  background: linear-gradient(transparent, #191919);
+}
+
+.webix_fmanager_player .plyr--video .plyr__progress__buffer {
+  color: rgba(193, 201, 209, 0.66);
+  box-shadow: none;
+  background: rgba(193, 201, 209, 0.66);
+}
+
+.webix_fmanager_player .plyr--video .plyr__control.plyr__tab-focus,
+.webix_fmanager_player .plyr--video .plyr__control--overlaid {
+  background: #cd00cc;
+}
+
+.webix_fmanager_player .plyr--video .plyr__control--overlaid:hover {
+  background: #a900a8;
+}
+
+.webix_fmanager_player .plyr--video .plyr__control.plyr__tab-focus {
+  box-shadow: none;
+}
+
+.webix_fmanager_player .plyr__time--current {
+  color: #ffffff;
+}
+
+.webix_fmanager_player .icon--not-pressed,
+.webix_fmanager_player .icon--pressed {
+  fill: #ffffff;
+}
+
+.webix_fmanager_player .plyr__controls__item.plyr__control:hover .icon--not-pressed, .webix_fmanager_player .plyr__controls__item.plyr__control:hover .icon--pressed, .webix_fmanager_player .plyr__controls__item.plyr__volume .plyr__control:hover .icon--not-pressed, .webix_fmanager_player .plyr__controls__item.plyr__volume .plyr__control:hover .icon--pressed, .webix_fmanager_player .plyr__controls__item.plyr__control.plyr__tab-focus,
+.webix_fmanager_player .plyr__controls__item .plyr__control.plyr__tab-focus, .webix_fmanager_player .plyr__controls__item.plyr__control:hover,
+.webix_fmanager_player .plyr__controls__item .plyr__control:hover,
+.webix_fmanager_player .plyr__controls__item .plyr__control[aria-expanded=true], .webix_fmanager_player .plyr__controls__item.plyr__control[aria-expanded=true] {
+  fill: #cd00cc;
+  background: transparent;
+}
+
+.webix_fmanager_player .plyr__controls__item.plyr__control:hover .icon--not-pressed .icon--not-pressed,
+.webix_fmanager_player .plyr__controls__item.plyr__control:hover .icon--not-pressed .icon--pressed, .webix_fmanager_player .plyr__controls__item.plyr__control:hover .icon--pressed .icon--not-pressed,
+.webix_fmanager_player .plyr__controls__item.plyr__control:hover .icon--pressed .icon--pressed, .webix_fmanager_player .plyr__controls__item.plyr__volume .plyr__control:hover .icon--not-pressed .icon--not-pressed,
+.webix_fmanager_player .plyr__controls__item.plyr__volume .plyr__control:hover .icon--not-pressed .icon--pressed, .webix_fmanager_player .plyr__controls__item.plyr__volume .plyr__control:hover .icon--pressed .icon--not-pressed,
+.webix_fmanager_player .plyr__controls__item.plyr__volume .plyr__control:hover .icon--pressed .icon--pressed, .webix_fmanager_player .plyr__controls__item.plyr__control.plyr__tab-focus .icon--not-pressed,
+.webix_fmanager_player .plyr__controls__item.plyr__control.plyr__tab-focus .icon--pressed,
+.webix_fmanager_player .plyr__controls__item .plyr__control.plyr__tab-focus .icon--not-pressed,
+.webix_fmanager_player .plyr__controls__item .plyr__control.plyr__tab-focus .icon--pressed, .webix_fmanager_player .plyr__controls__item.plyr__control:hover .icon--not-pressed,
+.webix_fmanager_player .plyr__controls__item.plyr__control:hover .icon--pressed,
+.webix_fmanager_player .plyr__controls__item .plyr__control:hover .icon--not-pressed,
+.webix_fmanager_player .plyr__controls__item .plyr__control:hover .icon--pressed,
+.webix_fmanager_player .plyr__controls__item .plyr__control[aria-expanded=true] .icon--not-pressed,
+.webix_fmanager_player .plyr__controls__item .plyr__control[aria-expanded=true] .icon--pressed, .webix_fmanager_player .plyr__controls__item.plyr__control[aria-expanded=true] .icon--not-pressed,
+.webix_fmanager_player .plyr__controls__item.plyr__control[aria-expanded=true] .icon--pressed {
+  fill: #cd00cc;
+}
+
+.webix_fmanager_player .plyr__controls__item.plyr__control.plyr__tab-focus,
+.webix_fmanager_player .plyr__controls__item .plyr__control.plyr__tab-focus {
+  box-shadow: none;
+}
+
+.webix_fmanager_player .plyr--full-ui input[type=range] {
+  color: #cd00cc;
+}
+
+.webix_fmanager_player .plyr--full-ui input[type=range].plyr__tab-focus::-moz-range-track {
+  box-shadow: 0 0 0 2px rgba(205, 0, 204, 0.5);
+}
+
+.webix_fmanager_player .plyr--full-ui input[type=range].plyr__tab-focus::-webkit-slider-runnable-track {
+  box-shadow: 0 0 0 2px rgba(205, 0, 204, 0.5);
+}
+
+.webix_fmanager_player .plyr--full-ui input[type=range].plyr__tab-focus::-ms-track {
+  box-shadow: 0 0 0 2px rgba(205, 0, 204, 0.5);
+}
+
+.webix_fmanager_player .plyr--full-ui.plyr--video input[type=range]::-moz-range-track {
+  background-color: rgba(193, 201, 209, 0.66);
+}
+
+.webix_fmanager_player .plyr--full-ui.plyr--video input[type=range]::-webkit-slider-runnable-track {
+  background-color: rgba(193, 201, 209, 0.66);
+}
+
+.webix_fmanager_player .plyr--full-ui.plyr--video input[type=range]::-ms-track {
+  background-color: rgba(193, 201, 209, 0.66);
+}
+
+.webix_fmanager_tree .webix_tree_item.webix_selected .webix_icon,
+.webix_fmanager_tree .webix_tree_item .webix_icon {
+  color: #ccc;
+  padding: 0 2px 0 0;
+  font-size: 20px;
+  vertical-align: top;
+}
+
+.webix_fmanager_fsstats .webix_template {
+  padding: 4px 14pt;
+}
+
+.webix_fmanager_inner_drag_zone_list .webix_fmanager_file-type-icon, .webix_fmanager_file-type-icon {
+  float: left;
+  height: 27px;
+}
+
+.webix_fmanager_filelist .webix_dtable_colrow {
+  cursor: pointer;
+  background-color: #191919;
+  border-bottom: 1px solid #edeff0;
+}
+
+.webix_fmanager_filelist .webix_dtable_colrow.webix_selected .webix_fmanager_back_icon {
+  position: relative;
+  top: 4px;
+  color: #ffffff;
+  font-size: 23px;
+  margin-right: 10px;
+}
+
+.webix_fmanager_filelist .webix_dtable_colrow.webix_selected .webix_fmanager_back {
+  color: #ffffff;
+}
+
+.webix_fmanager_filelist .webix_dtable_colrow.webix_selected .webix_fmanager_back:hover {
+  color: #ffffff;
+}
+
+.webix_fmanager_filelist .webix_dtable_colrow .webix_fmanager_back_icon {
+  position: relative;
+  top: 4px;
+  color: #cd00cc;
+  font-size: 23px;
+  margin-right: 10px;
+}
+
+.webix_fmanager_filelist .webix_dtable_colrow .webix_fmanager_back {
+  color: #cccccc;
+}
+
+.webix_fmanager_filelist .webix_dtable_colrow .webix_fmanager_back:hover {
+  color: #cd00cc;
+}
+
+.webix_fmanager_filelist .wxi-folder {
+  position: relative;
+  top: 2px;
+  color: #ccc;
+  font-size: 22px;
+  margin-right: 10px;
+}
+
+.webix_fmanager_file-type-icon {
+  margin-top: 3px;
+  margin-right: 7px;
+}
+
+.webix_fmanager_grid_drag_zone_list {
+  padding: 4px 8px;
+  border: 1px solid #edeff0;
+  font-weight: 500;
+}
+
+.webix_fmanager_inner_drag_zone_list {
+  line-height: 28px;
+  max-width: 200px;
+  min-width: 100px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.webix_fmanager_inner_drag_zone_list .webix_fmanager_file-type-icon {
+  margin-top: -2px;
+  margin-right: 8px;
+}
+
+.webix_fmanager_inner_drag_zone_list .wxi-folder {
+  position: relative;
+  top: 2px;
+  color: #ccc;
+  font-size: 22px;
+  margin-right: 10px;
+}
+
+.webix_fmanager_prompt .webix_win_head {
+  border-color: #393939;
+}
+
+.webix_fmanager_prompt .webix_win_head .webix_toolbar {
+  background: #393939;
+}
+
+.webix_fmanager_prompt .webix_win_head .webix_toolbar .webix_el_label {
+  color: #ffffff;
+}
+
+.webix_fmanager_prompt .webix_win_head .webix_toolbar .webix_icon_button .webix_icon {
+  color: #cccccc;
+}
+
+.webix_fmanager_prompt .webix_win_head .webix_toolbar .webix_icon_button:hover .webix_icon {
+  color: #ffffff;
+}
+
+.webix_fmanager_prompt .webix_fmanager_prompt_input input {
+  border-color: #818181;
+  border-bottom-color: #818181;
+}
+
+.webix_fmanager_prompt .webix_fmanager_prompt_input input:focus {
+  border-color: #ffffff;
+  border-bottom-color: #cd00cc;
+}
+
+.webix_fmanager_prompt .webix_fmanager_prompt_input.webix_invalid input {
+  border-color: #fea5a8;
+  border-bottom-color: #fea5a8;
+}
+
+.webix_fmanager_prompt .webix_fmanager_prompt_input.webix_invalid:focus {
+  border-color: #fea5a8;
+  border-bottom-color: #fea5a8;
+}
+
+.webix_fmanager_progress .webix_win_head {
+  border-bottom: 1px solid transparent;
+}
+
+.webix_fmanager_progress_head {
+  box-shadow: inset 0 4px #cd00cc;
+  background-color: #191919;
+}
+
+.webix_fmanager_progress_head .webix_template {
+  padding-top: 12px;
+  text-align: center;
+}
+
+.webix_template > div.webix_fmanager_progress_bar {
+  text-align: center;
+}
+
+.webix_fmanager_progress_counter {
+  font-weight: 500;
+}
+
+.webix_fmanager_progress_name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.webix_fmanager_progress_cancel .webix_el_box {
+  padding: 2px 0;
+}
+
+.webix_fmanager_spec_icon .webix_icon {
+  font-size: 20px;
+  height: 20px;
+}
+
+.webix_fmanager_editor_save .webix_icon_btn {
+  margin-left: -6px;
+}
+
+.webix_fmanager_editor_save .webix_icon_btn.webix_fmanager_icon.fmi-circle {
+  color: #ffe834;
+  font-size: 14px;
+}
+
+.webix_fmanager_path .webix_template {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: 300;
+  padding: 0;
+}
+
+.webix_fmanager_path_chunk:hover {
+  cursor: pointer;
+  color: #cd00cc;
+}
+
+.webix_fmanager_context-menu-hotkey {
+  color: #cccccc;
+  float: right;
+}
+
+.webix_fmanager_preview_toggle .webix_icon_btn {
+  margin-right: 0;
+}
+
+.webix_fmanager_add_new_menu {
+  border-color: transparent;
+}
+
+/* folder icons for dnd hover in all views*/
+.webix_fmanager_filelist .webix_drag_over .wxi-folder:before,
+.webix_fmanager_cards .webix_drag_over .wxi-folder:before,
+.webix_fmanager_tree .webix_drag_over .wxi-folder:before {
+  content: "";
+  /* opened folder */
+}
+
+.webix_fmanager_filelist .webix_drag_over.webix_selected .wxi-folder:before, .webix_fmanager_filelist .webix_drag_over.webix_row_select .wxi-folder:before,
+.webix_fmanager_cards .webix_drag_over.webix_selected .wxi-folder:before,
+.webix_fmanager_cards .webix_drag_over.webix_row_select .wxi-folder:before,
+.webix_fmanager_tree .webix_drag_over.webix_selected .wxi-folder:before,
+.webix_fmanager_tree .webix_drag_over.webix_row_select .wxi-folder:before {
+  content: "";
+  /* closed folder */
+}
+
+.webix_fmanager_confirm .webix_popup_text {
+  text-align: left;
+}
+
+.webix_fmanager_confirm .webix_popup_text .question {
+  margin-bottom: 10px;
+}
+
+.webix_fmanager_confirm .webix_popup_text .item {
+  font-weight: 500;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+/* text-overflow 'middle-ellipsis' */
+.webix_fmanager_editor_name .webix_el_box {
+  white-space: nowrap;
+}
+
+.webix_fmanager_editor_name .webix_el_box .filename {
+  float: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: calc(100% - 51px);
+}
+
+.webix_fmanager_filelist .webix_dtable_colrow {
+  background-color: #393939;
+  border-bottom: 1px solid #4d4d4d;
+}
+
+.webix_fmanager_filelist .webix_dtable_colrow .webix_fmanager_back,
+.webix_fmanager_filelist .webix_dtable_colrow .webix_fmanager_back:hover,
+.webix_fmanager_filelist .webix_dtable_colrow .webix_fmanager_back_icon {
+  color: #e2e2a7;
+}
+
+.webix_fmanager_cards,
+.webix_fmanager_menu_icon:hover,
+.webix_fmanager_cards .webix_dataview_item.tiles.webix_drag_over {
+  background-color: #393939;
+}
+
+.webix_fmanager_prompt_input input:focus {
+  border-bottom-color: #ffffff;
+}
+
+.webix_fmanager_progress_head {
+  box-shadow: inset 0 4px #28b263;
+  background-color: #393939;
+}
+
+.webix_fmanager_info_tab .webix_item_tab.webix_selected:focus {
+  box-shadow: inset 0 -2px transparent;
+  color: #ffffff;
+  text-decoration: none;
+}
+
+.webix_fmanager_mode_icon {
+  font-size: 17px;
+}
+
+.webix_fmanager_tree .webix_tree_item.webix_selected .webix_icon,
+.webix_fmanager_tree .webix_tree_item .webix_icon {
+  vertical-align: initial;
+}
+
+/**
+docmanager-webfont Webfont
+*/
+@font-face {
+  font-family: "docmanager-webfont";
+  src: url("../fonts/docmanager-webfont.woff2") format("woff2"), url("../fonts/docmanager-webfont.woff") format("woff");
+  font-weight: normal;
+  font-style: normal;
+}
+[class^=dmi-]:before,
+[class*=dmi-]:before {
+  font-family: "docmanager-webfont";
+  display: inline-block;
+  font-style: normal;
+  font-weight: normal;
+  line-height: 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transform: translate(0, 0);
+}
+
+.webix_docmanager_icon {
+  display: inline-block;
+}
+
+.webix_icon_btn.dmi-delete-empty {
+  vertical-align: initial;
+}
+
+.webix_icon_btn.dmi-delete-empty:before {
+  font-family: "docmanager-webfont";
+}
+
+/*
+Glyphs list
+*/
+.dmi-star:before {
+  content: "";
+}
+
+.dmi-star-outline:before {
+  content: "";
+}
+
+.dmi-tag:before {
+  content: "";
+}
+
+.dmi-share:before {
+  content: "";
+}
+
+.dmi-delete-empty:before {
+  content: "";
+}
+
+.dmi-delete-restore:before {
+  content: "";
+}
+
+.dmi-history:before {
+  content: "";
+}
+
+.dmi-share-all:before {
+  content: "";
+}
+
+.dmi-gesture-double-tap:before {
+  content: "";
+}
+
+.dmi-cog:before {
+  content: "";
+}
+
+.dmi-arrow-left:before {
+  content: "";
+}
+
+.webix_fmanager_card_preview .webix_fmanager_card_shared {
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  margin-top: 12px;
+  margin-right: 12px;
+}
+
+.shared_user_name {
+  display: inline-block;
+  height: 32px;
+  width: 32px;
+  border-radius: 100px;
+  box-shadow: 0px 0px 3px #28b263;
+  text-align: center;
+  line-height: 32px;
+  font-weight: 500;
+  /* position-overlay */
+  position: relative;
+}
+.shared_user_name.user_0, .shared_user_name.user_plus {
+  left: 0px;
+}
+.shared_user_name.user_1 {
+  left: 12px;
+}
+.shared_user_name.user_2 {
+  left: 24px;
+}
+.shared_user_name.user_3 {
+  left: 36px;
+}
+.shared_user_name.user_plus {
+  background: #818181;
+  color: #ffffff;
+}
+
+.webix_fmanager_card_preview .webix_fmanager_star {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+}
+.webix_fmanager_card_preview .webix_fmanager_star .dmi-star {
+  color: gold;
+  font-size: 17px;
+}
+.webix_fmanager_card_preview.file .webix_fmanager_star {
+  left: 12px;
+}
+
+.webix_fmanager_info_title.webix_el_label .webix_el_box {
+  color: #ffffff;
+  font-weight: 500;
+}
+
+.webix_fmanager_info {
+  background-color: #ffffff;
+}
+
+.webix_fmanager_tags_line {
+  border-bottom: 1px solid #e7e9f2;
+}
+
+.webix_fmanager_preview_tabs .webix_item_tab {
+  box-shadow: inset 0 -1px #818181;
+}
+
+.webix_fmanager_comments .webix_overlay {
+  display: table;
+  width: 100%;
+}
+.webix_fmanager_comments .webix_overlay .webix_fmanager_overlay {
+  display: table-cell;
+  text-align: center;
+  vertical-align: middle;
+}
+.webix_fmanager_comments .webix_list {
+  border-color: transparent;
+}
+.webix_fmanager_comments .webix_layout_form {
+  border-left-color: transparent;
+}
+
+.preview_tags .webix_inp_static {
+  background-color: transparent;
+  border-color: transparent;
+}
+.preview_tags .webix_inp_static input {
+  margin-left: 3px;
+}
+.preview_tags .webix_multicombo_value {
+  cursor: pointer;
+  color: #ffffff;
+}
+.preview_tags .webix_multicombo_value .webix_multicombo_delete,
+.preview_tags .webix_multicombo_value .webix_multicombo_delete:after {
+  color: inherit;
+}
+
+.webix_fmanager_tag_marker {
+  border-radius: 2px;
+  display: block;
+  float: right;
+  margin-top: 1px;
+}
+
+.webix_fmanager_tag_settings .webix_icon:before {
+  vertical-align: middle;
+}
+
+.webix_fmanager_shared_list .webix_fmanager_remove_user {
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.webix_fmanager_shared_title {
+  background-color: transparent;
+}
+.webix_fmanager_shared_title .webix_template {
+  text-align: center;
+  font-weight: 500;
+  font-size: 18px;
+  line-height: 18px;
+  padding-top: 10px;
+  margin-left: 38px;
+}
+
+.webix_fmanager_shared_list .webix_list_item {
+  cursor: default;
+  border-color: #818181;
+  position: relative;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding: 4px 50px 4px 50px;
+}
+.webix_fmanager_shared_list .default_avatar,
+.webix_fmanager_shared_list .avatar_img {
+  width: 28px;
+  height: 28px;
+  line-height: 28px;
+  font-size: 18px;
+  border-radius: 50%;
+  left: 12px;
+  top: 3px;
+  position: absolute;
+  text-align: center;
+  float: left;
+}
+.webix_fmanager_shared_list .webix_fmanager_remove_user {
+  cursor: pointer;
+  position: absolute;
+  display: inline-block;
+  height: 20px;
+  line-height: 20px;
+  right: 12px;
+  top: 7px;
+}
+.webix_fmanager_shared_list .webix_fmanager_remove_user:hover, .webix_fmanager_shared_list .webix_fmanager_remove_user:hover .webix_icon {
+  color: #28b263;
+}
+.webix_fmanager_shared_list .webix_fmanager_remove_user .webix_icon {
+  color: #ffffff;
+  vertical-align: middle;
+}
+.webix_fmanager_shared_list .webix_overlay {
+  display: table;
+  width: 100%;
+}
+.webix_fmanager_shared_list .webix_overlay .webix_fmanager_overlay {
+  display: table-cell;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.webix_fmanager_user_list .webix_list_item {
+  position: relative;
+}
+.webix_fmanager_user_list .webix_fmanager_user_email {
+  display: inline-block;
+  position: absolute;
+  right: 12px;
+  color: #cccccc;
+}
+
+.webix_fmanager_shared_close .webix_icon_button:hover .webix_icon {
+  color: #28b263;
+}
+
+.no-border {
+  border-top: transparent;
+}
+
+.webix_fmanager_filelist .webix_cell {
+  position: relative;
+}
+.webix_fmanager_filelist .webix_cell.webix_dtable_colrow {
+  position: absolute;
+}
+.webix_fmanager_filelist .webix_cell .webix_fmanager_star {
+  z-index: 1;
+  position: absolute;
+  top: -25%;
+  font-size: 11.3333333333px;
+}
+.webix_fmanager_filelist .webix_cell .webix_fmanager_star .dmi-star {
+  color: #28b263;
+  text-shadow: -1px -1px 0 #ffffff, 1px -1px 0 #ffffff, -1px 1px 0 #ffffff, 1px 1px 0 #ffffff;
+}
+
+.webix_fmanager_tree .webix_tree_item.webix_selected .webix_docmanager_icon,
+.webix_fmanager_tree .webix_tree_item .webix_docmanager_icon {
+  color: #ccc;
+  padding: 0 3px 0 0;
+  font-size: 16px;
+  line-height: 1;
+  vertical-align: top;
+}
+
+.webix_fmanager_version_face {
+  width: 30px;
+  height: 30px;
+  object-fit: cover;
+}
+
+.webix_fmanager_version {
+  padding-left: 12px;
+}
+
+.webix_fmanager_version_date {
+  font-weight: 500;
+}
+
+.webix_fmanager_restore_date {
+  margin-top: -8px;
+  color: #cccccc;
+}
+
+.webix_fmanager_version_author {
+  margin-bottom: 8px;
+  overflow: hidden;
+}
+.webix_fmanager_version_author img {
+  margin-right: 8px;
+  float: left;
+}
+.webix_fmanager_version_author .webix_fmanager_version_name {
+  display: inline-block;
+  white-space: nowrap;
+  width: 220px;
+}
+
+.webix_fmanager_history_bar .webix_el_box {
+  margin-left: -40px;
+}
+
+.webix_fmanager_history_back .dmi-arrow-left {
+  font-size: 16px;
+}
+
+.webix_docmanager_editor_diff {
+  font-family: monospace;
+  white-space: pre;
+}
+
+.webix_docmanager_diff_remove {
+  background-color: rgba(235, 49, 3, 0.16);
+  color: #eb3103;
+  text-decoration: line-through;
+}
+
+.webix_docmanager_diff_insert {
+  background-color: rgba(52, 161, 114, 0.16);
+  color: #34a172;
+}
+
+.webix_docmanager_diff_excel.webix_cell,
+.webix_fmanager_diff_all .webix_cell {
+  background-color: rgba(52, 161, 114, 0.16);
+  color: #34a172;
+  box-shadow: inset 0 0 0 1px #34a172;
+}
+
+.webix_fmanager_editor_name .webix_el_box .filename {
+  max-width: calc(100% - 250px);
+}
+
+.webix_fmanager_empty_trash .dmi-delete-empty {
+  margin-right: -2px;
+}
+
+.webix_fmanager_preview_toggle .webix_icon_btn.dmi-gesture-double-tap {
+  vertical-align: text-top;
+  font-size: 16px;
+}
+
+.webix_fmanager_tag_color {
+  border-radius: 2px;
+  display: inline-block;
+  cursor: pointer;
+  width: 25px;
+  height: 25px;
+  margin-top: 5px;
+}
+
+.webix_fmanager_remove_tag {
+  cursor: pointer;
+}
+.webix_fmanager_remove_tag:hover, .webix_fmanager_remove_tag:hover .webix_icon {
+  color: #28b263;
+}
+.webix_fmanager_remove_tag .webix_icon {
+  color: #ffffff;
+  vertical-align: middle;
+}
+
+.webix_fmanager_popup .webix_win_head {
+  border-bottom-color: transparent;
+}
+
+.webix_menu .webix_docmanager_icon {
+  color: #ffffff;
+  font-size: 17px;
+  width: 20px;
+  margin: 0 6px 0 1px;
+}
+
+.webix_fmanager_empty_trash .dmi-delete-empty {
+  font-size: 17px;
+}
+
+.webix_fmanager_tree .webix_tree_item.webix_selected .webix_docmanager_icon,
+.webix_fmanager_tree .webix_tree_item .webix_docmanager_icon {
+  vertical-align: text-top;
+}
+
+.webix_fmanager_menu .dmi-star:before,
+.webix_fmanager_menu .dmi-share:before {
+  vertical-align: middle;
+}
+.webix_fmanager_menu :-moz-any(.dmi-star):before,
+.webix_fmanager_menu :-moz-any(.dmi-share):before {
+  vertical-align: text-top;
+}
+
+.webix_fmanager_preview_toggle .webix_icon_btn.dmi-gesture-double-tap {
+  font-size: 15px;
+}
+
+.webix_fmanager_tag_settings .webix_icon {
+  font-size: 17px;
+  height: 22px;
+}
+
+.webix_fmanager_tag_color {
+  width: 23px;
+  height: 23px;
+  margin-top: 5px;
+  margin-left: 3px;
+}
+
+.webix_docmanager_diff_excel.webix_cell,
+.webix_fmanager_diff_all .webix_cell {
+  color: #8afccb;
+}
+
+.webix_docmanager_diff_insert {
+  color: #8afccb;
+}
+
+.webix_docmanager_diff_remove {
+  color: #ffd4c9;
+}
+
+.webix_fmanager_info {
+  background-color: #393939;
+}

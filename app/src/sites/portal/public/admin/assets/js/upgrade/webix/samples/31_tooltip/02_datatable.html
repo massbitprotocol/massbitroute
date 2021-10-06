@@ -1,0 +1,54 @@
+<!doctype html>
+<html>
+<head>
+    <title>Tooltip:: Datatable</title>
+    <meta  name = "viewport" content = "initial-scale = 1.0, maximum-scale = 1.0, user-scalable = no">
+
+    <script type="text/javascript" src="../../codebase/webix.js?v=8.0.5"></script>
+    <link rel="stylesheet" type="text/css" href="../../codebase/webix.css?v=8.0.5">
+    <script src="../common/testdata.js?v=8.0.5" type="text/javascript" charset="utf-8"></script>
+
+    <style>
+        #areaA, #areaB{
+            margin: 30px;
+            float: left;
+        }
+    </style>
+</head>
+    <body>
+    <div id="areaA"></div>
+
+    <script type="text/javascript">
+        webix.ready(function(){
+
+
+			webix.ui({
+				view:"datatable", container:"areaA", id:"dt",
+				css:"webix_header_border", footer:true,
+				columns:[
+					{ id:"rank",    header:"", tooltip:false, css:"rank", width:50},
+					{ id:"title",   header:[{ text:"Film", colspan:2, tooltip:true},  "Title"],
+                        tooltip:"Title: #title#", width:200
+                    },
+					{ id:"year",    header:["", { text:"Year", tooltip:"Release date: #text#"}], width:80,
+						tooltip:function(obj){
+							return "The film '"+obj.title+"' was shot in "+obj.year;
+						}
+					},
+					{ id:"votes",   header:[{text:"Votes", rowspan:2, tooltip:"#text#"}, ""],
+						width:100, footer:{ content:"summColumn", tooltip:function(obj){
+                            return "Total value: " + $$("dt").getHeaderContent(obj.contentId).getValue();
+                        }}
+					}
+				],
+				tooltip:true,
+				autoheight:true,
+				autowidth:true,
+				data:small_film_set
+			});
+
+
+        });
+    </script>
+</body>
+</html>

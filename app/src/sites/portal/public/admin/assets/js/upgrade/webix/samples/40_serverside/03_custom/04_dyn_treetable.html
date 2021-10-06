@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" href="../../../codebase/webix.css?v=8.0.5" type="text/css"   charset="utf-8">
+    <script src="../../../codebase/webix.js?v=8.0.5" type="text/javascript" charset="utf-8"></script>
+
+    <title>Dynamic Loading: Treetable</title>
+    <style>
+      #areaA{
+        margin:20px 0;
+        height:600px;
+      }
+    </style>
+  </head>
+  <body>
+      <div id="areaA"></div>
+    <script type="text/javascript">
+
+    webix.ui({
+      view:"treetable",
+      container:"areaA",
+      autowidth:true,
+      columns:[
+        { id:"value", header:"Name",  template:"{common.treetable()} #value#",    width:300 }
+      ],
+      url:{
+        $proxy:true,
+        load:function(view, details){ 
+          if (details){
+            console.log("details", details); 
+
+            //emulating server response  
+            var data ={data:[]}; 
+            var count = details.count || 10;
+            var start = details.start || 0
+
+            for (var i=0; i<count; i++){
+              data.data.push({
+                value: (details.parent?"Sub ":"Main ")+(i+1+start),
+                webix_kids:!details.parent
+              });
+            }
+
+            if(details.parent) //branch data
+              data.parent = details.parent;
+            else //linear data
+              data.pos = details.start;
+
+            console.log("response data", data);
+            return data;
+          } else {
+            //emulating initial data
+            return webix.promise.resolve({ 
+              total_count:200,
+              data:[
+                {value:"Main 1", webix_kids:true},
+                {value:"Main 2", webix_kids:true},
+                {value:"Main 3", webix_kids:true},
+                {value:"Main 4", webix_kids:true},
+                {value:"Main 5", webix_kids:true}
+              ]
+            });
+
+          }
+        }
+      }
+    }); 
+    </script>
+  </body>
+</html>

@@ -1,0 +1,103 @@
+<!doctype html>
+<html>
+<head>
+	<title>DND Events in Kanban</title>
+	<meta  name = "viewport" content = "initial-scale = 1.0, maximum-scale = 1.0, user-scalable = no">
+
+	<link rel="stylesheet" type="text/css" href="https://cdn.materialdesignicons.com/2.8.94/css/materialdesignicons.css?v=8.0.5">
+
+	<script src="../../codebase/webix/webix.js?v=8.0.5" type="text/javascript"></script>
+	<script src="../../codebase/kanban.js?v=8.0.5" type="text/javascript"></script>
+
+	<link rel="stylesheet" type="text/css" href="../../codebase/webix/webix.css?v=8.0.5">
+	<link rel="stylesheet" type="text/css" href="../../codebase/kanban.css?v=8.0.5">
+
+	<script src="../common/data.js?v=8.0.5"></script>
+	<script src="../common/types.js?v=8.0.5"></script>
+	<link rel="stylesheet" type="text/css" href="../common/style.css?v=8.0.5">
+
+
+</head>
+<body>
+<script type="text/javascript">
+
+
+
+	function onBeforeDrag(dragContext){
+		webix.message("Drag has been started");
+		return true
+	}
+
+	function onBeforeDragIn(dragContext,e,list){
+
+		// item id
+		var item =this.getItem(dragContext.start);
+
+		// if we move an item from one list to another
+		if(dragContext.from != dragContext.to){
+			var statusFrom = dragContext.from.config.status;
+			var statusTo = dragContext.to.config.status;
+			var statusIndex = {"new":0,"work":1, "test": 2, "done":3};
+			var diff = Math.abs(statusIndex[statusFrom] - statusIndex[statusTo]);
+			if(diff>1){
+				return false;
+			}
+		}
+		return true;
+	}
+
+	function onAfterDrop(dragContext,e,list){
+
+		// item id
+		var item =this.getItem(dragContext.start);
+
+		// if we move an item from one list to another
+		if(dragContext.from != dragContext.to){
+			var status = dragContext.to.config.status;
+			// show a message with new status and order
+			webix.message("Item '"+item.text+"' was moved into '"+status+"' column to the "+item.$index +" position");
+		}
+		else
+			webix.message("Item '"+item.text+"' was moved to the "+item.$index +" position");
+	}
+
+	webix.ready(function(){
+		if (!webix.env.touch && webix.env.scrollSize)
+			webix.CustomScroll.init();
+
+		webix.ui({
+			type:"space",
+			rows:[
+				{  view: "label", label: "You can move tasks only between neighbouring columns"},
+				{
+					view:"kanban",
+					id: "myBoard",
+					type: "wide",
+					on:{
+						onListBeforeDrag: onBeforeDrag,
+						onListBeforeDragIn: onBeforeDragIn,
+						onListAfterDrop: onAfterDrop
+					},
+					cols:[
+						{ header:"Backlog",
+							body:{ view:"kanbanlist", status:"new", type: "avatars"}
+						},
+						{ header:"In Progress",
+							body:{ view:"kanbanlist", status:"work", type: "avatars"}
+						},
+						{ header:"Testing",
+							body:{ view:"kanbanlist", status:"test", type: "avatars"}
+						},
+						{ header:"Done",
+							body:{ view:"kanbanlist", status:"done", type: "avatars"}
+						}
+					],
+					data: base_task_set
+				}
+			]
+
+		});
+	});
+</script>
+</body>
+</html>

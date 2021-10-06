@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<script type="text/javascript" src="../../codebase/webix.js?v=8.0.5"></script>
+	<link href="../../codebase/webix.css?v=8.0.5" rel="stylesheet"/>
+	<title>Colorboard</title>
+</head>
+<body>
+
+<script>
+	webix.ui({
+		rows:[
+			{cols:[
+				{rows:[
+					{template:"Material (default) palette", type:"header"},
+					{ 
+						view:"colorboard",
+						id:"color"
+					}
+				]},
+				{rows:[
+					{template:"Material palette, no gray scale", type:"header"},
+					{ 
+						view:"colorboard",
+						id:"color2",
+						grayScale:false
+					}
+				]},
+				{}
+			]},
+			{cols:[
+				{rows:[
+					{template:"Classic (old) palette", type:"header"},
+					{ 
+						view:"colorboard",
+						id:"color3",
+						type:"classic",
+					}
+				]},
+				{rows:[
+					{template:"Classic palette, no gray scale", type:"header"},
+					{ 
+						view:"colorboard",
+						id:"color4",
+						type:"classic",
+						grayScale:false
+					}
+				]},
+				{}
+			]}
+		]
+	});
+		
+	
+
+	$$("color").attachEvent("onSelect", doLog);
+	$$("color2").attachEvent("onSelect", doLog);
+	$$("color3").attachEvent("onSelect", doLog);
+	$$("color4").attachEvent("onSelect", doLog);
+	function doLog(val, control, ev){
+		webix.message(this.config.id + " - " + val);
+	}
+</script>
+</body>
+</html>
+

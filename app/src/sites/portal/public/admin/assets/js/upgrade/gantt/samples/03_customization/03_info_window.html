@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>Gantt: Info Window</title>
+		<!-- Webix Library -->
+		<script type="text/javascript" src="../../codebase/webix/webix.js"></script>
+		<link
+			rel="stylesheet"
+			type="text/css"
+			href="../../codebase/webix/webix.css"
+		/>
+
+		<!-- App -->
+		<script type="text/javascript" src="../../codebase/gantt.js"></script>
+		<link rel="stylesheet" type="text/css" href="../../codebase/gantt.css" />
+	</head>
+	<body>
+		<script>
+			webix.ready(function() {
+				if (webix.env.touch) webix.ui.fullScreen();
+				else if (webix.env.scrollSize) webix.CustomScroll.init();
+
+				class CustomInfo extends gantt.views["task/info"] {
+					//styling and sizes
+					config() {
+						this.Compact = this.getParam("compact", true);
+						const ui = super.config();
+						if (!this.Compact) {
+							ui.body.rows[0].padding = 4; //toolbar
+							ui.body.rows[1].padding = 4; //main area
+							ui.body.rows[1].rows[0].autoheight = true; //template with content
+							ui.body.rows[1].rows[1].inputWidth = 0; //"Delete button"
+						}
+						return ui;
+					}
+					//less details
+					InfoTemplate(obj) {
+						//remove links data
+						obj.targets = obj.sources = [];
+						delete obj.details;
+						return super.InfoTemplate(obj);
+					}
+					//"Edit" button click action
+					EditTask() {
+						if (!this.Compact) {
+							this.getParentView().Hide();
+							this.app.show("top/task.form");
+						} else super.EditTask();
+					}
+				}
+
+				class InfoPopup extends gantt.views.JetView {
+					config() {
+						return {
+							view: "popup",
+							width: 350,
+							body: CustomInfo, //use the above class
+						};
+					}
+					Show(node) {
+						this.getRoot().show(node);
+					}
+					Hide() {
+						this.getRoot().hide();
+					}
+				}
+
+				class CustomForm extends gantt.views["task/form"] {
+					config() {
+						let ui = super.config();
+						if (!this.Compact) {
+							//textarea
+							const notes = ui.body.rows[1].elements.splice(6, 1)[0];
+							notes.height = 290;
+
+							//form with 3 columns
+							const form = ui.body.rows[1];
+							form.cols = [
+								{ margin: form.margin, rows: ui.body.rows[1].elements },
+								{ rows: [notes, {}] },
+								{ width: 300 },
+							];
+							delete ui.body.rows[1].elements;
+
+							//prevent on-change saving
+							if (!this.Compact) delete form.on.onChange;
+
+							ui.body.rows[1] = form;
+
+							//bar
+							ui.body.rows[0].padding.right = 335;
+						}
+
+						return ui;
+					}
+					Back(exit) {
+						if (!this.Compact) {
+							//clear the form and show the Tasks area
+							this.Form.clear();
+							this.State.selected = this.State.parent = null;
+							this.app.show("top/chart");
+						} else super.Back(close);
+					}
+					//"Done" button action
+					Done(exit) {
+						// save data if a new task is created or the existing one is updated
+						if (this.State.selected === "$temp" || this.Form.isDirty())
+							this.UpdateTask().then(() => this.Back(exit));
+						else this.Back(exit);
+					}
+					//"Close" icon action
+					Close() {
+						// ask to save form data in case of changes
+						if (this.Form.isDirty()) {
+							webix
+								.confirm("Save changes?")
+								.then(() => this.Done(true))
+								.catch(() => this.Back(true));
+						} else this.Back(true);
+					}
+				}
+
+				class CustomBarsView extends gantt.views["chart/bars"] {
+					config() {
+						const ui = super.config();
+						// show InfoPopup on clicking the task
+						ui.cells[1].on.onItemClick = (id, e, node) => {
+							this.State.$batch({
+								parent: null,
+								selected: id,
+							});
+							this.Info.Show(node);
+						};
+						return ui;
+					}
+					init(view) {
+						super.init(view);
+						//create a popup window
+						this.Info = this.ui(InfoPopup);
+						//handle hide event
+						this.on(this.app, "edit:stop", () => {
+							this.State.selected = this.State.parent = null;
+							this.Info.Hide();
+						});
+					}
+				}
+
+				class CustomTopView extends gantt.views.top {
+					config() {
+						const ui = super.config();
+						// insert dynamic subview to show chart or form
+						ui.cells[0].cols[2] = { $subview: true };
+						return ui;
+					}
+					init(view) {
+						super.init(view);
+						//show chart
+						this.show("chart/bars");
+					}
+					// if new task is created, open the form
+					ShowTask(path) {
+						if (this.Compact) super.ShowTask(path);
+						else if (path === "form") this.show("task.form");
+					}
+					//preserve default hide logic only for compact mode
+					HideTask() {
+						if (this.Compact);
+						super.HideTask();
+					}
+				}
+
+				webix.ui({
+					view: "gantt",
+					url: "https://docs.webix.com/gantt-backend/",
+					override: new Map([
+						[gantt.views["chart/bars"], CustomBarsView],
+						[gantt.views.top, CustomTopView],
+						[gantt.views["task/info"], CustomInfo],
+						[gantt.views["task/form"], CustomForm],
+					]),
+				});
+			});
+		</script>
+	</body>
+</html>

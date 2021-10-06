@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>Adding new fields to user details and editor</title>
+		<!-- Webix Library -->
+		<script type="text/javascript" src="../../codebase/webix/webix.js"></script>
+		<link
+			rel="stylesheet"
+			type="text/css"
+			href="../../codebase/webix/webix.css"
+		/>
+		<!-- Maderial Design Icons -->
+		>
+		<link
+			rel="stylesheet"
+			href="https://cdn.materialdesignicons.com/5.3.45/css/materialdesignicons.css"
+			type="text/css"
+			charset="utf-8"
+		/>
+
+		<!-- App -->
+		<script type="text/javascript" src="../../codebase/usermanager.js"></script>
+		<link
+			rel="stylesheet"
+			type="text/css"
+			href="../../codebase/usermanager.css"
+		/>
+		<style>
+			.webix_um_infolist_header .webix_icon svg {
+				fill: #8693a5;
+			}
+		</style>
+	</head>
+	<body>
+		<script>
+			const mapIconSvg =
+				"<svg width='100%' height='100%' viewBox='0 0 24 24'><path d='M12,11.5A2.5,2.5 0 0,1 9.5,9A2.5,2.5 0 0,1 12,6.5A2.5,2.5 0 0,1 14.5,9A2.5,2.5 0 0,1 12,11.5M12,2A7,7 0 0,0 5,9C5,14.25 12,22 12,22C12,22 19,14.25 19,9A7,7 0 0,0 12,2Z' /></svg>";
+
+			const countries = [
+				{ id: "Belgium", value: "Belgium" },
+				{ id: "Croatia", value: "Croatia" },
+				{ id: "Estonia", value: "Estonia" },
+				{ id: "Faroe Islands", value: "Faroe Islands" },
+				{ id: "Germany", value: "Germany" },
+				{ id: "Italy", value: "Italy" },
+				{ id: "Morocco", value: "Morocco" },
+				{ id: "Romania", value: "Romania" },
+				{ id: "San Marino", value: "San Marino" },
+				{ id: "Slovakia", value: "Slovakia" },
+			];
+
+			webix.ready(function() {
+				// display new fields in user details
+				class UserDetails extends userManager.views["users/details"] {
+					GetDetailsHTML(user, roles, rules) {
+						let userDetails = "";
+
+						userDetails += this.InfoTemplate(
+							user.email,
+							this._("Email"),
+							"umi-email"
+						);
+						userDetails += this.InfoTemplate(
+							this.FormatDate(user.visited),
+							this._("Last visited"),
+							"umi-clock"
+						);
+
+						// the new 'Country' field with svg icon
+						userDetails +=
+							"<div class='webix_um_infolist_header'>" +
+							"<span class='webix_icon'>" +
+							mapIconSvg +
+							"</span> Country</div>" +
+							"<div class='webix_um_infolist_details'>" +
+							(user.country || "Unknown") +
+							"</div>";
+
+						// the new 'City' field with Material Design icon
+						userDetails += this.InfoTemplate(
+							user.city,
+							"City/town",
+							"mdi mdi-home-map-marker"
+						);
+
+						userDetails += this.GetListsHTML(user, roles, rules);
+
+						return userDetails;
+					}
+				}
+
+				// edit the new fields in the user's form
+				class UserForm extends userManager.views["users/form"] {
+					config() {
+						const ui = super.config();
+						// use "cols" layout to limit the field width
+						const inputs = [
+							{
+								cols: [
+									{
+										view: "text",
+										placeholder: "Type a country...",
+										label: "Country",
+										name: "country",
+										suggest: {
+											body: {
+												data: countries,
+												yCount: 4,
+											},
+										},
+										gravity: 2,
+										maxWidth: 550,
+										minWidth: 420,
+									},
+									{},
+								],
+							},
+							{
+								cols: [
+									{
+										view: "text",
+										label: "City/town",
+										name: "city",
+										suggest: {
+											body: {
+												data: countries,
+												yCount: 4,
+											},
+										},
+										gravity: 2,
+										maxWidth: 550,
+										minWidth: 420,
+									},
+									{},
+								],
+							},
+						];
+						// the form contains two rows layouts ( 1 - buttons, 2 - scrollable "rows" layout)
+						// put the new fields into the second layout
+						let rows = ui.rows[1].rows;
+						rows.splice(rows.length - 3, 0, ...inputs);
+						return ui;
+					}
+				}
+
+				// init
+				if (webix.env.touch) webix.ui.fullScreen();
+				else if (webix.env.scrollSize) webix.CustomScroll.init();
+
+				var app = new userManager.App({
+					url: "https://docs.webix.com/usermanager-backend/",
+					override: new Map([
+						[userManager.views["users/details"], UserDetails],
+						[userManager.views["users/form"], UserForm],
+					]),
+				});
+
+				app.render(document.body);
+			});
+		</script>
+	</body>
+</html>

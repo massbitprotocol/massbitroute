@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>Adding buttons to the toolbar</title>
+		<!-- Webix Library -->
+		<script type="text/javascript" src="../../codebase/webix/webix.js"></script>
+		<link
+			rel="stylesheet"
+			type="text/css"
+			href="../../codebase/webix/webix.css"
+		/>
+
+		<!-- App -->
+		<script type="text/javascript" src="../../codebase/usermanager.js"></script>
+		<link
+			rel="stylesheet"
+			type="text/css"
+			href="../../codebase/usermanager.css"
+		/>
+	</head>
+	<body>
+		<script>
+			webix.ready(function() {
+				const formatDate = webix.Date.dateToStr("%M %d, %Y %H:%i:%s");
+
+				class CustomToolbar extends userManager.views["users/toolbar"] {
+					config() {
+						const ui = super.config();
+						const mainToolbar = ui.rows[0].cols;
+
+						const newButton = {
+							view: "button",
+							type: "icon",
+							icon: "wxi-download",
+							css: "webix_primary",
+							label: "Export to Excel",
+							autowidth: true,
+							click: () => this.ExportUsers(),
+						};
+
+						mainToolbar.splice(3, 0, newButton);
+						return ui;
+					}
+
+					ExportUsers() {
+						const local = this.app.getService("local");
+						local.users().then(collection => {
+							webix.toExcel(collection, {
+								filename: "Users",
+								columns: {
+									name: { header: "Full name" },
+									email: { header: "Email" },
+									visited: {
+										header: "Last seen",
+										format: value => formatDate(new Date(value)),
+									},
+									status: {
+										header: "Status",
+										format: value => (value ? "Active" : "Not active"),
+									},
+								},
+							});
+						});
+					}
+				}
+
+				if (webix.env.touch) webix.ui.fullScreen();
+				else if (webix.env.scrollSize) webix.CustomScroll.init();
+
+				var app = new userManager.App({
+					url: "https://docs.webix.com/usermanager-backend/",
+					override: new Map([
+						[userManager.views["users/toolbar"], CustomToolbar],
+					]),
+				});
+
+				app.render(document.body);
+			});
+		</script>
+	</body>
+</html>

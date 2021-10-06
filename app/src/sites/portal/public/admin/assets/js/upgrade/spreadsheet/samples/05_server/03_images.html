@@ -1,0 +1,33 @@
+<!doctype html>
+<html>
+<head>
+    <title>Adding images into cells</title>
+    <meta  name = "viewport" content = "initial-scale = 1.0, maximum-scale = 1.0, user-scalable = no">
+
+    <script src="../../codebase/webix/webix.js?v=8.0.5" type="text/javascript"></script>
+    <script src="../../codebase/spreadsheet.js?v=8.0.5" type="text/javascript"></script>
+
+    <link rel="stylesheet" type="text/css" href="../../codebase/webix/webix.css?v=8.0.5">
+    <link rel="stylesheet" type="text/css" href="../../codebase/spreadsheet.css?v=8.0.5">
+</head>
+<body>
+    <script type="text/javascript">
+        webix.ready(function(){
+            webix.ui({
+                view:"spreadsheet",
+                toolbar:"full",
+                save: {
+                    images: "/spreadsheet/samples/server/images"
+                },
+                data:{ 
+                    spans:[[3,2,2,1],[3,5,3,3]],
+                    data: [   
+                        [3, 2, "Try to upload an image", ""],
+                        [3,5,"=IMAGE(\"/spreadsheet/samples/server/images/logo.jpg\")",""]
+                    ]
+                }
+            });
+        });
+    </script>
+</body>
+</html>

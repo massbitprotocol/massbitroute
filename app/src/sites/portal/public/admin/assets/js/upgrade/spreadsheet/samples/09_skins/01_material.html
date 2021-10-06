@@ -1,0 +1,28 @@
+<!doctype html>
+<html>
+<head>
+    <title>Material Skin</title>
+    <meta  name = "viewport" content = "initial-scale = 1.0, maximum-scale = 1.0, user-scalable = no">
+
+    <script src="../../codebase/webix/webix.js?v=8.0.5" type="text/javascript"></script>
+    <script src="../../codebase/spreadsheet.js?v=8.0.5" type="text/javascript"></script>
+
+    <link rel="stylesheet" type="text/css" href="../../codebase/webix/skins/material.css?v=8.0.5">
+    <link rel="stylesheet" type="text/css" href="../../codebase/skins/material.css?v=8.0.5">
+
+    <script src="../common/data.js?v=8.0.5"></script>
+</head>
+<body>
+<script type="text/javascript">
+
+    webix.ready(function(){
+        webix.ui({
+            view:"spreadsheet",
+            data: base_data,
+            toolbar: "full"
+        });
+    });
+
+</script>
+</body>
+</html>

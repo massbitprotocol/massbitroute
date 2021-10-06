@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>Chat: Toolbar title</title>
+		<!-- Webix Library -->
+		<script type="text/javascript" src="../../codebase/webix/webix.js"></script>
+		<link
+			rel="stylesheet"
+			type="text/css"
+			href="../../codebase/webix/webix.css"
+		/>
+
+		<!-- App -->
+		<script type="text/javascript" src="../../codebase/chat.js"></script>
+		<link rel="stylesheet" type="text/css" href="../../codebase/chat.css" />
+
+		<!-- Helpers, necessary for demo only -->
+		<script type="text/javascript" src="../common/login.js"></script>
+	</head>
+	<body>
+		<script>
+			class CustomToolbar extends chat.views["messages/toolbar"] {
+				TitleTemplate(chat) {
+					var helpers = this.app.getService("helpers");
+					var result = helpers.listAvatar(chat, "webix_chat_toolbar_avatar");
+
+					return (
+						result +
+						`
+						<div class='webix_chat_title'>
+							<div class="webix_chat_messages_groupchat_name">${chat.name}</div>
+							<div class="webix_chat_messages_groupchat_members">Custom content here</div>
+						</div>`
+					);
+				}
+			}
+
+			var server = "https://docs.webix.com/chat-backend/";
+			function start(token) {
+				webix.ready(function() {
+					if (webix.env.touch) webix.ui.fullScreen();
+					else if (webix.env.scrollSize) webix.CustomScroll.init();
+
+					var app = new chat.App({
+						token,
+						url: server + "api/v1",
+						override: new Map([
+							[chat.views["messages/toolbar"], CustomToolbar],
+						]),
+					});
+
+					app.render(document.body);
+				});
+			}
+
+			login(server).then(start);
+		</script>
+	</body>
+</html>

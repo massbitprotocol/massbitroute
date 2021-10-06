@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>Document Manager: Responsive</title>
+		<!-- Webix Library -->
+		<script type="text/javascript" src="../../codebase/webix/webix.js"></script>
+		<link
+			rel="stylesheet"
+			type="text/css"
+			href="../../codebase/webix/webix.css"
+		/>
+
+		<!-- App -->
+		<script type="text/javascript" src="../../codebase/docmanager.js"></script>
+		<link
+			rel="stylesheet"
+			type="text/css"
+			href="../../codebase/docmanager.css"
+		/>
+	</head>
+	<body>
+		<script>
+			webix.ready(function() {
+				// force no-zoom, fullscreen size headers
+				if (webix.env.mobile) webix.ui.fullScreen();
+
+				// use custom scrolls, optional
+				if (!webix.env.touch && webix.env.scrollSize) webix.CustomScroll.init();
+
+				webix.ui({
+					cols: [
+						{
+							view: "docmanager",
+							width: 480,
+							url: "https://docs.webix.com/docmanager-backend/",
+						},
+						{ view: "resizer" },
+						{
+							view: "docmanager",
+							url: "https://docs.webix.com/docmanager-backend/",
+						},
+					],
+				});
+			});
+		</script>
+	</body>
+</html>

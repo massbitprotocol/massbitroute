@@ -1,0 +1,33 @@
+<!doctype html>
+<html>
+<head>
+	<link rel="stylesheet" href="//cdn.webix.com/edge/webix.css" type="text/css" media="screen" charset="utf-8">
+	<script src="//cdn.webix.com/edge/webix.js" type="text/javascript" charset="utf-8"></script>
+
+	<script type="text/javascript" src="./codemirror.js"></script>
+</head>
+<body>
+	<script type="text/javascript">
+		
+		webix.ui({
+			rows:[
+				{ template:"CodeMirror editor", type:"header", css:"webix_dark" },
+				{cols:[
+					{ 
+						view:"codemirror-editor",
+						mode:"javascript",
+						theme:"lucario",
+						value:'webix.ui({\n\tview:"codemirror",\n\tmode:"javascript",\n\ttheme:"lucario",\n\tvalue:""\n});'
+					},
+					{view:"resizer"},
+					{ 
+						view:"codemirror-editor",
+						mode:"javascript",
+						value:'webix.ui({\n\tview:"codemirror",\n\tmode:"javascript",\n\tvalue:""\n});'
+					}
+				]}
+			]
+		});
+	</script>
+</body>
+</html>

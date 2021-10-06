@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title></title>
+		<!-- Webix Library -->
+		<script type="text/javascript" src="../../codebase/webix/webix.js"></script>
+		<link
+			rel="stylesheet"
+			type="text/css"
+			href="../../codebase/webix/webix.css"
+		/>
+
+		<!-- App -->
+		<script type="text/javascript" src="../../codebase/query.js"></script>
+		<link rel="stylesheet" type="text/css" href="../../codebase/query.css" />
+
+		<!-- Test data -->
+		<script src="../common/data.js"></script>
+	</head>
+	<body>
+		<script>
+			webix.ready(function() {
+				if (webix.env.touch) webix.ui.fullScreen();
+				else if (webix.env.scrollSize) webix.CustomScroll.init();
+
+				// customize the top bar of query
+				class CustomBar extends query.views.bar {
+					config() {
+						// default logic
+						const ui = super.config();
+
+						// add new button
+						ui.cols.push({
+							view: "button",
+							value: "Clear",
+							width: 70,
+							click: () => {
+								this.getParam("state").value = null;
+							},
+						});
+
+						return ui;
+					}
+				}
+
+				webix.ui({
+					type: "space",
+					rows: [
+						{
+							view: "query",
+							id: "query",
+							borderless: true,
+							width: 320,
+							type: "bar",
+							override: new Map([[query.views.bar, CustomBar]]),
+							// data defined in ../common/data.js
+							data: data,
+							fields: data_fields,
+							value: data_value,
+						},
+						{
+							view: "datatable",
+							columns: data_columns,
+							data: data_collection,
+							id: "table",
+						},
+						{ view: "textarea", readonly: true, value: "", id: "log" },
+					],
+				});
+
+				$$("query")
+					.getState()
+					.$observe("value", v => {
+						$$("table").filter($$("query").getFilterFunction());
+						$$("log").setValue(JSON.stringify(v, "", "\t"));
+					});
+			});
+		</script>
+	</body>
+</html>

@@ -1,0 +1,40 @@
+<!doctype html>
+<html>
+<head>
+	<title>Comments:: Mentioned Users</title>
+	<meta  name = "viewport" content = "initial-scale = 1.0, maximum-scale = 1.0, user-scalable = no">
+
+	<script type="text/javascript" src="../../codebase/webix.js?v=8.0.5"></script>
+	<link rel="stylesheet" type="text/css" href="../../codebase/webix.css?v=8.0.5">
+
+	<script src="./common/data.js?v=8.0.5" type="text/javascript"></script>
+</head>
+<body>
+	<script type="text/javascript">
+
+
+		webix.ready(function(){
+			webix.ui({
+				width:400,
+				rows:[
+					{
+						view:"comments",
+						currentUser:4,
+						data: mentionedData,
+						users: "/samples/server/comments_users",
+						mentions:true,
+						highlight:"users",
+						on:{
+							onUserMentioned:function(userId, id){
+								var user = this.getUsers().getItem(userId).value;
+								webix.message(user+" was mentioned in comment "+id);
+							} 
+						}
+					},
+					{}
+				]
+			});
+		});
+	</script>
+</body>
+</html>

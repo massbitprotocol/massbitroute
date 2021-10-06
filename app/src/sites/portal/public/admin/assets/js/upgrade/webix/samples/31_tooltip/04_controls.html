@@ -1,0 +1,55 @@
+<!doctype html>
+<html>
+<head>
+    <title>Tooltip:: Controls</title>
+    <meta  name = "viewport" content = "initial-scale = 1.0, maximum-scale = 1.0, user-scalable = no">
+
+    <script type="text/javascript" src="../../codebase/webix.js?v=8.0.5"></script>
+    <link rel="stylesheet" type="text/css" href="../../codebase/webix.css?v=8.0.5">
+
+    <style>
+        #areaA{
+            margin: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div id="areaA"></div>
+
+    <script type="text/javascript">
+        webix.ready(function(){
+			cities = [
+				{id:1, value:"Berlin"}, {id:2, value:"Kiev"}, {id:3, value:"Minsk"},
+				{id:4, value:"Moscow"}, {id:5, value:"Prague"}, {id:6, value:"Riga"},
+				{id:7, value:"St.Petersburg"}, {id:8, value:"Tallin"}, {id:9, value:"Vilnius"}
+			];
+
+            webix.ui({
+                view:"form", container:"areaA", elements:[
+                    { view:"text", placeholder:"Enter you name", label:"Name", tooltip:"First and last name"},
+                    { view:"combo",options:cities, label:"To", placeholder:"Select destination", tooltip:function(obj){
+                    	return obj.placeholder;
+                    }},
+                    {view:"datepicker",  label:"Departure Date", value:new Date(2024,6,12), format:"%d  %M %Y", tooltip:"#label# #value#"},
+                    {view:"datepicker",  id:"datepicker2", label:"Return Date", value:new Date(2024,6,12), format:"%d  %M %Y", tooltip:function(obj){
+                    	return webix.i18n.parseFormatStr(obj.value);
+                    }},
+                    {view:"checkbox", id:"flexible", value:0, label: "Flexible dates", inputWidth:160, tooltip:{ template:"#value#", dx:0, dy:-30}},
+                    {
+                        cols:[
+                            {view:"label",  label:"Passengers", width:120},
+                            // You can adjust the scope of the tooltip for inputs.
+                            {view:"counter", value:75, min:60, max:144, inputWidth:110, tooltip:"#min# - #max#"}
+                        ]
+                    },
+					{view:"button", css:"webix_primary", value:"Book Now", align:"center", width:150}
+                ],
+                width:600,
+                elementsConfig:{
+                    labelWidth:120, labelAlign:"left"
+                }
+            });
+        });
+    </script>
+</body>
+</html>

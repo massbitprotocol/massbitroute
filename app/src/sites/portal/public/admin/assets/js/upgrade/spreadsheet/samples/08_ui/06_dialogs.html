@@ -1,0 +1,95 @@
+<!doctype html>
+<html>
+<head>
+    <title>Dialog</title>
+    <meta  name = "viewport" content = "initial-scale = 1.0, maximum-scale = 1.0, user-scalable = no">
+
+    <script src="../../codebase/webix/webix.js?v=8.0.5" type="text/javascript"></script>
+    <script src="../../codebase/spreadsheet.js?v=8.0.5" type="text/javascript"></script>
+
+    <link rel="stylesheet" type="text/css" href="../../codebase/webix/webix.css?v=8.0.5">
+    <link rel="stylesheet" type="text/css" href="../../codebase/spreadsheet.css?v=8.0.5">
+
+    <script src="../common/data.js?v=8.0.5"></script>
+
+    <style>
+        .myicon{
+            background: url("images/edit.svg");
+        }
+    </style>
+</head>
+<body>
+<script type="text/javascript">
+
+    webix.ready(function(){
+
+        webix.ui({
+            id: "mydialog",
+            view: "ssheet-dialog",
+            head: "Editor",
+            position: "center",
+            body: {
+                view: "form",
+                elements:[
+                    {
+                        cols:[
+                            {view: "label", label: "Name", width: 80},
+                            {view: "text", placeholder: "Enter name"}
+                        ]
+                    },
+                    {
+                        cols:[
+                            {view: "label", label: "Type", width: 80},
+                            {view: "richselect", placeholder: "Select", suggest:{
+                                view:  "ssheet-form-suggest",
+                                data:["Area","Bar","Line"]
+                            }}
+                        ]
+                    },
+                    {
+                        cols:[
+                            {view: "label", label: "Color", width: 80},
+                            {view: "ssheet-colorpicker", placeholder: "Select"}
+                        ]
+                    }
+                ]
+            },
+            on: {
+                onSaveClick: function () {
+                    webix.message("onSaveClick");
+                    this.hide();
+                },
+                onCancelClick: function () {
+                    webix.message("onCancelClick");
+                    this.hide();
+                },
+                onHideClick: function () {
+                    webix.message("onHideClick");
+                    this.hide();
+                }
+            }
+        });
+
+   
+        webix.ui({
+            view:"spreadsheet",
+            data: base_data,
+            buttons: {
+                "undo-redo": ["undo","redo"],
+                "font": ["font-family","font-size","font-weight","font-style","text-decoration","color","background","borders"],
+                "align": ["text-align","vertical-align","wrap","span"],
+                "number": ["format"],
+                "Editors": [
+                    {
+                        view: "button", type:"htmlbutton", name: "a", width: 40,
+                        label: "<span class='webix_ssheet_button_icon myicon'></span>",
+                        tooltip: "Insert image", click: function(){$$("mydialog").show();}
+                    }
+                ]
+            }
+        });
+        
+    });
+</script>
+</body>
+</html>

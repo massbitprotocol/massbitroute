@@ -1,0 +1,37 @@
+<!doctype html>
+<html>
+<head>
+    <title>Adding images</title>
+    <meta  name = "viewport" content = "initial-scale = 1.0, maximum-scale = 1.0, user-scalable = no">
+
+    <script src="../../codebase/webix/webix.js?v=7.3.5" type="text/javascript"></script>
+    <script src="../../codebase/spreadsheet.js?v=7.3.5" type="text/javascript"></script>
+
+    <link rel="stylesheet" type="text/css" href="../../codebase/webix/webix.css?v=7.3.5">
+    <link rel="stylesheet" type="text/css" href="../../codebase/spreadsheet.css?v=7.3.5">
+
+    <script src="../common/data.js?v=7.3.5"></script>
+</head>
+<body>
+    <script type="text/javascript">
+        webix.ready(function(){
+            webix.ui({
+                view:"spreadsheet",
+                id: "ssheet",
+                toolbar: "full",
+                data:{
+                    styles: [
+                        [ "blue", "#FFFFFF;#2244DE;" ]
+                    ],
+                    sizes: [
+                        [ 3, 0, 50 ]
+                    ],
+                    data: []
+                }
+            });
+
+            $$("ssheet").addImage(3,2,"http://docs.webix.com/media/desktop/icons/spreadsheet.png");
+        });
+    </script>
+</body>
+</html>

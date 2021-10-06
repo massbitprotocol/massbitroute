@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>Document Manager: Customizing Excel editor</title>
+		<!-- Webix Library -->
+		<script type="text/javascript" src="../../codebase/webix/webix.js"></script>
+		<link
+			rel="stylesheet"
+			type="text/css"
+			href="../../codebase/webix/webix.css"
+		/>
+
+		<!-- App -->
+		<script type="text/javascript" src="../../codebase/docmanager.js"></script>
+		<link
+			rel="stylesheet"
+			type="text/css"
+			href="../../codebase/docmanager.css"
+		/>
+
+		<!-- Webix Spreadsheet -->
+		<script
+			src="//cdn.webix.com/site/spreadsheet/spreadsheet.js"
+			type="text/javascript"
+		></script>
+
+		<link
+			rel="stylesheet"
+			type="text/css"
+			href="//cdn.webix.com/site/spreadsheet/spreadsheet.css"
+		/>
+	</head>
+	<body>
+		<style>
+			.webix_docmanager_diff_excel.webix_cell,
+			.webix_fmanager_diff_all .webix_cell {
+				background-color: rgba(52, 161, 114, 0.16) !important;
+				color: #34a172 !important;
+			}
+		</style>
+		<script>
+			webix.ready(function() {
+				if (!webix.env.touch && webix.env.scrollSize) webix.CustomScroll.init();
+
+				class Editor extends docManager.views.excel {
+					config() {
+						const ui = super.config();
+						ui.rows[1].cols[0] = {
+							view: "spreadsheet",
+							localId: "editor",
+							bottombar: true,
+						};
+						return ui;
+					}
+					init() {
+						super.init();
+
+						// Spreadsheet has a different event to track changes
+						this.on(this.$$("editor"), "onChange", () =>
+							this.ChangeTextState(true)
+						);
+					}
+
+					ParseVersion(v, diff) {
+						if (v) {
+							this.Editor.showProgress({ type: "top" });
+
+							const path = this.app.getService("versions").directLink(v);
+							const id = this.getSubView("r-side").GetPrevVersion(v);
+
+							this.ResetTotalDiff(id ? false : diff);
+
+							if (diff && id) {
+								let prevPath = this.app.getService("versions").directLink(id);
+								webix.promise
+									.all([this.ParseExcel(prevPath), this.ParseExcel(path)])
+									.then(res => {
+										const older = res[0];
+										const target = res[1];
+										this.Sheets = this.GetSheetData(older, target);
+										this.Editor.parse(target, "excel");
+									});
+							} else {
+								this.Sheets = {};
+								this.Editor.load(`binary->${path}`, "excel").then(() => {
+									this.Editor.hideProgress();
+								});
+							}
+						}
+					}
+
+					StyleDiffCells(mode, sheet) {
+						if (!sheet) sheet = this.Editor.getActiveSheet();
+
+						const diffs = this.Sheets[sheet].diffs;
+						if (diffs && diffs.length) {
+							this.Editor.showProgress({ type: "top" });
+
+							const method = mode ? "addCellCss" : "removeCellCss";
+							const grid = this.Editor.$$("cells");
+							diffs.forEach(d => {
+								const colId = grid.columnId(d[1] + 1);
+								grid[method](
+									grid.getIdByIndex(d[0]),
+									colId,
+									"webix_docmanager_diff_excel",
+									true
+								);
+							});
+
+							grid.render();
+							this.Editor.hideProgress();
+						}
+					}
+
+					Save() {
+						const editor = this.$$("editor");
+						editor.$$("cells").editStop();
+						return webix
+							.toExcel(editor, {
+								download: false,
+								math: true,
+								styles: true,
+								spans: true,
+								heights: true,
+								sheets: true,
+							})
+							.then(data => {
+								return this.app
+									.getService("operations")
+									.writeBinary(this.File.id, this.File.value, data)
+									.then(() => {
+										this.ChangeTextState(false);
+									});
+							});
+					}
+
+					SetBatch(batch) {
+						this.getRoot()
+							.queryView("toolbar")
+							.showBatch(batch);
+						this.Editor = webix.ui(
+							{
+								view: "spreadsheet",
+								localId: "editor",
+								bottombar: true,
+								readonly: true,
+							},
+							this.$$("editor")
+						);
+						webix.extend(this.Editor, webix.ProgressBar);
+
+						// style diffs for a new opened sheet
+						this.Editor.attachEvent("onAfterSheetShow", name => {
+							if (this.Sheets && this.Sheets[name]) {
+								// only for sheets that are opened 1st time
+								if (!this.Sheets[name].diffs) {
+									this.Sheets[name].diffs = this.CollectDiffs(
+										this.Sheets[name].old,
+										this.Sheets[name].new
+									);
+								}
+								this.StyleDiffCells(this.State.diff, name);
+							}
+						});
+					}
+
+					CollectDiffs(old, target) {
+						const diffs = [];
+						for (let row = 0; row < target.length; ++row) {
+							for (let col = 0; col < target[row].length; ++col) {
+								if (
+									old[row] &&
+									target[row][col] != old[row][col] &&
+									(target[row][col] || old[row][col])
+								) {
+									diffs.push([row, col]);
+								}
+							}
+						}
+						return diffs;
+					}
+
+					GetSheetData(older, target) {
+						const sheets = {};
+						target.names.forEach((n, i) => {
+							if (i === 0) {
+								sheets[n] = { new: target.data, old: older.data };
+							} else {
+								const nsheet = webix.DataDriver.excel.getSheet(target, {
+									name: n,
+								});
+								sheets[n] = { new: nsheet.data };
+
+								if (older.names.indexOf(n) == target.names.indexOf(n)) {
+									const osheet = webix.DataDriver.excel.getSheet(older, {
+										name: n,
+									});
+									sheets[n].old = osheet.data;
+								} else {
+									sheets[n].old = [[]];
+								}
+							}
+						});
+						return sheets;
+					}
+				}
+
+				var app = new docManager.App({
+					url: "https://docs.webix.com/docmanager-backend/",
+					override: new Map([[docManager.views.excel, Editor]]),
+				});
+
+				app.render(document.body);
+			});
+		</script>
+	</body>
+</html>

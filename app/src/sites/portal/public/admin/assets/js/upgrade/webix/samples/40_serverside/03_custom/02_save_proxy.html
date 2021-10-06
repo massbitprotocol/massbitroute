@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<link rel="stylesheet" href="../../../codebase/webix.css?v=8.0.5" type="text/css" charset="utf-8">
+		<script src="../../../codebase/webix.js?v=8.0.5" type="text/javascript" charset="utf-8"></script>
+		<title>Saving: Proxy and Url</title>
+		<style>
+			#areaA, #areaB{
+				margin:20px 0;
+			}
+		</style>
+	</head>
+
+	<body>
+		<div style="margin-left:20px;">
+			Save function <br>
+			<div id='areaA'></div>
+			Save proxy <br>
+			<div id='areaB'></div>
+		</div>
+
+		<script type="text/javascript" charset="utf-8">
+
+		var grid = {
+			view:"datatable",
+			columns:[
+				{ id:"rank",	editor:"text",  header:"", css:"rank",  width:50},
+				{ id:"title",	editor:"text",  header:"Film title",	width:200},
+				{ id:"year",	editor:"text",  header:"Released" , 	width:80},
+				{ id:"votes",	editor:"text",  header:"Votes", 		width:100}
+			],
+			autoheight:true,
+			autowidth:true,
+			select:"row", editable:true, editaction:"dblclick",
+			url: "/samples/server/films"
+		};
+
+
+		function getButtons(grid){
+			return {
+				view:"toolbar", elements:[
+					{ view:"button", value:"Add Row", click:function(){
+						$$(grid).add({
+							rank:99,
+							title:"",
+							year:"2012",
+							votes:"100"
+						});
+					}},
+					{ view:"button", value:"Delete Row", click:function(){
+						var id = $$(grid).getSelectedId();
+						if (id)
+							$$(grid).remove(id);
+					}},
+					{}
+				]
+			}
+		};
+
+
+		webix.ready(function(){
+
+			//save url
+			webix.ui({
+				container:"areaA",
+				rows:[
+					getButtons("datatable1"),  
+					webix.extend(webix.copy(grid), {
+						id:"datatable1",
+						save:function(id, operation, update){
+							if(operation == "insert")
+								return webix.ajax().post("/samples/server/films", update);
+							if(operation == "update")
+								return webix.ajax().put("/samples/server/films/"+id, update);
+							if(operation == "delete")
+								return webix.ajax().del("/samples/server/films/"+id, update);
+						}
+					}, true)
+				]
+			});
+
+			//save proxy
+			webix.ui({
+				container:"areaB",
+				rows:[
+					getButtons("datatable2"),  
+					webix.extend(webix.copy(grid), {
+						id:"datatable2",
+						save:{
+							$proxy:true,
+							save:function(view,  params, dp){
+								var id = params.data.id;
+								if(params.operation == "insert")
+									return webix.ajax().post("/samples/server/films", params.data);
+								if(params.operation == "update")
+									return webix.ajax().put("/samples/server/films/"+id, params.data);
+								if(params.operation == "delete")
+									return webix.ajax().del("/samples/server/films/"+id, params.data);
+							}
+						}
+					}, true)
+				]
+			});
+
+
+			
+		});
+		</script>
+	</body>
+</html>

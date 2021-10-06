@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<link rel="stylesheet" href="../../../codebase/webix.css?v=8.0.5" type="text/css"   charset="utf-8">
+		<script src="../../../codebase/webix.js?v=8.0.5" type="text/javascript" charset="utf-8"></script>
+
+		<title>Button ('button')</title>
+		<style>
+			.htmlbutton_icon{
+				margin-right:4px;
+				font-size: 20px;
+			}
+			.htmlbutton_text{
+				line-height: 32px
+			}
+		</style>
+	</head>
+<body>
+	<div id="data_container"></div>
+
+	<script>
+		var elements = [
+			{ view:"label", label:"webix_secondary", align:"center"},
+			{ view:"button", label:"Standard"},
+			{ view:"button", label:"Image", type:"image", image:"./play.png" },
+			{ view:"button", label:"Image Top", type:"imageTop", image:"./play.png", height:50 },
+			{ view:"button", label:"Icon", type:"icon", icon:"wxi-clock" },
+			{ view:"button", label:"Icon Top", type:"iconTop", icon:"wxi-clock", height:50 }
+		];
+
+		function getForm(elements){
+			return { view:"form", width:200, scroll:false, elements:elements }
+		};
+
+		function getStylizedElements(css){
+			var data = webix.copy(elements);
+			data[0].label = css;
+			data.forEach(function(item){item.css = css});
+			return data;
+		};
+
+		webix.ui({
+			container:"data_container",
+			cols:[
+				getForm(elements),
+				getForm(getStylizedElements("webix_primary")),
+				getForm(getStylizedElements("webix_danger")),
+				getForm(getStylizedElements("webix_transparent"))
+			]
+		});
+	</script>
+</body>
+</html>

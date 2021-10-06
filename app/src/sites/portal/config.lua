@@ -3,7 +3,7 @@ local _config = {
         nginx = {
             port = "80",
             port_ssl = "443",
-            server_name = "localhost"
+            server_name = "masssbitroute"
         }
     },
     templates = {},

@@ -2,8 +2,10 @@ version: "3"
 services:
   builder:
     command: "sleep infinity"
-    image: phusion/baseimage:focal-1.0.0
+#    image: phusion/baseimage:focal-1.0.0
+    image: massbitroute
+    command: /massbit/massbitroute/app/src/start_server
     ports:
       - "80:80"
     volumes:
-      - ./:/massbit/massbitroute:rw
+      - ../:/massbit/massbitroute:rw

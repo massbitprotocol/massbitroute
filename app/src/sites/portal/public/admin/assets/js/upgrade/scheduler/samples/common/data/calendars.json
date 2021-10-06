@@ -1,0 +1,26 @@
+[
+	{
+		"id": 1,
+		"text": "Personal",
+		"color": "#997CEB",
+		"active": 1
+	},
+	{
+		"id": 2,
+		"text": "Public",
+		"color": "#01C2A5",
+		"active": 1
+	},
+	{
+		"id": 3,
+		"text": "Birthdays",
+		"color": "#D2FB9E",
+		"active": 0
+	},
+	{
+		"id": 4,
+		"text": "Holidays",
+		"color": "#F68896",
+		"active": 0
+	}
+]
