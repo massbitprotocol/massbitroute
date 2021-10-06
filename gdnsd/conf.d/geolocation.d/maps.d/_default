@@ -1,0 +1,80 @@
+generic-map => {
+                nets => nets.VN
+                geoip2_db => GeoIP2-City.mmdb
+                datacenters => [Ha-Noi HCM]
+                map => {
+                    # Use ISO 3166-2 official names
+                    AS => {
+                        VN => {
+                            00 => [Ha-Noi HCM]    # Không xác định
+                            44 => [Ha-Noi HCM]    # Ha Noi
+                            13 => [Ha-Noi HCM]    # Hai Phong
+                            72 => [Ha-Noi HCM]    # Bac Kan
+                            71 => [Ha-Noi HCM]    # Bac Giang
+                            74 => [Ha-Noi HCM]    # Bac Ninh
+                            05 => [Ha-Noi HCM]    # Cao Bang
+                            92 => [Ha-Noi HCM]    # Dien Bien
+                            50 => [Ha-Noi HCM]    # Ha Giang
+                            80 => [Ha-Noi HCM]    # Ha Nam
+                            79 => [Ha-Noi HCM]    # Hai Duong
+                            53 => [Ha-Noi HCM]    # Hoa Binh
+                            81 => [Ha-Noi HCM]    # Hung Yen
+                            89 => [Ha-Noi HCM]    # Lai Chau
+                            39 => [Ha-Noi HCM]    # Lang Son
+                            90 => [Ha-Noi HCM]    # Lao Cai
+                            82 => [Ha-Noi HCM]    # Nam Dinh
+                            59 => [Ha-Noi HCM]    # Ninh Binh
+                            83 => [Ha-Noi HCM]    # Phu Tho
+                            34 => [Ha-Noi HCM]    # Thanh Hoa
+                            30 => [Ha-Noi HCM]    # Quang Ninh
+                            32 => [Ha-Noi HCM]    # Son La
+                            35 => [Ha-Noi HCM]    # Thai Binh
+                            85 => [Ha-Noi HCM]    # Thai Nguyen
+                            68 => [Ha-Noi HCM]    # Tuyen Quang
+                            86 => [Ha-Noi HCM]    # Vinh Phuc
+                            70 => [Ha-Noi HCM]    # Yen Bai
+                            52 => [Ha-Noi HCM]    # Ha Tinh
+                            58 => [Ha-Noi HCM]    # Nghe An
+                            62 => [Ha-Noi HCM]    # Quang Binh
+                            64 => [Ha-Noi HCM]    # Quang Tri
+                            20 => [HCM Ha-Noi]    # TP. HCM
+                            78 => [HCM Ha-Noi]    # Da Nang
+                            46 => [HCM Ha-Noi]    # Binh Dinh
+                            76 => [HCM Ha-Noi]    # Binh Phuoc
+                            47 => [HCM Ha-Noi]    # Binh Thuan
+                            88 => [HCM Ha-Noi]    # Dac Lak
+                            91 => [HCM Ha-Noi]    # Dac Nong
+                            49 => [HCM Ha-Noi]    # Gia Lai
+                            54 => [HCM Ha-Noi]    # Khanh Hoa
+                            55 => [HCM Ha-Noi]    # Kon Tum
+                            23 => [HCM Ha-Noi]    # Lam Dong
+                            60 => [HCM Ha-Noi]    # Ninh Thuan
+                            61 => [HCM Ha-Noi]    # Phu Yen
+                            84 => [HCM Ha-Noi]    # Quang Nam
+                            63 => [HCM Ha-Noi]    # Quang Ngai
+                            66 => [HCM Ha-Noi]    # Hue
+                            75 => [HCM Ha-Noi]    # Binh Duong
+                            87 => [HCM Ha-Noi]    # Can Tho
+                            01 => [HCM Ha-Noi]    # An Giang
+                            45 => [HCM Ha-Noi]    # Vung Tau
+                            73 => [HCM Ha-Noi]    # Bac Lieu
+                            03 => [HCM Ha-Noi]    # Ben Tre
+                            77 => [HCM Ha-Noi]    # Ca Mau
+                            43 => [HCM Ha-Noi]    # Dong Nai
+                            09 => [HCM Ha-Noi]    # Dong Thap
+                            93 => [HCM Ha-Noi]    # Hau Giang
+                            21 => [HCM Ha-Noi]    # Kien Giang
+                            24 => [HCM Ha-Noi]    # Long An
+                            65 => [HCM Ha-Noi]    # Soc Trang
+                            33 => [HCM Ha-Noi]    # Tay Ninh
+                            37 => [HCM Ha-Noi]    # Tien Giang
+                            67 => [HCM Ha-Noi]    # Tra Vinh
+                            69 => [HCM Ha-Noi]    # Vinh Long
+                        }
+                        default => [Ha-Noi HCM]   # Các nước Asian
+                    }
+                    default => [Ha-Noi HCM]       # Các châu lục khác
+                }
+            }
+
+

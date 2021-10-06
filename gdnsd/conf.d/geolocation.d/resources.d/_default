@@ -1,0 +1,13 @@
+ generic-resource  => {
+                map => generic-map
+                dcmap => {
+                    Ha-Noi => [
+			14.225.241.153
+
+                    ]
+                    HCM => [
+			14.225.241.153
+                    ]
+                }
+            }
+
