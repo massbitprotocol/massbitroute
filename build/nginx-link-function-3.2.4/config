@@ -1,0 +1,109 @@
+ngx_addon_name=ngx_http_link_func_module
+
+HTTP_LINK_FUNC_SRCS="$ngx_addon_dir/src/ngx_link_func_module.c \
+"
+
+HTTP_LINK_FUNC_DEPS="$NGX_ADDON_DEPS \
+"
+
+
+# version
+#
+HTTP_LINK_FUNC_DEFAULT_VERSION=1.11
+# HTTP_LINK_FUNC_VERSION=`git --git-dir=$ngx_addon_dir/.git describe 2>/dev/null`
+HTTP_LINK_FUNC_VERSION=${HTTP_LINK_FUNC_VERSION:-$HTTP_LINK_FUNC_DEFAULT_VERSION}
+#echo "#define NGINX_HTTP_HTTP_LINK_FUNC_VERSION \""$HTTP_LINK_FUNC_VERSION"\"" > $NGX_OBJS/ngx_vod_version.h
+
+
+# ngx_link_func_module headers
+# to Test this in order to share the header file to other client instead of just depend on it owns
+ngx_feature="ngx_http_link_func"
+ngx_feature_name="NGX_HAVE_HTTP_LINK_FUNC_HEADERS"
+ngx_feature_run=no
+ngx_feature_incs="#include <ngx_link_func_module.h>"
+ngx_feature_path=
+ngx_feature_libs=
+# ngx_feature_exit_if_not_found=yes
+ngx_feature_test="int ngx_link_func_module_current_version_=ngx_link_func_module_version_34;"
+. auto/feature
+
+if [ $ngx_found != yes ]; then
+echo "ngx_link_func_module.h not found or version not aligned in your system c header path, please copy latest ngx_link_func_module.h to your /usr/include or /usr/local/include or relavent header search path with read and write permission given."
+echo "e.g install -m 644 ../nginx-link-function/src/ngx_link_func_module.h /usr/local/include/"
+echo
+exit 1
+else
+cat $ngx_addon_dir/build_test_resources/sanity_test_raw_parse.t > $ngx_addon_dir/t/sanity.t
+if [ $USE_THREADS = YES ]; then
+cat $ngx_addon_dir/build_test_resources/sanity_test_aio_parse.t >> $ngx_addon_dir/t/sanity.t
+fi
+if [ $HTTP_AUTH_REQUEST = YES ]; then
+cat $ngx_addon_dir/build_test_resources/sanity_test_subrequest_parse.t >> $ngx_addon_dir/t/sanity.t
+if [ $USE_THREADS = YES ]; then
+cat $ngx_addon_dir/build_test_resources/sanity_test_subrequest_aio_parse.t >> $ngx_addon_dir/t/sanity.t
+fi
+fi
+ABSOLUTE_NGX_LINKFUNC_CURRENT_PATH="$( cd "$ngx_addon_dir" ; pwd -P )"
+if [ "$NGX_SYSTEM" = "Darwin" ]; then
+clang -dynamiclib -o $ngx_addon_dir/t/liblinkfuntest.dylib -fPIC $ngx_addon_dir/build_test_resources/linkfuntest.c -Wl,-undefined,dynamic_lookup
+sed -i '' "s@NGINX_HTTP_LINK_FUNC_TEST_LIB_PATH@$ABSOLUTE_NGX_LINKFUNC_CURRENT_PATH/t/liblinkfuntest.dylib@g" $ngx_addon_dir/t/sanity.t
+else 
+if [ "$NGX_PLATFORM" != win32 ]; then
+cc -shared -o $ngx_addon_dir/t/liblinkfuntest.so -fPIC $ngx_addon_dir/build_test_resources/linkfuntest.c
+sed -i "s@NGINX_HTTP_LINK_FUNC_TEST_LIB_PATH@$ABSOLUTE_NGX_LINKFUNC_CURRENT_PATH/t/liblinkfuntest.so@g" $ngx_addon_dir/t/sanity.t
+fi
+fi
+fi
+
+# with OPENSSL feature, NGX_SSL had done verification
+# ngx_feature="ngx_link_func_ssl"
+# ngx_feature_name="NGX_HAVE_HTTP_LINK_FUNC_SSL_HEADERS"
+# ngx_feature_run=no
+# ngx_feature_incs="#include <openssl/ssl.h> #include <openssl/x509_vfy.h> #include <openssl/conf.h>"
+# ngx_feature_path=
+# ngx_feature_libs="-lssl -lcrypto"
+# # ngx_feature_exit_if_not_found=yes
+# ngx_feature_test="SSL_CTX *ctx = SSL_CTX_new(SSLv23_client_method()); SSL *ssl = SSL_new(ctx);"
+# . auto/feature
+
+# if [ $ngx_found = yes ]; then
+# have=NGX_LINK_FUNC_SSL . auto/have
+# fi
+
+# with dlfcn feature 
+ngx_feature="ngx_link_func_compatibility"
+ngx_feature_name="NGX_HAVE_HTTP_LINK_FUNC_COMPATIBLITY"
+ngx_feature_run=no
+ngx_feature_incs="#include <dlfcn.h>"
+ngx_feature_path=
+ngx_feature_libs="-ldl"
+# ngx_feature_exit_if_not_found=yes
+ngx_feature_test="void * pt = dlopen(NULL, RTLD_LAZY | RTLD_NOW);"
+. auto/feature
+
+if [ $ngx_found != yes ]; then
+echo "nginx version not support this module, please make sure nginx version is 1.10 and above"
+echo
+exit 1
+else
+have=DISB_NGX_LINK_FUNC_SUBREQ . auto/have
+fi
+
+
+if test -n "$ngx_module_link"; then
+    ngx_module_type=HTTP
+    ngx_module_name=$ngx_addon_name
+    ngx_module_deps="$HTTP_LINK_FUNC_DEPS"
+    ngx_module_srcs="$HTTP_LINK_FUNC_SRCS"
+    #ngx_module_libs=" -rdynamic -ldl -lpthread -lpcre -Wl,-E"
+    # ngx_module_libs="-ldl"
+    #ngx_module_libs="-lunwind-coredump -lunwind-generic -lunwind-ptrace -lunwind"
+    
+    . auto/module
+else
+  # CORE_INCS="$CORE_INCS $ngx_feature_path"
+  # CORE_LIBS="$CORE_LIBS -ldl"
+  HTTP_MODULES="$HTTP_MODULES ngx_http_link_func_module"
+  NGX_ADDON_SRCS="$NGX_ADDON_SRCS $HTTP_LINK_FUNC_SRCS"
+  NGX_ADDON_DEPS="$NGX_ADDON_DEPS $HTTP_LINK_FUNC_DEPS"
+fi

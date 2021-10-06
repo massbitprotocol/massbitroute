@@ -1,0 +1,14 @@
+version: "3"
+services:
+  builder:
+    command: "sleep infinity"
+#    image: rust:buster
+    image: nginx-link-function
+    ports:
+      - '8888:8888'
+    # depends_on:
+    #   - ipfs
+    #   - postgres
+    volumes:
+      - ./:/work/build:rw
+
