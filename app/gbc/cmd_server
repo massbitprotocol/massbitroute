@@ -1,4 +1,10 @@
 #!/bin/bash
+_install_libs() {
+	for p in luafilesystem lpeg lua-messagepack; do
+		/usr/local/openresty/luajit/bin/luarocks install $p
+	done
+
+}
 declare -i DEBUG=0
 ROOT_DIR=$(cd "$(dirname $0)" && pwd)
 source $ROOT_DIR/bin/shell_func.sh

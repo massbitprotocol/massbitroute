@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+      <title>App</title>
+      <meta charset="utf-8" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <noscript id='deferred-styles'>
+  <link rel="stylesheet" type="text/css" href="assets/js/upgrade/webix/codebase/webix.min.css">
+  <link rel="stylesheet" type="text/css" href="assets/js/upgrade/components/hint/codebase/hint.css">
+  <link rel="stylesheet" type="text/css" href="assets/MaterialDesign-Webfont-master/css/materialdesignicons.min.css">
+  <link rel="stylesheet" type="text/css" href="assets/css/app.css">
+    </noscript>
+    <script type="text/javascript">
+      window.app_name = "control";
+      window.app_version = window.app_name + "/v1";
+      window.api_version = "/api/v1";
+      window.app_view = "views/" + app_version;
+      window.deploy_version = "1.0.0"
+      </script>
+</head>
+
+<body>
+    
+<script type="text/javascript" src="assets/js/objectpath.js"></script>
+<script type="text/javascript" src="assets/js/nimble.min.js"></script>
+<script type="text/javascript" src="assets/js/upgrade/webix/codebase/webix.js"></script>
+<script type="text/javascript" src="assets/js/routie.js"></script>
+<script type="text/javascript" src="assets/js/polyglot.js"></script>
+<script type="text/javascript" data-main="control" src="assets/js/require.js"></script>
+<script type="text/javascript">
+var loadDeferredStyles = function () {
+    var addStylesNode = document.getElementById("deferred-styles");
+    var replacement = document.createElement("div");
+    replacement.innerHTML = addStylesNode.textContent;
+    document.body.appendChild(replacement)
+    addStylesNode.parentElement.removeChild(addStylesNode);
+  };
+  var raf = requestAnimationFrame || mozRequestAnimationFrame ||
+      webkitRequestAnimationFrame || msRequestAnimationFrame;
+  if (raf) raf(function () {
+    window.setTimeout(loadDeferredStyles, 0);
+  });
+  else window.addEventListener('load', loadDeferredStyles);
+  require.config({
+    urlArgs: "bust=" + deploy_version,
+    paths: {text: "assets/js/text"}
+  });
+
+  </script>
+</body>
+</html>
