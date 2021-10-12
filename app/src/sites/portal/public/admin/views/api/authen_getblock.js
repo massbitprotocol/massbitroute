@@ -14,7 +14,7 @@ define(["models/api"], function ($api_api) {
 
         elementsConfig: { labelWidth: 140 },
         view: "form",
-        id: type + "order-form",
+        id: type + "getblock-form",
         elements: [
           {
             view: "text",
@@ -34,7 +34,7 @@ define(["models/api"], function ($api_api) {
                 align: "center",
                 width: 120,
                 click: function () {
-                  var _values = $$(type + "order-form").getValues();
+                  var _values = $$(type + "getblock-form").getValues();
                   //                  $api_api.create(_values);
 
                   $api_api.list({}, function (_values) {
@@ -46,7 +46,8 @@ define(["models/api"], function ($api_api) {
                   console.log(id);
                   var item = _grid.getItem(id.row);
                   console.log(item);
-                  item.authen = _values;
+                  //                    item.authen = _values;
+                  Object.assign(item, _values);
                   console.log(item);
                   _grid.updateItem(id.row, item);
                   webix.$$("auth-win-getblock").close();

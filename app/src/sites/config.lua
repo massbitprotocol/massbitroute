@@ -1,16 +1,21 @@
 local _config = {
     modules = [[
+load_module _GBC_CORE_ROOT_/bin/openresty/nginx/modules/ngx_http_geoip2_module.so;
+load_module _GBC_CORE_ROOT_/bin/openresty/nginx/modules/ngx_stream_geoip2_module.so;
+load_module _GBC_CORE_ROOT_/bin/openresty/nginx/modules/ngx_http_vhost_traffic_status_module.so;
+load_module _GBC_CORE_ROOT_/bin/openresty/nginx/modules/ngx_http_stream_server_traffic_status_module.so;
+load_module _GBC_CORE_ROOT_/bin/openresty/nginx/modules/ngx_stream_server_traffic_status_module.so;
 	]],
     lua_package_path = [[_GBC_CORE_ROOT_/gbc/src/?.lua;]],
     lua_package_cpath = [[_GBC_CORE_ROOT_/gbc/src/?.so;]],
     sites = {
-       	services_gateway = "services/gateway",
+        services_gateway = "services/gateway",
         portal = {
             path = "portal",
             maininit = [[
             env BIND_ADDRESS;
          ]],
-         httpinit = [[
+            httpinit = [[
             resolver 8.8.8.8 ipv6=off;
             variables_hash_bucket_size 512;
             #ssl
@@ -44,8 +49,7 @@ local _config = {
             luawinit = [[
 
         ]]
-        },
-
+        }
     },
     supervisor = [[
 

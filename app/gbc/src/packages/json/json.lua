@@ -21,7 +21,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
 ]]
-
 local pcall = pcall
 local cjson = require("cjson")
 
@@ -34,13 +33,17 @@ local _M = {
 
 function _M.encode(var)
     local ok, res = pcall(cjson_encode, var)
-    if ok then return res end
+    if ok then
+        return res
+    end
     return nil, res -- res is error
 end
 
 function _M.decode(text)
     local ok, res = pcall(cjson_decode, text)
-    if ok then return res end
+    if ok then
+        return res
+    end
     return nil, res -- res is error
 end
 

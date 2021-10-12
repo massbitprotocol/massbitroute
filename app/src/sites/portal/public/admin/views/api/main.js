@@ -47,6 +47,7 @@ define(["views/api/config"], function ($config) {
               return _i.id == _v;
             });
             console.log(_item);
+            if (!_item) return;
             if (_item.network) {
               $$(type + "network").define("options", _item.network);
               $$(type + "network").refresh();

@@ -21,22 +21,21 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
 ]]
-
 local ngx = ngx
 local ngx_log = nil
 if ngx then
     ngx_log = ngx.log
 end
 
-local cc              = cc
+local cc = cc
 local debug_traceback = debug.traceback
-local error           = error
-local print           = print
-local string_format   = string.format
-local string_rep      = string.rep
-local string_upper    = string.upper
-local table_concat    = table.concat
-local tostring        = tostring
+local error = error
+local print = print
+local string_format = string.format
+local string_rep = string.rep
+local string_upper = string.upper
+local table_concat = table.concat
+local tostring = tostring
 
 function cc.throw(fmt, ...)
     local msg
@@ -45,22 +44,25 @@ function cc.throw(fmt, ...)
     else
         msg = string_format(fmt, ...)
     end
-    if cc.DEBUG > cc.DEBUG_WARN then
-        error(msg, 2)
-    else
-        error(msg, 0)
-    end
+    ngx.log(ngx.ERR, msg)
+    -- if cc.DEBUG > cc.DEBUG_WARN then
+    --     error(msg, 2)
+    -- else
+    --     error(msg, 0)
+    -- end
 end
 
 local function _dump_value(v)
     if type(v) == "string" then
-        v = "\"" .. v .. "\""
+        v = '"' .. v .. '"'
     end
     return tostring(v)
 end
 
 function cc.dump(value, desciption, nesting, _print)
-    if type(nesting) ~= "number" then nesting = 3 end
+    if type(nesting) ~= "number" then
+        nesting = 3
+    end
     _print = _print or print
 
     local lookup = {}
@@ -75,16 +77,16 @@ function cc.dump(value, desciption, nesting, _print)
             spc = string_rep(" ", keylen - string.len(_dump_value(desciption)))
         end
         if type(value) ~= "table" then
-            result[#result +1 ] = string_format("%s%s%s = %s", indent, _dump_value(desciption), spc, _dump_value(value))
+            result[#result + 1] = string_format("%s%s%s = %s", indent, _dump_value(desciption), spc, _dump_value(value))
         elseif lookup[tostring(value)] then
-            result[#result +1 ] = string_format("%s%s%s = *REF*", indent, _dump_value(desciption), spc)
+            result[#result + 1] = string_format("%s%s%s = *REF*", indent, _dump_value(desciption), spc)
         else
             lookup[tostring(value)] = true
             if nest > nesting then
-                result[#result +1 ] = string_format("%s%s = *MAX NESTING*", indent, _dump_value(desciption))
+                result[#result + 1] = string_format("%s%s = *MAX NESTING*", indent, _dump_value(desciption))
             else
-                result[#result +1 ] = string_format("%s%s = {", indent, _dump_value(desciption))
-                local indent2 = indent.."    "
+                result[#result + 1] = string_format("%s%s = {", indent, _dump_value(desciption))
+                local indent2 = indent .. "    "
                 local keys = {}
                 local keylen = 0
                 local values = {}
@@ -92,20 +94,25 @@ function cc.dump(value, desciption, nesting, _print)
                     keys[#keys + 1] = k
                     local vk = _dump_value(k)
                     local vkl = string.len(vk)
-                    if vkl > keylen then keylen = vkl end
+                    if vkl > keylen then
+                        keylen = vkl
+                    end
                     values[k] = v
                 end
-                table.sort(keys, function(a, b)
-                    if type(a) == "number" and type(b) == "number" then
-                        return a < b
-                    else
-                        return tostring(a) < tostring(b)
+                table.sort(
+                    keys,
+                    function(a, b)
+                        if type(a) == "number" and type(b) == "number" then
+                            return a < b
+                        else
+                            return tostring(a) < tostring(b)
+                        end
                     end
-                end)
+                )
                 for i, k in ipairs(keys) do
                     _dump(values[k], k, indent2, nest + 1, keylen)
                 end
-                result[#result +1] = string_format("%s}", indent)
+                result[#result + 1] = string_format("%s}", indent)
             end
         end
     end

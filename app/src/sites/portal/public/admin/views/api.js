@@ -70,6 +70,7 @@ define([
                   $api_api.update(_values);
                   $api_api.list({}, function (_values) {
                     console.log(_values);
+                    $$(type + "list").clearAll();
                     $$(type + "list").parse(_values);
                   });
                 },

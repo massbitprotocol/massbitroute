@@ -1,22 +1,23 @@
-define(["views/api/authen_infura", "views/api/authen_getblock"], function (
-  ui_authen_infura,
-  ui_authen_getblock
-) {
+define([
+  "views/api/entrypoint_new",
+  "views/api/authen_infura",
+  "views/api/authen_getblock",
+], function (ui_entrypoint_new, ui_authen_infura, ui_authen_getblock) {
   var type = "api";
-  var products = [
-    {
-      id: 1,
-      type: "INFURA",
-      priority: 5,
-      status: 0,
-    },
-    {
-      id: 2,
-      type: "GETBLOCK",
-      priority: 3,
-      status: 1,
-    },
-  ];
+  // var products = [
+  //   {
+  //     id: 1,
+  //     type: "INFURA",
+  //     priority: 5,
+  //     status: 0,
+  //   },
+  //   {
+  //     id: 2,
+  //     type: "GETBLOCK",
+  //     priority: 3,
+  //     status: 1,
+  //   },
+  // ];
 
   var grid = {
     id: type + "productsData",
@@ -25,7 +26,7 @@ define(["views/api/authen_infura", "views/api/authen_getblock"], function (
     editable: true,
     editaction: "dblclick",
     columns: [
-      { id: "id", header: "#", width: 50 },
+      { id: "id", header: "#", minWidth: 150 },
 
       {
         id: "type",
@@ -83,26 +84,33 @@ define(["views/api/authen_infura", "views/api/authen_getblock"], function (
         template:
           "<span  style='cursor:pointer;' class='webix_icon fa-trash-o'></span>",
       },
-      {
-        id: "add",
-        header: "&nbsp;",
-        width: 50,
-        template:
-          "<span  style='cursor:pointer;' class='webix_icon fa-plus'></span>",
-      },
+      // {
+      //   id: "add",
+      //   header: "&nbsp;",
+      //   width: 50,
+      //   template:
+      //     "<span  style='cursor:pointer;' class='webix_icon fa-plus'></span>",
+      // },
     ],
     pager: "pagerA",
     export: true,
-    data: products,
+    data: [],
     onClick: {
       "fa-shield": function (e, id, node) {
         var item = webix.$$(type + "productsData").getItem(id);
         switch (item.type) {
           case "INFURA":
             this.$scope.ui(ui_authen_infura.$ui).show();
+            $$(type + "infura-form").setValues({
+              infura_project_id: item.infura_project_id,
+              infura_project_secret: item.infura_project_secret,
+            });
             break;
           case "GETBLOCK":
             this.$scope.ui(ui_authen_getblock.$ui).show();
+            $$(type + "getblock-form").setValues({
+              getblock_api_key: item.getblock_api_key,
+            });
             break;
         }
         webix.$$(type + "productsData").refresh(id);
@@ -143,58 +151,59 @@ define(["views/api/authen_infura", "views/api/authen_getblock"], function (
             type: "iconButton",
             icon: "file-excel-o",
             width: 190,
-            label: "Export To Excel",
+            label: "Add Entrypoint",
             click: function () {
-              $$(type + "productsData").exportToExcel();
+              this.$scope.ui(ui_entrypoint_new.$ui).show();
+              //              $$(type + "productsData").exportToExcel();
             },
           },
-          {
-            view: "button",
-            css: "button_primary button_raised",
-            type: "iconButton",
-            icon: "refresh",
-            width: 130,
-            label: "Refresh",
-            click: function () {
-              var grid = $$(type + "productsData");
-              grid.clearAll();
-              grid.showProgress();
-              webix.delay(
-                function () {
-                  grid.parse(products.getAll);
-                  grid.hideProgress();
-                },
-                null,
-                null,
-                300
-              );
-            },
-          },
+          // {
+          //   view: "button",
+          //   css: "button_primary button_raised",
+          //   type: "iconButton",
+          //   icon: "refresh",
+          //   width: 130,
+          //   label: "Refresh",
+          //   click: function () {
+          //     var grid = $$(type + "productsData");
+          //     grid.clearAll();
+          //     grid.showProgress();
+          //     webix.delay(
+          //       function () {
+          //         grid.parse(products.getAll);
+          //         grid.hideProgress();
+          //       },
+          //       null,
+          //       null,
+          //       300
+          //     );
+          //   },
+          // },
           {},
-          {
-            view: "richselect",
-            id: "order_filter",
-            value: "all",
-            maxWidth: 300,
-            minWidth: 250,
-            vertical: true,
-            labelWidth: 110,
-            options: [
-              { id: "all", value: "All" },
-              { id: "1", value: "Published" },
-              { id: "2", value: "Not published" },
-              { id: "0", value: "Deleted" },
-            ],
-            label: "Filter products",
-            on: {
-              onChange: function () {
-                var val = this.getValue();
-                if (val == "all")
-                  $$(type + "productsData").filter("#status#", "");
-                else $$(type + "productsData").filter("#status#", val);
-              },
-            },
-          },
+          // {
+          //   view: "richselect",
+          //   id: "order_filter",
+          //   value: "all",
+          //   maxWidth: 300,
+          //   minWidth: 250,
+          //   vertical: true,
+          //   labelWidth: 110,
+          //   options: [
+          //     { id: "all", value: "All" },
+          //     { id: "1", value: "Published" },
+          //     { id: "2", value: "Not published" },
+          //     { id: "0", value: "Deleted" },
+          //   ],
+          //   label: "Filter products",
+          //   on: {
+          //     onChange: function () {
+          //       var val = this.getValue();
+          //       if (val == "all")
+          //         $$(type + "productsData").filter("#status#", "");
+          //       else $$(type + "productsData").filter("#status#", val);
+          //     },
+          //   },
+          // },
         ],
       },
       {
