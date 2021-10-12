@@ -11,17 +11,21 @@ local json_fields = {
 }
 
 local typeParent = {
-    user = "billing",
-    stack = "user",
-    dns = "stack",
-    site = "stack",
-    record = "dns",
-    monitor = "dns",
-    map = "dns",
-    datacenter = "dns"
+    domain = "user",
+    record = "domain"
+    -- user = "billing",
+    -- stack = "user",
+    -- dns = "stack",
+    -- site = "stack",
+    -- record = "dns",
+    -- monitor = "dns",
+    -- map = "dns",
+    -- datacenter = "dns"
 }
 local typeChild = {
-    dns = {"record"}
+    domain = {"record"},
+    user = {"domain"}
+    -- dns = {"record"}
 }
 
 local typeRelationId = {
@@ -47,6 +51,24 @@ local function _run_shell(cmd)
     return ok, stdout, stderr, reason, status
 end
 
+function _M.showFolderDepth(folder, parent_type)
+    ngx.log(ngx.ERR, "showFolderDepth:" .. folder)
+    local _files = {}
+    setmetatable(_files, cjson.array_mt)
+    -- mkdirp(folder)
+    for _dir in lfs.dir(folder) do
+        ngx.log(ngx.ERR, "showFolderDepth:" .. _dir)
+        if _dir ~= "." and _dir ~= ".." then
+            for _file in lfs.dir(folder .. "/" .. _dir) do
+                ngx.log(ngx.ERR, "showFolderDepth:" .. _file)
+                if _file ~= "." and _file ~= ".." then
+                    _files[#_files + 1] = {id = _file, [parent_type .. "_id"] = _dir}
+                end
+            end
+        end
+    end
+    return _files
+end
 local function showFolder(folder)
     local _files = {}
     setmetatable(_files, cjson.array_mt)
@@ -90,9 +112,15 @@ local function groupBy(_dc_hosts)
     return _tmp
 end
 local function getIdByType(_type, id, _data)
+    local _parent_id
     if not id and _data.id then
         id = _data.id
     end
+    if _data[typeParent[_type]] then
+        _parent_id = _ldata[typeParent[_type] .. "_id"]
+    end
+
+    ngx.log(ngx.ERR, "parent_id:" .. _parent_id)
     if id then
         local _dir = ngx.var.app_root .. "/data/" .. _type .. "/detail"
         mkdirp(_dir)
@@ -301,7 +329,7 @@ function _M.generateDnsZonesDomain(_old_data, _data)
     if _old_data then
         if _old_data.domain then
             local _record_list = {}
---            os.remove(_dir .. "/zones/" .. _old_data.domain)
+            --            os.remove(_dir .. "/zones/" .. _old_data.domain)
             --ngx.log(ngx.ERR, "remove:" .. _dir .. "/zones/" .. _old_data.domain)
 
             if _old_data.records then
@@ -336,7 +364,7 @@ function _M.generateDnsZonesDomain(_old_data, _data)
                 " "
             )
             ngx.log(ngx.ERR, _cmd)
-	    _run_shell(_cmd)
+            _run_shell(_cmd)
         end
     end
 
@@ -533,6 +561,7 @@ function _M.generateDnsZonesDomain(_old_data, _data)
     end
 end
 _M.showFolder = showFolder
+-- _M.showFolderDepth = showFolderDepth
 _M.getIdByType = getIdByType
 
 return _M

@@ -1,0 +1,45 @@
+<!doctype html>
+<html>
+<head>
+	<title>Custom Math Methods</title>
+	<meta  name = "viewport" content = "initial-scale = 1.0, maximum-scale = 1.0, user-scalable = no">
+
+	<script src="../../codebase/webix/webix.js?v=7.3.5" type="text/javascript"></script>
+	<script src="../../codebase/spreadsheet.js?v=7.3.5" type="text/javascript"></script>
+
+	<link rel="stylesheet" type="text/css" href="../../codebase/webix/webix.css?v=7.3.5">
+	<link rel="stylesheet" type="text/css" href="../../codebase/spreadsheet.css?v=7.3.5">
+
+	<script src="../common/data.js?v=7.3.5"></script>
+</head>
+<body>
+	<script type="text/javascript">
+		webix.ready(function(){
+			webix.ui({
+				view:"spreadsheet",
+				id:"ss",
+				toolbar: "full",
+			});
+
+			$$("ss").registerMathMethod("RANDOM", function(value){
+				value = value || 100;
+				return Math.round(Math.random()*value);
+			});
+			$$("ss").registerMathMethod("FIRST", function(set){
+				return set[0];
+			});
+			$$("ss").registerMathMethod("LAST", function(set){
+				return set[set.length-1];
+			});
+
+			$$("ss").parse({
+				data:[
+					[3,3,"RANDOM"], [3,4,"FIRST"], [3,5,"LAST"],
+					[4,3,"=RANDOM(1000)"], [4,4,"=FIRST(H3:H5)"], [4,5,"=LAST(H3:H5)"],
+					[3,8,"1"],[4,8,"2"],[5,8,"3"]
+				]
+			});
+		});
+	</script>
+</body>
+</html>

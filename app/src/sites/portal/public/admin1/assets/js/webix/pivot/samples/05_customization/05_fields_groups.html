@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Grouped fields</title>
+    <link rel="stylesheet" href="../../codebase/webix/webix.css?v=7.3.5" type="text/css" charset="utf-8">
+    <script src="../../codebase/webix/webix.js?v=7.3.5" type="text/javascript" charset="utf-8"></script>
+    <link rel="stylesheet" href="../../codebase//pivot.css?v=7.3.5" type="text/css" charset="utf-8">
+    <script src="../../codebase/pivot.js?v=7.3.5" type="text/javascript" charset="utf-8"></script>
+
+    <link rel="stylesheet" href="../common/samples.css?v=7.3.5" type="text/css" charset="utf-8">
+    <script src="../common/testdata.js?v=7.3.5" type="text/javascript" charset="utf-8"></script>
+    <style>
+        .webix_pivot .webix_unit_header{
+            background-color: #fff;
+            color: #888;
+            font-size: 14px;
+            padding-left: 20px;
+        }
+        .webix_pivot_list_drag {
+            display: none;
+        }
+        .webix_tree_item {
+            border-bottom: 1px solid #ebebeb;
+            padding: 5px 10px;
+            position: relative;
+        }
+        .webix_tree_leaves .webix_tree_leaves .webix_tree_item .webix_pivot_list_drag {
+            display: block;
+        }
+        .webix_tree .webix_scroll_cont>.webix_tree_leaves {
+            padding: 0;
+        }
+        .webix_tree_leaves .webix_tree_leaves {
+            margin-left: 0;
+        }
+        html, body {
+            width: 100%;
+            height: 100%;
+            padding: 0;
+            margin: 0;
+        }
+        .webix_tree_folder_pivot {
+            background-repeat: no-repeat;
+            margin-right: 8px;
+            width: 20px;
+            height: 16px;
+            vertical-align: middle;
+        }
+        .webix_tree_open+.webix_tree_folder_pivot {
+            background-image: url("../common/open-folder-icon.svg");
+        }
+        .webix_tree_close+.webix_tree_folder_pivot {
+            background-image: url("../common/folder.svg");
+        }
+        .webix_tree_file_pivot {
+            background-image: url("../common/file-icon.svg");
+            background-repeat: no-repeat;
+            width: 20px;
+            height: 20px;
+            vertical-align: middle;
+            margin-right: 5px;
+        }
+        .webix_tree_leaves .webix_tree_leaves .webix_tree_item {
+            padding-left: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<div id="testA"></div>
+
+<script type="text/javascript" charset="utf-8">
+    var valueFields = {
+        'Media Source': 1,
+        'Partner': 1,
+        'Campaign': 1,
+        'Adset': 1
+    };
+
+    webix.ready(function(){
+        webix.ui({
+            container: "testA",
+            id: "pivot",
+            view: "pivot",
+            popup:{
+                on:{
+                    onViewInit: function(name, config){
+                        if(name == "fields"){
+                            config.view = "tree";
+                            config.type = {
+                                folder: function(obj){
+                                    if(obj.$level == 1)
+                                        return "<span class='webix_icon webix_tree_folder_pivot'></span>";
+                                    if (obj.$level == 2)
+                                        return "<span class='webix_icon webix_tree_file_pivot'></span><span class='webix_pivot_icon webix_pivot_list_drag'></span>";
+                                }
+                            };
+                            config.template = "{common.icon()}{common.folder()}#name#<span class='webix_pivot_icon webix_pivot_list_drag'></span>";
+                            config.scheme = {
+                                $group:function(obj){
+                                    if (valueFields[obj.text]) {
+                                        return "Dimensions";
+                                    } else {
+                                        return "KPIs";
+                                    }
+
+                                },
+                                $init:function(obj){
+                                    obj.name = obj.name || obj.value;
+                                    if (obj.$group)
+                                        obj.open = true;
+                                }
+                            };
+                        }
+                    }
+                }
+            }
+        });
+
+        $$("pivot").parse([
+            {"Metric A":5, "Media Source":1, Partner:2, Campaign:3, Adset:4, "Metric B":6, "Metric C":7},
+            {"Metric A":5, "Media Source":1, Partner:2, Campaign:3, Adset:4, "Metric B":6, "Metric C":7}]);
+        $$("pivot").configure({});
+    });
+</script>
+</body>
+</html>

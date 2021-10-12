@@ -4,6 +4,7 @@ local _config = {
     lua_package_path = [[_GBC_CORE_ROOT_/gbc/src/?.lua;]],
     lua_package_cpath = [[_GBC_CORE_ROOT_/gbc/src/?.so;]],
     sites = {
+       	services_gateway = "services/gateway",
         portal = {
             path = "portal",
             maininit = [[
@@ -44,6 +45,7 @@ local _config = {
 
         ]]
         },
+
     },
     supervisor = [[
 

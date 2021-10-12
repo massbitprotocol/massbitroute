@@ -1,109 +1,105 @@
-local uuid = require 'jit-uuid'
-
-
-
 local gbc = cc.import("#gbc")
-local type = "api"
-local Action = cc.class("Api" .. type, gbc.ActionBase)
+local mytype = "api"
+local Session = cc.import("#session")
 
-local mkdirp = require "mkdirp"
-local flatdb = require "flatdb"
+local json = cc.import("#json")
+local cjson = require "cjson"
+local Action = cc.class(mytype .. "Action", gbc.ActionBase)
 
-local dir_data =  ngx.var.app_root .. "/data/"
-local dir_detail = dir_data .. type  .. "/detail"
+local _opensession
 
-local util = require "api_util"
-local showFolder = util.showFolder
-local getIdByType = util.getIdByType
-local typeParent = util.typeParent
+local Model = cc.import("#" .. mytype)
 
-function Action:updateAction(args)
-   if not args.key or string.len(args.key) == 0 then
-      uuid.seed()
-      args.key = uuid()
-   end
-   
+local _user
+
+function Action:createAction(args)
     args.action = nil
-    local id = args.id
+    local instance = self:getInstance()
+    local _session = _opensession(instance, args)
 
-    if id then
-        local _dir = dir_detail
-        mkdirp(_dir)
-        local db = flatdb(_dir)
-
-        if not db[id] then
-            db[id] = {}
-        end
-        table.merge(db[id], args)
-        db:save()
-
-        local parent_type = typeParent[type]
-        local parent_id = parent_type and db[id][parent_type .. "_id"]
-        if parent_type and parent_id then
-            local parent_dir = dir_data .. parent_type .. "/list/" .. type .. "/" .. parent_id
-            mkdirp(parent_dir)
-            local db_parent = flatdb(parent_dir)
-            if not db[id] then
-                db[id] = {}
-            end
-            db_parent[id] = db[id]
-            db_parent:save()
-        end
+    if not _session then
+        return {result = false}
     end
-
+    local model = Model:new(instance)
+    local _detail = model:create(args)
     return {
         result = true
     }
 end
 
-
-
-function Action:getAction(args)
-    local id = args.id
+function Action:updateAction(args)
     args.action = nil
-    mkdirp(dir_data)
-    local _data = {}
-    if not id then
-        _data = showFolder(dir_detail)
-    else
-        local db = flatdb(dir_detail)
-        _data = db[id]
-    end
-    return {
-        result = true,
-        data = _data
-    }
-end
+    local instance = self:getInstance()
+    local _session = _opensession(instance, args)
 
-function Action:genAction(args)
-    local id = args.id
-    args.action = nil
-    local _data
-    if id then
-        _data = getIdByType(type, id)
-        _data.dnss = {
-            {id = 1, domain = "abc.com"}
-        }
-        _data.sites = {
-            {id = 1}
-        }
+    if not _session then
+        return {result = false}
     end
+    local model = Model:new(instance)
+    local _detail = model:update(args)
     return {
-        result = true,
-        data = _data
+        result = true
     }
 end
 
 function Action:deleteAction(args)
-    local id = args.id
     args.action = nil
-    if id and id ~= "." and id ~= ".." then
-        os.remove(dir_data .. "/" .. id)
-    end
+    local instance = self:getInstance()
+    local _session = _opensession(instance, args)
 
+    if not _session then
+        return {result = false}
+    end
+    local model = Model:new(instance)
+    local _detail = model:delete(args)
     return {
         result = true
     }
+end
+
+function Action:listAction(args)
+    args.action = nil
+    local instance = self:getInstance()
+    local _session = _opensession(instance, args)
+
+    if not _session then
+        return {result = false}
+    end
+    local model = Model:new(instance)
+    local _detail = model:list(args)
+    local _res = {}
+
+    setmetatable(_res, cjson.empty_array_mt)
+
+    for i, v in pairs(_detail) do
+        if v then
+            _res[#_res + 1] = json.decode(v)
+        end
+    end
+
+    return {
+        result = true,
+        data = _res
+    }
+end
+
+--private
+
+_opensession = function(instance, args)
+    local sid = args.sid
+    sid = sid or ngx.var.cookie__slc_web_sid
+    if not sid then
+        cc.throw('not set argsument: "sid"')
+        return nil
+    end
+
+    local session = Session:new(instance:getRedis())
+    if not session:start(sid) then
+        cc.throw("session is expired, or invalid session id")
+        return nil
+    end
+
+    return session
 end
 
 return Action

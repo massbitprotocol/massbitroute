@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta  name = "viewport" content = "initial-scale = 1.0, maximum-scale = 1.0, user-scalable = no">
+
+	<script src="../../codebase/webix/webix.js?v=7.3.5" type="text/javascript"></script>
+		<script src="../../codebase/scheduler.js?v=7.3.5" type="text/javascript"></script>
+
+		<link rel="stylesheet" type="text/css" href="../../codebase/scheduler.css?v=7.3.5">
+
+	<title>Dynamic loading</title>
+	<script type="text/javascript" charset="utf-8">
+		scheduler.config.init_date = new Date(2018,5,12);
+		webix.ready(function(){
+			webix.ui.fullScreen();
+			webix.ui({
+				view: "scheduler",
+				id: "scheduler"
+			});
+			// scheduler supports "month" and "year" modes
+			$$("scheduler").setLoadMode("month");
+
+			$$("scheduler").load("/scheduler/samples/server/data");
+		});
+	</script>
+</head>
+<body>
+</body>
+</html>

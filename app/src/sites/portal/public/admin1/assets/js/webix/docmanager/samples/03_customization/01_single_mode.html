@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>Document Manager: Single Mode</title>
+		<!-- Webix Library -->
+		<script type="text/javascript" src="../../codebase/webix/webix.js"></script>
+		<link
+			rel="stylesheet"
+			type="text/css"
+			href="../../codebase/webix/webix.css"
+		/>
+
+		<!-- App -->
+		<script type="text/javascript" src="../../codebase/docmanager.js"></script>
+		<link
+			rel="stylesheet"
+			type="text/css"
+			href="../../codebase/docmanager.css"
+		/>
+	</head>
+	<body>
+		<script>
+			webix.ready(function() {
+				if (!webix.env.touch && webix.env.scrollSize) webix.CustomScroll.init();
+
+				// customize the top bar of Document Manager
+				class CustomTopBar extends docManager.views.topbar {
+					init() {
+						// default logic
+						super.init();
+						// removing views can cause errors
+						// hiding views is safe
+						this.$$("modes").hide();
+					}
+				}
+
+				var app = new docManager.App({
+					url: "https://docs.webix.com/docmanager-backend/",
+					mode: "cards",
+					override: new Map([[docManager.views.topbar, CustomTopBar]]),
+				});
+
+				app.render(document.body);
+			});
+		</script>
+	</body>
+</html>
