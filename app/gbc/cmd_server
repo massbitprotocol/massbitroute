@@ -5,9 +5,7 @@ _install_libs() {
 	done
 
 }
-if [ $# -gt 0 ];then
-    $@;exit 0;
-fi
+
 
 declare -i DEBUG=0
 ROOT_DIR=$(cd "$(dirname $0)" && pwd)
