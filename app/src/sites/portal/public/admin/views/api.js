@@ -4,8 +4,9 @@ define([
 
   "views/api/search",
   "views/api/main",
+  "views/api/stat",
   "views/api/entrypoint",
-], function ($api_api, ui_new, ui_search, ui_main, ui_entrypoint) {
+], function ($api_api, ui_new, ui_search, ui_main, ui_stat, ui_entrypoint) {
   var type = "api";
 
   var mainView = {};
@@ -39,13 +40,15 @@ define([
                 optionWidth: 100,
                 options: [
                   { id: type + "mainView", value: "Main" },
+
                   { id: type + "entrypointView", value: "Entrypoints" },
+                  { id: type + "statView", value: "Stat" },
                 ],
               },
             ],
           },
           {
-            cells: [ui_main, ui_entrypoint],
+            cells: [ui_main, ui_entrypoint, ui_stat],
           },
           {
             view: "form",
