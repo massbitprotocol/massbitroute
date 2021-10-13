@@ -62,7 +62,10 @@ define(["models/api", "views/api/config"], function ($api_api, $api_config) {
             label: "Network",
             name: "network",
             id: type + "network",
-            options: [],
+            options: [
+              { id: "mainnet", value: "Mainnet" },
+              { id: "testnet", value: "Testnet" },
+            ],
           },
           {
             margin: 10,

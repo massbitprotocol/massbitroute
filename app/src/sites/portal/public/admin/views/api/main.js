@@ -84,14 +84,20 @@ define(["views/api/config"], function ($api_config) {
         label: "API Interface",
         name: "api_interface",
         id: type + "api_interface",
-        options: [],
+        options: [
+          { id: "jsonrpc", value: "JSON-RPC" },
+          { id: "ws", value: "WS" },
+        ],
       },
       {
         view: "segmented",
         label: "Network",
         name: "network",
         id: type + "network",
-        options: [],
+        options: [
+          { id: "mainnet", value: "Mainnet" },
+          { id: "testnet", value: "Testnet" },
+        ],
       },
 
       {},
