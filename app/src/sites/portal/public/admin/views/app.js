@@ -1,5 +1,5 @@
 define([
-    "models/auth",
+  "models/auth",
   "views/menus/search",
   "views/menus/mail",
   "views/menus/message",
@@ -18,7 +18,7 @@ define([
         borderless: true,
         css: "logo",
         template:
-          "<a href='http://webix.com'><img class='photo' src='assets/imgs/logo.png?555' /></a>",
+          "<a href='https://dapi.massbit.io'><img class='photo' src='assets/imgs/logo.png?555' /></a>",
         width: 200,
       },
       {
@@ -90,8 +90,8 @@ define([
   return {
     $ui: layout,
     $menu: "app:menu",
-      $oninit: function (view, scope) {
-	        setTimeout(function () {
+    $oninit: function (view, scope) {
+      setTimeout(function () {
         $auth.ping();
       }, 1000);
 
