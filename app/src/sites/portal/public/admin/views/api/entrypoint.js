@@ -119,7 +119,7 @@ define([
           case "QUICKNODE":
             this.$scope.ui(ui_authen_quicknode.$ui).show();
             $$(type + "quicknode-form").setValues({
-              quicknode_api_key: item.quicknode_api_key,
+              quicknode_api_uri: item.quicknode_api_uri,
             });
             break;
           case "INFURA":

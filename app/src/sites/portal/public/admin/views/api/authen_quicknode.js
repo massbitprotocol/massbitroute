@@ -18,9 +18,9 @@ define(["models/api"], function ($api_api) {
         elements: [
           {
             view: "text",
-            label: "API Key",
-            placeholder: "Your API Key",
-            name: "quicknode_api_key",
+            label: "API URI",
+            placeholder: "Your API URI",
+            name: "quicknode_api_uri",
           },
           {
             margin: 10,

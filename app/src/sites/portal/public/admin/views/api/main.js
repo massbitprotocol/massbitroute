@@ -1,6 +1,6 @@
-define(["views/api/config"], function ($config) {
+define(["views/api/config"], function ($api_config) {
   var type = "api";
-  var _blockchain_option = $config.blockchains;
+  var _blockchain_option = $api_config.blockchains;
   var form = {
     view: "form",
     id: type + "mainView",
@@ -11,15 +11,27 @@ define(["views/api/config"], function ($config) {
     elements: [
       {
         cols: [
-          {},
           {
-            view: "toggle",
-            autowidth: true,
-            name: "status",
-            label: "Status",
-            offLabel: "Disabled",
-            onLabel: "Enabled",
+            view: "fieldset",
+            label: "Your API provider",
+            body: {
+              rows: [
+                {
+                  view: "text",
+                  name: "gateway_http",
+                  label: "HTTP Provider",
+                  readonly: true,
+                },
+                {
+                  view: "text",
+                  label: "WSS Provider",
+                  name: "gateway_wss",
+                  readonly: true,
+                },
+              ],
+            },
           },
+          //          {},
         ],
       },
       {
@@ -27,6 +39,11 @@ define(["views/api/config"], function ($config) {
         placeholder: type + " name",
         name: "name",
         label: "Name",
+      },
+      {
+        view: "checkbox",
+        name: "status",
+        label: "Status",
       },
       {
         view: "text",
@@ -48,13 +65,16 @@ define(["views/api/config"], function ($config) {
             });
             console.log(_item);
             if (!_item) return;
-            if (_item.network) {
-              $$(type + "network").define("options", _item.network);
-              $$(type + "network").refresh();
+
+            var _ui = $$(type + "network");
+            if (_item.network && _ui) {
+              _ui.define("options", _item.network);
+              _ui.refresh();
             }
-            if (_item.api_interface) {
-              $$(type + "api_interface").define("options", _item.api_interface);
-              $$(type + "api_interface").refresh();
+            var _ui = $$(type + "api_interface");
+            if (_item.api_interface && _ui) {
+              _ui.define("options", _item.api_interface);
+              _ui.refresh();
             }
           },
         },
