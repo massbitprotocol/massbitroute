@@ -21,9 +21,9 @@ function User:create(args)
     args.status = 1
     if args.blockchain and args.network then
         args.gateway_http =
-            "https://node01." .. args.blockchain .. "-" .. args.network .. ".massroute.com/" .. args.api_key .. "/"
+            "https://node01." .. args.blockchain .. "-" .. args.network .. ".massbitroute.com/" .. args.api_key .. "/"
         args.gateway_wss =
-            "wss://node01." .. args.blockchain .. "-" .. args.network .. ".massroute.com/" .. args.api_key .. "/"
+            "wss://node01." .. args.blockchain .. "-" .. args.network .. ".massbitroute.com/" .. args.api_key .. "/"
     end
 
     args.created_at = now
