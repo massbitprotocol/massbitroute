@@ -56,6 +56,7 @@ define(["views/api/config"], function ($api_config) {
         view: "combo",
         label: "Blockchain",
         name: "blockchain",
+        value: "eth",
         options: _blockchain_option,
         on: {
           onChange: function (_v) {
@@ -83,6 +84,7 @@ define(["views/api/config"], function ($api_config) {
         view: "segmented",
         label: "API Interface",
         name: "api_interface",
+        value: "jsonrpc",
         id: type + "api_interface",
         options: [
           { id: "jsonrpc", value: "JSON-RPC" },
@@ -93,6 +95,7 @@ define(["views/api/config"], function ($api_config) {
         view: "segmented",
         label: "Network",
         name: "network",
+        value: "mainnet",
         id: type + "network",
         options: [
           { id: "mainnet", value: "Mainnet" },

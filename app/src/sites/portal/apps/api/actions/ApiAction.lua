@@ -20,6 +20,11 @@ function Action:createAction(args)
     if not _session then
         return {result = false}
     end
+    local user_id = _session:get("id")
+    if user_id then
+        args.user_id = user_id
+    end
+
     local model = Model:new(instance)
     local _detail = model:create(args)
     return {
@@ -35,6 +40,11 @@ function Action:updateAction(args)
     if not _session then
         return {result = false}
     end
+    local user_id = _session:get("id")
+    if user_id then
+        args.user_id = user_id
+    end
+
     local model = Model:new(instance)
     local _detail = model:update(args)
     return {
@@ -50,6 +60,11 @@ function Action:deleteAction(args)
     if not _session then
         return {result = false}
     end
+    local user_id = _session:get("id")
+    if user_id then
+        args.user_id = user_id
+    end
+
     local model = Model:new(instance)
     local _detail = model:delete(args)
     return {
@@ -65,6 +80,11 @@ function Action:listAction(args)
     if not _session then
         return {result = false}
     end
+    local user_id = _session:get("id")
+    if user_id then
+        args.user_id = user_id
+    end
+
     local model = Model:new(instance)
     local _detail = model:list(args)
     local _res = {}

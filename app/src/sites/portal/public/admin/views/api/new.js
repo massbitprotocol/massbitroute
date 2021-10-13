@@ -26,6 +26,7 @@ define(["models/api", "views/api/config"], function ($api_api, $api_config) {
             view: "combo",
             label: "Blockchain",
             name: "blockchain",
+            value: "eth",
             options: _blockchain_option,
             on: {
               onChange: function (_v) {
@@ -60,6 +61,7 @@ define(["models/api", "views/api/config"], function ($api_api, $api_config) {
           {
             view: "segmented",
             label: "Network",
+            value: "mainnet",
             name: "network",
             id: type + "network",
             options: [

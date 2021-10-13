@@ -68,11 +68,13 @@ define([
                   console.log(_entrypoints);
                   _values.entrypoints = _entrypoints;
                   $api_api.update(_values);
-                  $api_api.list({}, function (_values) {
-                    console.log(_values);
-                    $$(type + "list").clearAll();
-                    $$(type + "list").parse(_values);
-                  });
+                  setTimeout(function () {
+                    $api_api.list({}, function (_values) {
+                      console.log(_values);
+                      $$(type + "list").clearAll();
+                      $$(type + "list").parse(_values);
+                    });
+                  }, 1000);
                 },
               },
               // {
