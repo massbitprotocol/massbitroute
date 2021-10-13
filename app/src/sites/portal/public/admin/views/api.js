@@ -37,7 +37,7 @@ define([
               {
                 view: "tabbar",
                 multiview: true,
-                optionWidth: 100,
+                optionWidth: 200,
                 options: [
                   { id: type + "mainView", value: "Main" },
 
