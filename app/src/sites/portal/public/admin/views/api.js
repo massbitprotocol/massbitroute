@@ -42,7 +42,7 @@ define([
                   { id: type + "mainView", value: "Main" },
 
                   { id: type + "entrypointView", value: "Entrypoints" },
-                  { id: type + "statView", value: "Stat" },
+                  { id: type + "statView", value: "Stats" },
                 ],
               },
             ],
