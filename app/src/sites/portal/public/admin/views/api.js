@@ -99,6 +99,7 @@ define([
                       if (res) {
                         var _values = $$(type + "mainView").getValues();
                         $api_api.delete(_values);
+                        $$(type + "list").remove(_values.id);
                         $api_api.list({}, function (_values) {
                           console.log(_values);
                           $$(type + "list").clearAll();
