@@ -20,19 +20,19 @@ define([
             type: "material",
             cols: [visitors, orders],
           },
-          {
-            type: "material",
-            cols: [
-              messages,
-              {
-                rows: [revenue],
-              },
-            ],
-          },
-          {
-            type: "material",
-            cols: [tasks, map],
-          },
+          // {
+          //   type: "material",
+          //   cols: [
+          //     messages,
+          //     {
+          //       rows: [revenue],
+          //     },
+          //   ],
+          // },
+          // {
+          //   type: "material",
+          //   cols: [tasks, map],
+          // },
         ],
       },
     ],
