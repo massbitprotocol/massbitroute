@@ -21,6 +21,14 @@ define(["views/api/config"], function ($api_config) {
   var _time = [
     { id: "10m", value: "10 Minutes" },
     { id: "30m", value: "30 Minutes" },
+    { id: "1h", value: "1 Hour" },
+    { id: "3h", value: "3 Hour" },
+    { id: "6h", value: "6 Hour" },
+    { id: "12h", value: "12 Hour" },
+    { id: "1d", value: "1 Day" },
+    { id: "1w", value: "1 Week" },
+    { id: "2w", value: "2 Weeks" },
+    { id: "1mon", value: "1 Month" },
   ];
   var form = {
     view: "form",
