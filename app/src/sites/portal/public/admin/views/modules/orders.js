@@ -4,7 +4,7 @@ define(function () {
       type: "clean",
       rows: [
         {
-          template: "<span class='webix_icon fa-bar-chart'></span>Orders",
+          template: "<span class='webix_icon fa-bar-chart'></span>Requests",
           css: "sub_title",
           height: 30,
         },

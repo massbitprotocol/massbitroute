@@ -3,11 +3,17 @@ define([
   "views/modules/dashline",
   "views/modules/visitors",
   "views/modules/orders",
-  "views/modules/messages",
-  "views/modules/revenue",
-  "views/modules/tasks",
-  "views/modules/map",
-], function ($auth, dashline, visitors, orders, messages, revenue, tasks, map) {
+  // "views/modules/messages",
+  // "views/modules/revenue",
+  // "views/modules/tasks",
+  // "views/modules/map",
+], function (
+  $auth,
+  dashline,
+  visitors,
+  orders
+  // messages, revenue, tasks, map
+) {
   var layout = {
     type: "clean",
     rows: [
