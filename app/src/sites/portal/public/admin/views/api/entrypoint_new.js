@@ -1,4 +1,5 @@
-define(["models/api"], function ($api_api) {
+define(["views/api/config", "models/api"], function ($api_config, $api_api) {
+  var _providers = $api_config.providers;
   var type = "api";
   return {
     $ui: {
@@ -22,10 +23,10 @@ define(["models/api"], function ($api_api) {
             placeholder: "Your Provider",
             name: "type",
             value: "INFURA",
-            options: ["INFURA", "GETBLOCK"],
+            options: _providers,
             on: {
               onChange: function (_v) {
-                ["INFURA", "GETBLOCK"].forEach(function (_v1) {
+                _providers.forEach(function (_v1) {
                   var _ui = $$("authen_" + _v1);
                   if (_ui) {
                     if (_v == _v1) _ui.show();
@@ -77,6 +78,30 @@ define(["models/api"], function ($api_api) {
                 label: "API Key",
                 placeholder: "Your API Key",
                 name: "getblock_api_key",
+              },
+            ],
+          },
+          {
+            hidden: true,
+            id: "authen_QUICKNODE",
+            rows: [
+              {
+                view: "text",
+                label: "API Key",
+                placeholder: "Your API Key",
+                name: "quicknode_api_key",
+              },
+            ],
+          },
+          {
+            hidden: true,
+            id: "authen_CUSTOM",
+            rows: [
+              {
+                view: "text",
+                label: "API URI",
+                placeholder: "Your API URI",
+                name: "custom_api_uri",
               },
             ],
           },

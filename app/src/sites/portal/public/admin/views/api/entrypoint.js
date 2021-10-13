@@ -1,9 +1,20 @@
 define([
+  "views/api/config",
   "views/api/entrypoint_new",
   "views/api/authen_infura",
   "views/api/authen_getblock",
-], function (ui_entrypoint_new, ui_authen_infura, ui_authen_getblock) {
+  "views/api/authen_quicknode",
+  "views/api/authen_custom",
+], function (
+  $api_config,
+  ui_entrypoint_new,
+  ui_authen_infura,
+  ui_authen_getblock,
+  ui_authen_quicknode,
+  ui_authen_custom
+) {
   var type = "api";
+  var _providers = $api_config.providers;
   // var products = [
   //   {
   //     id: 1,
@@ -35,7 +46,7 @@ define([
         minWidth: 150,
         // fillspace: 2,
         editor: "select",
-        options: ["INFURA", "GETBLOCK"],
+        options: _providers,
         template: "<div class='status provider#type#'>#type#</div>",
       },
 
@@ -99,6 +110,18 @@ define([
       "fa-shield": function (e, id, node) {
         var item = webix.$$(type + "productsData").getItem(id);
         switch (item.type) {
+          case "CUSTOM":
+            this.$scope.ui(ui_authen_custom.$ui).show();
+            $$(type + "custom-form").setValues({
+              custom_api_uri: item.custom_api_uri,
+            });
+            break;
+          case "QUICKNODE":
+            this.$scope.ui(ui_authen_quicknode.$ui).show();
+            $$(type + "quicknode-form").setValues({
+              quicknode_api_key: item.quicknode_api_key,
+            });
+            break;
           case "INFURA":
             this.$scope.ui(ui_authen_infura.$ui).show();
             $$(type + "infura-form").setValues({

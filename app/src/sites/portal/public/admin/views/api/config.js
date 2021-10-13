@@ -1,4 +1,5 @@
 define([], function () {
+  var _providers = ["INFURA", "GETBLOCK", "QUICKNODE", "CUSTOM"];
   var _blockchains = [
     {
       id: "eth",
@@ -34,6 +35,19 @@ define([], function () {
       network: [
         { id: "mainnet", value: "Mainnet" },
         { id: "testnet", value: "Testnet" },
+      ],
+    },
+    {
+      id: "sol",
+      value: "Solana",
+      api_interface: [
+        { id: "jsonrpc", value: "JSON-RPC" },
+        { id: "ws", value: "WS" },
+      ],
+      network: [
+        { id: "mainnet", value: "Mainnet" },
+        { id: "testnet", value: "Testnet" },
+        { id: "devnet", value: "Devnet" },
       ],
     },
     {
@@ -108,5 +122,6 @@ define([], function () {
   ];
   return {
     blockchains: _blockchains,
+    providers: _providers,
   };
 });

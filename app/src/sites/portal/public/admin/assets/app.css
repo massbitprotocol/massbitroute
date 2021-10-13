@@ -594,6 +594,12 @@ img {
 .providerGETBLOCK {
   background-color: #63b4ea;
 }
+.providerQUICKNODE {
+  background-color: #27ae60;
+}
+.providerCUSTOM {
+  background-color: #eb6e1a;
+}
 .status0 {
   background-color: #eb6e1a;
 }
