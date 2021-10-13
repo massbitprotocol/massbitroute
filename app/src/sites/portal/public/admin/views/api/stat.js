@@ -33,7 +33,7 @@ define(["views/api/config"], function ($api_config) {
       {
         cols: [
           { template: "Total Number of Method Calls", type: "header" },
-          { view: "select", width: 150, options: _blockchain_option },
+          // { view: "select", width: 150, options: _blockchain_option },
           { view: "select", width: 150, options: _time },
         ],
       },
@@ -61,7 +61,7 @@ define(["views/api/config"], function ($api_config) {
       {
         cols: [
           { template: "TOP 10 Method Calls", type: "header" },
-          { view: "select", width: 150, options: _blockchain_option },
+          // { view: "select", width: 150, options: _blockchain_option },
           { view: "select", width: 150, options: _time },
         ],
       },
