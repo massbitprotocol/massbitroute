@@ -1,0 +1,22 @@
+#!/bin/bash
+GRAFANA_VERSION=v8.2.1
+GRAFANA_DIR=/root/.asdf/installs/grafana/$GRAFANA_VERSION
+PROMETHEUS_VERSION=v2.30.3
+PROMETHEUS_DIR=/root/.asdf/installs/prometheus/$PROMETHEUS_VERSION
+
+_service_grafana() {
+	_SITE_ROOT_=$1
+	_service_grafana_init
+	exec $GRAFANA_DIR/bin/grafana-server -homepath $GRAFANA_DIR
+}
+_service_prometheus() {
+	_SITE_ROOT_=$1
+	exec $PROMETHEUS_DIR/bin/prometheus --web.enable-admin-api --config.file=$_SITE_ROOT_/etc/prometheus/stat.yml --web.listen-address="127.0.0.1:9090" --web.external-url http://127.0.0.1:9090/__internal_prometheus --web.enable-lifecycle --storage.tsdb.path $_SITE_ROOT_/data/prometheus
+}
+loop() {
+	while true; do
+		$@
+	done
+
+}
+$@
