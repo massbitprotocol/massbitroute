@@ -7,7 +7,7 @@ PROMETHEUS_DIR=/root/.asdf/installs/prometheus/$PROMETHEUS_VERSION
 _service_grafana() {
 	_SITE_ROOT_=$1
 	_service_grafana_init
-	exec $GRAFANA_DIR/bin/grafana-server -homepath $GRAFANA_DIR
+	exec $GRAFANA_DIR/bin/grafana-server -config $_SITE_ROOT_/etc/grafana.ini -homepath $GRAFANA_DIR
 }
 _service_prometheus() {
 	_SITE_ROOT_=$1
