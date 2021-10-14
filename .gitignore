@@ -4,4 +4,4 @@
 **/target
 **/tmp
 **/db
-**/*.pyc
+*.pyc

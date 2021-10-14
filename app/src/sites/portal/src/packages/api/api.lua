@@ -7,6 +7,7 @@ local model_type = "api"
 local model_id = 2000
 local Model = cc.import("#model")
 local uuid = require "jit-uuid"
+local util = require "util"
 
 function User:ctor(instance)
     self._instance = instance
@@ -20,11 +21,14 @@ function User:create(args)
     uuid.seed(_now)
     args.api_key = uuid()
     args.status = 1
+    args.api_id = util.randomString(6)
     if args.blockchain and args.network then
         args.gateway_http =
-            "https://node01-" .. args.blockchain .. "-" .. args.network .. ".massbitroute.com/" .. args.api_key .. "/"
+            "https://" ..
+            args.api_id .. "." .. args.blockchain .. "-" .. args.network .. ".massbitroute.com/" .. args.api_key .. "/"
         args.gateway_wss =
-            "wss://node01-" .. args.blockchain .. "-" .. args.network .. ".massbitroute.com/" .. args.api_key .. "/"
+            "wss://" ..
+            args.api_id .. "." .. args.blockchain .. "-" .. args.network .. ".massbitroute.com/" .. args.api_key .. "/"
     end
 
     args.created_at = now
