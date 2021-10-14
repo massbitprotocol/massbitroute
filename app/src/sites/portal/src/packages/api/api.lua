@@ -21,7 +21,7 @@ function User:create(args)
     uuid.seed(_now)
     args.api_key = uuid()
     args.status = 1
-    args.api_id = util.randomString(6)
+    args.api_id = util.randomString(12)
     if args.blockchain and args.network then
         args.gateway_http =
             "https://" ..
