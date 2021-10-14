@@ -10,4 +10,4 @@ scrape_configs:
     #     regex: "([^:]+)(:[0-9]+)?"
     #     replacement: "${1}"
     static_configs:
-      - targets: ["stat-01.massbitroute.com"]
+      - targets: ["s01.stats.massbitroute.com"]
