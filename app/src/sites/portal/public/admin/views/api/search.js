@@ -69,7 +69,7 @@ define(["models/api"], function ($api_api) {
                   "https://stats.massbitroute.com/__internal_grafana/d-solo/51eatqDMn/api?orgId=1&var-Instance=All&var-Host=" +
                   _loc.hostname +
                   "&panelId=8";
-                console.log(_chart_url);
+
                 var _ui = $$(type + "stat_total_request");
                 if (_ui) _ui.define("src", _chart_url_total_request);
                 var _ui = $$(type + "stat_total_bandwidth");
