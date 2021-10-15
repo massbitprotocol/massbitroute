@@ -6,8 +6,10 @@ define([], function () {
     webix.ajax().post("/api/v1", args, function (_text, _json) {
       var _res = _json.json();
       console.log(_res);
-      if (_res.result) callback && callback(_res.data);
-      else {
+      if (_res.result) {
+        webix.message("Update successful !");
+        callback && callback(_res.data);
+      } else {
         if (_res.err_code == 100) location.hash = "!/auth.login";
       }
     });
@@ -18,8 +20,10 @@ define([], function () {
     webix.ajax().post("/api/v1", args, function (_text, _json) {
       var _res = _json.json();
       console.log(_res);
-      if (_res.result) callback && callback(_res.data);
-      else {
+      if (_res.result) {
+        webix.message("Update successful !");
+        callback && callback(_res.data);
+      } else {
         if (_res.err_code == 100) location.hash = "!/auth.login";
       }
     });
@@ -30,8 +34,10 @@ define([], function () {
     webix.ajax().post("/api/v1", args, function (_text, _json) {
       var _res = _json.json();
       console.log(_res);
-      if (_res.result) callback && callback(_res.data);
-      else {
+      if (_res.result) {
+        webix.message("Update successful !");
+        callback && callback(_res.data);
+      } else {
         if (_res.err_code == 100) location.hash = "!/auth.login";
       }
     });
