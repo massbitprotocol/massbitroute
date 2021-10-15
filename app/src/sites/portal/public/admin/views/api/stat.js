@@ -1,6 +1,7 @@
 define(["views/api/config"], function ($api_config) {
   var type = "api";
   var _blockchain_option = $api_config.blockchains;
+  var _update_stat_urls = $api_config.update_stat_urls;
 
   var dataset = [
     { id: 1, sales: 20, year: "02" },
@@ -76,7 +77,8 @@ define(["views/api/config"], function ($api_config) {
     { id: "2w", value: "2 Weeks" },
     { id: "1mon", value: "1 Month" },
   ];
-  var _domain = "vt5hkxebciln.sol-mainnet.massbitroute.com";
+
+  // var _domain = "vt5hkxebciln.sol-mainnet.massbitroute.com";
   var form = {
     view: "form",
     id: type + "statView",
@@ -85,7 +87,41 @@ define(["views/api/config"], function ($api_config) {
     },
     scroll: true,
     elements: [
-      { cols: [{}, { view: "select", width: 150, options: _time_opt }] },
+      {
+        cols: [
+          {},
+          {
+            view: "select",
+            id: type + "time_select",
+            width: 150,
+            value: "now|now-6h",
+            options: _time_opt,
+            on: {
+              onChange: function (_v) {
+                console.log(_v);
+                if (_v == "custom") {
+                  return;
+                }
+                var _vr = _v.split("|");
+                var _from = _vr[0];
+                var _to = _vr[1];
+
+                var _gateway_http = $$(type + "gateway_http").getValue();
+                _update_stat_urls(_gateway_http, _from, _to);
+                // var _url = $$(type + "stat_total_request1").getValue();
+                // console.log(_url);
+                // _url = _url + "&from=" + _from + "&to=" + _to;
+                // var _ui = $$(type + "stat_total_request");
+                // if (_ui) _ui.define("src", _url);
+              },
+            },
+          },
+        ],
+      },
+      { template: "Total Number of Method Calls", type: "header" },
+      // { view: "text", id: type + "stat_total_request1", hidden: true },
+      // { view: "text", id: type + "stat_total_bandwidth1", hidden: true },
+      // { view: "text", id: type + "stat_time_response1", hidden: true },
       {
         view: "iframe",
         id: type + "stat_total_request",
@@ -104,34 +140,34 @@ define(["views/api/config"], function ($api_config) {
         height: 300,
         src: "https://stats.massbitroute.com/__internal_grafana/d-solo/51eatqDMn/api?orgId=1&var-Instance=All&var-Host=All&panelId=8",
       },
-      {
-        cols: [
-          { template: "Total Number of Method Calls", type: "header" },
-          // { view: "select", width: 150, options: _blockchain_option },
-          { view: "select", width: 150, options: _time },
-        ],
-      },
-      {
-        view: "chart",
-        //        width: 600,
-        height: 250,
-        id: "chart",
-        type: "line",
-        value: "#sales#",
-        preset: "plot", // "diamond", "round", "point", and "simple" style presets are also available
-        xAxis: {
-          template: "'#year#",
-        },
-        yAxis: {
-          start: 0,
-          end: 100,
-          step: 10,
-          template: function (obj) {
-            return obj % 20 ? "" : obj;
-          },
-        },
-        data: dataset,
-      },
+      // {
+      //   cols: [
+      //     { template: "Total Number of Method Calls", type: "header" },
+      //     // { view: "select", width: 150, options: _blockchain_option },
+      //     { view: "select", width: 150, options: _time },
+      //   ],
+      // },
+      // {
+      //   view: "chart",
+      //   //        width: 600,
+      //   height: 250,
+      //   id: "chart",
+      //   type: "line",
+      //   value: "#sales#",
+      //   preset: "plot", // "diamond", "round", "point", and "simple" style presets are also available
+      //   xAxis: {
+      //     template: "'#year#",
+      //   },
+      //   yAxis: {
+      //     start: 0,
+      //     end: 100,
+      //     step: 10,
+      //     template: function (obj) {
+      //       return obj % 20 ? "" : obj;
+      //     },
+      //   },
+      //   data: dataset,
+      // },
       {
         cols: [
           { template: "TOP 10 Method Calls", type: "header" },

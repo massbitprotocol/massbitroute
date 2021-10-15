@@ -19,6 +19,7 @@ define(["views/api/config"], function ($api_config) {
                 {
                   view: "text",
                   name: "gateway_http",
+                  id: type + "gateway_http",
                   label: "HTTP Provider",
                   readonly: true,
                 },
@@ -26,6 +27,7 @@ define(["views/api/config"], function ($api_config) {
                   view: "text",
                   label: "WSS Provider",
                   name: "gateway_wss",
+                  id: type + "gateway_wss",
                   readonly: true,
                 },
               ],

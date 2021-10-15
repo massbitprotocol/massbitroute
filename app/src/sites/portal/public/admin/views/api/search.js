@@ -1,23 +1,6 @@
-define(["models/api"], function ($api_api) {
+define(["models/api", "views/api/config"], function ($api_api, $api_config) {
   var type = "api";
-  function getLocation(href) {
-    var match = href.match(
-      /^(https?\:)\/\/(([^:\/?#]*)(?:\:([0-9]+))?)([\/]{0,1}[^?#]*)(\?[^#]*|)(#.*|)$/
-    );
-    return (
-      match && {
-        href: href,
-        protocol: match[1],
-        host: match[2],
-        hostname: match[3],
-        port: match[4],
-        pathname: match[5],
-        search: match[6],
-        hash: match[7],
-      }
-    );
-  }
-
+  var _update_stat_urls = $api_config.update_stat_urls;
   return {
     $oninit: function (_view, _scope) {
       $api_api.list({}, function (_values) {
@@ -56,26 +39,28 @@ define(["models/api"], function ($api_api) {
               var _item = _items[0];
 
               if (_item.gateway_http) {
-                var _loc = getLocation(_item.gateway_http);
-                var _chart_url_total_request =
-                  "https://stats.massbitroute.com/__internal_grafana/d-solo/51eatqDMn/api?orgId=1&var-Instance=All&var-Host=" +
-                  _loc.hostname +
-                  "&panelId=1";
-                var _chart_url_total_bandwidth =
-                  "https://stats.massbitroute.com/__internal_grafana/d-solo/51eatqDMn/api?orgId=1&var-Instance=All&var-Host=" +
-                  _loc.hostname +
-                  "&panelId=2";
-                var _chart_url_time_response =
-                  "https://stats.massbitroute.com/__internal_grafana/d-solo/51eatqDMn/api?orgId=1&var-Instance=All&var-Host=" +
-                  _loc.hostname +
-                  "&panelId=8";
-
-                var _ui = $$(type + "stat_total_request");
-                if (_ui) _ui.define("src", _chart_url_total_request);
-                var _ui = $$(type + "stat_total_bandwidth");
-                if (_ui) _ui.define("src", _chart_url_total_bandwidth);
-                var _ui = $$(type + "stat_time_response");
-                if (_ui) _ui.define("src", _chart_url_time_response);
+                _update_stat_urls(_item.gateway_http, "now", "now-6h");
+                //   var _loc = getLocation(_item.gateway_http);
+                //   var _chart_url_total_request =
+                //     "https://stats.massbitroute.com/__internal_grafana/d-solo/51eatqDMn/api?orgId=1&var-Instance=All&var-Host=" +
+                //     _loc.hostname +
+                //     "&panelId=1";
+                //   var _chart_url_total_bandwidth =
+                //     "https://stats.massbitroute.com/__internal_grafana/d-solo/51eatqDMn/api?orgId=1&var-Instance=All&var-Host=" +
+                //     _loc.hostname +
+                //     "&panelId=2";
+                //   var _chart_url_time_response =
+                //     "https://stats.massbitroute.com/__internal_grafana/d-solo/51eatqDMn/api?orgId=1&var-Instance=All&var-Host=" +
+                //     _loc.hostname +
+                //     "&panelId=8";
+                //   var _ui = $$(type + "stat_total_request1");
+                //   if (_ui) _ui.define("src", _chart_url_total_request);
+                //   var _ui = $$(type + "stat_total_bandwidth1");
+                //   if (_ui) _ui.define("src", _chart_url_total_bandwidth);
+                //   var _ui = $$(type + "stat_time_response1");
+                //   if (_ui) _ui.define("src", _chart_url_time_response);
+                //   var _ui = $$(type + "time_select");
+                //   if (_ui) _ui.setValue("now|now-6h");
               }
               $$(type + "productsData").clearAll();
               if (_item.entrypoints) {

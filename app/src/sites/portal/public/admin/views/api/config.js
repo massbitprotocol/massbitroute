@@ -1,4 +1,5 @@
 define([], function () {
+  var type = "api";
   var _providers = ["INFURA", "GETBLOCK", "QUICKNODE", "CUSTOM"];
   var _blockchains = [
     {
@@ -120,7 +121,58 @@ define([], function () {
     { id: "rsk", value: "Rsk" },
     { id: "fuse", value: "Fuse.io" },
   ];
+  function getLocation(href) {
+    var match = href.match(
+      /^(https?\:)\/\/(([^:\/?#]*)(?:\:([0-9]+))?)([\/]{0,1}[^?#]*)(\?[^#]*|)(#.*|)$/
+    );
+    return (
+      match && {
+        href: href,
+        protocol: match[1],
+        host: match[2],
+        hostname: match[3],
+        port: match[4],
+        pathname: match[5],
+        search: match[6],
+        hash: match[7],
+      }
+    );
+  }
+  function _update_stat_urls(_gateway_http, _from, _to) {
+    var _loc = getLocation(_gateway_http);
+    var _chart_url_total_request =
+      "https://stats.massbitroute.com/__internal_grafana/d-solo/51eatqDMn/api?orgId=1&var-Instance=All&var-Host=" +
+      _loc.hostname +
+      "&panelId=1" +
+      "&from=" +
+      _from +
+      "&to=" +
+      _to;
+    var _chart_url_total_bandwidth =
+      "https://stats.massbitroute.com/__internal_grafana/d-solo/51eatqDMn/api?orgId=1&var-Instance=All&var-Host=" +
+      _loc.hostname +
+      "&panelId=2" +
+      "&from=" +
+      _from +
+      "&to=" +
+      _to;
+    var _chart_url_time_response =
+      "https://stats.massbitroute.com/__internal_grafana/d-solo/51eatqDMn/api?orgId=1&var-Instance=All&var-Host=" +
+      _loc.hostname +
+      "&panelId=8" +
+      "&from=" +
+      _from +
+      "&to=" +
+      _to;
+    var _ui = $$(type + "stat_total_request");
+    if (_ui) _ui.define("src", _chart_url_total_request);
+    var _ui = $$(type + "stat_total_bandwidth");
+    if (_ui) _ui.define("src", _chart_url_total_bandwidth);
+    var _ui = $$(type + "stat_time_response");
+    if (_ui) _ui.define("src", _chart_url_time_response);
+  }
   return {
+    update_stat_urls: _update_stat_urls,
     blockchains: _blockchains,
     providers: _providers,
   };
