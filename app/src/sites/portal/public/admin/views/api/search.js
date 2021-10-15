@@ -1,5 +1,23 @@
 define(["models/api"], function ($api_api) {
   var type = "api";
+  function getLocation(href) {
+    var match = href.match(
+      /^(https?\:)\/\/(([^:\/?#]*)(?:\:([0-9]+))?)([\/]{0,1}[^?#]*)(\?[^#]*|)(#.*|)$/
+    );
+    return (
+      match && {
+        href: href,
+        protocol: match[1],
+        host: match[2],
+        hostname: match[3],
+        port: match[4],
+        pathname: match[5],
+        search: match[6],
+        hash: match[7],
+      }
+    );
+  }
+
   return {
     $oninit: function (_view, _scope) {
       $api_api.list({}, function (_values) {
@@ -36,6 +54,29 @@ define(["models/api"], function ($api_api) {
               var _items = this.getSelectedItem(_id);
               console.log(_items);
               var _item = _items[0];
+
+              if (_item.gateway_http) {
+                var _loc = getLocation(_item.gateway_http);
+                var _chart_url_total_request =
+                  "https://stats.massbitroute.com/__internal_grafana/d-solo/51eatqDMn/api?orgId=1&var-Instance=All&var-Host=" +
+                  _loc.hostname +
+                  "&panelId=1";
+                var _chart_url_total_bandwidth =
+                  "https://stats.massbitroute.com/__internal_grafana/d-solo/51eatqDMn/api?orgId=1&var-Instance=All&var-Host=" +
+                  _loc.hostname +
+                  "&panelId=2";
+                var _chart_url_time_response =
+                  "https://stats.massbitroute.com/__internal_grafana/d-solo/51eatqDMn/api?orgId=1&var-Instance=All&var-Host=" +
+                  _loc.hostname +
+                  "&panelId=8";
+                console.log(_chart_url);
+                var _ui = $$(type + "stat_total_request");
+                if (_ui) _ui.define("src", _chart_url_total_request);
+                var _ui = $$(type + "stat_total_bandwidth");
+                if (_ui) _ui.define("src", _chart_url_total_bandwidth);
+                var _ui = $$(type + "stat_time_response");
+                if (_ui) _ui.define("src", _chart_url_time_response);
+              }
               $$(type + "productsData").clearAll();
               if (_item.entrypoints) {
                 $$(type + "productsData").parse(_item.entrypoints);
