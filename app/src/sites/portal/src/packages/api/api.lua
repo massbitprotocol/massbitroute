@@ -9,6 +9,8 @@ local Model = cc.import("#model")
 local uuid = require "jit-uuid"
 local util = require "util"
 local mkdirp = require "mkdirp"
+local shell = require "resty.shell"
+local inspect = require "inspect"
 
 local CodeGen = require "CodeGen"
 local PROVIDERS = {
@@ -122,6 +124,19 @@ server {
 }
 ]]
 }
+
+local function _run_shell(cmd)
+    ngx.log(ngx.ERR, inspect(cmd))
+    local stdin = ""
+    local timeout = 300000 -- ms
+    local max_size = 409600 -- byte
+    local ok, stdout, stderr, reason, status = shell.run(cmd, stdin, timeout, max_size)
+    ngx.log(ngx.ERR, inspect(ok))
+    ngx.log(ngx.ERR, inspect(stdout))
+    ngx.log(ngx.ERR, inspect(stderr))
+    return ok, stdout, stderr, reason, status
+end
+
 local function _get_tmpl(rules, _data)
     local _rules = table.copy(rules)
     table.merge(_rules, _data)
@@ -240,12 +255,21 @@ function User:update(args)
             local _str_tmpl = _tmpl("_server_main")
             _content[#_content + 1] = _str_tmpl
             ngx.log(ngx.ERR, _str_tmpl)
+            local _conf_file =
+                "/massbit/massbitroute/app/src/sites/services/gateway/conf.d/" ..
+                args.user_id .. "/" .. args.id .. "/server.conf"
             _write_template(
                 {
-                    ["/massbit/massbitroute/app/src/sites/services/gateway/conf.d/" ..
-                        args.user_id .. "/" .. args.id .. "/server.conf"] = _content
+                    [_conf_file] = _content
                 }
             )
+
+            local _ok = _run_shell("/massbit/massbitroute/app/src/cmd_server nginx -t")
+            if not _ok then
+                os.remove(_conf_file)
+            else
+                _run_shell("/massbit/massbitroute/app/src/cmd_server nginx -s reload")
+            end
         end
 
     -- local _tmpl = _get_tmpl(rules, args)

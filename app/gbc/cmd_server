@@ -24,7 +24,7 @@ redis)
 nginx)
 	shift
 	$ROOT_DIR/bin/openresty/nginx/sbin/nginx -c $ROOT_DIR/tmp/nginx.conf $@
-	exit 0
+	exit $?
 	;;
 esac
 updateConfigs
