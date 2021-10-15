@@ -7,6 +7,9 @@ define([], function () {
       var _res = _json.json();
       console.log(_res);
       if (_res.result) callback && callback(_res.data);
+      else {
+        if (_res.err_code == 100) location.hash = "!/auth.login";
+      }
     });
   }
   function _delete(args, callback) {
@@ -16,6 +19,9 @@ define([], function () {
       var _res = _json.json();
       console.log(_res);
       if (_res.result) callback && callback(_res.data);
+      else {
+        if (_res.err_code == 100) location.hash = "!/auth.login";
+      }
     });
   }
   function _update(args, callback) {
@@ -25,6 +31,9 @@ define([], function () {
       var _res = _json.json();
       console.log(_res);
       if (_res.result) callback && callback(_res.data);
+      else {
+        if (_res.err_code == 100) location.hash = "!/auth.login";
+      }
     });
   }
   function _list(args, callback) {
@@ -34,6 +43,9 @@ define([], function () {
       var _res = _json.json();
       console.log(_res);
       if (_res.result) callback && callback(_res.data);
+      else {
+        if (_res.err_code == 100) location.hash = "!/auth.login";
+      }
     });
   }
   return {

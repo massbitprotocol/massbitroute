@@ -8,6 +8,9 @@ local Action = cc.class(mytype .. "Action", gbc.ActionBase)
 
 local _opensession
 
+local ERROR = {
+    NOT_LOGIN = 100
+}
 local Model = cc.import("#" .. mytype)
 
 local _user
@@ -18,7 +21,7 @@ function Action:createAction(args)
     local _session = _opensession(instance, args)
 
     if not _session then
-        return {result = false}
+        return {result = false, err_code = ERROR.NOT_LOGIN}
     end
     local user_id = _session:get("id")
     if user_id then
@@ -38,7 +41,7 @@ function Action:updateAction(args)
     local _session = _opensession(instance, args)
 
     if not _session then
-        return {result = false}
+        return {result = false, err_code = ERROR.NOT_LOGIN}
     end
     local user_id = _session:get("id")
     if user_id then
@@ -58,7 +61,7 @@ function Action:deleteAction(args)
     local _session = _opensession(instance, args)
 
     if not _session then
-        return {result = false}
+        return {result = false, err_code = ERROR.NOT_LOGIN}
     end
     local user_id = _session:get("id")
     if user_id then
@@ -78,7 +81,7 @@ function Action:listAction(args)
     local _session = _opensession(instance, args)
 
     if not _session then
-        return {result = false}
+        return {result = false, err_code = ERROR.NOT_LOGIN}
     end
     local user_id = _session:get("id")
     if user_id then

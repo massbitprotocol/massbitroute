@@ -1,0 +1,10 @@
+{
+  "config": {
+    "grafana": {
+      "url": "http://localhost:3000/__internal_grafana",
+      "username": "admin",
+      "password": "admin"
+    }
+  }
+}
+
