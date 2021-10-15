@@ -89,6 +89,7 @@ server {
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection $connection_upgrade;
     }
+}
 ]],
     _server_backend_CUSTOM = [[
 server {
@@ -102,6 +103,7 @@ server {
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection $connection_upgrade;
     }
+}
 ]],
     _server_backend_GETBLOCK = [[
 server {
