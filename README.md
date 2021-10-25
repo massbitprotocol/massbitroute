@@ -8,3 +8,7 @@ We support Ethereum, Binance Smart Chain (BSC) and Polygon via our Cloud API, Ga
 # Reference
 
 For more information, please read [here](https://massbitroute.gitbook.io/massbitroute-design/)
+
+# News 
+
+Please follow us by [news](https://massbitroute.gitbook.io/massbitroute-news/) 
