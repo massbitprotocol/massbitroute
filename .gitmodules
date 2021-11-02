@@ -1,0 +1,3 @@
+[submodule "app/src/sites/services/node"]
+	path = app/src/sites/services/node
+	url = https://github.com/massbitprotocol/massbitroute_node.git
