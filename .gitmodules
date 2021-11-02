@@ -1,3 +1,9 @@
 [submodule "app/src/sites/services/node"]
 	path = app/src/sites/services/node
 	url = https://github.com/massbitprotocol/massbitroute_node.git
+[submodule "app/src/sites/services/gateway"]
+	path = app/src/sites/services/gateway
+	url = https://github.com/massbitprotocol/massbitroute_gateway.git
+[submodule "app/src/sites/services/gwman"]
+	path = app/src/sites/services/gwman
+	url = https://github.com/massbitprotocol/massbitroute_gwman.git
