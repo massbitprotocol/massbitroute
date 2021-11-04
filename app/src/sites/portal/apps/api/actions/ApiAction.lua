@@ -49,10 +49,18 @@ function Action:updateAction(args)
     end
 
     local model = Model:new(instance)
-    local _detail = model:update(args)
-    return {
-        result = true
-    }
+    local _detail, _err_msg = model:update(args)
+    if _detail then
+        return {
+            result = true,
+            data = _detail
+        }
+    else
+        return {
+            result = false,
+            err_msg = _err_msg
+        }
+    end
 end
 
 function Action:deleteAction(args)
