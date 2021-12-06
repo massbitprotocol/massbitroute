@@ -6,6 +6,7 @@ local json = cc.import("#json")
 local cjson = require "cjson"
 local Action = cc.class(mytype .. "Action", gbc.ActionBase)
 
+local inspect = require "inspect"
 local _opensession
 
 local ERROR = {
@@ -15,7 +16,69 @@ local Model = cc.import("#" .. mytype)
 
 local _user
 
+local function _norm(_v)
+    if type(_v) == "string" then
+        _v = json.decode(_v)
+    end
+
+    -- setmetatable(_v, cjson.empty_array_mt)
+
+    if _v.entrypoints and type(_v.entrypoints) == "string" then
+        -- ngx.log(ngx.ERR, _v.entrypoints)
+        _v.entrypoints = json.decode(_v.entrypoints)
+        setmetatable(_v.entrypoints, cjson.empty_array_mt)
+    end
+    if _v.security and type(_v.security) == "string" then
+        -- ngx.log(ngx.ERR, _v.security)
+        _v.security = json.decode(_v.security)
+    end
+    -- setmetatable(_v.entrypoints, cjson.empty_array_mt)
+    return _v
+end
+
 function Action:createAction(args)
+    args.action = nil
+    args.id = nil
+    local instance = self:getInstance()
+    local _session = _opensession(instance, args)
+
+    if not _session then
+        return {result = false, err_code = ERROR.NOT_LOGIN}
+    end
+    local user_id = _session:get("id")
+    if user_id then
+        args.user_id = user_id
+    end
+
+    args.entrypoints = cjson.empty_array
+
+    args.security = {
+        allow_methods = "",
+        limit_rate_per_sec = 100,
+        limit_rate_per_day = 30000
+    }
+    local model = Model:new(instance)
+    local _detail, _err_msg = model:create(args)
+    if _detail then
+        return {
+            result = true,
+            data = _detail
+        }
+    else
+        return {
+            result = false,
+            err_msg = _err_msg
+        }
+    end
+end
+
+function Action:getAction(args)
+    if not args.id then
+        return {
+            result = false,
+            err_msg = "params 'id' missing"
+        }
+    end
     args.action = nil
     local instance = self:getInstance()
     local _session = _opensession(instance, args)
@@ -29,13 +92,30 @@ function Action:createAction(args)
     end
 
     local model = Model:new(instance)
-    local _detail = model:create(args)
-    return {
-        result = true
-    }
-end
 
+    local _v, _err_msg = model:get(args)
+
+    if _v then
+        _v = _norm(_v)
+
+        return {
+            result = true,
+            data = _v
+        }
+    else
+        return {
+            result = false,
+            err_msg = _err_msg
+        }
+    end
+end
 function Action:updateAction(args)
+    if not args.id then
+        return {
+            result = false,
+            err_msg = "params 'id' missing"
+        }
+    end
     args.action = nil
     local instance = self:getInstance()
     local _session = _opensession(instance, args)
@@ -52,8 +132,7 @@ function Action:updateAction(args)
     local _detail, _err_msg = model:update(args)
     if _detail then
         return {
-            result = true,
-            data = _detail
+            result = true
         }
     else
         return {
@@ -64,6 +143,12 @@ function Action:updateAction(args)
 end
 
 function Action:deleteAction(args)
+    if not args.id then
+        return {
+            result = false,
+            err_msg = "params 'id' missing"
+        }
+    end
     args.action = nil
     local instance = self:getInstance()
     local _session = _opensession(instance, args)
@@ -77,10 +162,17 @@ function Action:deleteAction(args)
     end
 
     local model = Model:new(instance)
-    local _detail = model:delete(args)
-    return {
-        result = true
-    }
+    local _detail, _err_msg = model:delete(args)
+    if _detail then
+        return {
+            result = true
+        }
+    else
+        return {
+            result = false,
+            err_msg = _err_msg
+        }
+    end
 end
 
 function Action:listAction(args)
@@ -102,9 +194,25 @@ function Action:listAction(args)
 
     setmetatable(_res, cjson.empty_array_mt)
 
-    for i, v in pairs(_detail) do
-        if v then
-            _res[#_res + 1] = json.decode(v)
+    for _, _v in pairs(_detail) do
+        -- ngx.log(ngx.ERR, inspect(type(_v)))
+        if _v then
+            _v = _norm(_v)
+            -- if type(_v) == "string" then
+            --     _v = json.decode(_v)
+            -- end
+
+            -- if _v.entrypoints and type(_v.entrypoints) == "string" then
+            --     ngx.log(ngx.ERR, _v.entrypoints)
+            --     _v.entrypoints = json.decode(_v.entrypoints)
+            -- end
+            -- if _v.security and type(_v.security) == "string" then
+            --     ngx.log(ngx.ERR, _v.security)
+            --     _v.security = json.decode(_v.security)
+            -- end
+            -- ngx.log(ngx.ERR, inspect(_v))
+            _res[#_res + 1] = _v
+        --json.decode(_v)
         end
     end
 
