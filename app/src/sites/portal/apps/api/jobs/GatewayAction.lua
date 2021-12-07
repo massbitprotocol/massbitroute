@@ -75,6 +75,9 @@ end
 --     table.merge(_rules1, _data)
 --     return CodeGen(_rules1)
 -- end
+
+--- Generate conf for gateway
+
 function JobsAction:generateconfAction(job)
     print(inspect(job))
     local _prometheus = {

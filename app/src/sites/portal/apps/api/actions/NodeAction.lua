@@ -136,6 +136,8 @@ local function _get_geo(ip)
     return _resb, _err
 end
 
+--- Register node
+
 function Action:registerAction(args)
     args.action = nil
     local _token = args.token
