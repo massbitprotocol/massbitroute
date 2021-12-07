@@ -1,5 +1,6 @@
+local ngx, cc = ngx, cc
 local Model = cc.class("Model")
-local json = cc.import("#json")
+-- local json = cc.import("#json")
 
 function Model:ctor(instance)
     self._instance = instance
@@ -42,7 +43,6 @@ end
 function Model:save(model_type, args)
     local _now = ngx and ngx.time() or os.time()
     args.updated_at = _now
-    ngx.log(ngx.ERR, json.encode(args))
     self:_save_key(model_type .. ":" .. args.id, args)
 end
 

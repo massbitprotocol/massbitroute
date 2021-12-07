@@ -1,7 +1,9 @@
 local User = cc.class("Api")
 local json = cc.import("#json")
-local crypto = require "crypto"
+-- local crypto = require "crypto"
 local objectid = require "objectid"
+-- local resty_string = require "resty.string"
+-- local resty_md5 = require "resty.md5"
 
 local model_type = "api"
 local model_id = 2000
@@ -14,6 +16,7 @@ local inspect = require "inspect"
 
 local CodeGen = require "CodeGen"
 local PROVIDERS = {
+    MASSBIT = 0,
     CUSTOM = 1,
     GETBLOCK = 2,
     QUICKNODE = 3,
@@ -21,16 +24,24 @@ local PROVIDERS = {
 }
 
 local rules = {
-    _upstream = [[ 
- server unix:/tmp/${api_key}-${provider_id}.sock;
-]],
+    _upstream = [[server unix:/tmp/${server_name}.sock;]],
     _upstreams = [[
 upstream upstream_${api_key} {
     ${entrypoints/_upstream()}
     keepalive 32;
 }
 ]],
+    _api_method = [[
+        set $api_method '';
+        access_by_lua_file /massbit/massbitroute/app/src/sites/services/gateway/src/jsonrpc-access.lua;
+        vhost_traffic_status_filter_by_set_key $api_method ${server_name}::api_method;
+]],
+    _allow_methods1 = [[set $jsonrpc_whitelist '${security.allow_methods}';]],
+    _limit_rate_per_sec2 = [[limit_req zone=${api_key};]],
+    _limit_rate_per_sec1 = [[limit_req_zone $binary_remote_addr zone=${api_key}:10m rate=${security.limit_rate_per_sec}r/s;]],
     _server_main = [[
+${security._is_limit_rate_per_sec?_limit_rate_per_sec1()}
+
 server {
     listen 80;
     listen 443 ssl;
@@ -42,8 +53,16 @@ server {
     server_name ${gateway_domain};
     access_log /massbit/massbitroute/app/src/sites/services/gateway/logs/nginx-${gateway_domain}-access.log main_json;
     error_log /massbit/massbitroute/app/src/sites/services/gateway/logs/nginx-${gateway_domain}-error.log debug;
+
     location /${api_key} {
         rewrite /(.*) / break;
+        ${security._is_limit_rate_per_sec?_limit_rate_per_sec2()}
+        ${_allow_methods1()}
+        set $api_method '';
+        access_by_lua_file /massbit/massbitroute/app/src/sites/services/gateway/src/filter-jsonrpc-access.lua;
+        vhost_traffic_status_filter_by_set_key $api_method ${api_key}::api_method;
+
+
         proxy_cache_use_stale updating error timeout invalid_header http_500 http_502 http_503 http_504;
         proxy_next_upstream error timeout invalid_header http_500 http_502 http_503 http_504;
         proxy_connect_timeout 10s;
@@ -60,13 +79,17 @@ server {
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection $connection_upgrade;
+#      proxy_set_header X-Real-IP $remote_addr;
+#      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+# proxy_set_header Host $http_host;
     }
 }
 ]],
     _server_backend_INFURA = [[
 server {
-    listen unix:/tmp/${api_key}-${provider_id}.sock;
+    listen unix:/tmp/${server_name}.sock;
     location / {
+       ${_api_method()}
         proxy_redirect off;
         set_encode_base64 $digest :${infura_project_secret};
         proxy_set_header Authorization 'Basic $digest';
@@ -81,8 +104,9 @@ server {
 ]],
     _server_backend_QUICKNODE = [[
 server {
-    listen unix:/tmp/${api_key}-${provider_id}.sock;
+    listen unix:/tmp/${server_name}.sock;
     location / {
+       ${_api_method()}
         proxy_redirect off;
         proxy_ssl_server_name on;
         proxy_pass ${quicknode_api_uri};
@@ -95,8 +119,9 @@ server {
 ]],
     _server_backend_CUSTOM = [[
 server {
-    listen unix:/tmp/${api_key}-${provider_id}.sock;
+    listen unix:/tmp/${server_name}.sock;
     location / {
+       ${_api_method()}
         proxy_redirect off;
         proxy_ssl_server_name on;
         proxy_pass ${custom_api_uri};
@@ -109,13 +134,29 @@ server {
 ]],
     _server_backend_GETBLOCK = [[
 server {
-    listen unix:/tmp/${api_key}-${provider_id}.sock;
+    listen unix:/tmp/${server_name}.sock;
     location / {
+       ${_api_method()}
         proxy_redirect off;
         proxy_ssl_server_name on;
         proxy_set_header X-Api-Key ${getblock_api_key};
         proxy_set_header Host ${blockchain}.getblock.io;
         proxy_pass https://${blockchain}.getblock.io/${network}/;
+        proxy_ssl_verify off;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection $connection_upgrade;
+    }
+}
+]],
+    _server_backend_MASSBIT = [[
+server {
+    listen unix:/tmp/${server_name}.sock;
+    location / {
+       ${_api_method()}
+        proxy_redirect off;
+        proxy_ssl_server_name on;
+        proxy_pass http://${blockchain}-${network}.node.mbr.massbitroute.com;
         proxy_ssl_verify off;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
@@ -137,11 +178,12 @@ local function _run_shell(cmd)
     return ok, stdout, stderr, reason, status
 end
 
-local function _get_tmpl(rules, _data)
-    local _rules = table.copy(rules)
-    table.merge(_rules, _data)
-    return CodeGen(_rules)
+local function _get_tmpl(_rules, _data)
+    local _rules1 = table.copy(_rules)
+    table.merge(_rules1, _data)
+    return CodeGen(_rules1)
 end
+
 local function dirname(str)
     if str:match(".-/.-") then
         local name = string.gsub(str, "(.*/)(.*)", "%1")
@@ -200,7 +242,7 @@ function User:create(args)
         args.gateway_wss = "wss://" .. args.gateway_url
     end
 
-    args.created_at = now
+    args.created_at = _now
 
     self._model:_save_key(user_id .. ":" .. model_type, {[args.id] = json.encode(args)})
     -- self._model:_save_key(model_type .. ":" .. model_type, {[args.domain] = args.id})
@@ -213,7 +255,7 @@ function User:update(args)
 
     if _detail then
         _detail = json.decode(_detail)
-        ngx.log(ngx.ERR, json.encode(_detail))
+        ngx.log(ngx.ERR, inspect(_detail))
         -- if _detail.domain ~= args.domain then
         --     self._model:_del_key(model_type .. ":" .. model_type, _detail.domain)
         --     self._model:_save_key(model_type .. ":" .. model_type, {[args.domain] = args.id})
@@ -221,20 +263,31 @@ function User:update(args)
         table.merge(_detail, args)
         self._model:_save_key(user_id .. ":" .. model_type, {[_detail.id] = json.encode(_detail)})
         -- _gen_template(args)
-        local _files = {}
-        ngx.log(ngx.ERR, json.encode(args))
+        -- local _files = {}
+
         if args.entrypoints and type(args.entrypoints) == "string" then
             args.entrypoints = json.decode(args.entrypoints)
         end
+        if args.security and type(args.security) == "string" then
+            args.security = json.decode(args.security)
+            if
+                args.security.limit_rate_per_sec and type(args.security.limit_rate_per_sec) == "string" and
+                    string.len(args.security.limit_rate_per_sec) == 0
+             then
+                args.security.limit_rate_per_sec = 100
+            end
+        end
+        ngx.log(ngx.ERR, inspect(args))
         local _content = {}
 
         if args.entrypoints and #args.entrypoints > 0 then
             local _entrypoints =
                 table.map(
                 args.entrypoints,
-                function(_ent, _idx)
-                    _ent.provider_id = PROVIDERS[_ent.type] .. "_" .. _idx
+                function(_ent)
+                    _ent.provider_id = PROVIDERS[_ent.type] .. "-" .. _ent.id
                     _ent.api_key = args.api_key
+                    _ent.server_name = args.api_key .. "-" .. _ent.provider_id
                     _ent.blockchain = args.blockchain
                     _ent.network = args.network
                     local _tmpl = _get_tmpl(rules, _ent)
@@ -248,8 +301,18 @@ function User:update(args)
 
             local _tmpl = _get_tmpl(rules, {api_key = args.api_key, entrypoints = _entrypoints})
             local _str_tmpl = _tmpl("_upstreams")
+            ngx.log(ngx.ERR, inspect(_str_tmpl))
 
-            ngx.log(ngx.ERR, _str_tmpl)
+            if args.security.limit_rate_per_sec and tonumber(args.security.limit_rate_per_sec) > 0 then
+                args.security._is_limit_rate_per_sec = true
+            end
+
+            if args.security.allow_methods and string.len(args.security.allow_methods) > 0 then
+                args.security._is_allow_methods = true
+            end
+
+            -- ngx.log(ngx.ERR, inspect(args))
+            -- ngx.log(ngx.ERR, _str_tmpl)
             _content[#_content + 1] = _str_tmpl
             local _tmpl = _get_tmpl(rules, args)
             local _str_tmpl = _tmpl("_server_main")
@@ -258,6 +321,7 @@ function User:update(args)
             local _conf_file =
                 "/massbit/massbitroute/app/src/sites/services/gateway/conf.d/" ..
                 args.user_id .. "/" .. args.id .. "/server.conf"
+            ngx.log(ngx.ERR, _conf_file)
             _write_template(
                 {
                     [_conf_file] = _content
@@ -268,7 +332,7 @@ function User:update(args)
             if not _ok then
                 os.remove(_conf_file)
             else
-                _run_shell("/massbit/massbitroute/app/src/cmd_server nginx -s reload")
+                _run_shell("/massbit/massbitroute/app/src/sites/services/gateway/scripts/run _commit " .. _conf_file)
             end
         end
 
@@ -280,6 +344,11 @@ end
 function User:delete(args)
     local user_id = args.user_id
     self._model:_del_key(user_id .. ":" .. model_type, args.id)
+    local _conf_file =
+        "/massbit/massbitroute/app/src/sites/services/gateway/conf.d/" ..
+        args.user_id .. "/" .. args.id .. "/server.conf"
+
+    _run_shell("/massbit/massbitroute/app/src/sites/services/gateway/scripts/run _remove " .. _conf_file)
     -- self._model:_del_key(user_id .. ":" ..  model_type .. ":" .. model_type, args.domain)
     return args
 end
@@ -288,6 +357,11 @@ function User:list(args)
     local user_id = args.user_id
     local _res = self._model:_getall_key(user_id .. ":" .. model_type)
     return _res
+end
+function User:get(args)
+    local user_id = args.user_id
+    local _detail = self._model:_get_key(user_id .. ":" .. model_type, args.id)
+    return _detail
 end
 
 return User
