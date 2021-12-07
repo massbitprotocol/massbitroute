@@ -8,7 +8,7 @@ local _config = {
     },
     templates = {},
     apps = {
-       api = "apps/api" 
+       api = "apps/api"
     },
     supervisor = [[
     ]]
