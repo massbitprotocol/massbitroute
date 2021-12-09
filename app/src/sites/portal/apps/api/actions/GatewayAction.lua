@@ -16,6 +16,7 @@ local ERROR = {
 }
 local Model = cc.import("#" .. mytype)
 
+local _ip_api_token = "092142b61eed12af33e32fc128295356"
 local function _norm_json(_v, _field)
     if _v[_field] and type(_v[_field]) == "string" then
         _v[_field] = json.decode(_v[_field])
@@ -32,8 +33,8 @@ local function _norm(_v)
 end
 
 local function _get_geo(ip)
-    local _api_url = "http://api.ipapi.com/api/" .. ip .. "?access_key=092142b61eed12af33e32fc128295356"
-    ngx.log(ngx.ERR, inspect(_api_url))
+    local _api_url = "http://api.ipapi.com/api/" .. ip .. "?access_key=" .. _ip_api_token
+    -- ngx.log(ngx.ERR, inspect(_api_url))
     local _res, _err = httpc:request_uri(_api_url, {method = "GET"})
     local _resb = _res.body
     if _res.status == 200 and _resb and type(_resb) == "string" then
@@ -42,8 +43,82 @@ local function _get_geo(ip)
     return _resb, _err
 end
 
+function Action:geonodecountryAction(args)
+    ngx.log(ngx.ERR, "geonodecity")
+    local _datacenters = {}
+    local instance = self:getInstance()
+    local _red = instance:getRedis()
+    local _user_gw = _red:keys("*:" .. mytype)
+    ngx.log(ngx.ERR, inspect(_user_gw))
+    for _, _k in ipairs(_user_gw) do
+        local _gw_arr = _red:arrayToHash(_red:hgetall(_k))
+        ngx.log(ngx.ERR, inspect(_gw_arr))
+        for _, _gw_str in pairs(_gw_arr) do
+            local _gw = json.decode(_gw_str)
+            ngx.log(ngx.ERR, inspect(_gw))
+            -- local _dc_id = table.concat({"mbr", "map", _gw.blockchain, _gw.network}, "-")
+            -- local _dc_id = table.concat({_gw.blockchain, _gw.network}, "-")
+            -- _datacenters[_dc_id] = _datacenters[_dc_id] or {}
+            if _gw.geo then
+                _datacenters[_gw.geo.continent_code] = _datacenters[_gw.geo.continent_code] or {}
+                _datacenters[_gw.geo.continent_code][_gw.geo.country_code] =
+                    _datacenters[_gw.geo.continent_code][_gw.geo.country_code] or 0
+                _datacenters[_gw.geo.continent_code][_gw.geo.country_code] =
+                    _datacenters[_gw.geo.continent_code][_gw.geo.country_code] + 1
+            -- table.insert(_datacenters[_gw.geo.continent_code][_gw.geo.country_code], _gw)
+            end
+        end
+    end
+
+    ngx.log(ngx.ERR, inspect(_datacenters))
+    local _data = {}
+    for _k1, _v1 in pairs(_datacenters) do
+        _data[_k1] = _data[_k1] or {}
+        for _k2, _v2 in pairs(_v1) do
+            table.insert(_data[_k1], {id = _k2, value = _v2})
+        end
+    end
+    ngx.log(ngx.ERR, inspect(_data))
+    return {
+        result = true,
+        data = _data
+    }
+end
+
+function Action:geonodecontinentAction(args)
+    ngx.log(ngx.ERR, "geonodecity")
+    local _datacenters = {}
+    local instance = self:getInstance()
+    local _red = instance:getRedis()
+    local _user_gw = _red:keys("*:" .. mytype)
+    ngx.log(ngx.ERR, inspect(_user_gw))
+    for _, _k in ipairs(_user_gw) do
+        local _gw_arr = _red:arrayToHash(_red:hgetall(_k))
+        ngx.log(ngx.ERR, inspect(_gw_arr))
+        for _, _gw_str in pairs(_gw_arr) do
+            local _gw = json.decode(_gw_str)
+            ngx.log(ngx.ERR, inspect(_gw))
+            -- local _dc_id = table.concat({"mbr", "map", _gw.blockchain, _gw.network}, "-")
+            -- local _dc_id = table.concat({_gw.blockchain, _gw.network}, "-")
+            -- _datacenters[_dc_id] = _datacenters[_dc_id] or {}
+            if _gw.geo then
+                _datacenters[_gw.geo.continent_code] = _datacenters[_gw.geo.continent_code] or 0
+                -- _datacenters[_gw.geo.continent_code][_gw.geo.country_code] =
+                --     _datacenters[_gw.geo.continent_code][_gw.geo.country_code] or 0
+                _datacenters[_gw.geo.continent_code] = _datacenters[_gw.geo.continent_code] + 1
+            -- table.insert(_datacenters[_gw.geo.continent_code][_gw.geo.country_code], _gw)
+            end
+        end
+    end
+    -- ngx.log(ngx.ERR, inspect(_datacenters))
+    return {
+        result = true,
+        data = _datacenters
+    }
+end
+
 function Action:pingAction(args)
-    ngx.log(ngx.ERR, "ping")
+    -- ngx.log(ngx.ERR, "ping")
     args.action = nil
     local _token = args.token
     if not _token then
@@ -55,11 +130,11 @@ function Action:pingAction(args)
         return {result = false, err_msg = "User ID missing"}
     end
 
-    ngx.log(ngx.ERR, "user_id:" .. user_id)
+    -- ngx.log(ngx.ERR, "user_id:" .. user_id)
 
     local token = ndk.set_var.set_decode_base32(_token)
     local id = ndk.set_var.set_decrypt_session(token)
-    ngx.log(ngx.ERR, "id:" .. id)
+    -- ngx.log(ngx.ERR, "id:" .. id)
     if not id or id ~= args.id then
         return {result = false, err_msg = "Token not correct"}
     end
@@ -95,8 +170,8 @@ function Action:registerAction(args)
         return {result = false, err_msg = "Token not correct"}
     end
     local ip = ngx.var.realip
-    ngx.log(ngx.ERR, "ip:" .. ip)
-    ngx.log(ngx.ERR, "id:" .. id)
+    -- ngx.log(ngx.ERR, "ip:" .. ip)
+    -- ngx.log(ngx.ERR, "id:" .. id)
     -- ip = "34.124.167.144"
     local _data = {
         id = id,
@@ -197,7 +272,7 @@ function Action:getAction(args)
 end
 
 function Action:updateAction(args)
-    ngx.log(ngx.ERR, "updateAction")
+    -- ngx.log(ngx.ERR, "updateAction")
     if not args.id then
         return {
             result = false,
