@@ -1,3 +1,4 @@
+local cc, ngx = cc, ngx
 local gbc = cc.import("#gbc")
 local type = "User"
 local Session = cc.import("#session")
@@ -12,7 +13,10 @@ local User = cc.import("#user")
 
 local _user
 
-local inspect = require "inspect"
+local ERROR = {
+    NOT_LOGIN = 100
+}
+-- local inspect = require "inspect"
 
 function Action:pingAction(args)
     args.action = nil
@@ -25,7 +29,7 @@ function Action:pingAction(args)
     -- ngx.log(ngx.ERR, inspect(appConfig))
 
     if not _session then
-        return {result = false}
+        return {result = false, err_code = ERROR.NOT_LOGIN}
     end
     -- ngx.log(ngx.ERR, "sid:" .. _sid)
 
@@ -114,13 +118,13 @@ _opensession = function(instance, args)
     end
 
     if not sid then
-        cc.throw('not set argsument: "sid"')
+        -- cc.throw('not set argsument: "sid"')
         return nil
     end
 
     local session = Session:new(instance:getRedis())
     if not session:start(sid) then
-        cc.throw("session is expired, or invalid session id")
+        -- cc.throw("session is expired, or invalid session id")
         return nil
     end
 

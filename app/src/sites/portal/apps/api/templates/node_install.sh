@@ -13,8 +13,8 @@ if [ ! -d "$SITE_ROOT" ]; then
 fi
 
 cd $SITE_ROOT
-bash init.sh
 git pull origin master
+bash init.sh
 ./mbr node set USER_ID {{user_id}}
 ./mbr node set ID {{id}}
 ./mbr node set TOKEN {{token}}

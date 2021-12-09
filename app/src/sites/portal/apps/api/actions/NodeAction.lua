@@ -192,7 +192,7 @@ function Action:registerAction(args)
     local ip = ngx.var.realip
     ngx.log(ngx.ERR, "ip:" .. ip)
     ngx.log(ngx.ERR, "id:" .. id)
-    ip = "34.124.167.144"
+    -- ip = "34.124.167.144"
     local _data = {
         id = id,
         token = _token,

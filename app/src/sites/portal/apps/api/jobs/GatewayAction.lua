@@ -9,28 +9,6 @@ local inspect = require "inspect"
 
 JobsAction.ACCEPTED_REQUEST_TYPE = "worker"
 
-local function _git_push(_dir, _files)
-    local _git = "git -C " .. _dir .. " "
-    local _cmd =
-        "export HOME=/tmp && " ..
-        _git ..
-            "config --global user.email baysao@gmail.com" ..
-                "&&" .. _git .. "config --global user.name baysao && " .. _git .. "remote -v"
-    for _, _file in ipairs(_files) do
-        _cmd = _cmd .. "&&" .. _git .. "add " .. _file
-    end
-    _cmd = _cmd .. " && " .. _git .. "commit -m update && " .. _git .. "push origin master"
-    -- print(_cmd)
-    local retcode, output = os.capture(_cmd)
-    print(retcode)
-    print(output)
-
-    -- local handle = io.popen(_cmd)
-    -- local result = handle:read("*a")
-    -- handle:close()
-    -- print(result)
-end
-
 local Model = cc.import("#" .. mytype)
 
 -- local CodeGen = require "CodeGen"
@@ -55,6 +33,29 @@ end
 --     file:close()
 --     return content
 -- end
+
+local function _git_push(_dir, _files)
+    local _git = "git -C " .. _dir .. " "
+    local _cmd =
+        "export HOME=/tmp && " ..
+        _git ..
+            "config --global user.email baysao@gmail.com" ..
+                "&&" .. _git .. "config --global user.name baysao && " .. _git .. "remote -v"
+    for _, _file in ipairs(_files) do
+        mkdirp(dirname(_file))
+        _cmd = _cmd .. "&&" .. _git .. "add " .. _file
+    end
+    _cmd = _cmd .. " && " .. _git .. "commit -m update && " .. _git .. "push origin master"
+    -- print(_cmd)
+    local retcode, output = os.capture(_cmd)
+    print(retcode)
+    print(output)
+
+    -- local handle = io.popen(_cmd)
+    -- local result = handle:read("*a")
+    -- handle:close()
+    -- print(result)
+end
 
 local function _write_file(_filepath, content)
     print("write_file")
@@ -178,7 +179,7 @@ scrape_configs:
             {
                 gwman_dir .. "/conf.d/geolocation.d/maps.d/" .. _k1,
                 gwman_dir .. "/conf.d/geolocation.d/resources.d/" .. _k1,
-                gwman_dir .. "/data/zones/" .. _k1 .. ".zone"
+                gwman_dir .. "/data/zones/gateway/" .. _k1 .. ".zone"
             }
         )
     end

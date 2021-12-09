@@ -476,7 +476,7 @@ _opensession = function(instance, args)
 
     local session = Session:new(instance:getRedis())
     if not session:start(sid) then
-        cc.throw("session is expired, or invalid session id")
+        -- cc.throw("session is expired, or invalid session id")
         return nil
     end
 
