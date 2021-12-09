@@ -9,6 +9,7 @@ local Action = cc.class(mytype .. "Action", gbc.ActionBase)
 local httpc = require("resty.http").new()
 local inspect = require "inspect"
 
+local _ipapi_token = "092142b61eed12af33e32fc128295356"
 -- local flatdb = require "flatdb"
 -- local lfs = require("lfs")
 
@@ -126,7 +127,7 @@ local function _norm(_v)
 end
 
 local function _get_geo(ip)
-    local _api_url = "http://api.ipapi.com/api/" .. ip .. "?access_key=092142b61eed12af33e32fc128295356"
+    local _api_url = "http://api.ipapi.com/api/" .. ip .. "?access_key=" .. _ipapi_token
     ngx.log(ngx.ERR, inspect(_api_url))
     local _res, _err = httpc:request_uri(_api_url, {method = "GET"})
     local _resb = _res.body
@@ -138,6 +139,37 @@ end
 
 --- Register node
 
+function Action:pingAction(args)
+    ngx.log(ngx.ERR, "ping")
+    args.action = nil
+    local _token = args.token
+    if not _token then
+        return {result = false, err_msg = "Token missing"}
+    end
+    local instance = self:getInstance()
+    local user_id = args.user_id
+    if not user_id then
+        return {result = false, err_msg = "User ID missing"}
+    end
+
+    ngx.log(ngx.ERR, "user_id:" .. user_id)
+
+    local token = ndk.set_var.set_decode_base32(_token)
+    local id = ndk.set_var.set_decrypt_session(token)
+    ngx.log(ngx.ERR, "id:" .. id)
+    if not id or id ~= args.id then
+        return {result = false, err_msg = "Token not correct"}
+    end
+    local _data = {
+        id = id,
+        user_id = user_id
+    }
+
+    local model = Model:new(instance)
+    model:update(_data)
+    return {result = true}
+end
+
 function Action:registerAction(args)
     args.action = nil
     local _token = args.token
@@ -146,11 +178,6 @@ function Action:registerAction(args)
     end
     local instance = self:getInstance()
 
-    -- local _session = _opensession(instance, args)
-
-    -- if not _session then
-    --     return {result = false, err_code = ERROR.NOT_LOGIN}
-    -- end
     local user_id = args.user_id
     if not user_id then
         return {result = false, err_msg = "User ID missing"}
@@ -165,7 +192,7 @@ function Action:registerAction(args)
     local ip = ngx.var.realip
     ngx.log(ngx.ERR, "ip:" .. ip)
     ngx.log(ngx.ERR, "id:" .. id)
-    -- ip = "34.124.167.144"
+    ip = "34.124.167.144"
     local _data = {
         id = id,
         token = _token,
