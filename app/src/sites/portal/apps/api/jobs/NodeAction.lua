@@ -18,11 +18,13 @@ local Model = cc.import("#" .. mytype)
 
 -- local CodeGen = require "CodeGen"
 local mkdirp = require "mkdirp"
--- local gwman_dir = "/massbit/massbitroute/app/src/sites/services/gwman"
+local gwman_dir = "/massbit/massbitroute/app/src/sites/services/gwman"
 local stat_dir = "/massbit/massbitroute/app/src/sites/services/stat"
 
 local rules = {
-    _node_stat_target = [[          - ${id}.gw.mbr.massbitroute.com]],
+    _node_zone = [[${id}.node.mbr 600 A ${ip}]],
+    _node_zones = [[${nodes/_node_zone(); separator='\n'}]],
+    _node_stat_target = [[          - ${id}.node.mbr.massbitroute.com]],
     _node_stat = [[
 scrape_configs:
   - job_name: stat_vhost
@@ -84,7 +86,7 @@ server {
     resolver 8.8.4.4 ipv6=off;
     client_body_buffer_size 512K;
     client_max_body_size 1G;
-    server_name ${id}.node.mbr.massbitroute.com node.mbr.massbitroute.com localhost;
+    server_name ${id}.node.mbr.massbitroute.com node.mbr.massbitroute.com;
     access_log /massbit/massbitroute/app/src/sites/services/node/logs/${id}-access.log main_json;
     error_log /massbit/massbitroute/app/src/sites/services/node/logs/${id}-error.log debug;
     # API keys verification
@@ -174,8 +176,10 @@ local function _git_push(_dir, _files)
     local _cmd =
         "export HOME=/tmp && " ..
         _git ..
-            "config --global user.email baysao@gmail.com" ..
-                "&&" .. _git .. "config --global user.name baysao && " .. _git .. "remote -v"
+            " pull origin master ;" ..
+                _git ..
+                    "config --global user.email baysao@gmail.com" ..
+                        "&&" .. _git .. "config --global user.name baysao && " .. _git .. "remote -v"
     for _, _file in ipairs(_files) do
         mkdirp(dirname(_file))
         _cmd = _cmd .. ";" .. _git .. "add " .. _file
@@ -375,8 +379,9 @@ local function _update_nodes_conf(instance)
             local _name = _gw.blockchain .. "-" .. _gw.network
             _nodes[_name] = _nodes[_name] or {}
             _config[_name] = _config[_name] or {}
-            table.insert(_nodes[_name], {id = _gw.id})
-
+            if _gw.id and _gw.ip then
+                table.insert(_nodes[_name], {id = _gw.id, ip = _gw.ip})
+            end
             local _tmpl = _get_tmpl(rules, _gw)
             local _str_tmpl = _tmpl("_gw_node")
             table.insert(_config[_name], _str_tmpl)
@@ -394,6 +399,16 @@ local function _update_nodes_conf(instance)
             stat_dir,
             {
                 stat_dir .. "/etc/prometheus/stat_node.yml"
+            }
+        )
+
+        local _str_zones = _tmpl("_node_zones")
+        print(_str_zones)
+        _write_file(gwman_dir .. "/data/zones/node_" .. _k1 .. ".zone", _str_zones)
+        _git_push(
+            gwman_dir,
+            {
+                gwman_dir .. "/data/zones/node_" .. _k1 .. ".zone"
             }
         )
     end
