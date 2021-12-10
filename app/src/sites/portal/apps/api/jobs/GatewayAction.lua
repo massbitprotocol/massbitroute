@@ -243,6 +243,11 @@ scrape_configs:
             }
         )
     end
+    local _cmd = "/massbit/massbitroute/app/src/sites/portal/scripts/run _rebuild_zone"
+    print(_cmd)
+    local retcode, output = os.capture(_cmd)
+    print(retcode)
+    print(output)
 
     print(inspect(_nodes_all))
     local _tmpl = _get_tmpl(rules, {nodes = _nodes_all})
