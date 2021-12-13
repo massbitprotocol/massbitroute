@@ -21,18 +21,13 @@ local function _norm(_v)
         _v = json.decode(_v)
     end
 
-    -- setmetatable(_v, cjson.empty_array_mt)
-
     if _v.entrypoints and type(_v.entrypoints) == "string" then
-        -- ngx.log(ngx.ERR, _v.entrypoints)
         _v.entrypoints = json.decode(_v.entrypoints)
         setmetatable(_v.entrypoints, cjson.empty_array_mt)
     end
     if _v.security and type(_v.security) == "string" then
-        -- ngx.log(ngx.ERR, _v.security)
         _v.security = json.decode(_v.security)
     end
-    -- setmetatable(_v.entrypoints, cjson.empty_array_mt)
     return _v
 end
 
@@ -130,16 +125,25 @@ function Action:updateAction(args)
 
     local model = Model:new(instance)
     local _detail, _err_msg = model:update(args)
-    if _detail then
-        return {
-            result = true
-        }
-    else
+    if not _detail then
         return {
             result = false,
             err_msg = _err_msg
         }
     end
+
+    local jobs = instance:getJobs()
+    local job = {
+        action = "/jobs/" .. mytype .. ".generateconf",
+        delay = 3,
+        data = {
+            id = _detail.id,
+            user_id = user_id
+        }
+    }
+    local ok, err = jobs:add(job)
+
+    return {result = true}
 end
 
 function Action:deleteAction(args)

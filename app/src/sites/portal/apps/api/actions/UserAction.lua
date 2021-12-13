@@ -23,18 +23,10 @@ function Action:pingAction(args)
     local instance = self:getInstance()
     local _session = _opensession(instance, args)
 
-    -- local config = self:getInstanceConfig()
-
-    -- local appConfig = config.app
-    -- ngx.log(ngx.ERR, inspect(appConfig))
-
     if not _session then
         return {result = false, err_code = ERROR.NOT_LOGIN}
     end
-    -- ngx.log(ngx.ERR, "sid:" .. _sid)
 
-    -- local session = Session:new(instance:getRedis())
-    -- local _is_ok = session:start(_sid)
     return {
         result = true
     }
@@ -42,7 +34,7 @@ end
 
 function Action:registerAction(args)
     args.action = nil
-    ngx.log(ngx.ERR, json.encode(args))
+    -- ngx.log(ngx.ERR, json.encode(args))
 
     local instance = self:getInstance()
 
@@ -67,7 +59,7 @@ function Action:loginAction(args)
     local config = self:getInstanceConfig()
 
     local appConfig = config.app
-    ngx.log(ngx.ERR, json.encode(appConfig))
+    -- ngx.log(ngx.ERR, json.encode(appConfig))
 
     _user = _user or User:new(instance)
     local _detail, _err = _user:login(args)
