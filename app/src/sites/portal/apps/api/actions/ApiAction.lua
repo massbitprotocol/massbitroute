@@ -21,18 +21,13 @@ local function _norm(_v)
         _v = json.decode(_v)
     end
 
-    -- setmetatable(_v, cjson.empty_array_mt)
-
     if _v.entrypoints and type(_v.entrypoints) == "string" then
-        -- ngx.log(ngx.ERR, _v.entrypoints)
         _v.entrypoints = json.decode(_v.entrypoints)
         setmetatable(_v.entrypoints, cjson.empty_array_mt)
     end
     if _v.security and type(_v.security) == "string" then
-        -- ngx.log(ngx.ERR, _v.security)
         _v.security = json.decode(_v.security)
     end
-    -- setmetatable(_v.entrypoints, cjson.empty_array_mt)
     return _v
 end
 
@@ -130,16 +125,25 @@ function Action:updateAction(args)
 
     local model = Model:new(instance)
     local _detail, _err_msg = model:update(args)
-    if _detail then
-        return {
-            result = true
-        }
-    else
+    if not _detail then
         return {
             result = false,
             err_msg = _err_msg
         }
     end
+
+    local jobs = instance:getJobs()
+    local job = {
+        action = "/jobs/" .. mytype .. ".generateconf",
+        delay = 3,
+        data = {
+            id = _detail.id,
+            user_id = user_id
+        }
+    }
+    local ok, err = jobs:add(job)
+
+    return {result = true}
 end
 
 function Action:deleteAction(args)
@@ -161,18 +165,37 @@ function Action:deleteAction(args)
         args.user_id = user_id
     end
 
-    local model = Model:new(instance)
-    local _detail, _err_msg = model:delete(args)
-    if _detail then
-        return {
-            result = true
+    local jobs = instance:getJobs()
+    local job = {
+        action = "/jobs/" .. mytype .. ".removeconf",
+        delay = 1,
+        data = {
+            id = args.id,
+            user_id = user_id
         }
-    else
-        return {
-            result = false,
-            err_msg = _err_msg
-        }
-    end
+    }
+    local _ok, _err = jobs:add(job)
+
+    ngx.log(ngx.ERR, inspect({_ok, _err}))
+
+    -- if _ok then
+    --     local model = Model:new(instance)
+    --     local _ok, _err = model:delete(args)
+    --     if _ok then
+    --         return {result = true}
+    --     end
+
+    -- if not _detail then
+    --     return {
+    --         result = false,
+    --         err_msg = _err_msg
+    --     }
+    -- end
+    -- end
+
+    return {
+        result = true
+    }
 end
 
 function Action:listAction(args)
@@ -195,24 +218,9 @@ function Action:listAction(args)
     setmetatable(_res, cjson.empty_array_mt)
 
     for _, _v in pairs(_detail) do
-        -- ngx.log(ngx.ERR, inspect(type(_v)))
         if _v then
             _v = _norm(_v)
-            -- if type(_v) == "string" then
-            --     _v = json.decode(_v)
-            -- end
-
-            -- if _v.entrypoints and type(_v.entrypoints) == "string" then
-            --     ngx.log(ngx.ERR, _v.entrypoints)
-            --     _v.entrypoints = json.decode(_v.entrypoints)
-            -- end
-            -- if _v.security and type(_v.security) == "string" then
-            --     ngx.log(ngx.ERR, _v.security)
-            --     _v.security = json.decode(_v.security)
-            -- end
-            -- ngx.log(ngx.ERR, inspect(_v))
             _res[#_res + 1] = _v
-        --json.decode(_v)
         end
     end
 
@@ -228,13 +236,13 @@ _opensession = function(instance, args)
     local sid = args.sid
     sid = sid or ngx.var.cookie__slc_web_sid
     if not sid then
-        cc.throw('not set argsument: "sid"')
+        -- cc.throw('not set argsument: "sid"')
         return nil
     end
 
     local session = Session:new(instance:getRedis())
     if not session:start(sid) then
-        cc.throw("session is expired, or invalid session id")
+        -- cc.throw("session is expired, or invalid session id")
         return nil
     end
 
