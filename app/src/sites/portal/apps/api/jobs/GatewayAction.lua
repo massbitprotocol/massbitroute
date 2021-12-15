@@ -1,21 +1,57 @@
+local mytype = "gateway"
 local cc = cc
 local gbc = cc.import("#gbc")
 local json = cc.import("#json")
-local io_open = io.open
-local mytype = "gateway"
+-- local io_open = io.open
+
 local JobsAction = cc.class(mytype .. "JobsAction", gbc.ActionBase)
 
-local inspect = require "inspect"
+local mbrutil = cc.import("#mbrutil")
+
+-- local mkdirp = mbrutil.mkdirp
+-- local dirname = mbrutil.dirname
+local read_dir = mbrutil.read_dir
+local read_file = mbrutil.read_file
+local show_folder = mbrutil.show_folder
+local inspect = mbrutil.inspect
+-- local CodeGen = mbrutil.codegen
+local _write_file = mbrutil.write_file
+local _get_tmpl = mbrutil.get_template
+local _git_push = mbrutil.git_push
 
 JobsAction.ACCEPTED_REQUEST_TYPE = "worker"
 
 local Model = cc.import("#" .. mytype)
 
-local CodeGen = require "CodeGen"
-
 local _deploy_dir = "/massbit/massbitroute/app/src/sites/portal/public/deploy/gateway"
 
 local rules = {
+    _dcmap = [[
+${id} => {
+${str}
+},
+]],
+    _dns_geo_resource = [[
+mbr-map-${id} =>{
+map => mbr-map-${id},
+plugin => weighted,
+dcmap => {
+${dcmaps/_dcmap(); separator='\n'}
+}
+}
+]],
+    _datacenter = [[${it}]],
+    _dns_geo_map = [[
+mbr-map-${id} =>{
+geoip2_db => GeoIP2-City.mmdb
+map => {
+${map}
+},
+datacenters => [
+${datacenters/_datacenter(); separator=',\n'}
+]
+}
+]],
     _gw_zone = [[${id}.gw.mbr 600 A ${ip}]],
     _gw_zones = [[${nodes/_gw_zone(); separator='\n'}]],
     _gw_stat_target = [[          - ${id}.gw.mbr.massbitroute.com]],
@@ -37,87 +73,167 @@ ${nodes/_gw_stat_target(); separator='\n'}
 ]]
 }
 
--- local CodeGen = require "CodeGen"
-local mkdirp = require "mkdirp"
 local gwman_dir = "/massbit/massbitroute/app/src/sites/services/gwman"
 local stat_dir = "/massbit/massbitroute/app/src/sites/services/stat"
-local function dirname(str)
-    if str:match(".-/.-") then
-        local name = string.gsub(str, "(.*/)(.*)", "%1")
-        return name
-    else
-        return ""
+
+local function _norm(_v)
+    print(inspect(_v))
+    if type(_v) == "string" then
+        _v = json.decode(_v)
     end
+
+    return _v
 end
 
--- local function _read_file(path)
---     local file = io_open(path, "rb") -- r read mode and b binary mode
---     if not file then
---         return nil
---     end
---     local content = file:read "*a" -- *a or *all reads the whole file
---     file:close()
---     return content
--- end
+local function _remove_item(instance, args)
+    local model = Model:new(instance)
+    local _item = _norm(model:get(args))
+    print("item:")
+    print(inspect(_item))
 
-local function _git_push(_dir, _files)
-    local _git = "git -C " .. _dir .. " "
-    local _cmd =
-        "export HOME=/tmp && " ..
-        _git ..
-            " pull origin master ;" ..
-                _git ..
-                    "config --global user.email baysao@gmail.com" ..
-                        "&&" .. _git .. "config --global user.name baysao && " .. _git .. "remote -v"
-    for _, _file in ipairs(_files) do
-        mkdirp(dirname(_file))
-        _cmd = _cmd .. ";" .. _git .. "add " .. _file
+    if
+        not _item or not _item.id or not _item.ip or not _item.blockchain or not _item.network or not _item.geo or
+            not _item.geo.continent_code or
+            not _item.geo.country_code
+     then
+        return nil, "invalid data"
     end
-    _cmd = _cmd .. " ; " .. _git .. "commit -m update && " .. _git .. "push origin master"
-    -- print(_cmd)
-    local retcode, output = os.capture(_cmd)
-    print(retcode)
-    print(output)
 
-    -- local handle = io.popen(_cmd)
-    -- local result = handle:read("*a")
-    -- handle:close()
-    -- print(result)
+    local _k1 =
+        _item.blockchain .. "/" .. _item.network .. "/" .. _item.geo.continent_code .. "/" .. _item.geo.country_code
+
+    local _deploy_file = _deploy_dir .. "/" .. _k1 .. "/" .. _item.id
+    os.remove(_deploy_file)
+    _git_push(
+        _deploy_dir,
+        {},
+        {
+            _deploy_file
+        }
+    )
+
+    return true
 end
+local function _update_gdnsd()
+    -- local _datacenters = {}
+    local _maps = {}
+    for _, _blockchain in ipairs(show_folder(_deploy_dir)) do
+        print("blockchain:" .. _blockchain)
+        for _, _network in ipairs(show_folder(_deploy_dir .. "/" .. _blockchain)) do
+            print("network:" .. _network)
+            local _blk_id = _blockchain .. "-" .. _network
+            _maps[_blk_id] = _maps[_blk_id] or {maps = {}, datacenters = {}}
+            -- _datacenters[_blk_id] = _datacenters[_blk_id] or {}
+            local _maps1 = _maps[_blk_id].maps
+            local _datacenters1 = _maps[_blk_id].datacenters
 
-local function _write_file(_filepath, content)
-    print("write_file")
-    if _filepath then
-        mkdirp(dirname(_filepath))
-        print(_filepath)
-        print(content)
-        local _file, _ = io_open(_filepath, "w+")
-        if _file ~= nil then
-            _file:write(content)
-            _file:close()
+            table.insert(_maps1, _blk_id .. " => {")
+            for _, _continent in ipairs(show_folder(_deploy_dir .. "/" .. _blockchain .. "/" .. _network)) do
+                print("continent:" .. _continent)
+                table.insert(_maps1, _continent .. " => {")
+                for _, _country in ipairs(
+                    show_folder(_deploy_dir .. "/" .. _blockchain .. "/" .. _network .. "/" .. _continent)
+                ) do
+                    print("country:" .. _country)
+                    local _dc_id = _blockchain .. "-" .. _network .. "-" .. _continent .. "-" .. _country
+
+                    table.insert(_maps1, _country .. " => [ " .. _dc_id .. " ],")
+                    _datacenters1[_dc_id] = _datacenters1[_dc_id] or {}
+                    for _, _id in ipairs(
+                        show_folder(
+                            _deploy_dir .. "/" .. _blockchain .. "/" .. _network .. "/" .. _continent .. "/" .. _country
+                        )
+                    ) do
+                        local _ip =
+                            read_file(
+                            _deploy_dir ..
+                                "/" ..
+                                    _blockchain .. "/" .. _network .. "/" .. _continent .. "/" .. _country .. "/" .. _id
+                        )
+                        table.insert(_datacenters1[_dc_id], _id .. " => " .. " [ " .. _ip .. " , " .. 10 .. " ],")
+                    end
+                end
+                table.insert(_maps1, "},")
+            end
+            table.insert(_maps1, "},")
         end
     end
-end
 
-local function _get_tmpl(_rules, _data)
-    local _rules1 = table.copy(_rules)
-    table.merge(_rules1, _data)
-    return CodeGen(_rules1)
+    print(inspect(_maps))
+    for _k, _v in pairs(_maps) do
+        local _dcmaps = {}
+        for _k1, _v1 in pairs(_v.datacenters) do
+            _dcmaps[#_dcmaps + 1] = {
+                id = _k1,
+                str = table.concat(_v1, "\n")
+            }
+        end
+
+        local _tmpl_res =
+            _get_tmpl(
+            rules,
+            {
+                id = _k,
+                dcmaps = _dcmaps
+            }
+        )
+        print(
+            inspect(
+                {
+                    id = _k,
+                    dcmaps = _dcmaps
+                }
+            )
+        )
+        local _geo_res = _tmpl_res("_dns_geo_resource")
+        print(_geo_res)
+        _write_file(gwman_dir .. "/conf.d/geolocation.d/resources.d/mbr-map-" .. _k, _geo_res)
+        local _tmpl_map =
+            _get_tmpl(
+            rules,
+            {
+                id = _k,
+                datacenters = table.keys(_v.datacenters),
+                map = table.concat(_v.maps, "\n")
+            }
+        )
+        local _geo_map = _tmpl_map("_dns_geo_map")
+        print(_geo_map)
+        _write_file(gwman_dir .. "/conf.d/geolocation.d/maps.d/mbr-map-" .. _k, _geo_map)
+    end
 end
 
 local function _generate_item(instance, args)
     local model = Model:new(instance)
-    local _item = model:get(args)
-    _item = _item and type(_item) == "string" and json.decode(_item)
+    local _item = _norm(model:get(args))
     print(inspect(_item))
 
-    --    print(inspect(_datacenters))
+    if
+        not _item or not _item.id or not _item.ip or not _item.blockchain or not _item.network or not _item.geo or
+            not _item.geo.continent_code or
+            not _item.geo.country_code
+     then
+        return nil, "invalid data"
+    end
 
-    -- local _tmpl = _get_tmpl(rules, _item)
-    -- local _str_tmpl = _tmpl("_local")
-    -- print(_str_tmpl)
-    -- mkdirp(_deploy_dir)
-    -- _write_file(_deploy_dir .. "/" .. _item.id .. ".conf", _str_tmpl)
+    local _k1 =
+        _item.blockchain .. "/" .. _item.network .. "/" .. _item.geo.continent_code .. "/" .. _item.geo.country_code
+    local _deploy_file = _deploy_dir .. "/" .. _k1 .. "/" .. _item.id
+    _write_file(_deploy_file, _item.ip)
+
+    _update_gdnsd()
+    -- local _content_all = read_dir(_deploy_dir1)
+    -- local _content_all_file = _deploy_dir .. "/" .. _k1 .. ".conf"
+    -- _write_file(_content_all_file, _content_all)
+
+    _git_push(
+        _deploy_dir,
+        {
+            _deploy_file
+            -- _content_all_file
+        }
+    )
+    return true
 end
 
 local function _update_gateway_conf(instance)
@@ -143,14 +259,14 @@ scrape_configs:
 
     local _red = instance:getRedis()
     local _user_gw = _red:keys("*:" .. mytype)
-    print(inspect(_user_gw))
+    -- print(inspect(_user_gw))
     local _datacenters = {}
     for _, _k in ipairs(_user_gw) do
         local _gw_arr = _red:arrayToHash(_red:hgetall(_k))
-        print(inspect(_gw_arr))
+        -- print(inspect(_gw_arr))
         for _, _gw_str in pairs(_gw_arr) do
             local _gw = json.decode(_gw_str)
-            print(inspect(_gw))
+            -- print(inspect(_gw))
             local _name = _gw.blockchain .. "-" .. _gw.network
             _nodes[_name] = _nodes[_name] or {}
             if _gw.id and _gw.ip then
@@ -170,7 +286,7 @@ scrape_configs:
         end
     end
 
-    print(inspect(_datacenters))
+    -- print(inspect(_datacenters))
 
     for _k1, _v1 in pairs(_datacenters) do
         local _dcs = {}
@@ -216,7 +332,7 @@ scrape_configs:
 
         table.insert(_resstr, "}")
         table.insert(_resstr, "}")
-        print(table.concat(_mapstr, "\n"))
+        -- print(table.concat(_mapstr, "\n"))
         _write_file(gwman_dir .. "/conf.d/geolocation.d/maps.d/" .. _k1, table.concat(_mapstr, "\n"))
         print(table.concat(_resstr, "\n"))
         _write_file(gwman_dir .. "/conf.d/geolocation.d/resources.d/" .. _k1, table.concat(_resstr, "\n"))
@@ -243,8 +359,13 @@ scrape_configs:
             }
         )
     end
+    local _cmd = "/massbit/massbitroute/app/src/sites/portal/scripts/run _rebuild_zone"
+    print(_cmd)
+    local retcode, output = os.capture(_cmd)
+    print(retcode)
+    print(output)
 
-    print(inspect(_nodes_all))
+    -- print(inspect(_nodes_all))
     local _tmpl = _get_tmpl(rules, {nodes = _nodes_all})
 
     local _str_stat = _tmpl("_gw_stat")
@@ -265,6 +386,15 @@ function JobsAction:generateconfAction(job)
     local instance = self:getInstance()
     local job_data = job.data
     _generate_item(instance, job_data)
-    _update_gateway_conf(instance)
+    -- _update_gateway_conf(instance)
 end
+
+function JobsAction:removeconfAction(job)
+    print(inspect(job))
+
+    local instance = self:getInstance()
+    local job_data = job.data
+    _remove_item(instance, job_data)
+end
+
 return JobsAction
