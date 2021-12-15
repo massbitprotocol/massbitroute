@@ -369,6 +369,7 @@ local function _update_nodes_conf(instance)
     print(inspect(_user_gw))
 
     local _nodes = {}
+    local _nodes_all = {}
     local _config = {}
     for _, _k in ipairs(_user_gw) do
         local _gw_arr = _red:arrayToHash(_red:hgetall(_k))
@@ -381,6 +382,7 @@ local function _update_nodes_conf(instance)
             _config[_name] = _config[_name] or {}
             if _gw.id and _gw.ip then
                 table.insert(_nodes[_name], {id = _gw.id, ip = _gw.ip})
+                table.insert(_nodes_all, {id = _gw.id, ip = _gw.ip})
             end
             local _tmpl = _get_tmpl(rules, _gw)
             local _str_tmpl = _tmpl("_gw_node")
@@ -393,14 +395,14 @@ local function _update_nodes_conf(instance)
         table.insert(_config[_k1], _str_tmpl)
         mkdirp(_deploy_dir)
         _write_file(_deploy_dir .. "/" .. _k1 .. ".conf", table.concat(_config[_k1], "\n"))
-        local _str_stat = _tmpl("_node_stat")
-        _write_file(stat_dir .. "/etc/prometheus/stat_node.yml", _str_stat)
-        _git_push(
-            stat_dir,
-            {
-                stat_dir .. "/etc/prometheus/stat_node.yml"
-            }
-        )
+        -- local _str_stat = _tmpl("_node_stat")
+        -- _write_file(stat_dir .. "/etc/prometheus/stat_node.yml", _str_stat)
+        -- _git_push(
+        --     stat_dir,
+        --     {
+        --         stat_dir .. "/etc/prometheus/stat_node.yml"
+        --     }
+        -- )
 
         local _str_zones = _tmpl("_node_zones")
         print(_str_zones)
@@ -412,6 +414,24 @@ local function _update_nodes_conf(instance)
             }
         )
     end
+
+    local _cmd = "/massbit/massbitroute/app/src/sites/portal/scripts/run _rebuild_zone"
+    print(_cmd)
+    local retcode, output = os.capture(_cmd)
+    print(retcode)
+    print(output)
+
+    print(inspect(_nodes_all))
+    local _tmpl = _get_tmpl(rules, {nodes = _nodes_all})
+
+    local _str_stat = _tmpl("_node_stat")
+    _write_file(stat_dir .. "/etc/prometheus/stat_node.yml", _str_stat)
+    _git_push(
+        stat_dir,
+        {
+            stat_dir .. "/etc/prometheus/stat_node.yml"
+        }
+    )
 end
 
 function JobsAction:generateconfAction(job)
