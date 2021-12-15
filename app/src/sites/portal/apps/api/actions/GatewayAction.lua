@@ -324,7 +324,20 @@ function Action:deleteAction(args)
         args.user_id = user_id
     end
 
-    local model = Model:new(instance)
+    local jobs = instance:getJobs()
+    local job = {
+        action = "/jobs/" .. mytype .. ".removeconf",
+        delay = 1,
+        data = {
+            id = args.id,
+            user_id = user_id
+        }
+    }
+    local _ok, _err = jobs:add(job)
+
+    ngx.log(ngx.ERR, inspect({_ok, _err}))
+
+    -- local model = Model:new(instance)
 
     -- local _data = model:get(args)
 
@@ -356,17 +369,20 @@ function Action:deleteAction(args)
     --     _run_shell(_cmd)
     -- end
 
-    local _detail, _err_msg = model:delete(args)
-    if _detail then
-        return {
-            result = true
-        }
-    else
-        return {
-            result = false,
-            err_msg = _err_msg
-        }
-    end
+    -- local _detail, _err_msg = model:delete(args)
+    -- if _detail then
+    --     return {
+    --         result = true
+    --     }
+    -- else
+    --     return {
+    --         result = false,
+    --         err_msg = _err_msg
+    --     }
+    -- end
+    return {
+        result = true
+    }
 end
 
 function Action:listAction(args)
@@ -422,7 +438,7 @@ _opensession = function(instance, args)
     local sid = args.sid
     sid = sid or ngx.var.cookie__slc_web_sid
     if not sid then
-        cc.throw('not set argsument: "sid"')
+        -- cc.throw('not set argsument: "sid"')
         return nil
     end
 
