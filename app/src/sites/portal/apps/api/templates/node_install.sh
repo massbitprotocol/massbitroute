@@ -1,7 +1,7 @@
 #!/bin/bash
 
 apt-get update
-apt-get -y install apache2-utils supervisor jq
+apt-get -y install git apache2-utils supervisor jq
 
 SITE_ROOT=/massbit/massbitroute/app/src/sites/services/node
 mkdir -p $(dirname $SITE_ROOT)
