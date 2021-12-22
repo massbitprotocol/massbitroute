@@ -123,6 +123,30 @@ function Action:updateAction(args)
         args.user_id = user_id
     end
 
+    if tonumber(args.status) == 0 then
+        local jobs = instance:getJobs()
+        local job = {
+            action = "/jobs/" .. mytype .. ".removeconf",
+            delay = 1,
+            data = {
+                id = args.id,
+                user_id = user_id
+            }
+        }
+        local _ok, _err = jobs:add(job)
+    else
+        local jobs = instance:getJobs()
+        local job = {
+            action = "/jobs/" .. mytype .. ".generateconf",
+            delay = 1,
+            data = {
+                id = args.id,
+                user_id = user_id
+            }
+        }
+        local _ok, _err = jobs:add(job)
+    end
+
     local model = Model:new(instance)
     local _detail, _err_msg = model:update(args)
     if not _detail then
@@ -131,17 +155,6 @@ function Action:updateAction(args)
             err_msg = _err_msg
         }
     end
-
-    local jobs = instance:getJobs()
-    local job = {
-        action = "/jobs/" .. mytype .. ".generateconf",
-        delay = 3,
-        data = {
-            id = _detail.id,
-            user_id = user_id
-        }
-    }
-    local ok, err = jobs:add(job)
 
     return {result = true}
 end
@@ -177,21 +190,6 @@ function Action:deleteAction(args)
     local _ok, _err = jobs:add(job)
 
     ngx.log(ngx.ERR, inspect({_ok, _err}))
-
-    -- if _ok then
-    --     local model = Model:new(instance)
-    --     local _ok, _err = model:delete(args)
-    --     if _ok then
-    --         return {result = true}
-    --     end
-
-    -- if not _detail then
-    --     return {
-    --         result = false,
-    --         err_msg = _err_msg
-    --     }
-    -- end
-    -- end
 
     return {
         result = true
