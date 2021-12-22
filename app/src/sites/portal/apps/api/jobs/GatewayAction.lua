@@ -88,6 +88,12 @@ local function _remove_item(instance, args)
     -- print("item:")
     -- print(inspect(_item))
 
+    if args._is_delete then
+        model:delete({id = args.id, user_id = args.user_id})
+    else
+        model:update({id = args.id, user_id = args.user_id, status = 0})
+    end
+
     if
         not _item or not _item.id or not _item.ip or not _item.blockchain or not _item.network or not _item.geo or
             not _item.geo.continent_code or
@@ -109,11 +115,6 @@ local function _remove_item(instance, args)
         }
     )
 
-    if args._is_delete then
-        model:delete(args)
-    else
-        model:update({id = args.id, user_id = args.user_id, status = 0})
-    end
     return true
 end
 local function _update_gdnsd()

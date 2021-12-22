@@ -148,7 +148,7 @@ server {
        ${_api_method1()}
         proxy_redirect off;
         proxy_ssl_server_name on;
-        proxy_pass ${quicknode_api_uri};
+        proxy_pass ${api_uri};
         proxy_http_version 1.1;
         proxy_ssl_verify off;
         proxy_set_header Upgrade $http_upgrade;
@@ -163,7 +163,7 @@ server {
        ${_api_method1()}
         proxy_redirect off;
         proxy_ssl_server_name on;
-        proxy_pass ${custom_api_uri};
+        proxy_pass ${api_uri};
         proxy_http_version 1.1;
         proxy_ssl_verify off;
         proxy_set_header Upgrade $http_upgrade;
@@ -225,6 +225,12 @@ local function _remove_item(instance, args)
     local model = Model:new(instance)
     local _item = _norm(model:get(args))
 
+    if args._is_delete then
+        model:delete({id = args.id, user_id = args.user_id})
+    else
+        model:update({id = args.id, user_id = args.user_id, status = 0})
+    end
+
     -- _item = _item and type(_item) == "string" and json.decode(_item)
     -- print(inspect(_item))
 
@@ -252,11 +258,6 @@ local function _remove_item(instance, args)
         }
     )
 
-    if args._is_delete then
-        model:delete(args)
-    else
-        model:update({id = args.id, user_id = args.user_id, status = 0})
-    end
     return true
 end
 

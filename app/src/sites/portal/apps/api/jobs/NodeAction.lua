@@ -12,6 +12,8 @@ local read_file = mbrutil.read_file
 local show_folder = mbrutil.show_folder
 local inspect = mbrutil.inspect
 
+local _print = mbrutil.print
+
 local _write_file = mbrutil.write_file
 local _get_tmpl = mbrutil.get_template
 local _git_push = mbrutil.git_push
@@ -193,10 +195,15 @@ local function _norm(_v)
 end
 
 local function _remove_item(instance, args)
-    print(inspect(args))
+    _print(inspect(args))
     local model = Model:new(instance)
     local _item = _norm(model:get(args))
 
+    if args._is_delete then
+        model:delete({id = args.id, user_id = args.user_id})
+    else
+        model:update({id = args.id, user_id = args.user_id, status = 0})
+    end
     if
         not _item or not _item.id or not _item.ip or not _item.blockchain or not _item.network or not _item.geo or
             not _item.geo.continent_code or
@@ -217,12 +224,6 @@ local function _remove_item(instance, args)
             _deploy_file
         }
     )
-
-    if args._is_delete then
-        model:delete(args)
-    else
-        model:update({id = args.id, user_id = args.user_id, status = 0})
-    end
 
     return true
 end
@@ -275,7 +276,7 @@ local function _update_gdnsd()
             local _str_tmpl = _tmpl("_gw_conf")
 
             local _file_gw = _deploy_gatewayconfdir .. "/" .. _k .. ".conf"
-            print(_file_gw)
+            _print(_file_gw)
             _write_file(_file_gw, _str_tmpl)
             table.insert(_portal_commit_files, _file_gw)
         end
@@ -284,7 +285,7 @@ local function _update_gdnsd()
             local _tmpl = _get_tmpl(rules, {nodes = _v.datacenter_ids})
             local _str = _tmpl("_node_zones")
             local _file = _gwman_dir .. "/data/zones/" .. mytype .. "/" .. _k .. ".zone"
-            print(_file)
+            _print(_file)
             _write_file(_file, _str)
             table.insert(_dns_commit_files, _file)
         end
@@ -297,7 +298,7 @@ local function _update_gdnsd()
     table.insert(_zone_content, read_dir(_gwman_dir .. "/data/zones/dapi"))
 
     local _zone_main = _gwman_dir .. "/zones/massbitroute.com"
-    print(_zone_main)
+    _print(_zone_main)
     _write_file(_zone_main, table.concat(_zone_content, "\n"))
     table.insert(_dns_commit_files, _zone_main)
 
@@ -306,7 +307,7 @@ local function _update_gdnsd()
 
     local _file_stat = _stat_dir .. "/etc/prometheus/stat_node.yml"
     _write_file(_file_stat, _str_stat)
-    print(_file_stat)
+    _print(_file_stat)
     _git_push(
         _stat_dir,
         {
@@ -333,7 +334,7 @@ local function _generate_item(instance, args)
     local _k1 =
         _item.blockchain .. "/" .. _item.network .. "/" .. _item.geo.continent_code .. "/" .. _item.geo.country_code
     local _deploy_file = _deploy_dir .. "/" .. _k1 .. "/" .. _item.id
-    print(_deploy_file)
+    _print(_deploy_file)
     _write_file(_deploy_file, json.encode(_item))
 
     local _tmpl = _get_tmpl(rules, _item)
@@ -341,7 +342,7 @@ local function _generate_item(instance, args)
 
     mkdirp(_deploy_dir)
     local _file_main = _deploy_nodeconfdir .. "/" .. _item.id .. ".conf"
-    print(_file_main)
+    _print(_file_main)
     _write_file(_file_main, _str_tmpl)
 
     _git_push(
@@ -355,7 +356,7 @@ local function _generate_item(instance, args)
 end
 
 function JobsAction:generateconfAction(job)
-    print(inspect(job))
+    _print(inspect(job))
 
     local instance = self:getInstance()
 
@@ -365,7 +366,7 @@ function JobsAction:generateconfAction(job)
 end
 
 function JobsAction:removeconfAction(job)
-    print(inspect(job))
+    _print(inspect(job))
 
     local instance = self:getInstance()
     local job_data = job.data
