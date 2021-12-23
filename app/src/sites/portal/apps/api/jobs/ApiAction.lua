@@ -14,6 +14,7 @@ local _read_dir = mbrutil.read_dir
 local _write_file = mbrutil.write_file
 local _get_tmpl = mbrutil.get_template
 local _git_push = mbrutil.git_push
+local _print = mbrutil.print
 
 local mkdirp = require "mkdirp"
 local inspect = require "inspect"
@@ -35,7 +36,9 @@ local PROVIDERS = {
 }
 
 local rules = {
-    _upstream = [[server unix:/tmp/${server_name}.sock;]],
+    _backup = [[backup]],
+    _priority = [[weight=${priority}]],
+    _upstream = [[server unix:/tmp/${server_name}.sock ${_is_backup?_backup()!_priority()};]],
     _upstreams = [[
 upstream upstream_${api_key} {
     ${entrypoints/_upstream()}
@@ -273,11 +276,35 @@ local function _generate_item(instance, args)
     -- print(inspect(_item))
     local _content = {}
 
+    local _entrypoints = {}
+    if _item.entrypoints then
+        _item.entrypoints =
+            table.walk(
+            _item.entrypoints,
+            function(_v)
+                if _v and tonumber(_v.status) == 1 then
+                    _entrypoints[#_entrypoints + 1] = _v
+                end
+            end
+        )
+
+        _print(inspect(_entrypoints))
+        _item.entrypoints = _entrypoints
+    end
+
     if _item.entrypoints and #_item.entrypoints > 0 then
         local _entrypoints =
             table.map(
             _item.entrypoints,
             function(_ent)
+                if not _ent.priority or tonumber(_ent.priority) == 0 then
+                    _ent.priority = 1
+                end
+
+                if _ent.backup and tonumber(_ent.backup) == 1 then
+                    _ent._is_backup = true
+                end
+
                 _ent.provider_id = PROVIDERS[_ent.type] .. "-" .. _ent.id
                 _ent.api_key = _item.api_key
                 _ent.server_name = _item.api_key .. "-" .. _ent.provider_id
