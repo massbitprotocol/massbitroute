@@ -14,6 +14,7 @@ local _read_dir = mbrutil.read_dir
 local _write_file = mbrutil.write_file
 local _get_tmpl = mbrutil.get_template
 local _git_push = mbrutil.git_push
+
 local _print = mbrutil.print
 
 local mkdirp = require "mkdirp"
@@ -248,6 +249,7 @@ local function _remove_item(instance, args)
 
     local _content_all = _read_dir(_deploy_dir1)
     local _content_all_file = _deploy_confdir .. "/" .. _k1 .. ".conf"
+
     print(_content_all_file)
     _write_file(_content_all_file, _content_all)
     _git_push(
@@ -270,7 +272,7 @@ local function _generate_item(instance, args)
 
     local _item_file = _deploy_dir .. "/" .. _item.id
     local _item_str = json.encode(_item)
-    print(_item_file)
+
     _write_file(_item_file, _item_str)
 
     -- print(inspect(_item))
@@ -349,7 +351,7 @@ local function _generate_item(instance, args)
 
     local _content_all = _read_dir(_deploy_dir1)
     local _content_all_file = _deploy_confdir .. "/" .. _k1 .. ".conf"
-    print(_content_all_file)
+
     _write_file(_content_all_file, _content_all)
     _git_push(
         _portal_dir,
