@@ -15,6 +15,8 @@ local _write_file = mbrutil.write_file
 local _get_tmpl = mbrutil.get_template
 local _git_push = mbrutil.git_push
 
+local _print = mbrutil.print
+
 local mkdirp = require "mkdirp"
 local inspect = require "inspect"
 
@@ -35,17 +37,18 @@ local PROVIDERS = {
 }
 
 local rules = {
-    _upstream = [[server unix:/tmp/${server_name}.sock;]],
+    _backup = [[backup]],
+    _priority = [[weight=${priority}]],
+    _upstream = [[server unix:/tmp/${server_name}.sock ${_is_backup?_backup()!_priority()};]],
     _upstreams = [[
 upstream upstream_${api_key} {
     ${entrypoints/_upstream()}
-    keepalive 32;
 }
 ]],
+    _api_method1 = "",
     _api_method = [[
-        set $api_method '';
-        access_by_lua_file /massbit/massbitroute/app/src/sites/services/gateway/src/jsonrpc-access.lua;
-        vhost_traffic_status_filter_by_set_key $api_method ${server_name}::api_method;
+#       access_by_lua_file /massbit/massbitroute/app/src/sites/services/gateway/src/jsonrpc-access.lua;
+        vhost_traffic_status_filter_by_set_key $api_method ${server_name}::dapi::api_method;
 ]],
     _allow_methods1 = [[set $jsonrpc_whitelist '${security.allow_methods}';]],
     _limit_rate_per_sec2 = [[limit_req zone=${api_key};]],
@@ -53,6 +56,24 @@ upstream upstream_${api_key} {
     _server_main = [[
 ${security._is_limit_rate_per_sec?_limit_rate_per_sec1()}
 
+server {
+    listen 80;
+    listen 443 ssl;
+    ssl_certificate /etc/letsencrypt/live/gw.mbr.massbitroute.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/gw.mbr.massbitroute.com/privkey.pem;
+    server_name __GATEWAY_ID__.gw.mbr.massbitroute.com;
+
+ location /__internal_status_vhost/ {
+        # auth_basic 'MBR admin';
+        # auth_basic_user_file /massbit/massbitroute/app/src/sites/services/node/etc/htpasswd;
+        vhost_traffic_status_bypass_limit on;
+        vhost_traffic_status_bypass_stats on;
+        vhost_traffic_status_display;
+        vhost_traffic_status_display_format html;
+    }
+
+
+}
 server {
     listen 80;
     listen 443 ssl;
@@ -65,24 +86,35 @@ server {
     access_log /massbit/massbitroute/app/src/sites/services/gateway/logs/nginx-${gateway_domain}-access.log main_json;
     error_log /massbit/massbitroute/app/src/sites/services/gateway/logs/nginx-${gateway_domain}-error.log debug;
 
+    set $api_method '';
+    set $jsonrpc_whitelist '';
+
     location /${api_key} {
         rewrite /(.*) / break;
         ${security._is_limit_rate_per_sec?_limit_rate_per_sec2()}
         ${_allow_methods1()}
-        set $api_method '';
+
         access_by_lua_file /massbit/massbitroute/app/src/sites/services/gateway/src/filter-jsonrpc-access.lua;
-        vhost_traffic_status_filter_by_set_key $api_method ${api_key}::api_method;
+        vhost_traffic_status_filter_by_set_key $api_method ${api_key}::dapi::api_method;
+        vhost_traffic_status_filter_by_set_key $api_method __GATEWAY_ID__::gw::api_method;
 
-
+        add_header X-Mbr-Gateway-Id __GATEWAY_ID__;
         proxy_cache_use_stale updating error timeout invalid_header http_500 http_502 http_503 http_504;
         proxy_next_upstream error timeout invalid_header http_500 http_502 http_503 http_504;
-        proxy_connect_timeout 10s;
+
+        proxy_connect_timeout 3;
+        proxy_send_timeout 3;
+        proxy_read_timeout 3;
+        send_timeout 3;
+
         proxy_cache_methods GET HEAD POST;
         proxy_cache_key $request_uri|$request_body;
         proxy_cache_min_uses 1;
         proxy_cache cache;
-        proxy_cache_valid 200 3s;
+        proxy_cache_valid 200 10s;
         proxy_cache_background_update on;
+        proxy_cache_lock on;
+        proxy_cache_revalidate on;
         add_header X-Cached $upstream_cache_status;
         proxy_ssl_verify off;
         proxy_pass http://upstream_${api_key}/;
@@ -100,7 +132,7 @@ server {
 server {
     listen unix:/tmp/${server_name}.sock;
     location / {
-       ${_api_method()}
+       ${_api_method1()}
         proxy_redirect off;
         set_encode_base64 $digest :${infura_project_secret};
         proxy_set_header Authorization 'Basic $digest';
@@ -117,10 +149,10 @@ server {
 server {
     listen unix:/tmp/${server_name}.sock;
     location / {
-       ${_api_method()}
+       ${_api_method1()}
         proxy_redirect off;
         proxy_ssl_server_name on;
-        proxy_pass ${quicknode_api_uri};
+        proxy_pass ${api_uri};
         proxy_http_version 1.1;
         proxy_ssl_verify off;
         proxy_set_header Upgrade $http_upgrade;
@@ -132,10 +164,10 @@ server {
 server {
     listen unix:/tmp/${server_name}.sock;
     location / {
-       ${_api_method()}
+       ${_api_method1()}
         proxy_redirect off;
         proxy_ssl_server_name on;
-        proxy_pass ${custom_api_uri};
+        proxy_pass ${api_uri};
         proxy_http_version 1.1;
         proxy_ssl_verify off;
         proxy_set_header Upgrade $http_upgrade;
@@ -147,7 +179,7 @@ server {
 server {
     listen unix:/tmp/${server_name}.sock;
     location / {
-       ${_api_method()}
+       ${_api_method1()}
         proxy_redirect off;
         proxy_ssl_server_name on;
         proxy_set_header X-Api-Key ${getblock_api_key};
@@ -164,7 +196,7 @@ server {
 server {
     listen unix:/tmp/${server_name}.sock;
     location / {
-       ${_api_method()}
+       ${_api_method1()}
         proxy_redirect off;
         proxy_ssl_server_name on;
         proxy_pass http://${blockchain}-${network}.node.mbr.massbitroute.com;
@@ -197,7 +229,12 @@ local function _remove_item(instance, args)
     local model = Model:new(instance)
     local _item = _norm(model:get(args))
 
-    model:delete(args)
+    if args._is_delete then
+        model:delete({id = args.id, user_id = args.user_id})
+    else
+        model:update({id = args.id, user_id = args.user_id, status = 0})
+    end
+
     -- _item = _item and type(_item) == "string" and json.decode(_item)
     -- print(inspect(_item))
 
@@ -212,6 +249,8 @@ local function _remove_item(instance, args)
 
     local _content_all = _read_dir(_deploy_dir1)
     local _content_all_file = _deploy_confdir .. "/" .. _k1 .. ".conf"
+
+    print(_content_all_file)
     _write_file(_content_all_file, _content_all)
     _git_push(
         _portal_dir,
@@ -223,6 +262,8 @@ local function _remove_item(instance, args)
             _item_file
         }
     )
+
+    return true
 end
 
 local function _generate_item(instance, args)
@@ -231,16 +272,41 @@ local function _generate_item(instance, args)
 
     local _item_file = _deploy_dir .. "/" .. _item.id
     local _item_str = json.encode(_item)
+
     _write_file(_item_file, _item_str)
 
     -- print(inspect(_item))
     local _content = {}
+
+    local _entrypoints = {}
+    if _item.entrypoints then
+        _item.entrypoints =
+            table.walk(
+            _item.entrypoints,
+            function(_v)
+                if _v and tonumber(_v.status) == 1 then
+                    _entrypoints[#_entrypoints + 1] = _v
+                end
+            end
+        )
+
+        _print(inspect(_entrypoints))
+        _item.entrypoints = _entrypoints
+    end
 
     if _item.entrypoints and #_item.entrypoints > 0 then
         local _entrypoints =
             table.map(
             _item.entrypoints,
             function(_ent)
+                if not _ent.priority or tonumber(_ent.priority) == 0 then
+                    _ent.priority = 1
+                end
+
+                if _ent.backup and tonumber(_ent.backup) == 1 then
+                    _ent._is_backup = true
+                end
+
                 _ent.provider_id = PROVIDERS[_ent.type] .. "-" .. _ent.id
                 _ent.api_key = _item.api_key
                 _ent.server_name = _item.api_key .. "-" .. _ent.provider_id
@@ -280,10 +346,12 @@ local function _generate_item(instance, args)
     local _deploy_dir1 = _deploy_confdir .. "/nodes/" .. _k1
     mkdirp(_deploy_dir1)
     local _deploy_file = _deploy_dir1 .. "/" .. _item.id .. ".conf"
+    print(_deploy_file)
     _write_file(_deploy_file, table.concat(_content, "\n"))
 
     local _content_all = _read_dir(_deploy_dir1)
     local _content_all_file = _deploy_confdir .. "/" .. _k1 .. ".conf"
+
     _write_file(_content_all_file, _content_all)
     _git_push(
         _portal_dir,

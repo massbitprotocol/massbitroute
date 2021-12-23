@@ -129,6 +129,9 @@ function Action:updateAction(args)
             action = "/jobs/" .. mytype .. ".removeconf",
             delay = 1,
             data = {
+
+                _is_delete = false,
+
                 id = args.id,
                 user_id = user_id
             }
@@ -183,6 +186,7 @@ function Action:deleteAction(args)
         action = "/jobs/" .. mytype .. ".removeconf",
         delay = 1,
         data = {
+            _is_delete = true,
             id = args.id,
             user_id = user_id
         }
