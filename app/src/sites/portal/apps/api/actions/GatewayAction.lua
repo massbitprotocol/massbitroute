@@ -44,18 +44,18 @@ local function _get_geo(ip)
 end
 
 function Action:geonodecountryAction(args)
-    ngx.log(ngx.ERR, "geonodecity")
+    -- ngx.log(ngx.ERR, "geonodecity")
     local _datacenters = {}
     local instance = self:getInstance()
     local _red = instance:getRedis()
     local _user_gw = _red:keys("*:" .. mytype)
-    ngx.log(ngx.ERR, inspect(_user_gw))
+    -- ngx.log(ngx.ERR, inspect(_user_gw))
     for _, _k in ipairs(_user_gw) do
         local _gw_arr = _red:arrayToHash(_red:hgetall(_k))
-        ngx.log(ngx.ERR, inspect(_gw_arr))
+        -- ngx.log(ngx.ERR, inspect(_gw_arr))
         for _, _gw_str in pairs(_gw_arr) do
             local _gw = json.decode(_gw_str)
-            ngx.log(ngx.ERR, inspect(_gw))
+            -- ngx.log(ngx.ERR, inspect(_gw))
             -- local _dc_id = table.concat({"mbr", "map", _gw.blockchain, _gw.network}, "-")
             -- local _dc_id = table.concat({_gw.blockchain, _gw.network}, "-")
             -- _datacenters[_dc_id] = _datacenters[_dc_id] or {}
@@ -70,7 +70,7 @@ function Action:geonodecountryAction(args)
         end
     end
 
-    ngx.log(ngx.ERR, inspect(_datacenters))
+    -- ngx.log(ngx.ERR, inspect(_datacenters))
     local _data = {}
     for _k1, _v1 in pairs(_datacenters) do
         _data[_k1] = _data[_k1] or {}
@@ -78,7 +78,7 @@ function Action:geonodecountryAction(args)
             table.insert(_data[_k1], {id = _k2, value = _v2})
         end
     end
-    ngx.log(ngx.ERR, inspect(_data))
+    -- ngx.log(ngx.ERR, inspect(_data))
     return {
         result = true,
         data = _data
@@ -86,18 +86,18 @@ function Action:geonodecountryAction(args)
 end
 
 function Action:geonodecontinentAction(args)
-    ngx.log(ngx.ERR, "geonodecity")
+    -- ngx.log(ngx.ERR, "geonodecity")
     local _datacenters = {}
     local instance = self:getInstance()
     local _red = instance:getRedis()
     local _user_gw = _red:keys("*:" .. mytype)
-    ngx.log(ngx.ERR, inspect(_user_gw))
+    -- ngx.log(ngx.ERR, inspect(_user_gw))
     for _, _k in ipairs(_user_gw) do
         local _gw_arr = _red:arrayToHash(_red:hgetall(_k))
-        ngx.log(ngx.ERR, inspect(_gw_arr))
+        -- ngx.log(ngx.ERR, inspect(_gw_arr))
         for _, _gw_str in pairs(_gw_arr) do
             local _gw = json.decode(_gw_str)
-            ngx.log(ngx.ERR, inspect(_gw))
+            -- ngx.log(ngx.ERR, inspect(_gw))
             -- local _dc_id = table.concat({"mbr", "map", _gw.blockchain, _gw.network}, "-")
             -- local _dc_id = table.concat({_gw.blockchain, _gw.network}, "-")
             -- _datacenters[_dc_id] = _datacenters[_dc_id] or {}
@@ -170,8 +170,7 @@ function Action:registerAction(args)
         return {result = false, err_msg = "Token not correct"}
     end
     local ip = ngx.var.realip
-    -- ngx.log(ngx.ERR, "ip:" .. ip)
-    -- ngx.log(ngx.ERR, "id:" .. id)
+
     -- ip = "34.124.167.144"
     local _data = {
         id = id,
@@ -192,8 +191,52 @@ function Action:registerAction(args)
     local jobs = instance:getJobs()
     local job = {
         action = "/jobs/" .. mytype .. ".generateconf",
-        delay = 3,
+        delay = 1,
         data = {
+            id = id,
+            user_id = user_id
+        }
+    }
+    local ok, err = jobs:add(job)
+    return {result = true}
+end
+
+function Action:unregisterAction(args)
+    args.action = nil
+    local _token = args.token
+    if not _token then
+        return {result = false, err_msg = "Token missing"}
+    end
+    local instance = self:getInstance()
+
+    local user_id = args.user_id
+    if not user_id then
+        return {result = false, err_msg = "User ID missing"}
+    end
+
+    local token = ndk.set_var.set_decode_base32(_token)
+    local id = ndk.set_var.set_decrypt_session(token)
+
+    if not id or id ~= args.id then
+        return {result = false, err_msg = "Token not correct"}
+    end
+
+    -- ip = "34.124.167.144"
+    local _data = {
+        id = id,
+        user_id = user_id,
+        status = 0
+    }
+
+    local model = Model:new(instance)
+    model:update(_data)
+
+    local jobs = instance:getJobs()
+    local job = {
+        action = "/jobs/" .. mytype .. ".removeconf",
+        delay = 1,
+        data = {
+            _is_delete = false,
             id = id,
             user_id = user_id
         }
@@ -263,16 +306,15 @@ function Action:getAction(args)
             result = true,
             data = _v
         }
-    else
-        return {
-            result = false,
-            err_msg = _err_msg
-        }
     end
+    return {
+        result = false,
+        err_msg = _err_msg
+    }
 end
 
 function Action:updateAction(args)
-    -- ngx.log(ngx.ERR, "updateAction")
+    -- ngx.log(ngx.ERR, "updateAction" .. inspect(args))
     if not args.id then
         return {
             result = false,
@@ -291,18 +333,43 @@ function Action:updateAction(args)
         args.user_id = user_id
     end
 
+    if tonumber(args.status) == 0 then
+        local jobs = instance:getJobs()
+        local job = {
+            action = "/jobs/" .. mytype .. ".removeconf",
+            delay = 1,
+            data = {
+                _is_delete = false,
+                id = args.id,
+                user_id = user_id
+            }
+        }
+        local _ok, _err = jobs:add(job)
+    else
+        local jobs = instance:getJobs()
+        local job = {
+            action = "/jobs/" .. mytype .. ".generateconf",
+            delay = 1,
+            data = {
+                id = args.id,
+                user_id = user_id
+            }
+        }
+        local _ok, _err = jobs:add(job)
+    end
+
     local model = Model:new(instance)
     local _detail, _err_msg = model:update(args)
-    if _detail then
-        return {
-            result = true
-        }
-    else
+
+    if not _detail then
         return {
             result = false,
             err_msg = _err_msg
         }
     end
+    return {
+        result = true
+    }
 end
 
 function Action:deleteAction(args)
@@ -329,57 +396,19 @@ function Action:deleteAction(args)
         action = "/jobs/" .. mytype .. ".removeconf",
         delay = 1,
         data = {
+
+            _is_delete = true,
+
             id = args.id,
             user_id = user_id
         }
     }
     local _ok, _err = jobs:add(job)
 
-    ngx.log(ngx.ERR, inspect({_ok, _err}))
 
-    -- local model = Model:new(instance)
+    -- ngx.log(ngx.ERR, inspect({_ok, _err}))
 
-    -- local _data = model:get(args)
 
-    -- if type(_data) == "string" then
-    --     _data = json.decode(_data)
-    -- end
-    -- ngx.log(ngx.ERR, inspect(_data))
-    -- if _data.geo and _data.geo.continent_code and _data.geo.country_code then
-    --     local _conf_file =
-    --         "/massbit/massbitroute/app/src/sites/services/gwman/data/" ..
-    --         mytype .. "/mbr-map/" .. _data.blockchain .. "/" .. _data.network
-    --     -- for _, dc in ipairs({"HCM", "Ha-Noi"}) do
-    --     local _file = table.concat({_conf_file, _data.geo.continent_code, _data.geo.country_code, _data.id}, "/")
-    --     ngx.log(ngx.ERR, inspect(_file))
-    --     -- _files[#_files + 1] = _file
-    --     -- _write_template(
-    --     --     {
-    --     --         [_file] = ip
-    --     --     }
-    --     -- )
-
-    --     local _cmd =
-    --         ngx.var.site_root ..
-    --         "/scripts/run _" ..
-    --             mytype ..
-    --                 "_unregister " ..
-    --                     table.concat({_data.ip, _data.id, _data.blockchain, _data.network}, " ") .. " " .. _file
-    --     ngx.log(ngx.ERR, _cmd)
-    --     _run_shell(_cmd)
-    -- end
-
-    -- local _detail, _err_msg = model:delete(args)
-    -- if _detail then
-    --     return {
-    --         result = true
-    --     }
-    -- else
-    --     return {
-    --         result = false,
-    --         err_msg = _err_msg
-    --     }
-    -- end
     return {
         result = true
     }
@@ -405,24 +434,9 @@ function Action:listAction(args)
     setmetatable(_res, cjson.empty_array_mt)
 
     for _, _v in pairs(_detail) do
-        -- ngx.log(ngx.ERR, inspect(type(_v)))
         if _v then
             _v = _norm(_v)
-            -- if type(_v) == "string" then
-            --     _v = json.decode(_v)
-            -- end
-
-            -- if _v.entrypoints and type(_v.entrypoints) == "string" then
-            --     ngx.log(ngx.ERR, _v.entrypoints)
-            --     _v.entrypoints = json.decode(_v.entrypoints)
-            -- end
-            -- if _v.security and type(_v.security) == "string" then
-            --     ngx.log(ngx.ERR, _v.security)
-            --     _v.security = json.decode(_v.security)
-            -- end
-            -- ngx.log(ngx.ERR, inspect(_v))
             _res[#_res + 1] = _v
-        --json.decode(_v)
         end
     end
 

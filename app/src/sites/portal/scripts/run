@@ -1,0 +1,44 @@
+#!/bin/bash
+export HOME=/massbit/massbitroute/app/src/tmp
+export ASDF=/massbit/massbitroute/app/src/bin/.asdf/installs
+GRAFANA_VERSION=v8.2.1
+PROMETHEUS_VERSION=v2.30.3
+portal_dir=/massbit/massbitroute/app/src/sites/portal
+gwman_dir=/massbit/massbitroute/app/src/sites/services/gwman
+gw_dir=/massbit/massbitroute/app/src/sites/services/gateway
+cmd_server=/massbit/massbitroute/app/src/cmd_server
+gdnsd="/massbit/massbitroute/app/gbc/bin/.asdf/installs/gdnsd/v3.8.0/sbin/gdnsd -c $gwman_dir"
+nginx="/massbit/massbitroute/app/src/bin/openresty/nginx/sbin/nginx -c /massbit/massbitroute/app/src/tmp/nginx.conf"
+
+_supervisor() {
+	cat <<EOF >/etc/supervisor/conf.d/mbr_portal.conf
+[program:mbr_portal]
+command=/massbit/massbitroute/app/src/start_server
+EOF
+}
+
+_git_config() {
+	git config --global user.name "Vu Tran"
+	git config --global user.email "baysao@gmail.com"
+}
+_reload() {
+	$cmd_server _update
+	$cmd_server restart worker-portal-api:00
+}
+
+_pull() {
+	dir=$1
+	cd $dir
+	git pull | grep -i "updating"
+	if [ $? -eq 0 ]; then
+		_reload
+	fi
+}
+loop() {
+	while true; do
+		$@
+		sleep 1
+	done
+
+}
+$@

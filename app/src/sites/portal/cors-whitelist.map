@@ -1,0 +1,4 @@
+'~^https?://(.*\.)?oht-design.net(:\d+)?$' $http_origin;
+'~^https?://(.*\.)?massbit.io(:\d+)?$' $http_origin;
+'~^https?://(.*\.)?massbit.local(:\d+)?$' $http_origin;
+'~^https?://(.*\.)?localhost(:\d+)?$' $http_origin;
