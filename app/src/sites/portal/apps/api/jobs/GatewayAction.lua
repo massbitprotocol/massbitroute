@@ -3,14 +3,17 @@ local cc = cc
 local gbc = cc.import("#gbc")
 local json = cc.import("#json")
 
+
 local JobsAction = cc.class(mytype .. "JobsAction", gbc.ActionBase)
 
 local mbrutil = cc.import("#mbrutil")
+
 
 local read_dir = mbrutil.read_dir
 local read_file = mbrutil.read_file
 local show_folder = mbrutil.show_folder
 local inspect = mbrutil.inspect
+
 
 local _write_file = mbrutil.write_file
 local _get_tmpl = mbrutil.get_template
@@ -19,6 +22,7 @@ local _git_push = mbrutil.git_push
 JobsAction.ACCEPTED_REQUEST_TYPE = "worker"
 
 local Model = cc.import("#" .. mytype)
+
 
 local _deploy_dir = "/massbit/massbitroute/app/src/sites/portal/public/deploy/gateway"
 
@@ -73,6 +77,7 @@ ${nodes/_gw_stat_target(); separator='\n'}
 ]]
 }
 
+
 local function _norm(_v)
     -- print(inspect(_v))
     if type(_v) == "string" then
@@ -105,6 +110,7 @@ local function _remove_item(instance, args)
     local _k1 =
         _item.blockchain .. "/" .. _item.network .. "/" .. _item.geo.continent_code .. "/" .. _item.geo.country_code
 
+
     local _deploy_file = _deploy_dir .. "/" .. _k1 .. "/" .. _item.id
     os.remove(_deploy_file)
     _git_push(
@@ -114,6 +120,7 @@ local function _remove_item(instance, args)
             _deploy_file
         }
     )
+
 
     return true
 end
@@ -166,6 +173,7 @@ local function _update_gdnsd()
                             table.insert(_datacenter_ids_all, {id = _id, ip = _ip})
                             table.insert(_datacenters1[_dc_id], _id .. " => " .. " [ " .. _ip .. " , " .. 10 .. " ],")
                         end
+
                     end
                 end
                 table.insert(_maps1, "},")
@@ -183,9 +191,11 @@ local function _update_gdnsd()
             }
         end
 
+
         local _tmpl_res =
             _get_tmpl(
             rules,
+
             {
                 id = _k,
                 dcmaps = _dcmaps
@@ -227,6 +237,12 @@ local function _update_gdnsd()
         _write_file(_file_dapi, "*." .. _k .. " DYNA	geoip!mbr-map-" .. _k .. "\n")
         table.insert(_commit_files, _file_dapi)
     end
+    local _cmd = "/massbit/massbitroute/app/src/sites/portal/scripts/run _rebuild_zone"
+    print(_cmd)
+    local retcode, output = os.capture(_cmd)
+    print(retcode)
+    print(output)
+
 
     local _zone_content = {}
     table.insert(_zone_content, read_file(gwman_dir .. "/data/zones/massbitroute.com"))
@@ -240,6 +256,7 @@ local function _update_gdnsd()
     table.insert(_commit_files, _zone_main)
 
     local _tmpl = _get_tmpl(rules, {nodes = _datacenter_ids_all})
+
     local _str_stat = _tmpl("_gw_stat")
 
     local _file_stat = stat_dir .. "/etc/prometheus/stat_gw.yml"
@@ -288,7 +305,9 @@ function JobsAction:generateconfAction(job)
     local instance = self:getInstance()
     local job_data = job.data
     _generate_item(instance, job_data)
+
     _update_gdnsd()
+
 end
 
 function JobsAction:removeconfAction(job)
@@ -297,7 +316,9 @@ function JobsAction:removeconfAction(job)
     local instance = self:getInstance()
     local job_data = job.data
     _remove_item(instance, job_data)
+
     _update_gdnsd()
+
 end
 
 return JobsAction

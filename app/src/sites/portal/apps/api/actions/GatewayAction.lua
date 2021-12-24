@@ -396,14 +396,18 @@ function Action:deleteAction(args)
         action = "/jobs/" .. mytype .. ".removeconf",
         delay = 1,
         data = {
+
             _is_delete = true,
+
             id = args.id,
             user_id = user_id
         }
     }
     local _ok, _err = jobs:add(job)
 
+
     -- ngx.log(ngx.ERR, inspect({_ok, _err}))
+
 
     return {
         result = true
