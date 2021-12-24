@@ -3,6 +3,27 @@
 apt-get update
 apt-get -y install git apache2-utils supervisor jq
 
+
+ip="$(curl -ssSfL https://dapi.massbit.io/myip)"
+
+if [ -z "$ip" ]; then
+	echo "Your IP is unknown"
+	exit 1
+fi
+
+zone="$(curl -ssSfL http://api.ipapi.com/api/$ip?access_key=092142b61eed12af33e32fc128295356 | jq .continent_code)"
+zone=$(echo $zone | sed 's/\"//g')
+if [ -z "$zone" ]; then
+	echo "Cannot detect zone from IP $ip"
+	exit 1
+fi
+
+if [ "$zone" != "{{zone}}" ]; then
+	echo "Your IP $ip not in zone {{zone}}"
+	exit 1
+fi
+
+
 SITE_ROOT=/massbit/massbitroute/app/src/sites/services/node
 mkdir -p $(dirname $SITE_ROOT)
 
