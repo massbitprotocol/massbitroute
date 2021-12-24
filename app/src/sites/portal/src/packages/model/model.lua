@@ -1,6 +1,6 @@
 local ngx, cc = ngx, cc
 local Model = cc.class("Model")
--- local json = cc.import("#json")
+local util = cc.import("#mbrutil")
 
 function Model:ctor(instance)
     self._instance = instance
@@ -24,6 +24,8 @@ function Model:_get_key(key, opt)
     return _ret
 end
 function Model:_del_key(key, opt)
+    util.print(_key)
+    util.print(_opt)
     local _redis = self._redis
     local _ret = _redis:hdel(key, opt)
     if not _ret or _ret == _redis.null then

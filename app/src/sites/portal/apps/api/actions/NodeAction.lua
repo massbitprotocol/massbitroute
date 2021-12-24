@@ -10,33 +10,6 @@ local httpc = require("resty.http").new()
 local inspect = require "inspect"
 
 local _ipapi_token = "092142b61eed12af33e32fc128295356"
--- local flatdb = require "flatdb"
--- local lfs = require("lfs")
-
--- local shell = require "resty.shell"
--- local mkdirp = require "mkdirp"
-
--- local CodeGen = require "CodeGen"
-
--- local _dir_gateway = ngx.var.site_root .. "/data/gateway"
--- mkdirp(_dir_gateway)
--- local _db_gateway = flatdb(_dir_gateway)
-
--- local function _show_folder(folder)
---     local _files = {}
---     setmetatable(_files, cjson.array_mt)
-
---     for _file in lfs.dir(folder) do
---         if _file ~= "." and _file ~= ".." then
---             _files[#_files + 1] = {id = _file}
---         end
---     end
---     return _files
--- end
-
--- local validation = require "validation"
-
--- local jsonschema = require "jsonschema"
 
 local _opensession
 
@@ -44,72 +17,6 @@ local ERROR = {
     NOT_LOGIN = 100
 }
 local Model = cc.import("#" .. mytype)
-
--- local _user
-
--- local _rules = {
---     name = {type = "string"},
---     ip = {type = "string"},
---     blockchain = {type = "string"},
---     network = {type = "string"}
--- }
-
--- local function dirname(str)
---     if str:match(".-/.-") then
---         local name = string.gsub(str, "(.*/)(.*)", "%1")
---         return name
---     else
---         return ""
---     end
--- end
-
--- local function _get_tmpl(_rules, _data)
---     local _rules1 = table.copy(_rules)
---     table.merge(_rules1, _data)
---     return CodeGen(_rules1)
--- end
-
--- local function _run_shell(cmd)
---     ngx.log(ngx.ERR, inspect(cmd))
---     local stdin = ""
---     local timeout = 300000 -- ms
---     local max_size = 409600 -- byte
---     local ok, stdout, stderr, reason, status = shell.run(cmd, stdin, timeout, max_size)
---     ngx.log(ngx.ERR, inspect(ok))
---     ngx.log(ngx.ERR, inspect(stdout))
---     ngx.log(ngx.ERR, inspect(stderr))
---     return ok, stdout, stderr, reason, status
--- end
-
--- local function _write_file(_filepath, content)
---     ngx.log(ngx.ERR, "write_file")
---     if _filepath then
---         mkdirp(dirname(_filepath))
---         ngx.log(ngx.ERR, "write_file:" .. _filepath)
---         ngx.log(ngx.ERR, content)
---         local _file, _ = io.open(_filepath, "w+")
---         if _file ~= nil then
---             _file:write(content)
---             _file:close()
---         end
---     end
--- end
-
--- local function _write_template(_files)
---     ngx.log(ngx.ERR, "write_template")
---     ngx.log(ngx.ERR, inspect(_files))
---     -- _tmpl("_domain")
---     -- _files["zones/" .. _data.domain] = _zones_tmpl
---     for _path, _content in pairs(_files) do
---         ngx.log(ngx.ERR, "_path:" .. _path)
---         ngx.log(ngx.ERR, "_content .. " .. json.encode(_content))
---         if type(_content) == "string" then
---             _write_file(_path, _content)
---         else
---             _write_file(_path, table.concat(_content, "\n"))
---         end
---     end
--- end
 
 local function _norm_json(_v, _field)
     if _v[_field] and type(_v[_field]) == "string" then
@@ -128,7 +35,7 @@ end
 
 local function _get_geo(ip)
     local _api_url = "http://api.ipapi.com/api/" .. ip .. "?access_key=" .. _ipapi_token
-    ngx.log(ngx.ERR, inspect(_api_url))
+    -- ngx.log(ngx.ERR, inspect(_api_url))
     local _res, _err = httpc:request_uri(_api_url, {method = "GET"})
     local _resb = _res.body
     if _res.status == 200 and _resb and type(_resb) == "string" then
@@ -143,13 +50,13 @@ function Action:geonodecountryAction(args)
     local instance = self:getInstance()
     local _red = instance:getRedis()
     local _user_gw = _red:keys("*:" .. mytype)
-    ngx.log(ngx.ERR, inspect(_user_gw))
+    -- ngx.log(ngx.ERR, inspect(_user_gw))
     for _, _k in ipairs(_user_gw) do
         local _gw_arr = _red:arrayToHash(_red:hgetall(_k))
-        ngx.log(ngx.ERR, inspect(_gw_arr))
+        -- ngx.log(ngx.ERR, inspect(_gw_arr))
         for _, _gw_str in pairs(_gw_arr) do
             local _gw = json.decode(_gw_str)
-            ngx.log(ngx.ERR, inspect(_gw))
+            -- ngx.log(ngx.ERR, inspect(_gw))
             -- local _dc_id = table.concat({"mbr", "map", _gw.blockchain, _gw.network}, "-")
             -- local _dc_id = table.concat({_gw.blockchain, _gw.network}, "-")
             -- _datacenters[_dc_id] = _datacenters[_dc_id] or {}
@@ -173,7 +80,7 @@ function Action:geonodecountryAction(args)
             table.insert(_data[_k1], {id = _k2, value = _v2})
         end
     end
-    ngx.log(ngx.ERR, inspect(_data))
+    -- ngx.log(ngx.ERR, inspect(_data))
 
     return {
         result = true,
@@ -182,18 +89,18 @@ function Action:geonodecountryAction(args)
 end
 
 function Action:geonodecontinentAction(args)
-    ngx.log(ngx.ERR, "geonodecity")
+    -- ngx.log(ngx.ERR, "geonodecity")
     local _datacenters = {}
     local instance = self:getInstance()
     local _red = instance:getRedis()
     local _user_gw = _red:keys("*:" .. mytype)
-    ngx.log(ngx.ERR, inspect(_user_gw))
+    -- ngx.log(ngx.ERR, inspect(_user_gw))
     for _, _k in ipairs(_user_gw) do
         local _gw_arr = _red:arrayToHash(_red:hgetall(_k))
-        ngx.log(ngx.ERR, inspect(_gw_arr))
+        -- ngx.log(ngx.ERR, inspect(_gw_arr))
         for _, _gw_str in pairs(_gw_arr) do
             local _gw = json.decode(_gw_str)
-            ngx.log(ngx.ERR, inspect(_gw))
+            -- ngx.log(ngx.ERR, inspect(_gw))
             -- local _dc_id = table.concat({"mbr", "map", _gw.blockchain, _gw.network}, "-")
             -- local _dc_id = table.concat({_gw.blockchain, _gw.network}, "-")
             -- _datacenters[_dc_id] = _datacenters[_dc_id] or {}
@@ -228,8 +135,6 @@ function Action:pingAction(args)
         return {result = false, err_msg = "User ID missing"}
     end
 
-    -- ngx.log(ngx.ERR, "user_id:" .. user_id)
-
     local token = ndk.set_var.set_decode_base32(_token)
     local id = ndk.set_var.set_decrypt_session(token)
     -- ngx.log(ngx.ERR, "id:" .. id)
@@ -249,6 +154,7 @@ end
 --- Register node
 
 function Action:registerAction(args)
+    ngx.log(ngx.ERR, inspect(args))
     args.action = nil
     local _token = args.token
     if not _token then
@@ -268,15 +174,20 @@ function Action:registerAction(args)
         return {result = false, err_msg = "Token not correct"}
     end
     local ip = ngx.var.realip
-    -- ngx.log(ngx.ERR, "ip:" .. ip)
-    -- ngx.log(ngx.ERR, "id:" .. id)
+
+    local data_uri = args.data_uri
+    if not data_uri then
+        data_uri = "http://127.0.0.1:8545"
+    end
+
     -- ip = "34.124.167.144"
     local _data = {
         id = id,
         token = _token,
         user_id = user_id,
         ip = ip,
-        status = 1
+        status = 1,
+        data_uri = data_uri
     }
     local _geo = _get_geo(ip)
 
@@ -287,71 +198,69 @@ function Action:registerAction(args)
     local model = Model:new(instance)
     model:update(_data)
 
-    -- local _gateway = model:get(_data)
-    -- _gateway = _gateway and json.decode(_gateway)
-    -- table.merge(args, _data)
     local jobs = instance:getJobs()
     local job = {
         action = "/jobs/" .. mytype .. ".generateconf",
-        delay = 3,
+        delay = 1,
         data = {
             id = id,
             user_id = user_id
         }
     }
     local ok, err = jobs:add(job)
+    return {result = true}
+end
 
-    -- local _gateway = model:get(_data)
+function Action:unregisterAction(args)
+    ngx.log(ngx.ERR, inspect(args))
+    args.action = nil
+    local _token = args.token
+    if not _token then
+        return {result = false, err_msg = "Token missing"}
+    end
+    local instance = self:getInstance()
 
-    -- -- _gateway = _gateway and json.decode(_gateway)
-    -- -- ngx.log(ngx.ERR, inspect(type(_gateway)))
+    local user_id = args.user_id
+    if not user_id then
+        return {result = false, err_msg = "User ID missing"}
+    end
 
-    -- if not _db_gateway[id] then
-    --     _db_gateway[id] = {_raw = _gateway}
-    -- else
-    --     table.merge(_db_gateway[id], {_raw = _gateway})
-    -- end
-    -- _db_gateway:save()
-    -- -- local _files = {}
-    -- local _conf_file =
-    --     "/massbit/massbitroute/app/src/sites/services/gwman/data/" ..
-    --     mytype .. "/mbr-map/" .. args.blockchain .. "/" .. args.network
-    -- -- for _, dc in ipairs({"HCM", "Ha-Noi"}) do
-    -- local _file = table.concat({_conf_file, _data.geo.continent_code, _data.geo.country_code, args.id}, "/")
-    -- ngx.log(ngx.ERR, inspect(_file))
-    -- -- _files[#_files + 1] = _file
-    -- _write_template(
-    --     {
-    --         [_file] = ip
-    --     }
-    -- )
+    local token = ndk.set_var.set_decode_base32(_token)
+    local id = ndk.set_var.set_decrypt_session(token)
 
-    -- local _cmd =
-    --     ngx.var.site_root ..
-    --     "/scripts/run _" ..
-    --         mytype .. "_register " .. table.concat({ip, args.id, args.blockchain, args.network}, " ") .. " " .. _file
-    -- ngx.log(ngx.ERR, _cmd)
-    -- _run_shell(_cmd)
+    if not id or id ~= args.id then
+        return {result = false, err_msg = "Token not correct"}
+    end
+
+    -- ip = "34.124.167.144"
+    local _data = {
+        id = id,
+        user_id = user_id,
+        status = 0
+    }
+
+    local model = Model:new(instance)
+    model:update(_data)
+
+    local jobs = instance:getJobs()
+    local job = {
+        action = "/jobs/" .. mytype .. ".removeconf",
+        delay = 1,
+        data = {
+            _is_delete = true,
+            id = id,
+            user_id = user_id
+        }
+    }
+    local ok, err = jobs:add(job)
 
     return {result = true}
 end
 
 function Action:createAction(args)
+    ngx.log(ngx.ERR, inspect(args))
     args.action = nil
     args.id = nil
-    -- local validation =
-    --     jsonschema.generate_validator {
-    --     type = "object",
-    --     properties = _rules
-    -- }
-    -- local isValid = validation(args)
-
-    -- if not isValid then
-    --     return {
-    --         result = false,
-    --         err_msg = "Params not valid"
-    --     }
-    -- end
 
     local instance = self:getInstance()
     local _session = _opensession(instance, args)
@@ -364,29 +273,22 @@ function Action:createAction(args)
         args.user_id = user_id
     end
 
-    -- args.entrypoints = cjson.empty_array
-
-    -- args.security = {
-    --     allow_methods = "",
-    --     limit_rate_per_sec = 100,
-    --     limit_rate_per_day = 30000
-    -- }
     local model = Model:new(instance)
     local _detail, _err_msg = model:create(args)
-    if _detail then
-        return {
-            result = true,
-            data = _detail
-        }
-    else
+    if not _detail then
         return {
             result = false,
             err_msg = _err_msg
         }
     end
+    return {
+        result = true,
+        data = _detail
+    }
 end
 
 function Action:getAction(args)
+    ngx.log(ngx.ERR, inspect(args))
     if not args.id then
         return {
             result = false,
@@ -416,15 +318,15 @@ function Action:getAction(args)
             result = true,
             data = _v
         }
-    else
-        return {
-            result = false,
-            err_msg = _err_msg
-        }
     end
+    return {
+        result = false,
+        err_msg = _err_msg
+    }
 end
 
 function Action:updateAction(args)
+    ngx.log(ngx.ERR, inspect(args))
     -- ngx.log(ngx.ERR, "updateAction")
     if not args.id then
         return {
@@ -444,6 +346,31 @@ function Action:updateAction(args)
         args.user_id = user_id
     end
 
+    if tonumber(args.status) == 0 then
+        local jobs = instance:getJobs()
+        local job = {
+            action = "/jobs/" .. mytype .. ".removeconf",
+            delay = 1,
+            data = {
+                _is_delete = false,
+                id = args.id,
+                user_id = user_id
+            }
+        }
+        local _ok, _err = jobs:add(job)
+    else
+        local jobs = instance:getJobs()
+        local job = {
+            action = "/jobs/" .. mytype .. ".generateconf",
+            delay = 1,
+            data = {
+                id = args.id,
+                user_id = user_id
+            }
+        }
+        local _ok, _err = jobs:add(job)
+    end
+
     local model = Model:new(instance)
     local _detail, _err_msg = model:update(args)
     if _detail then
@@ -459,6 +386,7 @@ function Action:updateAction(args)
 end
 
 function Action:deleteAction(args)
+    ngx.log(ngx.ERR, inspect(args))
     if not args.id then
         return {
             result = false,
@@ -477,52 +405,25 @@ function Action:deleteAction(args)
         args.user_id = user_id
     end
 
-    local model = Model:new(instance)
-
-    -- local _data = model:get(args)
-
-    -- if type(_data) == "string" then
-    --     _data = json.decode(_data)
-    -- end
-    -- ngx.log(ngx.ERR, inspect(_data))
-    -- if _data.geo and _data.geo.continent_code and _data.geo.country_code then
-    --     local _conf_file =
-    --         "/massbit/massbitroute/app/src/sites/services/gwman/data/" ..
-    --         mytype .. "/mbr-map/" .. _data.blockchain .. "/" .. _data.network
-    --     -- for _, dc in ipairs({"HCM", "Ha-Noi"}) do
-    --     local _file = table.concat({_conf_file, _data.geo.continent_code, _data.geo.country_code, _data.id}, "/")
-    --     ngx.log(ngx.ERR, inspect(_file))
-    --     -- _files[#_files + 1] = _file
-    --     -- _write_template(
-    --     --     {
-    --     --         [_file] = ip
-    --     --     }
-    --     -- )
-
-    --     local _cmd =
-    --         ngx.var.site_root ..
-    --         "/scripts/run _" ..
-    --             mytype ..
-    --                 "_unregister " ..
-    --                     table.concat({_data.ip, _data.id, _data.blockchain, _data.network}, " ") .. " " .. _file
-    --     ngx.log(ngx.ERR, _cmd)
-    --     _run_shell(_cmd)
-    -- end
-
-    local _detail, _err_msg = model:delete(args)
-    if _detail then
-        return {
-            result = true
+    local jobs = instance:getJobs()
+    local job = {
+        action = "/jobs/" .. mytype .. ".removeconf",
+        delay = 1,
+        data = {
+            _is_delete = true,
+            id = args.id,
+            user_id = user_id
         }
-    else
-        return {
-            result = false,
-            err_msg = _err_msg
-        }
-    end
+    }
+    local _ok, _err = jobs:add(job)
+
+    return {
+        result = true
+    }
 end
 
 function Action:listAction(args)
+    ngx.log(ngx.ERR, inspect(args))
     args.action = nil
     local instance = self:getInstance()
     local _session = _opensession(instance, args)
@@ -542,24 +443,10 @@ function Action:listAction(args)
     setmetatable(_res, cjson.empty_array_mt)
 
     for _, _v in pairs(_detail) do
-        -- ngx.log(ngx.ERR, inspect(type(_v)))
         if _v then
             _v = _norm(_v)
-            -- if type(_v) == "string" then
-            --     _v = json.decode(_v)
-            -- end
 
-            -- if _v.entrypoints and type(_v.entrypoints) == "string" then
-            --     ngx.log(ngx.ERR, _v.entrypoints)
-            --     _v.entrypoints = json.decode(_v.entrypoints)
-            -- end
-            -- if _v.security and type(_v.security) == "string" then
-            --     ngx.log(ngx.ERR, _v.security)
-            --     _v.security = json.decode(_v.security)
-            -- end
-            -- ngx.log(ngx.ERR, inspect(_v))
             _res[#_res + 1] = _v
-        --json.decode(_v)
         end
     end
 
@@ -575,13 +462,13 @@ _opensession = function(instance, args)
     local sid = args.sid
     sid = sid or ngx.var.cookie__slc_web_sid
     if not sid then
-        cc.throw('not set argsument: "sid"')
+        -- cc.throw('not set argsument: "sid"')
         return nil
     end
 
     local session = Session:new(instance:getRedis())
     if not session:start(sid) then
-        cc.throw("session is expired, or invalid session id")
+        -- cc.throw("session is expired, or invalid session id")
         return nil
     end
 
