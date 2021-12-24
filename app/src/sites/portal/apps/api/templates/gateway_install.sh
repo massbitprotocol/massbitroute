@@ -2,6 +2,7 @@
 
 apt-get update
 apt-get -y install git apache2-utils supervisor jq
+
 ip="$(curl -ssSfL https://dapi.massbit.io/myip)"
 
 if [ -z "$ip" ]; then
@@ -20,6 +21,7 @@ if [ "$zone" != "{{zone}}" ]; then
 	echo "Your IP $ip not in zone {{zone}}"
 	exit 1
 fi
+
 
 SITE_ROOT=/massbit/massbitroute/app/src/sites/services/gateway
 mkdir -p $(dirname $SITE_ROOT)
