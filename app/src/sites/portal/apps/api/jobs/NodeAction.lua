@@ -12,6 +12,9 @@ local read_file = mbrutil.read_file
 local show_folder = mbrutil.show_folder
 local inspect = mbrutil.inspect
 
+local _print = mbrutil.print
+
+
 local _write_file = mbrutil.write_file
 local _get_tmpl = mbrutil.get_template
 local _git_push = mbrutil.git_push
@@ -55,16 +58,12 @@ server unix:/tmp/${id}.sock;
     _gw_node_upstreams = [[
 upstream eth-mainnet.node.mbr.massbitroute.com {
 ${nodes/_gw_node_upstream()}
-keepalive 32;
 }
 ]],
     _gw_node = [[
 server {
     listen unix:/tmp/${id}.sock;
     location / {
-               set $api_method '';
-               access_by_lua_file /massbit/massbitroute/app/src/sites/services/gateway/src/jsonrpc-access.lua;
-               vhost_traffic_status_filter_by_set_key $api_method ${id}::api_method;
         proxy_redirect off;
         proxy_ssl_server_name on;
         proxy_set_header X-Api-Key ${token};
@@ -99,34 +98,56 @@ server {
     client_body_buffer_size 512K;
     client_max_body_size 1G;
     server_name ${id}.node.mbr.massbitroute.com node.mbr.massbitroute.com;
-    access_log /massbit/massbitroute/app/src/sites/services/node/logs/${id}-access.log main_json;
-    error_log /massbit/massbitroute/app/src/sites/services/node/logs/${id}-error.log debug;
-    # API keys verification
-    location = /authorize_apikey {
-        internal;
-        if ($api_realm = '') {
-            return 403; # Forbidden
-        }
-        if ($http_x_api_key = '') {
-            return 401; # Unauthorized
-        }
-        return 204; # OK
-    }
+  
+
+    set $api_method '';
+    set $jsonrpc_whitelist '';
+   
     location /ping {
         return 200 pong;
     }
     location / {
-        proxy_pass http://127.0.0.1:8545;
+  access_log /massbit/massbitroute/app/src/sites/services/node/logs/api-${id}-access.log main_json;
+    error_log /massbit/massbitroute/app/src/sites/services/node/logs/api-${id}-error.log debug;
+
+       if ($api_realm = '') {
+            return 403; # Forbidden
+        }
+
+        add_header X-Mbr-Node-Id ${id};
+
+        access_by_lua_file /massbit/massbitroute/app/src/sites/services/node/src/jsonrpc-access.lua;
+        vhost_traffic_status_filter_by_set_key $api_method ${id}::node::api_method;
+
+        proxy_cache_use_stale updating error timeout invalid_header http_500 http_502 http_503 http_504;
+        proxy_next_upstream error timeout invalid_header http_500 http_502 http_503 http_504;
+        proxy_connect_timeout 3;
+        proxy_send_timeout 3;
+        proxy_read_timeout 3;
+        send_timeout 3;
+        proxy_cache_methods GET HEAD POST;
+        proxy_cache_key $request_uri|$request_body;
+        proxy_cache_min_uses 1;
+        proxy_cache cache;
+        proxy_cache_valid 200 10s;
+        proxy_cache_background_update on;
+        proxy_cache_lock on;
+        proxy_cache_revalidate on;
+        add_header X-Cached-Node $upstream_cache_status;
+        proxy_ssl_verify off;
+
+
+        proxy_pass ${data_uri};
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection $connection_upgrade;
         if ($request_method = OPTIONS) {
             add_header Access-Control-Allow-Headers 'X-API-Key, Authorization';
         }
-        satisfy any;
-        auth_request /authorize_apikey;
     }
     location /__internal_status_vhost/ {
+  access_log /massbit/massbitroute/app/src/sites/services/node/logs/stat-${id}-access.log main_json;
+    error_log /massbit/massbitroute/app/src/sites/services/node/logs/stat-${id}-error.log debug;
         # auth_basic 'MBR admin';
         # auth_basic_user_file /massbit/massbitroute/app/src/sites/services/node/etc/htpasswd;
         vhost_traffic_status_bypass_limit on;
@@ -139,8 +160,7 @@ server {
     _upstream_server = [[server unix:/tmp/${id}.sock;]],
     _upstream = [[
 upstream eth-mainnet.node.mbr.massbitroute.com {
-${}
-keepalive 32;
+${_upstream_server}
 }
 ]],
     _api_method = [[
@@ -176,8 +196,15 @@ local function _norm(_v)
 end
 
 local function _remove_item(instance, args)
+
     local model = Model:new(instance)
     local _item = _norm(model:get(args))
+
+    if args._is_delete then
+        model:delete({id = args.id, user_id = args.user_id})
+    else
+        model:update({id = args.id, user_id = args.user_id, status = 0})
+    end
 
     if
         not _item or not _item.id or not _item.ip or not _item.blockchain or not _item.network or not _item.geo or
@@ -231,12 +258,16 @@ local function _update_gdnsd()
                                 "/" ..
                                     _blockchain .. "/" .. _network .. "/" .. _continent .. "/" .. _country .. "/" .. _id
                         )
-                        if _item and type(_item) == "string" then
-                            _item = json.decode(_item)
+
+                        if _item then
+                            if type(_item) == "string" then
+                                _item = json.decode(_item)
+                            end
+
+                            table.insert(_datacenter_ids, _item)
+                            table.insert(_datacenter_ids_all, {id = _item.id, ip = _item.ip})
                         end
 
-                        table.insert(_datacenter_ids, _item)
-                        table.insert(_datacenter_ids_all, {id = _item.id, ip = _item.ip})
                     end
                 end
             end
@@ -249,6 +280,7 @@ local function _update_gdnsd()
             local _str_tmpl = _tmpl("_gw_conf")
 
             local _file_gw = _deploy_gatewayconfdir .. "/" .. _k .. ".conf"
+
             _write_file(_file_gw, _str_tmpl)
             table.insert(_portal_commit_files, _file_gw)
         end
@@ -257,6 +289,7 @@ local function _update_gdnsd()
             local _tmpl = _get_tmpl(rules, {nodes = _v.datacenter_ids})
             local _str = _tmpl("_node_zones")
             local _file = _gwman_dir .. "/data/zones/" .. mytype .. "/" .. _k .. ".zone"
+
             _write_file(_file, _str)
             table.insert(_dns_commit_files, _file)
         end
@@ -269,45 +302,29 @@ local function _update_gdnsd()
     table.insert(_zone_content, read_dir(_gwman_dir .. "/data/zones/dapi"))
 
     local _zone_main = _gwman_dir .. "/zones/massbitroute.com"
+
     _write_file(_zone_main, table.concat(_zone_content, "\n"))
     table.insert(_dns_commit_files, _zone_main)
 
     local _tmpl = _get_tmpl(rules, {nodes = _datacenter_ids_all})
     local _str_stat = _tmpl("_node_stat")
-    _write_file(_stat_dir .. "/etc/prometheus/stat_node.yml", _str_stat)
-    _git_push(
-        _stat_dir,
-        {
-            _stat_dir .. "/etc/prometheus/stat_node.yml"
-        }
-    )
 
-    _git_push(_portal_dir, _portal_commit_files)
-    _git_push(_gwman_dir, _dns_commit_files)
-end
 
-local function _generate_item(instance, args)
-    local model = Model:new(instance)
-    local _item = _norm(model:get(args))
+    local _file_stat = _stat_dir .. "/etc/prometheus/stat_node.yml"
+    _write_file(_file_stat, _str_stat)
+    _print(_file_stat)
 
-    if
-        not _item or not _item.id or not _item.ip or not _item.blockchain or not _item.network or not _item.geo or
-            not _item.geo.continent_code or
-            not _item.geo.country_code
-     then
-        return nil, "invalid data"
-    end
-
-    local _k1 =
-        _item.blockchain .. "/" .. _item.network .. "/" .. _item.geo.continent_code .. "/" .. _item.geo.country_code
-    local _deploy_file = _deploy_dir .. "/" .. _k1 .. "/" .. _item.id
     _write_file(_deploy_file, json.encode(_item))
 
     local _tmpl = _get_tmpl(rules, _item)
     local _str_tmpl = _tmpl("_local")
 
     mkdirp(_deploy_dir)
-    _write_file(_deploy_nodeconfdir .. "/" .. _item.id .. ".conf", _str_tmpl)
+
+    local _file_main = _deploy_nodeconfdir .. "/" .. _item.id .. ".conf"
+    _print(_file_main)
+    _write_file(_file_main, _str_tmpl)
+
 
     _git_push(
         _deploy_dir,
@@ -320,7 +337,7 @@ local function _generate_item(instance, args)
 end
 
 function JobsAction:generateconfAction(job)
-    print(inspect(job))
+    _print(inspect(job))
 
     local instance = self:getInstance()
 
@@ -330,7 +347,7 @@ function JobsAction:generateconfAction(job)
 end
 
 function JobsAction:removeconfAction(job)
-    print(inspect(job))
+
 
     local instance = self:getInstance()
     local job_data = job.data
