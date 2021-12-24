@@ -150,6 +150,7 @@ function Action:updateAction(args)
         local _ok, _err = jobs:add(job)
     end
 
+
     local model = Model:new(instance)
     local _detail, _err_msg = model:update(args)
     if not _detail then
@@ -158,6 +159,7 @@ function Action:updateAction(args)
             err_msg = _err_msg
         }
     end
+
 
     return {result = true}
 end
@@ -186,7 +188,9 @@ function Action:deleteAction(args)
         action = "/jobs/" .. mytype .. ".removeconf",
         delay = 1,
         data = {
+
             _is_delete = true,
+
             id = args.id,
             user_id = user_id
         }
@@ -194,6 +198,7 @@ function Action:deleteAction(args)
     local _ok, _err = jobs:add(job)
 
     ngx.log(ngx.ERR, inspect({_ok, _err}))
+
 
     return {
         result = true
