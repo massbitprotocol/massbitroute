@@ -14,6 +14,7 @@ local inspect = mbrutil.inspect
 
 local _print = mbrutil.print
 
+
 local _write_file = mbrutil.write_file
 local _get_tmpl = mbrutil.get_template
 local _git_push = mbrutil.git_push
@@ -195,7 +196,7 @@ local function _norm(_v)
 end
 
 local function _remove_item(instance, args)
-    _print(inspect(args))
+
     local model = Model:new(instance)
     local _item = _norm(model:get(args))
 
@@ -204,6 +205,7 @@ local function _remove_item(instance, args)
     else
         model:update({id = args.id, user_id = args.user_id, status = 0})
     end
+
     if
         not _item or not _item.id or not _item.ip or not _item.blockchain or not _item.network or not _item.geo or
             not _item.geo.continent_code or
@@ -256,6 +258,7 @@ local function _update_gdnsd()
                                 "/" ..
                                     _blockchain .. "/" .. _network .. "/" .. _continent .. "/" .. _country .. "/" .. _id
                         )
+
                         if _item then
                             if type(_item) == "string" then
                                 _item = json.decode(_item)
@@ -264,6 +267,7 @@ local function _update_gdnsd()
                             table.insert(_datacenter_ids, _item)
                             table.insert(_datacenter_ids_all, {id = _item.id, ip = _item.ip})
                         end
+
                     end
                 end
             end
@@ -276,7 +280,7 @@ local function _update_gdnsd()
             local _str_tmpl = _tmpl("_gw_conf")
 
             local _file_gw = _deploy_gatewayconfdir .. "/" .. _k .. ".conf"
-            _print(_file_gw)
+
             _write_file(_file_gw, _str_tmpl)
             table.insert(_portal_commit_files, _file_gw)
         end
@@ -285,7 +289,7 @@ local function _update_gdnsd()
             local _tmpl = _get_tmpl(rules, {nodes = _v.datacenter_ids})
             local _str = _tmpl("_node_zones")
             local _file = _gwman_dir .. "/data/zones/" .. mytype .. "/" .. _k .. ".zone"
-            _print(_file)
+
             _write_file(_file, _str)
             table.insert(_dns_commit_files, _file)
         end
@@ -298,52 +302,29 @@ local function _update_gdnsd()
     table.insert(_zone_content, read_dir(_gwman_dir .. "/data/zones/dapi"))
 
     local _zone_main = _gwman_dir .. "/zones/massbitroute.com"
-    _print(_zone_main)
+
     _write_file(_zone_main, table.concat(_zone_content, "\n"))
     table.insert(_dns_commit_files, _zone_main)
 
     local _tmpl = _get_tmpl(rules, {nodes = _datacenter_ids_all})
     local _str_stat = _tmpl("_node_stat")
 
+
     local _file_stat = _stat_dir .. "/etc/prometheus/stat_node.yml"
     _write_file(_file_stat, _str_stat)
     _print(_file_stat)
-    _git_push(
-        _stat_dir,
-        {
-            _stat_dir .. "/etc/prometheus/stat_node.yml"
-        }
-    )
 
-    _git_push(_portal_dir, _portal_commit_files)
-    _git_push(_gwman_dir, _dns_commit_files)
-end
-
-local function _generate_item(instance, args)
-    local model = Model:new(instance)
-    local _item = _norm(model:get(args))
-
-    if
-        not _item or not _item.id or not _item.ip or not _item.blockchain or not _item.network or not _item.geo or
-            not _item.geo.continent_code or
-            not _item.geo.country_code
-     then
-        return nil, "invalid data"
-    end
-
-    local _k1 =
-        _item.blockchain .. "/" .. _item.network .. "/" .. _item.geo.continent_code .. "/" .. _item.geo.country_code
-    local _deploy_file = _deploy_dir .. "/" .. _k1 .. "/" .. _item.id
-    _print(_deploy_file)
     _write_file(_deploy_file, json.encode(_item))
 
     local _tmpl = _get_tmpl(rules, _item)
     local _str_tmpl = _tmpl("_local")
 
     mkdirp(_deploy_dir)
+
     local _file_main = _deploy_nodeconfdir .. "/" .. _item.id .. ".conf"
     _print(_file_main)
     _write_file(_file_main, _str_tmpl)
+
 
     _git_push(
         _deploy_dir,
@@ -366,7 +347,7 @@ function JobsAction:generateconfAction(job)
 end
 
 function JobsAction:removeconfAction(job)
-    _print(inspect(job))
+
 
     local instance = self:getInstance()
     local job_data = job.data
