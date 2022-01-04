@@ -91,6 +91,7 @@ function Action:registerconfirmAction(args)
     -- return {result = false, err = "Account confirmed"}
     end
 
+    _data.confirmtype = nil
     _data.confirmed = true
     model:update(_data)
 
@@ -123,6 +124,7 @@ function Action:registerAction(args)
     local _token = set_var.set_encode_base32(__data)
 
     _detail.token = _token
+    _detail.site_root = ngx.var.site_root
     -- _print("detail:" .. inspect(_detail))
     local jobs = instance:getJobs()
     local job = {
@@ -288,7 +290,7 @@ function Action:logoutAction(args)
     -- delete session
     session:destroy()
     instance:getRedis():setKeepAlive()
-    return {ok = "ok"}
+    return {result = true}
 end
 
 --private

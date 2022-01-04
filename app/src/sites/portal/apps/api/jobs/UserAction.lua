@@ -7,7 +7,7 @@ local JobsAction = cc.class(mytype .. "JobsAction", gbc.ActionBase)
 
 local cURL = require "cURL"
 
-local SENDGRID_API_KEY = "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"
+local SENDGRID_API_KEY = ""
 
 local mbrutil = cc.import("#mbrutil")
 local _get_tmpl = mbrutil.get_template
@@ -26,25 +26,25 @@ local mails = {
         subject = "Welcome to Massbit! Confirm Your Email"
     }
 }
-local rules = {
-    login = [[An attempt to login was made from an unknown browser. Please confirm the following details are correct: - Time: ${time} - IP Address: ${ip} - Device: ${user_agent}]],
-    register = [[<a href='https://dapi.massbit.io/api/v1?action=user.registerconfirm&token=${token}'>Confirm your email</a>]]
-}
+local rules = {}
 
 local function _sendmail(args)
+    local _mailtype = args.mailtype
+    rules[_mailtype] = mbrutil.read_file(args.site_root .. "/public/mail-templates/" .. _mailtype .. ".html")
+    -- local _str_tmpl = mbrutil.read_file(args.site_root .. "/public/mail-templates/test.html")
+    -- mbrutil.read_file(args.site_root .. "/public/mail-templates/templates-inlined/basic-full/welcome/content.html")
     local _id = args.id
     if not _id then
         return false
     end
 
-    _print(inspect(args))
-    local _mailtype = args.mailtype
     local _tmpl = _get_tmpl(rules, args)
     local _str_tmpl = _tmpl(_mailtype)
     if _str_tmpl then
-        _str_tmpl = _str_tmpl:gsub("%s+", " "):gsub('"', '\\"'):gsub("'", "\\'")
+        _str_tmpl = _str_tmpl:gsub("%s+", " "):gsub("\\", "\\\\"):gsub('"', '\\"'):gsub("'", "")
     end
-
+    _print(inspect(args))
+    _print(_str_tmpl)
     -- local _str_tmpl =
     --     "<a href='https://dapi.massbit.io/api/v1?action=user.registerconfirm&token=" ..
     --     args.token .. "'>Confirm your email</a>"
