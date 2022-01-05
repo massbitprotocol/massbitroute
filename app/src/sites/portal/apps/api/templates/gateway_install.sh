@@ -1,7 +1,64 @@
 #!/bin/bash
+_debian() {
+	apt-get update
+	apt-get install -y git apache2-utils supervisor jq python2
 
-apt-get update
-apt-get -y install git apache2-utils supervisor jq
+}
+
+_ubuntu() {
+	apt-get update
+	apt-get install -y git apache2-utils supervisor jq python-is-python2
+
+}
+_centos() {
+	yum update
+	yum install -y git httpd-tools supervisor jq python2
+}
+
+if [ -f /etc/os-release ]; then
+	# freedesktop.org and systemd
+	. /etc/os-release
+	OS=$NAME
+	VER=$VERSION_ID
+elif type lsb_release >/dev/null 2>&1; then
+	# linuxbase.org
+	OS=$(lsb_release -si)
+	VER=$(lsb_release -sr)
+elif [ -f /etc/lsb-release ]; then
+	# For some versions of Debian/Ubuntu without lsb_release command
+	. /etc/lsb-release
+	OS=$DISTRIB_ID
+	VER=$DISTRIB_RELEASE
+elif [ -f /etc/debian_version ]; then
+	# Older Debian/Ubuntu/etc.
+	OS=Debian
+	VER=$(cat /etc/debian_version)
+# elif [ -f /etc/SuSe-release ]; then
+# 	# Older SuSE/etc.
+
+# elif [ -f /etc/redhat-release ]; then
+# 	# Older Red Hat, CentOS, etc.
+# else
+# 	# Fall back to uname, e.g. "Linux <version>", also works for BSD, etc.
+# 	OS=$(uname -s)
+# 	VER=$(uname -r)
+fi
+
+case "$OS" in
+"Debian GNU/Linux")
+	_debian
+	;;
+"Ubuntu")
+	_ubuntu
+	;;
+"CentOS Linux")
+	_centos
+	;;
+*)
+	echo "Your OS not support"
+	exit 0
+	;;
+esac
 
 ip="$(curl -ssSfL https://dapi.massbit.io/myip)"
 
@@ -21,7 +78,6 @@ if [ "$zone" != "{{zone}}" ]; then
 	echo "Your IP $ip not in zone {{zone}}"
 	exit 1
 fi
-
 
 SITE_ROOT=/massbit/massbitroute/app/src/sites/services/gateway
 mkdir -p $(dirname $SITE_ROOT)
