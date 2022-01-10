@@ -44,21 +44,28 @@ elif [ -f /etc/debian_version ]; then
 # 	VER=$(uname -r)
 fi
 
-case "$OS" in
-"Debian GNU/Linux")
-	_debian
-	;;
-"Ubuntu")
+if [ \( "$OS" = "Ubuntu" \) -a \( "$VER" = "20.04" \) ]; then
 	_ubuntu
-	;;
-"CentOS Linux")
-	_centos
-	;;
-*)
-	echo "Your OS not support"
+else
+	echo "Sorry. Current we only support Ubuntu 20.04. "
 	exit 0
-	;;
-esac
+fi
+
+# case "$OS" in
+# "Debian GNU/Linux")
+# 	_debian
+# 	;;
+# "Ubuntu")
+# 	_ubuntu
+# 	;;
+# "CentOS Linux")
+# 	_centos
+# 	;;
+# *)
+# 	echo "Your OS not support"
+# 	exit 0
+# 	;;
+# esac
 
 ip="$(curl -ssSfL https://dapi.massbit.io/myip)"
 
@@ -76,7 +83,12 @@ fi
 
 if [ "$zone" != "{{zone}}" ]; then
 	echo "Your IP $ip not in zone {{zone}}"
-	exit 1
+	read -p "Are you sure ? (y/n) " -n 1 -r
+	echo # (optional) move to a new line
+	if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+		echo "Please install in correct Zone"
+		exit 0
+	fi
 fi
 
 SITE_ROOT=/massbit/massbitroute/app/src/sites/services/node
@@ -94,8 +106,10 @@ bash init.sh
 ./mbr node set DATA_URI {*data_url*}
 ./mbr node set USER_ID {{user_id}}
 ./mbr node set ID {{id}}
+./mbr node set IP {{ip}}
 ./mbr node set TOKEN {{token}}
 ./mbr node set BLOCKCHAIN {{blockchain}}
 ./mbr node set NETWORK {{network}}
 ./mbr node set SITE_ROOT "$SITE_ROOT"
 ./mbr node register
+rm -f $SITE_ROOT/http.d/*
