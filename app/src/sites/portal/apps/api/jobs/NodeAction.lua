@@ -20,6 +20,12 @@ local _git_push = mbrutil.git_push
 
 JobsAction.ACCEPTED_REQUEST_TYPE = "worker"
 
+local lfs = require "lfs"
+local function is_dir(path)
+    -- lfs.attributes will error on a filename ending in '/'
+    return path:sub(-1) == "/" or lfs.attributes(path, "mode") == "directory"
+end
+
 local _portal_dir = "/massbit/massbitroute/app/src/sites/portal"
 local _deploy_dir = "/massbit/massbitroute/app/src/sites/portal/public/deploy/node"
 local _deploy_nodeconfdir = "/massbit/massbitroute/app/src/sites/portal/public/deploy/nodeconf"
@@ -197,7 +203,7 @@ local function _norm(_v)
 end
 
 local function _remove_item(instance, args)
-    _print(inspect(args))
+    _print("remove_item:" .. inspect(args))
     local model = Model:new(instance)
     local _item = _norm(model:get(args))
 
@@ -227,6 +233,8 @@ local function _remove_item(instance, args)
         }
     )
 
+    mkdirp(_deploy_dir .. "/" .. _k1)
+
     return true
 end
 
@@ -244,20 +252,22 @@ local function _update_gdnsd()
             local _datacenter_ids = _maps[_blk_id].datacenter_ids
 
             for _, _continent in ipairs(show_folder(_deploy_dir .. "/" .. _blockchain .. "/" .. _network)) do
-                for _, _country in ipairs(
-                    show_folder(_deploy_dir .. "/" .. _blockchain .. "/" .. _network .. "/" .. _continent)
-                ) do
-                    for _, _id in ipairs(
-                        show_folder(
-                            _deploy_dir .. "/" .. _blockchain .. "/" .. _network .. "/" .. _continent .. "/" .. _country
-                        )
-                    ) do
-                        local _item =
-                            read_file(
-                            _deploy_dir ..
-                                "/" ..
-                                    _blockchain .. "/" .. _network .. "/" .. _continent .. "/" .. _country .. "/" .. _id
-                        )
+                local _dir_continent = _deploy_dir .. "/" .. _blockchain .. "/" .. _network .. "/" .. _continent
+                if _continent == ".gitkeep" or not is_dir(_dir_continent) then
+                    break
+                end
+                for _, _country in ipairs(show_folder(_dir_continent)) do
+                    local _dir_country = _dir_continent .. "/" .. _country
+                    if _country == ".gitkeep" or not is_dir(_dir_country) then
+                        break
+                    end
+
+                    for _, _id in ipairs(show_folder(_dir_country)) do
+                        _print("_gdnsd_file:" .. _id)
+                        if _id == ".gitkeep" then
+                            break
+                        end
+                        local _item = read_file(_dir_country .. "/" .. _id)
                         if _item then
                             if type(_item) == "string" then
                                 _item = json.decode(_item)
@@ -326,6 +336,7 @@ local function _update_gdnsd()
 end
 
 local function _generate_item(instance, args)
+    _print("generate_item:" .. inspect(args))
     local model = Model:new(instance)
     local _item = _norm(model:get(args))
 
@@ -338,32 +349,36 @@ local function _generate_item(instance, args)
         return nil, "invalid data"
     end
 
+    local _k2 = _item.blockchain .. "/" .. _item.network
+
     local _k1 =
         _item.blockchain .. "/" .. _item.network .. "/" .. _item.geo.continent_code .. "/" .. _item.geo.country_code
+    mkdirp(_deploy_dir .. "/" .. _k1)
     local _deploy_file = _deploy_dir .. "/" .. _k1 .. "/" .. _item.id
+    local _deploy_file1 = _deploy_dir .. "/" .. _k2 .. "/.gitkeep"
     _print(_deploy_file)
     _write_file(_deploy_file, json.encode(_item))
 
     local _tmpl = _get_tmpl(rules, _item)
     local _str_tmpl = _tmpl("_local")
 
-    mkdirp(_deploy_dir)
+    _write_file(_deploy_file1, "")
     local _file_main = _deploy_nodeconfdir .. "/" .. _item.id .. ".conf"
     _print(_file_main)
     _write_file(_file_main, _str_tmpl)
 
-    _git_push(
-        _deploy_dir,
-        {
-            _deploy_file,
-            _deploy_nodeconfdir .. "/" .. _item.id .. ".conf"
-        }
-    )
+    local _files = {
+        _deploy_file,
+        _deploy_file1,
+        _deploy_nodeconfdir .. "/" .. _item.id .. ".conf"
+    }
+    _print("files:" .. inspect(_files))
+    _git_push(_deploy_dir, _files)
     return true
 end
 
 function JobsAction:generateconfAction(job)
-    _print(inspect(job))
+    _print("generateconf:" .. inspect(job))
 
     local instance = self:getInstance()
 
@@ -373,7 +388,7 @@ function JobsAction:generateconfAction(job)
 end
 
 function JobsAction:removeconfAction(job)
-    _print(inspect(job))
+    _print("removeconf:" .. inspect(job))
 
     local instance = self:getInstance()
     local job_data = job.data
