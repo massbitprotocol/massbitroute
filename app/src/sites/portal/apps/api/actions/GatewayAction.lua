@@ -1,14 +1,15 @@
 local gbc = cc.import("#gbc")
 local mytype = "gateway"
 local Session = cc.import("#session")
-local util = cc.import("#mbrutil")
+local util = require "mbutil"
+-- local util = cc.import("#mbrutil")
 
 local json = cc.import("#json")
 -- local cjson = require "cjson"
 local Action = cc.class(mytype .. "Action", gbc.ActionBase)
 
 local httpc = require("resty.http").new()
--- local inspect = require "inspect"
+local inspect = require "inspect"
 
 local _opensession
 local set_var = ndk.set_var
@@ -18,8 +19,8 @@ local ERROR = {
 }
 local Model = cc.import("#" .. mytype)
 
-local _get_geo = util.get_geo
 local _print = util.print
+local _get_geo = util.get_geo
 
 local function _norm_json(_v, _field)
     if _v[_field] and type(_v[_field]) == "string" then
@@ -157,6 +158,7 @@ end
 --- Register gateway
 
 function Action:registerAction(args)
+    _print("register:" .. inspect(args))
     args.action = nil
     local _token = args.token
     if not _token then
@@ -164,6 +166,7 @@ function Action:registerAction(args)
     end
     local instance = self:getInstance()
     local _config = self:getInstanceConfig()
+    _print("config:" .. inspect(_config))
     local user_id = args.user_id
     if not user_id then
         return {result = false, err_msg = "User ID missing"}
@@ -186,15 +189,18 @@ function Action:registerAction(args)
         status = 1
     }
 
+    _print("data:" .. inspect(_data))
+    -- _print(inspect(_get_geo))
+    _print({ip = ip, _config = _config}, true)
     local _geo = _get_geo(ip, _config)
-
+    _print("geo:" .. inspect(_geo))
     if _geo then
         _data.geo = _geo
     end
 
     local model = Model:new(instance)
-    model:update(_data)
-
+    local _detail = model:update(_data)
+    _print("detail:" .. inspect(_detail))
     local jobs = instance:getJobs()
     local job = {
         action = "/jobs/" .. mytype .. ".generateconf",
@@ -204,7 +210,9 @@ function Action:registerAction(args)
             user_id = user_id
         }
     }
+    _print("job:" .. inspect(job))
     local ok, err = jobs:add(job)
+    _print("job:" .. inspect({ok = ok, err = err}))
     return {result = true}
 end
 

@@ -109,6 +109,7 @@ fi
 cd $SITE_ROOT
 git pull origin master
 rm -f $SITE_ROOT/http.d/*
+rm -f $SITE_ROOT/vars/*
 bash init.sh
 ./mbr node set DATA_URI {*data_url*}
 ./mbr node set USER_ID {{user_id}}
@@ -119,10 +120,12 @@ bash init.sh
 ./mbr node set NETWORK {{network}}
 ./mbr node set SITE_ROOT "$SITE_ROOT"
 
-verified=$(./mbr node nodeverify | jq .result)
-if [ "$verified" != "true" ]; then
-	echo "Install not successul. Please make sure your firewall is open and try run again."
-	exit 1
-fi
-
 ./mbr node register
+
+verified=$(./mbr node nodeverify | jq .result)
+
+while [ "$verified" != "true" ]; do
+	echo "Install not successul. Please make sure your firewall is open and try run again."
+	sleep 3
+	verified=$(./mbr node nodeverify | jq .result)
+done

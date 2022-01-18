@@ -3,25 +3,31 @@ local mytype = "node"
 local Session = cc.import("#session")
 
 local json = cc.import("#json")
-local cjson = require "cjson"
+local util = require "mbutil" -- cc.import("#mbrutil")
+-- local cjson = require "cjson"
 local Action = cc.class(mytype .. "Action", gbc.ActionBase)
 
-local httpc = require("resty.http").new()
+-- local httpc = require("resty.http").new()
 local inspect = require "inspect"
 
-local _ipapi_token = "092142b61eed12af33e32fc128295356"
+local httpc = require("resty.http").new()
+
+local set_var = ndk.set_var
 
 local _opensession
+local _print = util.print
 
 local ERROR = {
     NOT_LOGIN = 100
 }
 local Model = cc.import("#" .. mytype)
 
+local _get_geo = util.get_geo
+
 local function _norm_json(_v, _field)
     if _v[_field] and type(_v[_field]) == "string" then
         _v[_field] = json.decode(_v[_field])
-        setmetatable(_v[_field], cjson.empty_array_mt)
+        setmetatable(_v[_field], json.empty_array_mt)
     end
 end
 
@@ -33,16 +39,16 @@ local function _norm(_v)
     return _v
 end
 
-local function _get_geo(ip)
-    local _api_url = "http://api.ipapi.com/api/" .. ip .. "?access_key=" .. _ipapi_token
-    -- ngx.log(ngx.ERR, inspect(_api_url))
-    local _res, _err = httpc:request_uri(_api_url, {method = "GET"})
-    local _resb = _res.body
-    if _res.status == 200 and _resb and type(_resb) == "string" then
-        _resb = json.decode(_resb)
-    end
-    return _resb, _err
-end
+-- local function _get_geo(ip)
+--     local _api_url = "http://api.ipapi.com/api/" .. ip .. "?access_key=" .. _ipapi_token
+--     -- ngx.log(ngx.ERR, inspect(_api_url))
+--     local _res, _err = httpc:request_uri(_api_url, {method = "GET"})
+--     local _resb = _res.body
+--     if _res.status == 200 and _resb and type(_resb) == "string" then
+--         _resb = json.decode(_resb)
+--     end
+--     return _resb, _err
+-- end
 
 function Action:geonodecountryAction(args)
     ngx.log(ngx.ERR, "geonodecity")
@@ -135,8 +141,8 @@ function Action:pingAction(args)
         return {result = false, err_msg = "User ID missing"}
     end
 
-    local token = ndk.set_var.set_decode_base32(_token)
-    local id = ndk.set_var.set_decrypt_session(token)
+    local token = set_var.set_decode_base32(_token)
+    local id = set_var.set_decrypt_session(token)
     -- ngx.log(ngx.ERR, "id:" .. id)
     if not id or id ~= args.id then
         return {result = false, err_msg = "Token not correct"}
@@ -154,30 +160,37 @@ end
 --- Register node
 
 function Action:registerAction(args)
-    ngx.log(ngx.ERR, inspect(args))
+    _print("register:" .. inspect(args))
     args.action = nil
     local _token = args.token
     if not _token then
         return {result = false, err_msg = "Token missing"}
     end
     local instance = self:getInstance()
+    local _config = self:getInstanceConfig()
 
     local user_id = args.user_id
     if not user_id then
         return {result = false, err_msg = "User ID missing"}
     end
 
-    local token = ndk.set_var.set_decode_base32(_token)
-    local id = ndk.set_var.set_decrypt_session(token)
+    local token = set_var.set_decode_base32(_token)
+    local id = set_var.set_decrypt_session(token)
+
+    _print("id:" .. id)
 
     if not id or id ~= args.id then
         return {result = false, err_msg = "Token not correct"}
     end
     local ip = ngx.var.realip
 
-    local data_uri = args.data_uri
-    if not data_uri then
-        data_uri = "http://127.0.0.1:8545"
+    _print("ip:" .. ip)
+
+    local data_url = args.data_url
+
+    _print("data_url:" .. data_url)
+    if not data_url then
+        data_url = "http://127.0.0.1:8545"
     end
 
     -- ip = "34.124.167.144"
@@ -187,9 +200,12 @@ function Action:registerAction(args)
         user_id = user_id,
         ip = ip,
         status = 1,
-        data_uri = data_uri
+        data_url = data_url
     }
-    local _geo = _get_geo(ip)
+    _print(_data, true)
+    local _geo = _get_geo(ip, _config)
+
+    _print("geo:" .. inspect(_geo))
 
     if _geo then
         _data.geo = _geo
@@ -208,7 +224,37 @@ function Action:registerAction(args)
         }
     }
     local ok, err = jobs:add(job)
+
     return {result = true}
+end
+
+function Action:nodeverifyAction(args)
+    _print(args, true)
+    local ip = args.ip
+    local id = args.id
+
+    if not ip then
+        return {
+            result = false,
+            err_msg = "IP not defined"
+        }
+    end
+
+    local _res, _err =
+        httpc:request_uri(
+        "https://" .. ip .. "/ping",
+        {
+            method = "GET",
+            headers = {
+                ["Host"] = "node.mbr.massbitroute.com"
+            },
+            ssl_verify = false
+        }
+    )
+
+    _print(_res, true)
+    _print(_err, true)
+    return {result = _res and _res.status == 200}
 end
 
 function Action:unregisterAction(args)
@@ -225,8 +271,8 @@ function Action:unregisterAction(args)
         return {result = false, err_msg = "User ID missing"}
     end
 
-    local token = ndk.set_var.set_decode_base32(_token)
-    local id = ndk.set_var.set_decrypt_session(token)
+    local token = set_var.set_decode_base32(_token)
+    local id = set_var.set_decrypt_session(token)
 
     if not id or id ~= args.id then
         return {result = false, err_msg = "Token not correct"}
@@ -275,16 +321,18 @@ function Action:createAction(args)
 
     local model = Model:new(instance)
     local _detail, _err_msg = model:create(args)
+    local _result = {
+        result = true,
+        data = _detail
+    }
     if not _detail then
-        return {
+        _result = {
             result = false,
             err_msg = _err_msg
         }
     end
-    return {
-        result = true,
-        data = _detail
-    }
+    instance:getRedis():setKeepAlive()
+    return _result
 end
 
 function Action:getAction(args)
@@ -311,18 +359,20 @@ function Action:getAction(args)
 
     local _v, _err_msg = model:get(args)
 
+    local _result = {
+        result = false,
+        err_msg = _err_msg
+    }
     if _v then
         _v = _norm(_v)
 
-        return {
+        _result = {
             result = true,
             data = _v
         }
     end
-    return {
-        result = false,
-        err_msg = _err_msg
-    }
+    instance:getRedis():setKeepAlive()
+    return _result
 end
 
 function Action:updateAction(args)
@@ -373,16 +423,19 @@ function Action:updateAction(args)
 
     local model = Model:new(instance)
     local _detail, _err_msg = model:update(args)
+    local _result
     if _detail then
-        return {
+        _result = {
             result = true
         }
     else
-        return {
+        _result = {
             result = false,
             err_msg = _err_msg
         }
     end
+    instance:getRedis():setKeepAlive()
+    return _result
 end
 
 function Action:deleteAction(args)
@@ -416,7 +469,7 @@ function Action:deleteAction(args)
         }
     }
     local _ok, _err = jobs:add(job)
-
+    instance:getRedis():setKeepAlive()
     return {
         result = true
     }
@@ -440,7 +493,7 @@ function Action:listAction(args)
     local _detail = model:list(args)
     local _res = {}
 
-    setmetatable(_res, cjson.empty_array_mt)
+    setmetatable(_res, json.empty_array_mt)
 
     for _, _v in pairs(_detail) do
         if _v then
@@ -449,7 +502,7 @@ function Action:listAction(args)
             _res[#_res + 1] = _v
         end
     end
-
+    instance:getRedis():setKeepAlive()
     return {
         result = true,
         data = _res

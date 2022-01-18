@@ -1,5 +1,4 @@
 local cc = cc
-
 local mytype = "api"
 local gbc = cc.import("#gbc")
 local json = cc.import("#json")
@@ -8,14 +7,13 @@ local cjson = require("cjson")
 
 local JobsAction = cc.class(mytype .. "JobsAction", gbc.ActionBase)
 
-local mbrutil = cc.import("#mbrutil")
+local mbrutil = require "mbutil" -- cc.import("#mbrutil")
 
 local _read_dir = mbrutil.read_dir
 
 local _write_file = mbrutil.write_file
 local _get_tmpl = mbrutil.get_template
 local _git_push = mbrutil.git_push
-
 local _print = mbrutil.print
 
 local mkdirp = require "mkdirp"
@@ -28,7 +26,7 @@ local Model = cc.import("#" .. mytype)
 local _portal_dir = "/massbit/massbitroute/app/src/sites/portal"
 local _deploy_dir = "/massbit/massbitroute/app/src/sites/portal/public/deploy/dapi"
 local _deploy_confdir = "/massbit/massbitroute/app/src/sites/portal/public/deploy/dapiconf"
-
+local gwman_dir = "/massbit/massbitroute/app/src/sites/services/gwman"
 
 local PROVIDERS = {
     MASSBIT = 0,
@@ -39,10 +37,9 @@ local PROVIDERS = {
 }
 
 local rules = {
-
     _backup = [[backup]],
     _priority = [[weight=${priority}]],
-    _upstream = [[server unix:/tmp/${server_name}.sock ${_is_backup?_backup()!_priority()};]],
+    _upstream = [[server unix:/tmp/${server_name}.sock max_fails=1 fail_timeout=3s ${_is_backup?_backup()!_priority()};]],
     _upstreams = [[
 upstream upstream_${api_key} {
     ${entrypoints/_upstream()}
@@ -52,7 +49,6 @@ upstream upstream_${api_key} {
     _api_method = [[
 #       access_by_lua_file /massbit/massbitroute/app/src/sites/services/gateway/src/jsonrpc-access.lua;
         vhost_traffic_status_filter_by_set_key $api_method ${server_name}::dapi::api_method;
-
 ]],
     _allow_methods1 = [[set $jsonrpc_whitelist '${security.allow_methods}';]],
     _limit_rate_per_sec2 = [[limit_req zone=${api_key};]],
@@ -63,26 +59,6 @@ ${security._is_limit_rate_per_sec?_limit_rate_per_sec1()}
 server {
     listen 80;
     listen 443 ssl;
-
-    ssl_certificate /etc/letsencrypt/live/gw.mbr.massbitroute.com/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/gw.mbr.massbitroute.com/privkey.pem;
-    server_name __GATEWAY_ID__.gw.mbr.massbitroute.com;
-
- location /__internal_status_vhost/ {
-        # auth_basic 'MBR admin';
-        # auth_basic_user_file /massbit/massbitroute/app/src/sites/services/node/etc/htpasswd;
-        vhost_traffic_status_bypass_limit on;
-        vhost_traffic_status_bypass_stats on;
-        vhost_traffic_status_display;
-        vhost_traffic_status_display_format html;
-    }
-
-
-}
-server {
-    listen 80;
-    listen 443 ssl;
-
     ssl_certificate /etc/letsencrypt/live/${blockchain}-${network}.massbitroute.com/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/${blockchain}-${network}.massbitroute.com/privkey.pem;
     resolver 8.8.4.4 ipv6=off;
@@ -92,10 +68,8 @@ server {
     access_log /massbit/massbitroute/app/src/sites/services/gateway/logs/nginx-${gateway_domain}-access.log main_json;
     error_log /massbit/massbitroute/app/src/sites/services/gateway/logs/nginx-${gateway_domain}-error.log debug;
 
-
     set $api_method '';
     set $jsonrpc_whitelist '';
-
 
     location /${api_key} {
         rewrite /(.*) / break;
@@ -115,17 +89,14 @@ server {
         proxy_read_timeout 3;
         send_timeout 3;
 
-
         proxy_cache_methods GET HEAD POST;
         proxy_cache_key $request_uri|$request_body;
         proxy_cache_min_uses 1;
         proxy_cache cache;
-
         proxy_cache_valid 200 10s;
         proxy_cache_background_update on;
         proxy_cache_lock on;
         proxy_cache_revalidate on;
-
         add_header X-Cached $upstream_cache_status;
         proxy_ssl_verify off;
         proxy_pass http://upstream_${api_key}/;
@@ -143,9 +114,7 @@ server {
 server {
     listen unix:/tmp/${server_name}.sock;
     location / {
-
        ${_api_method1()}
-
         proxy_redirect off;
         set_encode_base64 $digest :${infura_project_secret};
         proxy_set_header Authorization 'Basic $digest';
@@ -162,12 +131,10 @@ server {
 server {
     listen unix:/tmp/${server_name}.sock;
     location / {
-
        ${_api_method1()}
         proxy_redirect off;
         proxy_ssl_server_name on;
         proxy_pass ${api_uri};
-
         proxy_http_version 1.1;
         proxy_ssl_verify off;
         proxy_set_header Upgrade $http_upgrade;
@@ -179,12 +146,10 @@ server {
 server {
     listen unix:/tmp/${server_name}.sock;
     location / {
-
        ${_api_method1()}
         proxy_redirect off;
         proxy_ssl_server_name on;
         proxy_pass ${api_uri};
-
         proxy_http_version 1.1;
         proxy_ssl_verify off;
         proxy_set_header Upgrade $http_upgrade;
@@ -196,9 +161,7 @@ server {
 server {
     listen unix:/tmp/${server_name}.sock;
     location / {
-
        ${_api_method1()}
-
         proxy_redirect off;
         proxy_ssl_server_name on;
         proxy_set_header X-Api-Key ${getblock_api_key};
@@ -215,11 +178,14 @@ server {
 server {
     listen unix:/tmp/${server_name}.sock;
     location / {
-
        ${_api_method1()}
-
         proxy_redirect off;
         proxy_ssl_server_name on;
+        proxy_next_upstream error timeout invalid_header http_500 http_502 http_503 http_504;
+        proxy_connect_timeout 3;
+        proxy_send_timeout 3;
+        proxy_read_timeout 3;
+
         proxy_pass http://${blockchain}-${network}.node.mbr.massbitroute.com;
         proxy_ssl_verify off;
         proxy_http_version 1.1;
@@ -230,9 +196,8 @@ server {
 ]]
 }
 
-
 local function _norm(_v)
-    -- print(inspect(_v))
+    print(inspect(_v))
     if type(_v) == "string" then
         _v = json.decode(_v)
     end
@@ -247,12 +212,12 @@ local function _norm(_v)
     return _v
 end
 
-
 local function _remove_item(instance, args)
+    _print("remove_item:" .. inspect(args))
     local model = Model:new(instance)
     local _item = _norm(model:get(args))
-
-if args._is_delete then
+    _print("_item:" .. inspect(_item))
+    if args._is_delete then
         model:delete({id = args.id, user_id = args.user_id})
     else
         model:update({id = args.id, user_id = args.user_id, status = 0})
@@ -262,46 +227,42 @@ if args._is_delete then
     -- print(inspect(_item))
 
     local _item_file = _deploy_dir .. "/" .. _item.id
+    _print("remove:" .. _item_file)
     os.remove(_item_file)
 
     local _k1 = _item.blockchain .. "-" .. _item.network
     local _deploy_dir1 = _deploy_confdir .. "/nodes/" .. _k1
-
     mkdirp(_deploy_dir1)
     local _deploy_file = _deploy_dir1 .. "/" .. _item.id .. ".conf"
+    _print("remove:" .. _deploy_file)
     os.remove(_deploy_file)
 
     local _content_all = _read_dir(_deploy_dir1)
-
     local _content_all_file = _deploy_confdir .. "/" .. _k1 .. ".conf"
-
     print(_content_all_file)
     _write_file(_content_all_file, _content_all)
     _git_push(
         _portal_dir,
-
         {
             _content_all_file
         },
         {
-
             _deploy_file,
             _item_file
         }
     )
 
     return true
-
 end
 
 local function _generate_item(instance, args)
     local model = Model:new(instance)
     local _item = _norm(model:get(args))
 
-
+    _print("item:" .. inspect(_item))
     local _item_file = _deploy_dir .. "/" .. _item.id
     local _item_str = json.encode(_item)
-
+    print(_item_file)
     _write_file(_item_file, _item_str)
 
     -- print(inspect(_item))
@@ -323,13 +284,11 @@ local function _generate_item(instance, args)
         _item.entrypoints = _entrypoints
     end
 
-
     if _item.entrypoints and #_item.entrypoints > 0 then
         local _entrypoints =
             table.map(
             _item.entrypoints,
             function(_ent)
-
                 if not _ent.priority or tonumber(_ent.priority) == 0 then
                     _ent.priority = 1
                 end
@@ -337,7 +296,6 @@ local function _generate_item(instance, args)
                 if _ent.backup and tonumber(_ent.backup) == 1 then
                     _ent._is_backup = true
                 end
-
 
                 _ent.provider_id = PROVIDERS[_ent.type] .. "-" .. _ent.id
                 _ent.api_key = _item.api_key
@@ -356,7 +314,6 @@ local function _generate_item(instance, args)
         local _tmpl = _get_tmpl(rules, {api_key = _item.api_key, entrypoints = _entrypoints})
         local _str_tmpl = _tmpl("_upstreams")
 
-
         if _item.security.limit_rate_per_sec and tonumber(_item.security.limit_rate_per_sec) > 0 then
             _item.security._is_limit_rate_per_sec = true
         end
@@ -370,13 +327,12 @@ local function _generate_item(instance, args)
         local _str_tmpl1 = _tmpl1("_server_main")
         _content[#_content + 1] = _str_tmpl1
     end
-
+    -- print(table.concat(_content, "\n"))
 
     --- Generate config of dApi in deploy/dapi folder
     -- This folder also public for Gateway Community download for serving blockchain-network traffic
 
     local _k1 = _item.blockchain .. "-" .. _item.network
-
     local _deploy_dir1 = _deploy_confdir .. "/nodes/" .. _k1
     mkdirp(_deploy_dir1)
     local _deploy_file = _deploy_dir1 .. "/" .. _item.id .. ".conf"
@@ -385,13 +341,23 @@ local function _generate_item(instance, args)
 
     local _content_all = _read_dir(_deploy_dir1)
     local _content_all_file = _deploy_confdir .. "/" .. _k1 .. ".conf"
-
+    print(_content_all_file)
     _write_file(_content_all_file, _content_all)
+
+    local _file_dapi = gwman_dir .. "/data/zones/dapi/" .. _k1 .. ".zone"
+    print(_file_dapi)
+    _write_file(_file_dapi, "*." .. _k1 .. " DYNA	geoip!mbr-map-" .. _k1 .. "\n")
+
+    _git_push(
+        gwman_dir,
+        {
+            _file_dapi
+        }
+    )
     _git_push(
         _portal_dir,
         {
             _item_file,
-
             _deploy_file,
             _content_all_file
         }

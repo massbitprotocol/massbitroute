@@ -3,7 +3,8 @@ local mytype = "api"
 local Session = cc.import("#session")
 
 local json = cc.import("#json")
-local cjson = require "cjson"
+local util = require "mbutil" -- cc.import("#mbrutil")
+-- local cjson = require "cjson"
 local Action = cc.class(mytype .. "Action", gbc.ActionBase)
 
 local inspect = require "inspect"
@@ -14,6 +15,10 @@ local ERROR = {
 }
 local Model = cc.import("#" .. mytype)
 
+-- local jsonschema = require "jsonschema"
+-- local validator = jsonschema.generate_validator
+
+local _print = util.print
 local _user
 
 local function _norm(_v)
@@ -23,7 +28,7 @@ local function _norm(_v)
 
     if _v.entrypoints and type(_v.entrypoints) == "string" then
         _v.entrypoints = json.decode(_v.entrypoints)
-        setmetatable(_v.entrypoints, cjson.empty_array_mt)
+        setmetatable(_v.entrypoints, json.empty_array_mt)
     end
     if _v.security and type(_v.security) == "string" then
         _v.security = json.decode(_v.security)
@@ -32,8 +37,22 @@ local function _norm(_v)
 end
 
 function Action:createAction(args)
+    _print(inspect(args))
     args.action = nil
     args.id = nil
+    -- local myvalidator =
+    --     validator {
+    --     type = "object",
+    --     properties = {
+    --         name = {type = "string"},
+    --         blockchain = {type = "string"},
+    --         network = {type = "string"}
+    --     }
+    -- }
+
+    -- local _res = myvalidator(args)
+    -- _print(inspect(_res))
+
     local instance = self:getInstance()
     local _session = _opensession(instance, args)
 
@@ -45,7 +64,7 @@ function Action:createAction(args)
         args.user_id = user_id
     end
 
-    args.entrypoints = cjson.empty_array
+    args.entrypoints = json.empty_array
 
     args.security = {
         allow_methods = "",
@@ -54,17 +73,22 @@ function Action:createAction(args)
     }
     local model = Model:new(instance)
     local _detail, _err_msg = model:create(args)
+
+    _print(inspect(_detail))
+    local _result
     if _detail then
-        return {
+        _result = {
             result = true,
             data = _detail
         }
     else
-        return {
+        _result = {
             result = false,
             err_msg = _err_msg
         }
     end
+    instance:getRedis():setKeepAlive()
+    return _result
 end
 
 function Action:getAction(args)
@@ -90,20 +114,36 @@ function Action:getAction(args)
 
     local _v, _err_msg = model:get(args)
 
+    local _result
     if _v then
         _v = _norm(_v)
 
-        return {
+        _result = {
             result = true,
             data = _v
         }
     else
-        return {
+        _result = {
             result = false,
             err_msg = _err_msg
         }
     end
+    instance:getRedis():setKeepAlive()
+    return _result
 end
+
+-- function Action:testmailAction(args)
+--     local instance = self:getInstance()
+
+--     local jobs = instance:getJobs()
+--     local job = {
+--         action = "/jobs/user.sendmail",
+--         delay = 1,
+--         data = {}
+--     }
+--     local _ok, _err = jobs:add(job)
+-- end
+
 function Action:updateAction(args)
     if not args.id then
         return {
@@ -129,9 +169,7 @@ function Action:updateAction(args)
             action = "/jobs/" .. mytype .. ".removeconf",
             delay = 1,
             data = {
-
                 _is_delete = false,
-
                 id = args.id,
                 user_id = user_id
             }
@@ -150,18 +188,17 @@ function Action:updateAction(args)
         local _ok, _err = jobs:add(job)
     end
 
-
     local model = Model:new(instance)
     local _detail, _err_msg = model:update(args)
+    local _result = {result = true}
     if not _detail then
-        return {
+        _result = {
             result = false,
             err_msg = _err_msg
         }
     end
-
-
-    return {result = true}
+    instance:getRedis():setKeepAlive()
+    return _result
 end
 
 function Action:deleteAction(args)
@@ -188,9 +225,7 @@ function Action:deleteAction(args)
         action = "/jobs/" .. mytype .. ".removeconf",
         delay = 1,
         data = {
-
             _is_delete = true,
-
             id = args.id,
             user_id = user_id
         }
@@ -198,8 +233,7 @@ function Action:deleteAction(args)
     local _ok, _err = jobs:add(job)
 
     ngx.log(ngx.ERR, inspect({_ok, _err}))
-
-
+    instance:getRedis():setKeepAlive()
     return {
         result = true
     }
@@ -222,7 +256,7 @@ function Action:listAction(args)
     local _detail = model:list(args)
     local _res = {}
 
-    setmetatable(_res, cjson.empty_array_mt)
+    setmetatable(_res, json.empty_array_mt)
 
     for _, _v in pairs(_detail) do
         if _v then
@@ -231,10 +265,12 @@ function Action:listAction(args)
         end
     end
 
-    return {
+    local _result = {
         result = true,
         data = _res
     }
+    instance:getRedis():setKeepAlive()
+    return _result
 end
 
 --private

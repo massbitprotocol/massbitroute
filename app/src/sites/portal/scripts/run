@@ -1,4 +1,6 @@
 #!/bin/bash
+SITE_ROOT=$(realpath $(dirname $(realpath $0))/..)
+cd $SITE_ROOT
 export HOME=/massbit/massbitroute/app/src/tmp
 export ASDF=/massbit/massbitroute/app/src/bin/.asdf/installs
 GRAFANA_VERSION=v8.2.1
@@ -23,20 +25,54 @@ _git_config() {
 }
 _reload() {
 	$cmd_server _update
-	$cmd_server restart worker-portal-api:00
+	$cmd_server update
+	$cmd_server status | grep worker-portal-api | awk '{print $1}' | while read f; do
+		$cmd_server restart $f
+	done
 }
 
-_pull() {
-	dir=$1
-	cd $dir
-	git pull | grep -i "updating"
-	if [ $? -eq 0 ]; then
-		_reload
+_git_cmd() {
+	cmd=$1
+	if [ -z "$cmd" ]; then cmd=push; fi
+	_dir=/massbit/massbitroute/app/src/sites/services
+	for service in gateway node gwman stat monitor; do
+		git -C $_dir/$service $cmd
+	done
+
+}
+_monitor() {
+	_git_cmd pull
+	reload=0
+
+	if [ ! -d "$SITE_ROOT/vars" ]; then mkdir -p $SITE_ROOT/vars; fi
+	echo mbr-portal >$SITE_ROOT/vars/TYPE
+
+	stat_dir=$SITE_ROOT/etc
+	if [ ! -d "$stat_dir/mkagent/.git" ]; then
+		mkdir -p $stat_dir
+		git clone http://mbr_gateway:6a796299bb72357770735a79019612af228586e7@git.massbitroute.com/massbitroute/mkagent.git $stat_dir/mkagent
+		is_reload=1
 	fi
+
+	for d in /massbit/massbitroute/app/gbc \
+		/massbit/massbitroute/app/src \
+		$portal_dir \
+		$stat_dir/mkagent; do
+		git -C $d pull | grep -i "updating"
+		if [ $? -eq 0 ]; then
+			reload=1
+		fi
+	done
+
+	if [ $reload -eq 1 ]; then
+		$0 _reload
+	fi
+
+	_git_cmd push
 }
 loop() {
 	while true; do
-		$@
+		$0 $@
 		sleep 1
 	done
 

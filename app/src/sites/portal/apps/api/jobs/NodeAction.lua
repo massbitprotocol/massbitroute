@@ -5,7 +5,7 @@ local json = cc.import("#json")
 local mytype = "node"
 local JobsAction = cc.class(mytype .. "JobsAction", gbc.ActionBase)
 
-local mbrutil = cc.import("#mbrutil")
+local mbrutil = require "mbutil" -- cc.import("#mbrutil")
 
 local read_dir = mbrutil.read_dir
 local read_file = mbrutil.read_file
@@ -220,20 +220,20 @@ local function _remove_item(instance, args)
         return nil, "invalid data"
     end
 
-    local _k1 =
-        _item.blockchain .. "/" .. _item.network .. "/" .. _item.geo.continent_code .. "/" .. _item.geo.country_code
-
-    local _deploy_file = _deploy_dir .. "/" .. _k1 .. "/" .. _item.id
-    os.remove(_deploy_file)
-    _git_push(
-        _deploy_dir,
-        {},
-        {
-            _deploy_file
-        }
-    )
-
-    mkdirp(_deploy_dir .. "/" .. _k1)
+    if args._is_delete then
+        local _k1 =
+            _item.blockchain .. "/" .. _item.network .. "/" .. _item.geo.continent_code .. "/" .. _item.geo.country_code
+        mkdirp(_deploy_dir .. "/" .. _k1)
+        local _deploy_file = _deploy_dir .. "/" .. _k1 .. "/" .. _item.id
+        os.remove(_deploy_file)
+        _git_push(
+            _deploy_dir,
+            {},
+            {
+                _deploy_file
+            }
+        )
+    end
 
     return true
 end
