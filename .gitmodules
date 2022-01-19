@@ -7,3 +7,9 @@
 [submodule "app/src/sites/services/gwman"]
 	path = app/src/sites/services/gwman
 	url = https://github.com/massbitprotocol/massbitroute_gwman.git
+[submodule "app/src/sites/services/monitor"]
+	path = app/src/sites/services/monitor
+	url = git@github.com:massbitprotocol/massbitroute_monitor.git
+[submodule "app/src/sites/services/stat"]
+	path = app/src/sites/services/stat
+	url = git@github.com:massbitprotocol/massbitroute_stat.git
