@@ -14,7 +14,7 @@ local inspect = mbrutil.inspect
 
 local _write_file = mbrutil.write_file
 local _get_tmpl = mbrutil.get_template
-local _git_push = mbrutil.git_push
+-- local _git_push = mbrutil.git_push
 
 JobsAction.ACCEPTED_REQUEST_TYPE = "worker"
 
@@ -108,13 +108,13 @@ local function _remove_item(instance, args)
 
         local _deploy_file = _deploy_dir .. "/" .. _k1 .. "/" .. _item.id
         os.remove(_deploy_file)
-        _git_push(
-            _deploy_dir,
-            {},
-            {
-                _deploy_file
-            }
-        )
+    -- _git_push(
+    --     _deploy_dir,
+    --     {},
+    --     {
+    --         _deploy_file
+    --     }
+    -- )
     end
 
     return true
@@ -247,14 +247,14 @@ local function _update_gdnsd()
     local _file_stat = stat_dir .. "/etc/prometheus/stat_gw.yml"
     print(_file_stat)
     _write_file(_file_stat, _str_stat)
-    _git_push(
-        stat_dir,
-        {
-            _file_stat
-        }
-    )
+    -- _git_push(
+    --     stat_dir,
+    --     {
+    --         _file_stat
+    --     }
+    -- )
 
-    _git_push(gwman_dir, _commit_files)
+    -- _git_push(gwman_dir, _commit_files)
 end
 
 local function _generate_item(instance, args)
@@ -278,7 +278,7 @@ local function _generate_item(instance, args)
     -- print(_content)
     print(_deploy_file)
     _write_file(_deploy_file, _content)
-    _git_push(_deploy_dir, {_deploy_file})
+    -- _git_push(_deploy_dir, {_deploy_file})
     return true
 end
 

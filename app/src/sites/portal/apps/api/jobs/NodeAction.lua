@@ -16,7 +16,7 @@ local _print = mbrutil.print
 
 local _write_file = mbrutil.write_file
 local _get_tmpl = mbrutil.get_template
-local _git_push = mbrutil.git_push
+-- local _git_push = mbrutil.git_push
 
 JobsAction.ACCEPTED_REQUEST_TYPE = "worker"
 
@@ -226,13 +226,13 @@ local function _remove_item(instance, args)
         mkdirp(_deploy_dir .. "/" .. _k1)
         local _deploy_file = _deploy_dir .. "/" .. _k1 .. "/" .. _item.id
         os.remove(_deploy_file)
-        _git_push(
-            _deploy_dir,
-            {},
-            {
-                _deploy_file
-            }
-        )
+    -- _git_push(
+    --     _deploy_dir,
+    --     {},
+    --     {
+    --         _deploy_file
+    --     }
+    -- )
     end
 
     return true
@@ -322,17 +322,17 @@ local function _update_gdnsd()
     local _file_stat = _stat_dir .. "/etc/prometheus/stat_node.yml"
     _write_file(_file_stat, _str_stat)
     _print(_file_stat)
-    _git_push(
-        _stat_dir,
-        {
-            _stat_dir .. "/etc/prometheus/stat_node.yml"
-        }
-    )
+    -- _git_push(
+    --     _stat_dir,
+    --     {
+    --         _stat_dir .. "/etc/prometheus/stat_node.yml"
+    --     }
+    -- )
 
     _print(inspect(_portal_commit_files))
-    _git_push(_portal_dir, _portal_commit_files)
+    -- _git_push(_portal_dir, _portal_commit_files)
     _print(inspect(_dns_commit_files))
-    _git_push(_gwman_dir, _dns_commit_files)
+    -- _git_push(_gwman_dir, _dns_commit_files)
 end
 
 local function _generate_item(instance, args)
@@ -373,7 +373,7 @@ local function _generate_item(instance, args)
         _deploy_nodeconfdir .. "/" .. _item.id .. ".conf"
     }
     _print("files:" .. inspect(_files))
-    _git_push(_deploy_dir, _files)
+    -- _git_push(_deploy_dir, _files)
     return true
 end
 
