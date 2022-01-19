@@ -20,8 +20,10 @@ EOF
 }
 
 _git_config() {
-	git config --global user.name "Vu Tran"
-	git config --global user.email "baysao@gmail.com"
+	_dir=$1
+	if [ -z "$_dir" ]; then _dir=$PWD; fi
+	git -C $_dir config --global user.name "Vu Tran"
+	git -C $_dir config --global user.email "baysao@gmail.com"
 }
 _reload() {
 	$cmd_server _update
@@ -31,12 +33,53 @@ _reload() {
 	done
 }
 
+_git_cmd_commit() {
+	_cdir=$1
+	shift
+	if [ $# -gt 0 ]; then
+		_time=$(date -u)
+		_git_config $_cdir
+		for _fdir in $@; do
+			git -C $_cdir add -f $_fdir
+		done
+		git -C $_cdir commit -m "$_fdir at $_time"
+
+	fi
+}
+
 _git_cmd() {
 	cmd=$1
+	shift
 	if [ -z "$cmd" ]; then cmd=push; fi
-	_dir=/massbit/massbitroute/app/src/sites/services
-	for service in gateway node gwman stat monitor; do
-		git -C $_dir/$service $cmd
+
+	_dir_def=/massbit/massbitroute/app/src/sites/services
+	for _service in portal gateway node gwman stat monitor; do
+		if [ "$_service" = "portal" ]; then
+			_dir=/massbit/massbitroute/app/src/sites/portal
+		else
+			_dir="$_dir_def/$_service"
+		fi
+
+		if [ "$cmd" = "commit" ]; then
+			_mydir=""
+			case "$_service" in
+			portal)
+				_mydir="$_dir/public/deploy"
+				;;
+			gwman)
+				_mydir="$_dir/data $_dir/zones"
+				;;
+			stat)
+				_mydir="$_dir/etc/prometheus"
+				;;
+			esac
+
+			if [ -n "$_mydir" ]; then
+				_git_cmd_commit $_dir $_mydir
+			fi
+		else
+			git -C $_dir $cmd
+		fi
 	done
 
 }
@@ -68,6 +111,7 @@ _monitor() {
 		$0 _reload
 	fi
 
+	_git_cmd commit
 	_git_cmd push
 }
 loop() {

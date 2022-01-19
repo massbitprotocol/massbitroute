@@ -13,7 +13,7 @@ local _read_dir = mbrutil.read_dir
 
 local _write_file = mbrutil.write_file
 local _get_tmpl = mbrutil.get_template
-local _git_push = mbrutil.git_push
+-- local _git_push = mbrutil.git_push
 local _print = mbrutil.print
 
 local mkdirp = require "mkdirp"
@@ -241,16 +241,16 @@ local function _remove_item(instance, args)
     local _content_all_file = _deploy_confdir .. "/" .. _k1 .. ".conf"
     print(_content_all_file)
     _write_file(_content_all_file, _content_all)
-    _git_push(
-        _portal_dir,
-        {
-            _content_all_file
-        },
-        {
-            _deploy_file,
-            _item_file
-        }
-    )
+    -- _git_push(
+    --     _portal_dir,
+    --     {
+    --         _content_all_file
+    --     },
+    --     {
+    --         _deploy_file,
+    --         _item_file
+    --     }
+    -- )
 
     return true
 end
@@ -348,20 +348,20 @@ local function _generate_item(instance, args)
     print(_file_dapi)
     _write_file(_file_dapi, "*." .. _k1 .. " DYNA	geoip!mbr-map-" .. _k1 .. "\n")
 
-    _git_push(
-        gwman_dir,
-        {
-            _file_dapi
-        }
-    )
-    _git_push(
-        _portal_dir,
-        {
-            _item_file,
-            _deploy_file,
-            _content_all_file
-        }
-    )
+    -- _git_push(
+    --     gwman_dir,
+    --     {
+    --         _file_dapi
+    --     }
+    -- )
+    -- _git_push(
+    --     _portal_dir,
+    --     {
+    --         _item_file,
+    --         _deploy_file,
+    --         _content_all_file
+    --     }
+    -- )
 end
 
 --- Generate conf for gateway
