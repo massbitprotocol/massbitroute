@@ -1,0 +1,453 @@
+#!/bin/bash
+SITE_ROOT=$(realpath $(dirname $(realpath $0))/..)
+cd $SITE_ROOT
+#export HOME=/massbit/massbitroute/app/src/tmp
+export HOME=$SITE_ROOT
+export ASDF=/massbit/massbitroute/app/src/bin/.asdf/installs
+GRAFANA_VERSION=v8.2.1
+PROMETHEUS_VERSION=v2.30.3
+monitor_dir=/massbit/massbitroute/app/src/sites/services/monitor
+portal_dir=/massbit/massbitroute/app/src/sites/services/api
+# portal_dir=/massbit/massbitroute/app/src/sites/portal
+deploy_dir=$portal_dir/public/deploy
+gwman_dir=/massbit/massbitroute/app/src/sites/services/gwman
+gw_dir=/massbit/massbitroute/app/src/sites/services/gateway
+# cmd=/massbit/massbitroute/app/src/cmd_server
+cmd=$SITE_ROOT/cmd_server
+service_dir=/massbit/massbitroute/app/src/sites/services
+type=api
+gdnsd="/massbit/massbitroute/app/gbc/bin/.asdf/installs/gdnsd/v3.8.0/sbin/gdnsd -c $gwman_dir"
+nginx="/massbit/massbitroute/app/src/bin/openresty/nginx/sbin/nginx -c /massbit/massbitroute/app/src/tmp/nginx.conf"
+
+_supervisor() {
+	cat <<EOF >/etc/supervisor/conf.d/mbr_portal.conf
+[program:mbr_portal]
+command=/massbit/massbitroute/app/src/start_server
+EOF
+}
+
+_git_config() {
+	_dir=$1
+	if [ -z "$_dir" ]; then _dir=$PWD; fi
+	git -C $_dir config --global user.name "Vu Tran"
+	git -C $_dir config --global user.email "baysao@gmail.com"
+}
+_reload() {
+	if [ ! -f "/usr/bin/parallel" ]; then apt install -y parallel; fi
+	$cmd _update
+	$cmd update
+	tmp=$(mktemp)
+	$cmd status | grep worker-portal-api | awk '{print $1}' >$tmp
+	n=$(cat $tmp | wc -l)
+	cat $tmp | while read f; do
+		echo $cmd restart $f
+	done | parallel -j$n
+	rm $tmp
+}
+_install() {
+	mkdir -p /massbit/massbitroute/app $service_dir $SITE_ROOT/etc $SITE_ROOT/logs
+
+	user=massbit
+	pass=41d919e74993945a97972d147c4d01847e8bc1b6
+
+	service=gbc
+	git clone http://$user:$pass@git.massbitroute.com/massbitroute/${service}.git /massbit/massbitroute/app/$service
+	git -C /massbit/massbitroute/app/$service remote set-url origin http://$user:$pass@git.massbitroute.com/massbitroute/${service}.git
+
+	service=asdf
+	git clone http://$user:$pass@git.massbitroute.com/massbitroute/${service}.git /massbit/massbitroute/app/gbc/bin/.asdf
+	git -C /massbit/massbitroute/app/gbc/bin/.asdf remote set-url origin http://$user:$pass@git.massbitroute.com/massbitroute/${service}.git
+
+	service=ssl
+	git clone http://$user:$pass@git.massbitroute.com/massbitroute/${service}.git /etc/letsencrypt
+	git -C /etc/letsencrypt remote set-url origin http://$user:$pass@git.massbitroute.com/massbitroute/${service}.git
+
+	service=mkagent
+	git clone http://$user:$pass@git.massbitroute.com/massbitroute/${service}.git $SITE_ROOT/etc/$service
+
+	git -C $SITE_ROOT/etc/$service remote set-url origin http://$user:$pass@git.massbitroute.com/massbitroute/${service}.git
+
+	# for service in node gateway gwman monitor stat; do
+	service=node
+	user=$service
+	pass=62af19e6fcaef03daa1557020e2393762692bbb0
+	git clone http://$service:$pass@git.massbitroute.com/massbitroute/${service}.git $service_dir/$service
+
+	service=gateway
+	user=$service
+	pass=3dfe744c51d8b17d6e79ef4e17c90a5f75f00809
+	git clone http://$service:$pass@git.massbitroute.com/massbitroute/${service}.git $service_dir/$service
+	git -C $service_dir/$service remote set-url origin http://$user:$pass@git.massbitroute.com/massbitroute/${service}.git
+
+	service=gwman
+	user=$service
+	pass=067b14c85441fc9381d3425e1c9ed1dbc70017f2
+	git clone http://$service:$pass@git.massbitroute.com/massbitroute/${service}.git $service_dir/$service
+	git -C $service_dir/$service remote set-url origin http://$user:$pass@git.massbitroute.com/massbitroute/${service}.git
+
+	service=stat
+	user=$service
+	pass=36445cd061b196017bfa30986d336448ec6739d4
+	git clone http://$service:$pass@git.massbitroute.com/massbitroute/${service}.git $service_dir/$service
+	git -C $service_dir/$service remote set-url origin http://$user:$pass@git.massbitroute.com/massbitroute/${service}.git
+
+	service=monitor
+	user=$service
+	pass=65ec50bca724c9318443504fd78b944fb427860e
+	git clone http://$service:$pass@git.massbitroute.com/massbitroute/${service}.git $service_dir/$service
+	git -C $service_dir/$service remote set-url origin http://$user:$pass@git.massbitroute.com/massbitroute/${service}.git
+
+	# done
+
+	service=$type
+	user=$service
+	pass=a89cc4349663791f86759c83a5569fa791e63422
+	gitdir=$service_dir/$service
+	giturl=http://$user:$pass@git.massbitroute.com/massbitroute/${service}.git
+	git clone $giturl $gitdir
+	git -C $gitdir remote set-url origin $giturl
+
+	git clone https://github.com/massbitprotocol/mbr-app.git $service_dir/$service/public/mbr-app-prod
+
+	service=apideploy
+	user=$service
+	pass=85493fd5177ca58793f243c071303ac4109087a8
+	gitdir=$service_dir/api/public/deploy
+	giturl=http://$service:$pass@git.massbitroute.com/massbitroute/${service}.git
+	git clone $giturl $gitdir
+	git -C $gitdir remote set-url origin $giturl
+
+	ln -sf /massbit/massbitroute/app/gbc /massbit/massbitroute/app/src/gbc
+	ln -sf /massbit/massbitroute/app/gbc/bin/openresty /usr/local/openresty
+	apt-get update
+	apt-get install -y git apache2-utils supervisor jq python-is-python2 libssl-dev
+	cp supervisor.conf /etc/supervisor/conf.d/${type}.conf
+	systemctl enable supervisor
+	systemctl start supervisor
+	supervisorctl update
+
+}
+
+_git() {
+	git "$@"
+	st=$?
+	echo $st
+	# while [ $st -ne 0 ]; do
+	# 	sleep 1
+	# 	git "$@"
+	# 	st=$?
+	# done
+
+}
+_git_cmd_commit() {
+	_cdir=$1
+	shift
+	if [ $# -gt 0 ]; then
+		_time=$(date -u)
+		_git_config $_cdir
+		for _fdir in $@; do
+			_git -C $_cdir add -f $_fdir
+		done
+		_git -C $_cdir commit -m "$_fdir at $_time"
+
+	fi
+}
+
+_git_cmd() {
+	cmd=$1
+	shift
+	if [ -z "$cmd" ]; then cmd=push; fi
+
+	_dir_def=$service_dir
+	for _service in api gateway node gwman stat monitor; do
+		_dir="$_dir_def/$_service"
+
+		# if [ "$cmd" = "push" ]; then
+		case "$_service" in
+		api)
+			_dir="$_dir_def/$_service/public/deploy"
+			# _dir=$_mydir
+			;;
+		esac
+		# fi
+
+		if [ "$cmd" = "commit" ]; then
+			_mydir=""
+			case "$_service" in
+			api)
+				_mydir="$_dir_def/$_service/public/deploy"
+				# _dir=$_mydir
+				;;
+			gwman)
+				_mydir="$_dir/data $_dir/conf.d $_dir/zones"
+				;;
+			stat)
+				_mydir="$_dir/etc/prometheus"
+				;;
+			monitor)
+				_mydir="$_dir/etc/main.mk $_dir/scripts/tokens.txt"
+				;;
+
+			esac
+
+			if [ -n "$_mydir" ]; then
+				_git_cmd_commit $_dir $_mydir
+			fi
+		else
+			_git -C $_dir $cmd
+		fi
+	done
+
+}
+# _scan_monitor1() {
+# 	type=gateway
+# 	ls $deploy_dir/$type | while read blockchain; do
+# 		ls $deploy_dir/$type/$blockchain | while read network; do
+# 			ls $deploy_dir/$type/$blockchain/$network | while read continent; do
+# 				ls $deploy_dir/$type/$blockchain/$network/$continent | while read country; do
+# 					group=$blockchain-$network-$continent-$country
+# 					echo $group
+# 					ls $deploy_dir/$type/$blockchain/$network/$continent/$country | while read id; do
+# 						_f=$deploy_dir/$type/$blockchain/$network/$continent/$country/$id
+# 						ip=$(cat $_f | jq .ip)
+# 						echo $ip
+# 					done
+# 				done
+# 			done
+# 		done
+# 	done
+# }
+
+_scan_monitor_type() {
+	dir=$1
+	type=$2
+	format=$3
+	if [ ! -d "$dir/$type" ]; then return 1; fi
+	cd $dir/$type
+
+	find . -type f | sed 's/^\.\///g' | while read f; do
+		id=$(basename $f)
+		group=$type-$(dirname $f | sed 's/\//-/g')
+		name=$group-$id
+		if [ "$type" = "gateway" ]; then
+			group=$(echo $group | cut -d'-' -f1-3)
+			name=$group-$id
+		else
+			group=$type
+		fi
+
+		ip=$(cat $f | jq .ip | sed 's/\"//g')
+
+		if [ "$format" = "address" ]; then
+			echo "\"$name\": \"$ip\","
+		elif [ "$format" = "host" ]; then
+			echo "\"$name\","
+			# echo "\"$name|$group\","
+		elif [ "$format" = "token" ]; then
+			export TOKEN=$(echo -n ${name} | sha1sum | cut -d' ' -f1)
+			echo "$TOKEN $name"
+		fi
+	done
+	return 0
+}
+# _scan_monitor() {
+
+# 	main_mk=$(mktemp)
+# 	echo "ipaddresses = {" >$main_mk
+# 	echo '"localhost":"127.0.0.1",' >>$main_mk
+# 	_scan_monitor_type $deploy_dir gateway address >>$main_mk
+# 	for _c in stat monitor portal; do
+# 		_scan_monitor_type $monitor_dir/data mbr-$_c address >>$main_mk
+# 	done
+# 	echo "}" >>$main_mk
+# 	echo "all_hosts += [" >>$main_mk
+# 	_scan_monitor_type $deploy_dir gateway host >>$main_mk
+# 	for _c in stat monitor portal; do
+# 		_scan_monitor_type $monitor_dir/data mbr-$_c host >>$main_mk
+# 	done
+# 	echo "]" >>$main_mk
+# 	# cat $main_mk
+# 	rm $main_mk
+# 	# mv $main_mk $monitor_dir/etc/main.mk
+
+# 	token_mk=$(mktemp)
+# 	_scan_monitor_type $deploy_dir gateway token >$token_mk
+# 	for _c in stat monitor portal; do
+# 		_scan_monitor_type $monitor_dir/data mbr-$_c token >>$token_mk
+# 	done
+# 	mv $token_mk $monitor_dir/scripts/tokens.txt
+
+# }
+_update_dapi_list() {
+	_type=dapi
+	_dir=$portal_dir/public/deploy/$_type
+	if [ ! -d "$_dir" ]; then return 1; fi
+	info_dir=$portal_dir/public/deploy/info/$_type
+	mkdir -p $info_dir /tmp/info/$_type
+	rm /tmp/info/$_type/*
+	find $_dir -type f | while read f; do
+		gateway_domain=$(cat $f | jq .gateway_domain | sed 's/\"//g')
+		api_key=$(cat $f | jq .api_key | sed 's/\"//g')
+		block=$(cat $f | jq .blockchain | sed 's/\"//g')
+		net=$(cat $f | jq .network | sed 's/\"//g')
+		user_id=$(cat $f | jq .user_id | sed 's/\"//g')
+		status=$(cat $f | jq .status | sed 's/\"//g')
+		name=$(basename $f)
+		if [ -n "$block" ]; then
+			mesg="$name $user_id $block $net $gateway_domain $api_key $status"
+			echo $mesg >>/tmp/info/$_type/listid
+			echo $mesg >>/tmp/info/$_type/listid-$block-$net
+		fi
+	done
+	rm $info_dir/*
+	mv /tmp/info/$_type/* $info_dir/
+}
+_update_user_list() {
+	_type=user
+	_dir=$portal_dir/public/deploy/$_type
+	if [ ! -d "$_dir" ]; then return 1; fi
+	info_dir=$portal_dir/public/deploy/info/$_type
+	mkdir -p $info_dir
+	tmp=$(mktemp)
+
+	find $_dir -type f | while read f; do
+		username=$(cat $f | jq .username | sed 's/\"//g')
+		email=$(cat $f | jq .email | sed 's/\"//g')
+		confirmed=$(cat $f | jq .confirmed | sed 's/\"//g')
+		name=$(basename $f)
+		echo "$name $username $email $confirmed" >>$tmp
+
+	done
+	mv $tmp $info_dir/listid
+	chmod 755 $info_dir/listid
+}
+_update_gateway_list() {
+	_type=gateway
+	_dir=$portal_dir/public/deploy/$_type
+	if [ ! -d "$_dir" ]; then return 1; fi
+	info_dir=$portal_dir/public/deploy/info/$_type
+	mkdir -p $info_dir /tmp/info/$_type
+	rm /tmp/info/$_type/*
+	find $_dir -type f | while read f; do
+		ip=$(cat $f | jq .ip | sed 's/\"//g')
+		block=$(cat $f | jq .blockchain | sed 's/\"//g')
+		net=$(cat $f | jq .network | sed 's/\"//g')
+		continent=$(cat $f | jq .geo.continent_code | sed 's/\"//g')
+		country=$(cat $f | jq .geo.country_code | sed 's/\"//g')
+		user_id=$(cat $f | jq .user_id | sed 's/\"//g')
+		token=$(cat $f | jq .token | sed 's/\"//g')
+		status=$(cat $f | jq .status | sed 's/\"//g')
+		approved=$(cat $f | jq .approved | sed 's/\"//g')
+		name=$(basename $f)
+		if [ -n "$block" ]; then
+			mesg="$name $user_id $block $net $ip $continent $country $token $status $approved"
+			echo $mesg >>/tmp/info/$_type/listid
+			echo $mesg >>/tmp/info/$_type/listid-$block-$net
+		fi
+	done
+	rm $info_dir/*
+	mv /tmp/info/$_type/* $info_dir/
+
+}
+_update_node_list() {
+	_type=node
+	_dir=$portal_dir/public/deploy/$_type
+	if [ ! -d "$_dir" ]; then return 1; fi
+	info_dir=$portal_dir/public/deploy/info/$_type
+	mkdir -p $info_dir /tmp/info/$_type
+	rm /tmp/info/$_type/*
+	# gwman_data_zones_node=$(mktemp -d)
+	find $_dir -type f | while read f; do
+		ip=$(cat $f | jq .ip | sed 's/\"//g')
+		block=$(cat $f | jq .blockchain | sed 's/\"//g')
+		net=$(cat $f | jq .network | sed 's/\"//g')
+		continent=$(cat $f | jq .geo.continent_code | sed 's/\"//g')
+		country=$(cat $f | jq .geo.country_code | sed 's/\"//g')
+		name=$(basename $f)
+		user_id=$(cat $f | jq .user_id | sed 's/\"//g')
+		token=$(cat $f | jq .token | sed 's/\"//g')
+		status=$(cat $f | jq .status | sed 's/\"//g')
+		approved=$(cat $f | jq .approved | sed 's/\"//g')
+		if [ -n "$block" ]; then
+			mesg="$name $user_id $block $net $ip $continent $country $token $status $approved"
+			echo $mesg >>/tmp/info/$_type/listid
+			echo $mesg >>/tmp/info/$_type/listid-$block-$net
+			# echo "${name}.node.mbr 60 A $ip" >>$gwman_data_zones_node/${block}-${network}.zone
+		fi
+	done
+	rm $info_dir/*
+	# rm -rf $gwman/data/zones/node
+	# mv $gwman_data_zones_node $gwman/data/zones/node
+	mv /tmp/info/$_type/* $info_dir/
+
+}
+_rescan_conf() {
+	svr=$1
+	if [ -n "$svr" ]; then
+		curl -k -H 'Content-Type: application/json' -H 'Host: dapi.massbit.io' "https://127.0.0.1/_internal_api/v1?action=${svr}.calljob" -d "{\"job\":\"${svr}.rescanconf\"}"
+	else
+		for svr1 in node gateway; do
+			curl -k -H 'Content-Type: application/json' -H 'Host: dapi.massbit.io' "https://127.0.0.1/_internal_api/v1?action=${svr1}.calljob" -d "{\"job\":\"${svr1}.rescanconf\"}"
+		done
+	fi
+
+}
+_update_listid() {
+	_update_gateway_list
+	_update_dapi_list
+	_update_node_list
+	_update_user_list
+
+}
+_monitor() {
+
+	$0 _git_cmd pull
+	reload=0
+
+	if [ ! -d "$SITE_ROOT/vars" ]; then mkdir -p $SITE_ROOT/vars; fi
+	# echo mbr-portal >$SITE_ROOT/vars/TYPE
+
+	# stat_dir=$SITE_ROOT/etc
+	# if [ ! -d "$stat_dir/mkagent/.git" ]; then
+	# 	mkdir -p $stat_dir
+	# 	git clone http://mbr_gateway:6a796299bb72357770735a79019612af228586e7@git.massbitroute.com/massbitroute/mkagent.git $stat_dir/mkagent
+	# 	is_reload=1
+	# fi
+	# /massbit/massbitroute/app/src \
+	for d in /massbit/massbitroute/app/gbc \
+		$portal_dir \
+		$SITE_ROOT/etc/mkagent; do
+		git -C $d pull | grep -i "updating"
+		if [ $? -eq 0 ]; then
+			reload=1
+		fi
+	done
+
+	if [ $reload -eq 1 ]; then
+		$0 _reload
+	fi
+
+	#	$0 _rescan_conf
+	# sleep 1
+	# $0 _update_gateway_list
+	# $0 _update_dapi_list
+	# $0 _update_node_list
+	# $0 _update_user_list
+	# _scan_monitor
+	$0 _git_cmd commit
+	$0 _git_cmd push
+	$cmd start all
+}
+loop() {
+	while true; do
+		$0 $@
+		sleep 3
+	done
+
+}
+_run() {
+	rm -rf $SITE_ROOT/tmp/*
+	sleep 3
+	$SITE_ROOT/start_server
+}
+$@
