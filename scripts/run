@@ -323,62 +323,65 @@ _update_user_list() {
 }
 _update_gateway_list() {
 	_type=gateway
-	_dir=$portal_dir/public/deploy/$_type
-	if [ ! -d "$_dir" ]; then return 1; fi
+	# _dir=$portal_dir/public/deploy/$_type
+	# if [ ! -d "$_dir" ]; then return 1; fi
 	info_dir=$portal_dir/public/deploy/info/$_type
-	mkdir -p $info_dir /tmp/info/$_type
-	rm /tmp/info/$_type/*
-	find $_dir -type f | while read f; do
-		ip=$(cat $f | jq .ip | sed 's/\"//g')
-		block=$(cat $f | jq .blockchain | sed 's/\"//g')
-		net=$(cat $f | jq .network | sed 's/\"//g')
-		continent=$(cat $f | jq .geo.continent_code | sed 's/\"//g')
-		country=$(cat $f | jq .geo.country_code | sed 's/\"//g')
-		user_id=$(cat $f | jq .user_id | sed 's/\"//g')
-		token=$(cat $f | jq .token | sed 's/\"//g')
-		status=$(cat $f | jq .status | sed 's/\"//g')
-		approved=$(cat $f | jq .approved | sed 's/\"//g')
-		name=$(basename $f)
-		if [ -n "$block" ]; then
-			mesg="$name $user_id $block $net $ip $continent $country $token $status $approved"
-			echo $mesg >>/tmp/info/$_type/listid
-			echo $mesg >>/tmp/info/$_type/listid-$block-$net
-		fi
-	done
-	rm $info_dir/*
-	mv /tmp/info/$_type/* $info_dir/
+	cat $info_dir/listid-* >$info_dir/listid
+
+	# mkdir -p $info_dir /tmp/info/$_type
+	# rm /tmp/info/$_type/*
+	# find $_dir -type f | while read f; do
+	# 	ip=$(cat $f | jq .ip | sed 's/\"//g')
+	# 	block=$(cat $f | jq .blockchain | sed 's/\"//g')
+	# 	net=$(cat $f | jq .network | sed 's/\"//g')
+	# 	continent=$(cat $f | jq .geo.continent_code | sed 's/\"//g')
+	# 	country=$(cat $f | jq .geo.country_code | sed 's/\"//g')
+	# 	user_id=$(cat $f | jq .user_id | sed 's/\"//g')
+	# 	token=$(cat $f | jq .token | sed 's/\"//g')
+	# 	status=$(cat $f | jq .status | sed 's/\"//g')
+	# 	approved=$(cat $f | jq .approved | sed 's/\"//g')
+	# 	name=$(basename $f)
+	# 	if [ -n "$block" ]; then
+	# 		mesg="$name $user_id $block $net $ip $continent $country $token $status $approved"
+	# 		echo $mesg >>/tmp/info/$_type/listid
+	# 		echo $mesg >>/tmp/info/$_type/listid-$block-$net
+	# 	fi
+	# done
+	# rm $info_dir/*
+	# mv /tmp/info/$_type/* $info_dir/
 
 }
 _update_node_list() {
 	_type=node
-	_dir=$portal_dir/public/deploy/$_type
-	if [ ! -d "$_dir" ]; then return 1; fi
+	# _dir=$portal_dir/public/deploy/$_type
+	# if [ ! -d "$_dir" ]; then return 1; fi
 	info_dir=$portal_dir/public/deploy/info/$_type
-	mkdir -p $info_dir /tmp/info/$_type
-	rm /tmp/info/$_type/*
-	# gwman_data_zones_node=$(mktemp -d)
-	find $_dir -type f | while read f; do
-		ip=$(cat $f | jq .ip | sed 's/\"//g')
-		block=$(cat $f | jq .blockchain | sed 's/\"//g')
-		net=$(cat $f | jq .network | sed 's/\"//g')
-		continent=$(cat $f | jq .geo.continent_code | sed 's/\"//g')
-		country=$(cat $f | jq .geo.country_code | sed 's/\"//g')
-		name=$(basename $f)
-		user_id=$(cat $f | jq .user_id | sed 's/\"//g')
-		token=$(cat $f | jq .token | sed 's/\"//g')
-		status=$(cat $f | jq .status | sed 's/\"//g')
-		approved=$(cat $f | jq .approved | sed 's/\"//g')
-		if [ -n "$block" ]; then
-			mesg="$name $user_id $block $net $ip $continent $country $token $status $approved"
-			echo $mesg >>/tmp/info/$_type/listid
-			echo $mesg >>/tmp/info/$_type/listid-$block-$net
-			# echo "${name}.node.mbr 60 A $ip" >>$gwman_data_zones_node/${block}-${network}.zone
-		fi
-	done
-	rm $info_dir/*
-	# rm -rf $gwman/data/zones/node
-	# mv $gwman_data_zones_node $gwman/data/zones/node
-	mv /tmp/info/$_type/* $info_dir/
+	cat $info_dir/listid-* >$info_dir/listid
+	# mkdir -p $info_dir /tmp/info/$_type
+	# rm /tmp/info/$_type/*
+	# # gwman_data_zones_node=$(mktemp -d)
+	# find $_dir -type f | while read f; do
+	# 	ip=$(cat $f | jq .ip | sed 's/\"//g')
+	# 	block=$(cat $f | jq .blockchain | sed 's/\"//g')
+	# 	net=$(cat $f | jq .network | sed 's/\"//g')
+	# 	continent=$(cat $f | jq .geo.continent_code | sed 's/\"//g')
+	# 	country=$(cat $f | jq .geo.country_code | sed 's/\"//g')
+	# 	name=$(basename $f)
+	# 	user_id=$(cat $f | jq .user_id | sed 's/\"//g')
+	# 	token=$(cat $f | jq .token | sed 's/\"//g')
+	# 	status=$(cat $f | jq .status | sed 's/\"//g')
+	# 	approved=$(cat $f | jq .approved | sed 's/\"//g')
+	# 	if [ -n "$block" ]; then
+	# 		mesg="$name $user_id $block $net $ip $continent $country $token $status $approved"
+	# 		echo $mesg >>/tmp/info/$_type/listid
+	# 		echo $mesg >>/tmp/info/$_type/listid-$block-$net
+	# 		# echo "${name}.node.mbr 60 A $ip" >>$gwman_data_zones_node/${block}-${network}.zone
+	# 	fi
+	# done
+	# rm $info_dir/*
+	# # rm -rf $gwman/data/zones/node
+	# # mv $gwman_data_zones_node $gwman/data/zones/node
+	# mv /tmp/info/$_type/* $info_dir/
 
 }
 _rescan_conf() {
@@ -397,7 +400,6 @@ _update_listid() {
 	_update_dapi_list
 	_update_node_list
 	_update_user_list
-
 }
 _monitor() {
 

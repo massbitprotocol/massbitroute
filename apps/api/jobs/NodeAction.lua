@@ -25,19 +25,24 @@ local function is_dir(path)
     -- lfs.attributes will error on a filename ending in '/'
     return path:sub(-1) == "/" or lfs.attributes(path, "mode") == "directory"
 end
-
-local _portal_dir = "/massbit/massbitroute/app/src/sites/services/api"
+local _service_dir = "/massbit/massbitroute/app/src/sites/services"
+local _portal_dir = _service_dir .. "/api"
 local _deploy_dir = _portal_dir .. "/public/deploy/node"
+
+local _info_dir = _portal_dir .. "/public/deploy/info"
+
 local _deploy_nodeconfdir = _portal_dir .. "/public/deploy/nodeconf"
 local _deploy_gatewayconfdir = _portal_dir .. "/public/deploy/gatewayconf"
 
 local Model = cc.import("#" .. mytype)
 
 local mkdirp = require "mkdirp"
-local _gwman_dir = "/massbit/massbitroute/app/src/sites/services/gwman"
-local _stat_dir = "/massbit/massbitroute/app/src/sites/services/stat"
+local _gwman_dir = _service_dir .. "/gwman"
+local _stat_dir = _service_dir .. "/stat"
 
 local rules = {
+    _listid = [[${id} ${user_id} ${blockchain} ${network} ${ip} ${geo.continent_code} ${geo.country_code} ${token} ${status} ${approved}]],
+    _listids = [[${nodes/_listid(); separator='\n'}]],
     _node_zone = [[${id}.node.mbr 60 A ${ip}]],
     _node_zones = [[${nodes/_node_zone(); separator='\n'}]],
     _node_stat_target = [[          - ${id}.node.mbr.massbitroute.com]],
@@ -339,10 +344,26 @@ local function _rescanconf_blockchain_network(_blockchain, _network)
         _print(_str_stat)
         _print(_file_stat)
         _write_file(_file_stat, _str_stat)
+
+        local _str_listid = _tmpl("_listids")
+        mkdirp(_info_dir .. "/" .. mytype)
+        local _file_listid = _info_dir .. "/" .. mytype .. "/listid-" .. _blocknet_id
+        _print(_str_listid)
+        _print(_file_listid)
+        _write_file(_file_listid, _str_listid)
     end
 end
 
-local function _update_gdnsd(instance, args)
+local function _rescanconf()
+    for _, _blockchain in ipairs(show_folder(_deploy_dir)) do
+        local _blockchain_dir = _deploy_dir .. "/" .. _blockchain
+        for _, _network in ipairs(show_folder(_blockchain_dir)) do
+            _rescanconf_blockchain_network(_blockchain, _network)
+        end
+    end
+end
+
+local function _rescanconf1(instance, args)
     -- local _portal_commit_files = {}
     -- local _dns_commit_files = {}
 
@@ -538,9 +559,9 @@ function JobsAction:generateconfAction(job)
 end
 
 function JobsAction:rescanconfAction(job)
-    local instance = self:getInstance()
-    local job_data = job.data
-    _update_gdnsd(instance, job_data)
+    -- local instance = self:getInstance()
+    -- local job_data = job.data
+    _rescanconf()
 end
 
 function JobsAction:removeconfAction(job)
