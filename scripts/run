@@ -1,6 +1,7 @@
 #!/bin/bash
 SITE_ROOT=$(realpath $(dirname $(realpath $0))/..)
 cd $SITE_ROOT
+. $SITE_ROOT/.env
 #export HOME=/massbit/massbitroute/app/src/tmp
 export HOME=$SITE_ROOT
 export ASDF=/massbit/massbitroute/app/src/bin/.asdf/installs
@@ -47,73 +48,55 @@ _reload() {
 _install() {
 	mkdir -p /massbit/massbitroute/app $service_dir $SITE_ROOT/etc $SITE_ROOT/logs
 
-	user=massbit
-	pass=41d919e74993945a97972d147c4d01847e8bc1b6
-
 	service=gbc
-	git clone http://$user:$pass@git.massbitroute.com/massbitroute/${service}.git /massbit/massbitroute/app/$service
+	git clone http://$GIT_READ@git.massbitroute.com/massbitroute/${service}.git /massbit/massbitroute/app/$service
 	git -C /massbit/massbitroute/app/$service remote set-url origin http://$user:$pass@git.massbitroute.com/massbitroute/${service}.git
 
 	service=asdf
-	git clone http://$user:$pass@git.massbitroute.com/massbitroute/${service}.git /massbit/massbitroute/app/gbc/bin/.asdf
+	git clone http://$GIT_READ@git.massbitroute.com/massbitroute/${service}.git /massbit/massbitroute/app/gbc/bin/.asdf
 	git -C /massbit/massbitroute/app/gbc/bin/.asdf remote set-url origin http://$user:$pass@git.massbitroute.com/massbitroute/${service}.git
 
 	service=ssl
-	git clone http://$user:$pass@git.massbitroute.com/massbitroute/${service}.git /etc/letsencrypt
+	git clone http://$GIT_READ@git.massbitroute.com/massbitroute/${service}.git /etc/letsencrypt
 	git -C /etc/letsencrypt remote set-url origin http://$user:$pass@git.massbitroute.com/massbitroute/${service}.git
 
 	service=mkagent
-	git clone http://$user:$pass@git.massbitroute.com/massbitroute/${service}.git $SITE_ROOT/etc/$service
+	git clone http://$GIT_READ@git.massbitroute.com/massbitroute/${service}.git $SITE_ROOT/etc/$service
 
 	git -C $SITE_ROOT/etc/$service remote set-url origin http://$user:$pass@git.massbitroute.com/massbitroute/${service}.git
 
-	# for service in node gateway gwman monitor stat; do
 	service=node
-	user=$service
-	pass=62af19e6fcaef03daa1557020e2393762692bbb0
-	git clone http://$service:$pass@git.massbitroute.com/massbitroute/${service}.git $service_dir/$service
+	git clone http://$GIT_NODE_WRITE@git.massbitroute.com/massbitroute/${service}.git $service_dir/$service
 
 	service=gateway
-	user=$service
-	pass=3dfe744c51d8b17d6e79ef4e17c90a5f75f00809
-	git clone http://$service:$pass@git.massbitroute.com/massbitroute/${service}.git $service_dir/$service
+	git clone http://$GIT_GATEWAY_WRITE@git.massbitroute.com/massbitroute/${service}.git $service_dir/$service
 	git -C $service_dir/$service remote set-url origin http://$user:$pass@git.massbitroute.com/massbitroute/${service}.git
 
 	service=gwman
-	user=$service
-	pass=067b14c85441fc9381d3425e1c9ed1dbc70017f2
-	git clone http://$service:$pass@git.massbitroute.com/massbitroute/${service}.git $service_dir/$service
+	git clone http://$GIT_GWMAN_WRITE@git.massbitroute.com/massbitroute/${service}.git $service_dir/$service
 	git -C $service_dir/$service remote set-url origin http://$user:$pass@git.massbitroute.com/massbitroute/${service}.git
 
 	service=stat
-	user=$service
-	pass=36445cd061b196017bfa30986d336448ec6739d4
-	git clone http://$service:$pass@git.massbitroute.com/massbitroute/${service}.git $service_dir/$service
+	git clone http://$GIT_STAT_WRITE@git.massbitroute.com/massbitroute/${service}.git $service_dir/$service
 	git -C $service_dir/$service remote set-url origin http://$user:$pass@git.massbitroute.com/massbitroute/${service}.git
 
 	service=monitor
-	user=$service
-	pass=65ec50bca724c9318443504fd78b944fb427860e
-	git clone http://$service:$pass@git.massbitroute.com/massbitroute/${service}.git $service_dir/$service
+	git clone http://$GIT_MONITOR_WRITE@git.massbitroute.com/massbitroute/${service}.git $service_dir/$service
 	git -C $service_dir/$service remote set-url origin http://$user:$pass@git.massbitroute.com/massbitroute/${service}.git
 
 	# done
 
 	service=$type
-	user=$service
-	pass=a89cc4349663791f86759c83a5569fa791e63422
 	gitdir=$service_dir/$service
-	giturl=http://$user:$pass@git.massbitroute.com/massbitroute/${service}.git
+	giturl=http://$GIT_API_WRITE@git.massbitroute.com/massbitroute/${service}.git
 	git clone $giturl $gitdir
 	git -C $gitdir remote set-url origin $giturl
 
 	git clone https://github.com/massbitprotocol/mbr-app.git $service_dir/$service/public/mbr-app-prod
 
 	service=apideploy
-	user=$service
-	pass=85493fd5177ca58793f243c071303ac4109087a8
 	gitdir=$service_dir/api/public/deploy
-	giturl=http://$service:$pass@git.massbitroute.com/massbitroute/${service}.git
+	giturl=http://$GIT_APIDEPLOY_WRITE@git.massbitroute.com/massbitroute/${service}.git
 	git clone $giturl $gitdir
 	git -C $gitdir remote set-url origin $giturl
 
@@ -323,62 +306,65 @@ _update_user_list() {
 }
 _update_gateway_list() {
 	_type=gateway
-	_dir=$portal_dir/public/deploy/$_type
-	if [ ! -d "$_dir" ]; then return 1; fi
+	# _dir=$portal_dir/public/deploy/$_type
+	# if [ ! -d "$_dir" ]; then return 1; fi
 	info_dir=$portal_dir/public/deploy/info/$_type
-	mkdir -p $info_dir /tmp/info/$_type
-	rm /tmp/info/$_type/*
-	find $_dir -type f | while read f; do
-		ip=$(cat $f | jq .ip | sed 's/\"//g')
-		block=$(cat $f | jq .blockchain | sed 's/\"//g')
-		net=$(cat $f | jq .network | sed 's/\"//g')
-		continent=$(cat $f | jq .geo.continent_code | sed 's/\"//g')
-		country=$(cat $f | jq .geo.country_code | sed 's/\"//g')
-		user_id=$(cat $f | jq .user_id | sed 's/\"//g')
-		token=$(cat $f | jq .token | sed 's/\"//g')
-		status=$(cat $f | jq .status | sed 's/\"//g')
-		approved=$(cat $f | jq .approved | sed 's/\"//g')
-		name=$(basename $f)
-		if [ -n "$block" ]; then
-			mesg="$name $user_id $block $net $ip $continent $country $token $status $approved"
-			echo $mesg >>/tmp/info/$_type/listid
-			echo $mesg >>/tmp/info/$_type/listid-$block-$net
-		fi
-	done
-	rm $info_dir/*
-	mv /tmp/info/$_type/* $info_dir/
+	cat $info_dir/listid-* >$info_dir/listid
+
+	# mkdir -p $info_dir /tmp/info/$_type
+	# rm /tmp/info/$_type/*
+	# find $_dir -type f | while read f; do
+	# 	ip=$(cat $f | jq .ip | sed 's/\"//g')
+	# 	block=$(cat $f | jq .blockchain | sed 's/\"//g')
+	# 	net=$(cat $f | jq .network | sed 's/\"//g')
+	# 	continent=$(cat $f | jq .geo.continent_code | sed 's/\"//g')
+	# 	country=$(cat $f | jq .geo.country_code | sed 's/\"//g')
+	# 	user_id=$(cat $f | jq .user_id | sed 's/\"//g')
+	# 	token=$(cat $f | jq .token | sed 's/\"//g')
+	# 	status=$(cat $f | jq .status | sed 's/\"//g')
+	# 	approved=$(cat $f | jq .approved | sed 's/\"//g')
+	# 	name=$(basename $f)
+	# 	if [ -n "$block" ]; then
+	# 		mesg="$name $user_id $block $net $ip $continent $country $token $status $approved"
+	# 		echo $mesg >>/tmp/info/$_type/listid
+	# 		echo $mesg >>/tmp/info/$_type/listid-$block-$net
+	# 	fi
+	# done
+	# rm $info_dir/*
+	# mv /tmp/info/$_type/* $info_dir/
 
 }
 _update_node_list() {
 	_type=node
-	_dir=$portal_dir/public/deploy/$_type
-	if [ ! -d "$_dir" ]; then return 1; fi
+	# _dir=$portal_dir/public/deploy/$_type
+	# if [ ! -d "$_dir" ]; then return 1; fi
 	info_dir=$portal_dir/public/deploy/info/$_type
-	mkdir -p $info_dir /tmp/info/$_type
-	rm /tmp/info/$_type/*
-	# gwman_data_zones_node=$(mktemp -d)
-	find $_dir -type f | while read f; do
-		ip=$(cat $f | jq .ip | sed 's/\"//g')
-		block=$(cat $f | jq .blockchain | sed 's/\"//g')
-		net=$(cat $f | jq .network | sed 's/\"//g')
-		continent=$(cat $f | jq .geo.continent_code | sed 's/\"//g')
-		country=$(cat $f | jq .geo.country_code | sed 's/\"//g')
-		name=$(basename $f)
-		user_id=$(cat $f | jq .user_id | sed 's/\"//g')
-		token=$(cat $f | jq .token | sed 's/\"//g')
-		status=$(cat $f | jq .status | sed 's/\"//g')
-		approved=$(cat $f | jq .approved | sed 's/\"//g')
-		if [ -n "$block" ]; then
-			mesg="$name $user_id $block $net $ip $continent $country $token $status $approved"
-			echo $mesg >>/tmp/info/$_type/listid
-			echo $mesg >>/tmp/info/$_type/listid-$block-$net
-			# echo "${name}.node.mbr 60 A $ip" >>$gwman_data_zones_node/${block}-${network}.zone
-		fi
-	done
-	rm $info_dir/*
-	# rm -rf $gwman/data/zones/node
-	# mv $gwman_data_zones_node $gwman/data/zones/node
-	mv /tmp/info/$_type/* $info_dir/
+	cat $info_dir/listid-* >$info_dir/listid
+	# mkdir -p $info_dir /tmp/info/$_type
+	# rm /tmp/info/$_type/*
+	# # gwman_data_zones_node=$(mktemp -d)
+	# find $_dir -type f | while read f; do
+	# 	ip=$(cat $f | jq .ip | sed 's/\"//g')
+	# 	block=$(cat $f | jq .blockchain | sed 's/\"//g')
+	# 	net=$(cat $f | jq .network | sed 's/\"//g')
+	# 	continent=$(cat $f | jq .geo.continent_code | sed 's/\"//g')
+	# 	country=$(cat $f | jq .geo.country_code | sed 's/\"//g')
+	# 	name=$(basename $f)
+	# 	user_id=$(cat $f | jq .user_id | sed 's/\"//g')
+	# 	token=$(cat $f | jq .token | sed 's/\"//g')
+	# 	status=$(cat $f | jq .status | sed 's/\"//g')
+	# 	approved=$(cat $f | jq .approved | sed 's/\"//g')
+	# 	if [ -n "$block" ]; then
+	# 		mesg="$name $user_id $block $net $ip $continent $country $token $status $approved"
+	# 		echo $mesg >>/tmp/info/$_type/listid
+	# 		echo $mesg >>/tmp/info/$_type/listid-$block-$net
+	# 		# echo "${name}.node.mbr 60 A $ip" >>$gwman_data_zones_node/${block}-${network}.zone
+	# 	fi
+	# done
+	# rm $info_dir/*
+	# # rm -rf $gwman/data/zones/node
+	# # mv $gwman_data_zones_node $gwman/data/zones/node
+	# mv /tmp/info/$_type/* $info_dir/
 
 }
 _rescan_conf() {
@@ -397,7 +383,6 @@ _update_listid() {
 	_update_dapi_list
 	_update_node_list
 	_update_user_list
-
 }
 _monitor() {
 
