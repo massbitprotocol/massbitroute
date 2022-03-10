@@ -155,10 +155,14 @@ local function _remove_item(instance, args)
     return true
 end
 
+--- Rescan gateway only for specific blockchain and network
+-- using after update gateway
+--
 local function _rescanconf_blockchain_network(_blockchain, _network)
     _print("rescanconf_blockchain_network:" .. _blockchain .. ":" .. _network)
     local _datacenters = {}
     local _actives = {}
+
     local _blocknet_id = _blockchain .. "-" .. _network
 
     local _network_dir = _deploy_dir .. "/" .. _blockchain .. "/" .. _network
@@ -289,6 +293,15 @@ local function _rescanconf_blockchain_network(_blockchain, _network)
 end
 
 local function _rescanconf()
+    for _, _blockchain in ipairs(show_folder(_deploy_dir)) do
+        local _blockchain_dir = _deploy_dir .. "/" .. _blockchain
+        for _, _network in ipairs(show_folder(_blockchain_dir)) do
+            _rescanconf_blockchain_network(_blockchain, _network)
+        end
+    end
+end
+
+local function _rescanconf1()
     -- local _commit_files = {}
 
     local _datacenter_ids_all = {}
@@ -549,6 +562,7 @@ local function _generate_item(instance, args)
 end
 
 --- Job handler for rescan conf
+-- Scan all files and update status
 --
 
 function JobsAction:rescanconfAction(job)
