@@ -5,3 +5,4 @@
 **/tmp
 **/db
 *.pyc
+/data/geoip/GeoIP2-City.mmdb
