@@ -1,6 +1,5 @@
 #!/bin/bash
 auth=massbit:c671e4ea06280e7a3f6f9aea6e8155fcde9bc703
-ipapi_key=e660b739310497215d77e593f4bfe1bc
 _debian() {
 	apt-get update
 	apt-get install -y git apache2-utils supervisor jq python2
@@ -82,7 +81,7 @@ if [ -z "$IP" ]; then
 	exit 1
 fi
 
-zone="$(curl -ssSfL http://api.ipapi.com/api/$IP?access_key=$ipapi_key | jq .continent_code)"
+zone="$(curl -ssSfL '{{portal_url}}/mbr/node/{{id}}/geo?ip=$IP' --header 'Authorization: {{app_key}}' | jq .continent_code)"
 zone=$(echo $zone | sed 's/\"//g')
 if [ -z "$zone" ]; then
 	echo "Cannot detect zone from IP $IP"
@@ -107,8 +106,12 @@ mkdir -p $(dirname $SITE_ROOT)
 
 if [ ! -d "$SITE_ROOT/.git" ]; then
 	rm -rf $SITE_ROOT
-	#git clone -b master http://$auth@git.massbitroute.dev/massbitroute/gateway.git $SITE_ROOT
-	git clone -b dev https://github.com/massbitprotocol/massbitroute_gateway $SITE_ROOT
+	git clone -b master http://$auth@git.massbitroute.dev/massbitroute/gateway.git $SITE_ROOT
+  #if [ -z ${ENV+x} ]; then
+  #  git clone -b ${ENV} https://github.com/massbitprotocol/massbitroute_node $SITE_ROOT
+  #else
+  #  git clone -b master https://github.com/massbitprotocol/massbitroute_node $SITE_ROOT
+  #fi
 fi
 
 cd $SITE_ROOT
