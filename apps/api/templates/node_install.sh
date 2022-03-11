@@ -105,12 +105,12 @@ mkdir -p $(dirname $SITE_ROOT)
 
 if [ ! -d "$SITE_ROOT/.git" ]; then
 	rm -rf $SITE_ROOT
-	git clone -b master http://$auth@git.massbitroute.dev/massbitroute/node.git $SITE_ROOT
-	#if [ -z ${ENV+x} ]; then
-	#  git clone -b ${ENV} https://github.com/massbitprotocol/massbitroute_node $SITE_ROOT
-	#else
-	#  git clone -b master https://github.com/massbitprotocol/massbitroute_node $SITE_ROOT
-	#fi
+	#git clone -b master http://$auth@git.massbitroute.dev/massbitroute/node.git $SITE_ROOT
+	if [ -z ${ENV+x} ]; then
+	  git clone -b ${ENV} https://github.com/massbitprotocol/massbitroute_node $SITE_ROOT
+	else
+	  git clone -b master https://github.com/massbitprotocol/massbitroute_node $SITE_ROOT
+	fi
 fi
 
 cd $SITE_ROOT
