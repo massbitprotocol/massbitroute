@@ -26,7 +26,7 @@ redirect_stderr=true
 stdout_logfile=_SITE_ROOT_/logs/monitor_client.log
 
 [program:portal_homepage_prod]
-command=/bin/bash _SITE_ROOT_/scripts/mbr_app.sh.sh _start_prod
+command=/bin/bash _SITE_ROOT_/scripts/mbr_app.sh _start_prod
 autorestart=true
 redirect_stderr=true
 stdout_logfile=_SITE_ROOT_/logs/portal_homepage_prod.log
