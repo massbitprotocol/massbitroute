@@ -1,4 +1,5 @@
 #!/bin/bash
+api_portal_url="https://dev.user.massbit.io"
 auth=massbit:c671e4ea06280e7a3f6f9aea6e8155fcde9bc703
 ipapi_key=e660b739310497215d77e593f4bfe1bc
 _debian() {
@@ -81,7 +82,7 @@ if [ -z "$IP" ]; then
 	exit 1
 fi
 
-zone="$(curl -ssSfL http://api.ipapi.com/api/$IP?access_key=$ipapi_key | jq .continent_code)"
+zone="$(curl -ssSfL '$api_portal_url/mbr/node/{{id}}/geo?ip=$IP' --header 'Authorization: {{app_key}}' | jq .continent_code)"
 zone=$(echo $zone | sed 's/\"//g')
 if [ -z "$zone" ]; then
 	echo "Cannot detect zone from IP $IP"
@@ -124,6 +125,7 @@ rm -f $SITE_ROOT/http.d/* $SITE_ROOT/vars/*
 ./mbr node set TOKEN {{token}}
 ./mbr node set BLOCKCHAIN {{blockchain}}
 ./mbr node set NETWORK {{network}}
+./mbr node set APP_KEY {{app_key}}
 ./mbr node set SITE_ROOT "$SITE_ROOT"
 
 ./mbr node register
