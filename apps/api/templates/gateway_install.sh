@@ -68,6 +68,7 @@ fi
 # 	;;
 # esac
 
+ENV={{env}}
 IP="$(curl -ssSfL https://dapi.massbit.io/myip)"
 
 n=$(grep -o "\." <<<"$IP" | wc -l)
@@ -121,13 +122,23 @@ $SITE_ROOT/scripts/run _install
 
 rm -f $SITE_ROOT/http.d/* $SITE_ROOT/vars/*
 
+#create environment variables
+if [ "x$ENV" == xdev ]; then
+./mbr gw set DOMAIN massbitroute.dev
+else
+./mbr gw set DOMAIN massbitroute.com
+fi
+
 ./mbr gw set USER_ID {{user_id}}
 ./mbr gw set ID {{id}}
 ./mbr gw set IP $IP
 ./mbr gw set TOKEN {{token}}
 ./mbr gw set BLOCKCHAIN {{blockchain}}
 ./mbr gw set NETWORK {{network}}
+./mbr gw set APP_KEY {{app_key}}
+./mbr gw set MBRAPI {{portal_url}}
 ./mbr gw set SITE_ROOT "$SITE_ROOT"
+
 
 ./mbr gw register
 

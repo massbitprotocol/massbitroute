@@ -66,6 +66,7 @@ fi
 # 	exit 0
 # 	;;
 # esac
+
 ENV={{env}}
 IP="$(curl -ssSfL https://dapi.massbit.io/myip)"
 
@@ -119,6 +120,13 @@ $SITE_ROOT/scripts/run _install
 
 rm -f $SITE_ROOT/http.d/* $SITE_ROOT/vars/*
 
+#create environment variables
+if [ "x$ENV" == xdev ]; then
+./mbr gw set DOMAIN massbitroute.dev
+else
+./mbr gw set DOMAIN massbitroute.com
+fi
+
 #bash init.sh
 ./mbr node set DATA_URI {*data_url*}
 ./mbr node set USER_ID {{user_id}}
@@ -128,6 +136,7 @@ rm -f $SITE_ROOT/http.d/* $SITE_ROOT/vars/*
 ./mbr node set BLOCKCHAIN {{blockchain}}
 ./mbr node set NETWORK {{network}}
 ./mbr node set APP_KEY {{app_key}}
+./mbr node set MBRAPI {{portal_url}}
 ./mbr node set SITE_ROOT "$SITE_ROOT"
 
 ./mbr node register
