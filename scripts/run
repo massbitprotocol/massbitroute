@@ -299,10 +299,10 @@ _update_node_list() {
 _rescan_conf() {
 	svr=$1
 	if [ -n "$svr" ]; then
-		curl -k -H 'Content-Type: application/json' -H 'Host: dapi.massbit.io' "https://127.0.0.1/_internal_api/v1?action=${svr}.calljob" -d "{\"job\":\"${svr}.rescanconf\"}"
+		curl -k -H 'Content-Type: application/json' -H 'Host: dapi.${DOMAIN}' "https://127.0.0.1/_internal_api/v1?action=${svr}.calljob" -d "{\"job\":\"${svr}.rescanconf\"}"
 	else
 		for svr1 in node gateway; do
-			curl -k -H 'Content-Type: application/json' -H 'Host: dapi.massbit.io' "https://127.0.0.1/_internal_api/v1?action=${svr1}.calljob" -d "{\"job\":\"${svr1}.rescanconf\"}"
+			curl -k -H 'Content-Type: application/json' -H 'Host: dapi.${DOMAIN}' "https://127.0.0.1/_internal_api/v1?action=${svr1}.calljob" -d "{\"job\":\"${svr1}.rescanconf\"}"
 		done
 	fi
 
@@ -327,7 +327,6 @@ _monitor() {
 			reload=1
 		fi
 	done
-
 	if [ $reload -eq 1 ]; then
 		$0 _reload
 	fi
@@ -346,6 +345,7 @@ loop() {
 _run() {
 	rm -rf $SITE_ROOT/tmp/*
 	sleep 3
+  sed "s/_SERVER_NAME_/$DOMAIN/g" ssl.conf > tmp/ssl.conf
 	$SITE_ROOT/start_server
 }
 $@
