@@ -262,12 +262,25 @@ _update_user_list() {
 _update_gateway_list() {
 	_type=gateway
 	info_dir=$portal_dir/public/deploy/info/$_type
-	cat $info_dir/listid-* >$info_dir/listid
+	tmp=$(mktemp)
+	find $info_dir -type f -iname 'listid-*' | while read f;do
+	    cat $f >> $tmp
+	    echo >> $tmp
+	done
+	mv $tmp $info_dir/listid
+
 }
 _update_node_list() {
 	_type=node
 	info_dir=$portal_dir/public/deploy/info/$_type
-	cat $info_dir/listid-* >$info_dir/listid
+		tmp=$(mktemp)
+	find $info_dir -type f -iname 'listid-*' | while read f;do
+	    cat $f >> $tmp
+	    echo >> $tmp
+	done
+	mv $tmp $info_dir/listid
+	
+
 }
 _rescan_conf() {
 	svr=$1
@@ -282,9 +295,9 @@ _rescan_conf() {
 }
 _update_listid() {
 	_update_gateway_list
-	_update_dapi_list
+	# _update_dapi_list
 	_update_node_list
-	_update_user_list
+	# _update_user_list
 }
 _monitor() {
 
