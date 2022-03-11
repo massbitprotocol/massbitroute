@@ -342,7 +342,16 @@ local function _rescanconf_blockchain_network(_blockchain, _network)
     end
 end
 
-local function _update_gdnsd(instance, args)
+local function _rescanconf()
+    for _, _blockchain in ipairs(show_folder(_deploy_dir)) do
+        local _blockchain_dir = _deploy_dir .. "/" .. _blockchain
+        for _, _network in ipairs(show_folder(_blockchain_dir)) do
+            _rescanconf_blockchain_network(_blockchain, _network)
+        end
+    end
+end
+
+local function _rescanconf1(instance, args)
     -- local _portal_commit_files = {}
     -- local _dns_commit_files = {}
 
@@ -538,9 +547,9 @@ function JobsAction:generateconfAction(job)
 end
 
 function JobsAction:rescanconfAction(job)
-    local instance = self:getInstance()
-    local job_data = job.data
-    _update_gdnsd(instance, job_data)
+    -- local instance = self:getInstance()
+    -- local job_data = job.data
+    _rescanconf()
 end
 
 function JobsAction:removeconfAction(job)
