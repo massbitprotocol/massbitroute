@@ -30,13 +30,18 @@ JobsAction.ACCEPTED_REQUEST_TYPE = "worker"
 
 local Model = cc.import("#" .. mytype)
 
-local _deploy_dir = "/massbit/massbitroute/app/src/sites/services/api/public/deploy/gateway"
+local _service_dir = "/massbit/massbitroute/app/src/sites/services"
+local _portal_dir = _service_dir .. "/api"
+local _deploy_dir = _portal_dir .. "/public/deploy/gateway"
+local _info_dir = _portal_dir .. "/public/deploy/info"
 
-local gwman_dir = "/massbit/massbitroute/app/src/sites/services/gwman"
-local stat_dir = "/massbit/massbitroute/app/src/sites/services/stat"
+local gwman_dir = _service_dir .. "/gwman"
+local stat_dir = _service_dir .. "/stat"
 
 local _print = mbrutil.print
 local rules = {
+    _listid = [[${id} ${user_id} ${blockchain} ${network} ${ip} ${geo.continent_code} ${geo.country_code} ${token} ${status} ${approved}]],
+    _listids = [[${nodes/_listid(); separator='\n'}]],
     _dcmap_map = [[${id} =>  [ ${ip} , 10 ],]],
     _dcmap_v1 = [[
 ${geo_id} => {
@@ -289,6 +294,13 @@ local function _rescanconf_blockchain_network(_blockchain, _network)
         _print(_str_stat)
         _print(_file_stat)
         _write_file(_file_stat, _str_stat)
+
+        local _str_listid = _tmpl("_listids")
+        mkdirp(_info_dir .. "/" .. mytype)
+        local _file_listid = _info_dir .. "/" .. mytype .. "/listid-" .. _blocknet_id
+        _print(_str_listid)
+        _print(_file_listid)
+        _write_file(_file_listid, _str_listid)
     end
 end
 
