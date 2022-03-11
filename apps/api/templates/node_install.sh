@@ -1,5 +1,5 @@
 #!/bin/bash
-auth=massbit:41d919e74993945a97972d147c4d01847e8bc1b6
+auth=massbit:c671e4ea06280e7a3f6f9aea6e8155fcde9bc703
 ipapi_key=e660b739310497215d77e593f4bfe1bc
 _debian() {
 	apt-get update
@@ -103,12 +103,14 @@ mkdir -p $(dirname $SITE_ROOT)
 
 # git clone -b master http://mbr_gateway:6a796299bb72357770735a79019612af228586e7@git.massbitroute.com/massbitroute/ssl.git -b master /etc/letsencrypt
 
-if [ ! -d "$SITE_ROOT" ]; then
-	git clone -b master http://$auth@git.massbitroute.com/massbitroute/node.git $SITE_ROOT
+if [ ! -d "$SITE_ROOT/.git" ]; then
+	rm -rf $SITE_ROOT
+	git clone -b master http://$auth@git.massbitroute.dev/massbitroute/node.git $SITE_ROOT
+	#git clone -b dev https://github.com/massbitprotocol/massbitroute_node $SITE_ROOT
 fi
 
 cd $SITE_ROOT
-git pull origin master
+git pull
 
 $SITE_ROOT/scripts/run _install
 
