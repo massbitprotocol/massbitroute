@@ -30,13 +30,18 @@ JobsAction.ACCEPTED_REQUEST_TYPE = "worker"
 
 local Model = cc.import("#" .. mytype)
 
-local _deploy_dir = "/massbit/massbitroute/app/src/sites/services/api/public/deploy/gateway"
+local _service_dir = "/massbit/massbitroute/app/src/sites/services"
+local _portal_dir = _service_dir .. "/api"
+local _deploy_dir = _portal_dir .. "/public/deploy/gateway"
+local _info_dir = _portal_dir .. "/public/deploy/info"
 
-local gwman_dir = "/massbit/massbitroute/app/src/sites/services/gwman"
-local stat_dir = "/massbit/massbitroute/app/src/sites/services/stat"
+local gwman_dir = _service_dir .. "/gwman"
+local stat_dir = _service_dir .. "/stat"
 
 local _print = mbrutil.print
 local rules = {
+    _listid = [[${id} ${user_id} ${blockchain} ${network} ${ip} ${geo.continent_code} ${geo.country_code} ${token} ${status} ${approved}]],
+    _listids = [[${nodes/_listid(); separator='\n'}]],
     _dcmap_map = [[${id} =>  [ ${ip} , 10 ],]],
     _dcmap_v1 = [[
 ${geo_id} => {
@@ -162,6 +167,7 @@ local function _rescanconf_blockchain_network(_blockchain, _network)
     _print("rescanconf_blockchain_network:" .. _blockchain .. ":" .. _network)
     local _datacenters = {}
     local _actives = {}
+    local _approved = {}
 
     local _blocknet_id = _blockchain .. "-" .. _network
 
@@ -197,6 +203,7 @@ local function _rescanconf_blockchain_network(_blockchain, _network)
                             _item._is_enabled = true
                             _actives[#_actives + 1] = _item
                             if _item.approved and tonumber(_item.approved) == 1 then
+                                _approved[#_approved + 1] = _item
                                 _item._is_approved = true
 
                                 _datacenters["geo"] = _datacenters["geo"] or {}
@@ -273,6 +280,16 @@ local function _rescanconf_blockchain_network(_blockchain, _network)
         _write_file(_file_dapi, "*." .. _blocknet_id .. " 60/60 DYNA	geoip!mbr-map-" .. _blocknet_id .. "\n")
     end
 
+    if _approved and #_approved > 0 then
+        local _tmpl = _get_tmpl(rules, {nodes = _approved})
+        local _str_stat = _tmpl("_gw_stat_v1")
+        mkdirp(stat_dir .. "/etc/prometheus/stat_gw")
+        local _file_stat = stat_dir .. "/etc/prometheus/stat_gw/" .. _blocknet_id .. ".yml"
+        _print(_str_stat)
+        _print(_file_stat)
+        _write_file(_file_stat, _str_stat)
+    end
+
     if _actives and #_actives > 0 then
         -- _print(_actives, true)
         local _tmpl = _get_tmpl(rules, {nodes = _actives})
@@ -283,12 +300,19 @@ local function _rescanconf_blockchain_network(_blockchain, _network)
         _write_file(_file, _str)
 
         -- local _tmpl = _get_tmpl(rules, {nodes = _datacenter_ids_all})
-        local _str_stat = _tmpl("_gw_stat_v1")
-        mkdirp(stat_dir .. "/etc/prometheus/stat_gw")
-        local _file_stat = stat_dir .. "/etc/prometheus/stat_gw/" .. _blocknet_id .. ".yml"
-        _print(_str_stat)
-        _print(_file_stat)
-        _write_file(_file_stat, _str_stat)
+        -- local _str_stat = _tmpl("_gw_stat_v1")
+        -- mkdirp(stat_dir .. "/etc/prometheus/stat_gw")
+        -- local _file_stat = stat_dir .. "/etc/prometheus/stat_gw/" .. _blocknet_id .. ".yml"
+        -- _print(_str_stat)
+        -- _print(_file_stat)
+        -- _write_file(_file_stat, _str_stat)
+
+        local _str_listid = _tmpl("_listids")
+        mkdirp(_info_dir .. "/" .. mytype)
+        local _file_listid = _info_dir .. "/" .. mytype .. "/listid-" .. _blocknet_id
+        _print(_str_listid)
+        _print(_file_listid)
+        _write_file(_file_listid, _str_listid)
     end
 end
 
