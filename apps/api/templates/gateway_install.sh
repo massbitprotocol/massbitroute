@@ -124,10 +124,14 @@ rm -f $SITE_ROOT/http.d/* $SITE_ROOT/vars/*
 
 #create environment variables
 if [ "x$ENV" == xdev ]; then
-./mbr gw set DOMAIN massbitroute.dev
+if [ "x$ENV" == xdev ]; then
+./mbr node set DOMAIN massbitroute.dev
+./mbr node set MBRAPI dapi.massbitroute.dev
 else
-./mbr gw set DOMAIN massbitroute.com
+./mbr node set DOMAIN massbitroute.com
+./mbr node set MBRAPI dapi.massbit.io
 fi
+
 
 ./mbr gw set USER_ID {{user_id}}
 ./mbr gw set ID {{id}}
@@ -136,7 +140,6 @@ fi
 ./mbr gw set BLOCKCHAIN {{blockchain}}
 ./mbr gw set NETWORK {{network}}
 ./mbr gw set APP_KEY {{app_key}}
-./mbr gw set MBRAPI {{portal_url}}
 ./mbr gw set SITE_ROOT "$SITE_ROOT"
 
 
