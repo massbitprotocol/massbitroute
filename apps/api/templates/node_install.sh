@@ -81,7 +81,7 @@ if [ -z "$IP" ]; then
 	exit 1
 fi
 
-zone="$(curl -ssSfL '{{portal_url}}/mbr/node/{{id}}/geo?ip=$IP' --header 'Authorization: {{app_key}}' | jq .continent_code)"
+zone="$(curl -ssSfL '{*portal_url*}/mbr/node/{{id}}/geo?ip=$IP' --header 'Authorization: {{app_key}}' | jq .continent_code)"
 zone=$(echo $zone | sed 's/\"//g')
 if [ -z "$zone" ]; then
 	echo "Cannot detect zone from IP $IP"
@@ -106,7 +106,7 @@ mkdir -p $(dirname $SITE_ROOT)
 if [ ! -d "$SITE_ROOT/.git" ]; then
 	rm -rf $SITE_ROOT
 	#git clone -b master http://$auth@git.massbitroute.dev/massbitroute/node.git $SITE_ROOT
-	if [ -z ${ENV+x} ]; then
+	if [ "x$ENV" == xdev ]; then
 	  git clone -b ${ENV} https://github.com/massbitprotocol/massbitroute_node $SITE_ROOT
 	else
 	  git clone -b master https://github.com/massbitprotocol/massbitroute_node $SITE_ROOT
@@ -115,10 +115,6 @@ fi
 
 cd $SITE_ROOT
 git pull
-
-$SITE_ROOT/scripts/run _install
-
-rm -f $SITE_ROOT/http.d/* $SITE_ROOT/vars/*
 
 #create environment variables
 if [ "x$ENV" == xdev ]; then
@@ -139,6 +135,10 @@ fi
 ./mbr node set NETWORK {{network}}
 ./mbr node set APP_KEY {{app_key}}
 ./mbr node set SITE_ROOT "$SITE_ROOT"
+
+$SITE_ROOT/scripts/run _install
+
+rm -f $SITE_ROOT/http.d/* $SITE_ROOT/vars/*
 
 ./mbr node register
 

@@ -82,7 +82,7 @@ if [ -z "$IP" ]; then
 	exit 1
 fi
 
-zone="$(curl -ssSfL '{{portal_url}}/mbr/node/{{id}}/geo?ip=$IP' --header 'Authorization: {{app_key}}' | jq .continent_code)"
+zone="$(curl -ssSfL '{*portal_url*}/mbr/node/{{id}}/geo?ip=$IP' --header 'Authorization: {{app_key}}' | jq .continent_code)"
 zone=$(echo $zone | sed 's/\"//g')
 if [ -z "$zone" ]; then
 	echo "Cannot detect zone from IP $IP"
@@ -108,28 +108,23 @@ mkdir -p $(dirname $SITE_ROOT)
 if [ ! -d "$SITE_ROOT/.git" ]; then
 	rm -rf $SITE_ROOT
 	#git clone -b master http://$auth@git.massbitroute.dev/massbitroute/gateway.git $SITE_ROOT
-  if [ -z ${ENV+x} ]; then
-    git clone -b ${ENV} https://github.com/massbitprotocol/massbitroute_node $SITE_ROOT
+  if [ "x$ENV" == xdev ]; then
+    git clone -b ${ENV} https://github.com/massbitprotocol/massbitroute_gateway $SITE_ROOT
   else
-    git clone -b master https://github.com/massbitprotocol/massbitroute_node $SITE_ROOT
+    git clone -b master https://github.com/massbitprotocol/massbitroute_gateway $SITE_ROOT
   fi
 fi
 
 cd $SITE_ROOT
 git pull
 
-$SITE_ROOT/scripts/run _install
-
-rm -f $SITE_ROOT/http.d/* $SITE_ROOT/vars/*
-
 #create environment variables
 if [ "x$ENV" == xdev ]; then
-if [ "x$ENV" == xdev ]; then
-./mbr node set DOMAIN massbitroute.dev
-./mbr node set MBRAPI dapi.massbitroute.dev
+./mbr gw set DOMAIN massbitroute.dev
+./mbr gw set MBRAPI dapi.massbitroute.dev
 else
-./mbr node set DOMAIN massbitroute.com
-./mbr node set MBRAPI dapi.massbit.io
+./mbr gw set DOMAIN massbitroute.com
+./mbr gw set MBRAPI dapi.massbit.io
 fi
 
 
@@ -142,6 +137,9 @@ fi
 ./mbr gw set APP_KEY {{app_key}}
 ./mbr gw set SITE_ROOT "$SITE_ROOT"
 
+$SITE_ROOT/scripts/run _install
+
+rm -f $SITE_ROOT/http.d/* $SITE_ROOT/vars/*
 
 ./mbr gw register
 
