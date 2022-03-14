@@ -82,7 +82,7 @@ if [ -z "$IP" ]; then
 	exit 1
 fi
 
-zone="$(curl -ssSfL '{*portal_url*}/mbr/node/{{id}}/geo?ip=$IP' --header 'Authorization: {{app_key}}' | jq .continent_code)"
+zone=$(curl -ssSfL "{*portal_url*}/mbr/node/{{id}}/geo?ip=$IP" --header 'Authorization: {{app_key}}' | jq .continent_code)
 zone=$(echo $zone | sed 's/\"//g')
 if [ -z "$zone" ]; then
 	echo "Cannot detect zone from IP $IP"
@@ -117,6 +117,7 @@ fi
 
 cd $SITE_ROOT
 git pull
+rm -f $SITE_ROOT/vars/*
 
 #create environment variables
 if [ "x$ENV" == xdev ]; then
@@ -127,7 +128,7 @@ else
 ./mbr gw set MBRAPI dapi.massbit.io
 fi
 
-
+./mbr node set PORTAL_URL {*portal_url*}
 ./mbr gw set USER_ID {{user_id}}
 ./mbr gw set ID {{id}}
 ./mbr gw set IP $IP
@@ -139,7 +140,7 @@ fi
 
 $SITE_ROOT/scripts/run _install
 
-rm -f $SITE_ROOT/http.d/* $SITE_ROOT/vars/*
+rm -f $SITE_ROOT/http.d/*
 
 ./mbr gw register
 
