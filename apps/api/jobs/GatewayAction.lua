@@ -85,7 +85,7 @@ ${datacenters/_datacenter(); separator=',\n'}
 ]],
     _gw_zone = [[${id}.gw.mbr 60 A ${ip}]],
     _gw_zones = [[${nodes/_gw_zone(); separator='\n'}]],
-    _gw_stat_target = [[          - ${id}.gw.mbr.massbitroute.com]],
+    _gw_stat_target = [[          - ${id}.gw.mbr.${server_name}]],
     _gw_stat_v1 = [[${nodes/_gw_stat_target(); separator='\n'}]],
     _gw_stat = [[
 scrape_configs:
@@ -163,7 +163,7 @@ end
 --- Rescan gateway only for specific blockchain and network
 -- using after update gateway
 --
-local function _rescanconf_blockchain_network(_blockchain, _network)
+local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
     _print("rescanconf_blockchain_network:" .. _blockchain .. ":" .. _network)
     local _datacenters = {}
     local _actives = {}
@@ -189,6 +189,7 @@ local function _rescanconf_blockchain_network(_blockchain, _network)
                         if type(_item) == "string" then
                             _item = json.decode(_item)
                         end
+                        _item.server_name = _job_data.server_name
                         -- local _ip = _item.ip
                         -- print("ip:" .. inspect(_ip))
                         local _obj = {
@@ -309,15 +310,15 @@ local function _rescanconf_blockchain_network(_blockchain, _network)
     end
 end
 
-local function _rescanconf()
+local function _rescanconf(_job_data)
     for _, _blockchain in ipairs(show_folder(_deploy_dir)) do
         local _blockchain_dir = _deploy_dir .. "/" .. _blockchain
         for _, _network in ipairs(show_folder(_blockchain_dir)) do
-            _rescanconf_blockchain_network(_blockchain, _network)
+            _rescanconf_blockchain_network(_blockchain, _network, _job_data)
         end
     end
 end
-
+--[[
 local function _rescanconf1()
     -- local _commit_files = {}
 
@@ -532,7 +533,7 @@ local function _rescanconf1()
     print(_file_stat)
     _write_file(_file_stat, _str_stat)
 end
-
+]]
 --- Generate gateway conf
 --
 local function _generate_item(instance, args)
@@ -540,7 +541,7 @@ local function _generate_item(instance, args)
 
     -- query db for detail
     local _item = _norm(model:get(args))
-
+    _print("stored item: " .. inspect(_item))
     if
         not _item or not _item.id or not _item.ip or not _item.blockchain or not _item.network or not _item.geo or
             not _item.geo.continent_code or
@@ -574,7 +575,7 @@ local function _generate_item(instance, args)
     -- dump detail
     _write_file(_deploy_file, json.encode(_item))
 
-    _rescanconf_blockchain_network(_item.blockchain, _item.network)
+    _rescanconf_blockchain_network(_item.blockchain, _item.network, args)
     return true
 end
 
@@ -584,8 +585,10 @@ end
 
 function JobsAction:rescanconfAction(job)
     -- local instance = self:getInstance()
-    -- local job_data = job.data
-    _rescanconf()
+    local config = self:getInstanceConfig();
+    local job_data = job.data
+    job_data.server_name = config.server.nginx.server_name
+    _rescanconf(job_data)
 end
 
 --- Job handler for generate conf
@@ -595,7 +598,9 @@ function JobsAction:generateconfAction(job)
     print(inspect(job))
 
     local instance = self:getInstance()
+    local config = self:getInstanceConfig();
     local job_data = job.data
+    job_data.server_name = config.server.nginx.server_name
     _generate_item(instance, job_data)
 end
 

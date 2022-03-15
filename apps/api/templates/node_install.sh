@@ -120,10 +120,10 @@ rm -f $SITE_ROOT/vars/*
 #create environment variables
 if [ "x$ENV" == xdev ]; then
 ./mbr node set DOMAIN massbitroute.dev
-./mbr node set MBRAPI dapi.massbitroute.dev
+./mbr node set MBRAPI https://dapi.massbitroute.dev
 else
 ./mbr node set DOMAIN massbitroute.com
-./mbr node set MBRAPI dapi.massbit.io
+./mbr node set MBRAPI https://dapi.massbit.io
 fi
 
 #bash init.sh

@@ -22,8 +22,7 @@ function Gateway:create(args)
 
     args.status = 0
     -- args.id = uuid()
-    args.id = util.get_uuid(_now)
-
+    args.id = args.id or util.get_uuid(_now)
     args.created_at = _now
 
     self._model:_save_key(user_id .. ":" .. model_type, {[args.id] = json.encode(args)})

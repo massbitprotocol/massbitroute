@@ -358,7 +358,7 @@ end
 function Action:createAction(args)
     ngx.log(ngx.ERR, inspect(args))
     args.action = nil
-    args.id = nil
+    -- args.id = nil
 
     local instance = self:getInstance()
     local _res = _authorize_whitelist(self, args)

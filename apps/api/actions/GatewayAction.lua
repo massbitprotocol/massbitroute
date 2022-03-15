@@ -211,19 +211,19 @@ function Action:unregisterAction(args)
         return {result = false, err_msg = "Token missing"}
     end
     local instance = self:getInstance()
-
+    local id = args.id
     local user_id = args.user_id
     if not user_id then
         return {result = false, err_msg = "User ID missing"}
     end
-
+    --[[
     local token = set_var.set_decode_base32(_token)
     local id = set_var.set_decrypt_session(token)
 
     if not id or id ~= args.id then
         return {result = false, err_msg = "Token not correct"}
     end
-
+    ]]
     local _data = {
         id = id,
         user_id = user_id,
@@ -249,7 +249,7 @@ end
 
 function Action:createAction(args)
     args.action = nil
-    args.id = nil
+    -- args.id = nil
 
     local instance = self:getInstance()
     local _res = _authorize_whitelist(self, args)
