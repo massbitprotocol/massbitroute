@@ -45,7 +45,7 @@ local rules = {
     _listids = [[${nodes/_listid(); separator='\n'}]],
     _node_zone = [[${id}.node.mbr 60 A ${ip}]],
     _node_zones = [[${nodes/_node_zone(); separator='\n'}]],
-    _node_stat_target = [[          - ${id}.node.mbr.massbitroute.com]],
+    _node_stat_target = [[          - ${id}.node.mbr.${server_name}]],
     _node_stat_v1 = [[${nodes/_node_stat_target(); separator='\n'}]],
     _node_stat = [[
 scrape_configs:
@@ -79,7 +79,7 @@ ${_is_enabled?_gw_node()}
 ${_is_approved?_gw_node_upstream()}
 ]],
     _gw_node_upstreams = [[
-upstream ${node_type}.node.mbr.massbitroute.com {
+upstream ${node_type}.node.mbr.${server_name} {
 ${nodes/_gw_node_upstream_approved()}
 }
 ]],
@@ -90,7 +90,7 @@ server {
         proxy_redirect off;
         proxy_ssl_server_name on;
         proxy_set_header X-Api-Key ${token};
-        proxy_set_header Host ${id}.node.mbr.massbitroute.com;
+        proxy_set_header Host ${id}.node.mbr.${server_name};
         add_header X-Mbr-GNode-Id ${id};
         proxy_pass https://${ip};
         proxy_http_version 1.1;
@@ -116,12 +116,12 @@ map $http_x_api_key $api_realm {
 server {
     listen 80;
     listen 443 ssl;
-    ssl_certificate  /massbit/massbitroute/app/src/sites/services/node/ssl/node.mbr.massbitroute.com/fullchain.pem;
-    ssl_certificate_key  /massbit/massbitroute/app/src/sites/services/node/ssl/node.mbr.massbitroute.com/privkey.pem;
+    ssl_certificate  /massbit/massbitroute/app/src/sites/services/node/ssl/node.mbr.${server_name}/fullchain.pem;
+    ssl_certificate_key  /massbit/massbitroute/app/src/sites/services/node/ssl/node.mbr.${server_name}/privkey.pem;
     resolver 8.8.4.4 ipv6=off;
     client_body_buffer_size 512K;
     client_max_body_size 1G;
-    server_name ${id}.node.mbr.massbitroute.com;
+    server_name ${id}.node.mbr.${server_name};
   
 
     set $api_method '';
@@ -184,7 +184,7 @@ server {
 ]],
     _upstream_server = [[server unix:/tmp/${id}.sock max_fails=1 fail_timeout=3s;]],
     _upstream = [[
-upstream eth-mainnet.node.mbr.massbitroute.com {
+upstream eth-mainnet.node.mbr.${_domain} {
 ${_upstream_server}
 }
 ]],
@@ -201,7 +201,7 @@ server {
         proxy_redirect off;
         proxy_ssl_server_name on;
         proxy_set_header X-Api-Key ${token};
-        proxy_set_header Host ${id}.node.mbr.massbitroute.com;
+        proxy_set_header Host ${id}.node.mbr.${_domain};
         proxy_pass https://${ip};
         proxy_http_version 1.1;
         proxy_ssl_verify off;
@@ -273,7 +273,7 @@ local function _remove_item(instance, args)
     return true
 end
 
-local function _rescanconf_blockchain_network(_blockchain, _network)
+local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
     local _datacenters = {}
     local _actives = {}
     local _approved = {}
@@ -299,7 +299,7 @@ local function _rescanconf_blockchain_network(_blockchain, _network)
                                         if type(_item) == "string" then
                                             _item = json.decode(_item)
                                         end
-
+                                        _item.server_name = _job_data.server_name
                                         if tonumber(_item.status) == 1 then
                                             _item._is_enabled = true
                                             _actives[#_actives + 1] = _item
@@ -323,7 +323,7 @@ local function _rescanconf_blockchain_network(_blockchain, _network)
     _print("datacenters:" .. inspect(_datacenters))
     if _datacenters and #_datacenters > 0 then
         -- _print("actives:" .. inspect(_actives))
-        local _tmpl = _get_tmpl(rules, {node_type = _blocknet_id, nodes = _datacenters})
+        local _tmpl = _get_tmpl(rules, {node_type = _blocknet_id, nodes = _datacenters, server_name = _job_data.server_name})
         local _str_tmpl = _tmpl("_gw_conf")
         _print(_str_tmpl)
         local _file_gw = _deploy_gatewayconfdir .. "/" .. _blocknet_id .. ".conf"
@@ -332,7 +332,7 @@ local function _rescanconf_blockchain_network(_blockchain, _network)
     end
 
     if _approved and #_approved > 0 then
-        local _tmpl = _get_tmpl(rules, {nodes = _approved})
+        local _tmpl = _get_tmpl(rules, {nodes = _approved, server_name = _job_data.server_name})
         local _str_stat = _tmpl("_node_stat_v1")
 
         mkdirp(_stat_dir .. "/etc/prometheus/stat_node/")
@@ -343,7 +343,7 @@ local function _rescanconf_blockchain_network(_blockchain, _network)
     end
 
     if _actives and #_actives > 0 then
-        local _tmpl = _get_tmpl(rules, {nodes = _actives})
+        local _tmpl = _get_tmpl(rules, {nodes = _actives, server_name = _job_data.server_name})
         local _str = _tmpl("_node_zones")
         local _file = _gwman_dir .. "/data/zones/" .. mytype .. "/" .. _blocknet_id .. ".zone"
         _print(_str)
@@ -359,15 +359,15 @@ local function _rescanconf_blockchain_network(_blockchain, _network)
     end
 end
 
-local function _rescanconf()
+local function _rescanconf(_job_data)
     for _, _blockchain in ipairs(show_folder(_deploy_dir)) do
         local _blockchain_dir = _deploy_dir .. "/" .. _blockchain
         for _, _network in ipairs(show_folder(_blockchain_dir)) do
-            _rescanconf_blockchain_network(_blockchain, _network)
+            _rescanconf_blockchain_network(_blockchain, _network, _job_data)
         end
     end
 end
-
+--[[
 local function _rescanconf1(instance, args)
     -- local _portal_commit_files = {}
     -- local _dns_commit_files = {}
@@ -485,15 +485,14 @@ local function _rescanconf1(instance, args)
     -- _print(inspect(_dns_commit_files))
     -- _git_push(_gwman_dir, _dns_commit_files)
 end
-
+]]
 local function _generate_item(instance, args)
     _print("generate_item:" .. inspect(args))
     local model = Model:new(instance)
     local _item1 = model:get(args)
-    -- _print(inspect(_item1))
+    _print("stored item: " .. inspect(_item1))
     local _item = _norm(_item1)
 
-    -- _print(inspect(_item))
     if
         not _item or not _item.id or not _item.ip or not _item.blockchain or not _item.network or not _item.geo or
             not _item.geo.continent_code or
@@ -534,7 +533,7 @@ local function _generate_item(instance, args)
     -- keep create dir blockchain/network
     local _deploy_file1 = _deploy_dir .. "/" .. _k2 .. "/.gitkeep"
     _write_file(_deploy_file1, "")
-
+    _item.server_name = args.server_name
     local _tmpl = _get_tmpl(rules, _item)
     local _str_tmpl = _tmpl("_local")
 
@@ -557,23 +556,31 @@ function JobsAction:generateconfAction(job)
     _print("generateconf:" .. inspect(job))
 
     local instance = self:getInstance()
+    local _config = self:getInstanceConfig()
 
-    local job_data = job.data
+    local job_data = job.data or {}
+    job_data.server_name = _config.app.server.nginx.server_name or "massbitroute.com"
+    _print("job_data: " .. inspect(job_data))
     _generate_item(instance, job_data)
     -- _update_gdnsd(job_data)
-end
+    end
 
 function JobsAction:rescanconfAction(job)
     -- local instance = self:getInstance()
-    -- local job_data = job.data
-    _rescanconf()
+    local _config = self:getInstanceConfig()
+
+    local job_data = job.data or {}
+    job_data.server_name = _config.app.server.nginx.server_name or "massbitroute.com"
+    _rescanconf(job_data)
 end
 
 function JobsAction:removeconfAction(job)
     _print("removeconf:" .. inspect(job))
 
     local instance = self:getInstance()
-    local job_data = job.data
+    local _config = self:getInstanceConfig()
+    local job_data = job.data or {}
+    job_data.server_name = _config.app.server.nginx.server_name or "massbitroute.com"
     _remove_item(instance, job_data)
     -- _update_gdnsd(job_data)
 end
