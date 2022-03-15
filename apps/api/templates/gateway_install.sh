@@ -69,7 +69,7 @@ fi
 # esac
 
 ENV={{env}}
-IP="$(curl -ssSfL https://dapi.massbit.io/myip)"
+IP="$(curl -ssSfL http://ipv4.icanhazip.com)"
 
 n=$(grep -o "\." <<<"$IP" | wc -l)
 if [ $n -ne 3 ]; then
@@ -108,10 +108,10 @@ mkdir -p $(dirname $SITE_ROOT)
 if [ ! -d "$SITE_ROOT/.git" ]; then
 	rm -rf $SITE_ROOT
 	#git clone -b master http://$auth@git.massbitroute.dev/massbitroute/gateway.git $SITE_ROOT
-  if [ "x$ENV" == xdev ]; then
-    git clone -b ${ENV} https://github.com/massbitprotocol/massbitroute_gateway $SITE_ROOT
-  else
+  if [ "x$ENV" == "x" ]; then
     git clone -b master https://github.com/massbitprotocol/massbitroute_gateway $SITE_ROOT
+  else
+    git clone -b ${ENV} https://github.com/massbitprotocol/massbitroute_gateway $SITE_ROOT
   fi
 fi
 
@@ -120,14 +120,7 @@ git pull
 rm -f $SITE_ROOT/vars/*
 
 #create environment variables
-if [ "x$ENV" == xdev ]; then
-./mbr gw set DOMAIN massbitroute.dev
-./mbr gw set MBRAPI https://dapi.massbitroute.dev
-else
-./mbr gw set DOMAIN massbitroute.com
-./mbr gw set MBRAPI https://dapi.massbit.io
-fi
-
+./mbr node set ENV {{env}}
 ./mbr node set PORTAL_URL {*portal_url*}
 ./mbr gw set USER_ID {{user_id}}
 ./mbr gw set ID {{id}}

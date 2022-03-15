@@ -67,9 +67,8 @@ fi
 # 	;;
 # esac
 
-ENV={{env}}
-IP="$(curl -ssSfL https://dapi.massbit.io/myip)"
 
+IP="$(curl -ssSfL http://ipv4.icanhazip.com)"
 n=$(grep -o "\." <<<"$IP" | wc -l)
 if [ $n -ne 3 ]; then
 	echo "Your IP is unknown"
@@ -100,16 +99,15 @@ fi
 
 SITE_ROOT=/massbit/massbitroute/app/src/sites/services/node
 mkdir -p $(dirname $SITE_ROOT)
-
+ENV={{env}}
 # git clone -b master http://mbr_gateway:6a796299bb72357770735a79019612af228586e7@git.massbitroute.com/massbitroute/ssl.git -b master /etc/letsencrypt
-
 if [ ! -d "$SITE_ROOT/.git" ]; then
 	rm -rf $SITE_ROOT
 	#git clone -b master http://$auth@git.massbitroute.dev/massbitroute/node.git $SITE_ROOT
-	if [ "x$ENV" == xdev ]; then
-	  git clone -b ${ENV} https://github.com/massbitprotocol/massbitroute_node $SITE_ROOT
-	else
+	if [ "x$ENV" == "x" ]; then
 	  git clone -b master https://github.com/massbitprotocol/massbitroute_node $SITE_ROOT
+	else
+	  git clone -b ${ENV} https://github.com/massbitprotocol/massbitroute_node $SITE_ROOT
 	fi
 fi
 
@@ -118,13 +116,7 @@ git pull
 rm -f $SITE_ROOT/vars/*
 
 #create environment variables
-if [ "x$ENV" == xdev ]; then
-./mbr node set DOMAIN massbitroute.dev
-./mbr node set MBRAPI https://dapi.massbitroute.dev
-else
-./mbr node set DOMAIN massbitroute.com
-./mbr node set MBRAPI https://dapi.massbit.io
-fi
+./mbr node set ENV {{env}}
 
 #bash init.sh
 ./mbr node set PORTAL_URL {*portal_url*}
