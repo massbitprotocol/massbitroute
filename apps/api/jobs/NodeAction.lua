@@ -276,6 +276,7 @@ end
 local function _rescanconf_blockchain_network(_blockchain, _network)
     local _datacenters = {}
     local _actives = {}
+    local _approved = {}
     local _blocknet_id = _blockchain .. "-" .. _network
     local _network_dir = _deploy_dir .. "/" .. _blockchain .. "/" .. _network
     for _, _continent in ipairs(show_folder(_network_dir)) do
@@ -303,6 +304,7 @@ local function _rescanconf_blockchain_network(_blockchain, _network)
                                             _item._is_enabled = true
                                             _actives[#_actives + 1] = _item
                                             if _item.approved and tonumber(_item.approved) == 1 then
+                                                _approved[#_approved + 1] = _item
                                                 _item._is_approved = true
                                                 table.insert(_datacenters, _item)
                                             end
@@ -329,6 +331,17 @@ local function _rescanconf_blockchain_network(_blockchain, _network)
         _write_file(_file_gw, _str_tmpl)
     end
 
+    if _approved and #_approved > 0 then
+        local _tmpl = _get_tmpl(rules, {nodes = _approved})
+        local _str_stat = _tmpl("_node_stat_v1")
+
+        mkdirp(_stat_dir .. "/etc/prometheus/stat_node/")
+        local _file_stat = _stat_dir .. "/etc/prometheus/stat_node/" .. _blocknet_id .. ".yml"
+        _print(_str_stat)
+        _print(_file_stat)
+        _write_file(_file_stat, _str_stat)
+    end
+
     if _actives and #_actives > 0 then
         local _tmpl = _get_tmpl(rules, {nodes = _actives})
         local _str = _tmpl("_node_zones")
@@ -337,14 +350,6 @@ local function _rescanconf_blockchain_network(_blockchain, _network)
         _print(_file)
         _write_file(_file, _str)
         -- local _tmpl = _get_tmpl(rules, {nodes = _actives})
-        local _str_stat = _tmpl("_node_stat_v1")
-
-        mkdirp(_stat_dir .. "/etc/prometheus/stat_node/")
-        local _file_stat = _stat_dir .. "/etc/prometheus/stat_node/" .. _blocknet_id .. ".yml"
-        _print(_str_stat)
-        _print(_file_stat)
-        _write_file(_file_stat, _str_stat)
-
         local _str_listid = _tmpl("_listids")
         mkdirp(_info_dir .. "/" .. mytype)
         local _file_listid = _info_dir .. "/" .. mytype .. "/listid-" .. _blocknet_id
