@@ -300,13 +300,6 @@ local function _rescanconf_blockchain_network(_blockchain, _network)
         _write_file(_file, _str)
 
         -- local _tmpl = _get_tmpl(rules, {nodes = _datacenter_ids_all})
-        -- local _str_stat = _tmpl("_gw_stat_v1")
-        -- mkdirp(stat_dir .. "/etc/prometheus/stat_gw")
-        -- local _file_stat = stat_dir .. "/etc/prometheus/stat_gw/" .. _blocknet_id .. ".yml"
-        -- _print(_str_stat)
-        -- _print(_file_stat)
-        -- _write_file(_file_stat, _str_stat)
-
         local _str_listid = _tmpl("_listids")
         mkdirp(_info_dir .. "/" .. mytype)
         local _file_listid = _info_dir .. "/" .. mytype .. "/listid-" .. _blocknet_id
