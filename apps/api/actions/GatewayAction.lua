@@ -160,6 +160,7 @@ function Action:registerAction(args)
     local instance = self:getInstance()
     local _config = self:getInstanceConfig()
     -- _print("config:" .. inspect(_config))
+    local id = args.id
     local user_id = args.user_id
     if not user_id then
         return {result = false, err_msg = "User ID missing"}
