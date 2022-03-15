@@ -199,15 +199,18 @@ function Action:registerAction(args)
     if not user_id then
         return {result = false, err_msg = "User ID missing"}
     end
-
-    local token = set_var.set_decode_base32(_token)
-    local id = set_var.set_decrypt_session(token)
+    --[[
+      --22 March 15
+      --Trust token from portal backend
+      local token = set_var.set_decode_base32(_token)
+      local id = set_var.set_decrypt_session(token)
 
     _print("id:" .. id)
 
     if not id or id ~= args.id then
         return {result = false, err_msg = "Token not correct"}
     end
+    ]]
     local ip = ngx.var.realip
 
     _print("ip:" .. ip)
@@ -230,12 +233,12 @@ function Action:registerAction(args)
         data_url = data_url
     }
     _print(_data, true)
-    local _geo = _get_geo(ip, _config)
+    --local _geo = _get_geo(ip, _config)
 
-    _print("geo:" .. inspect(_geo))
+    _print("geo:" .. inspect(args.geo))
 
-    if _geo then
-        _data.geo = _geo
+    if args.geo then
+        _data.geo = args.geo
     end
 
     local model = Model:new(instance)
