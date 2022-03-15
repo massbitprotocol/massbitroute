@@ -1,6 +1,5 @@
 #!/bin/bash
-auth=massbit:41d919e74993945a97972d147c4d01847e8bc1b6
-ipapi_key=e660b739310497215d77e593f4bfe1bc
+auth=massbit:c671e4ea06280e7a3f6f9aea6e8155fcde9bc703
 _debian() {
 	apt-get update
 	apt-get install -y git apache2-utils supervisor jq python2
@@ -69,6 +68,7 @@ fi
 # 	;;
 # esac
 
+ENV={{env}}
 IP="$(curl -ssSfL https://dapi.massbit.io/myip)"
 
 n=$(grep -o "\." <<<"$IP" | wc -l)
@@ -82,7 +82,7 @@ if [ -z "$IP" ]; then
 	exit 1
 fi
 
-zone="$(curl -ssSfL http://api.ipapi.com/api/$IP?access_key=$ipapi_key | jq .continent_code)"
+zone=$(curl -ssSfL "{*portal_url*}/mbr/node/{{id}}/geo?ip=$IP" --header 'Authorization: {{app_key}}' | jq .continent_code)
 zone=$(echo $zone | sed 's/\"//g')
 if [ -z "$zone" ]; then
 	echo "Cannot detect zone from IP $IP"
@@ -107,23 +107,40 @@ mkdir -p $(dirname $SITE_ROOT)
 
 if [ ! -d "$SITE_ROOT/.git" ]; then
 	rm -rf $SITE_ROOT
-	git clone -b master http://$auth@git.massbitroute.com/massbitroute/gateway.git $SITE_ROOT
+	#git clone -b master http://$auth@git.massbitroute.dev/massbitroute/gateway.git $SITE_ROOT
+  if [ "x$ENV" == xdev ]; then
+    git clone -b ${ENV} https://github.com/massbitprotocol/massbitroute_gateway $SITE_ROOT
+  else
+    git clone -b master https://github.com/massbitprotocol/massbitroute_gateway $SITE_ROOT
+  fi
 fi
 
 cd $SITE_ROOT
-git pull origin master
+git pull
+rm -f $SITE_ROOT/vars/*
 
-$SITE_ROOT/scripts/run _install
+#create environment variables
+if [ "x$ENV" == xdev ]; then
+./mbr gw set DOMAIN massbitroute.dev
+./mbr gw set MBRAPI dapi.massbitroute.dev
+else
+./mbr gw set DOMAIN massbitroute.com
+./mbr gw set MBRAPI dapi.massbit.io
+fi
 
-rm -f $SITE_ROOT/http.d/* $SITE_ROOT/vars/*
-
+./mbr node set PORTAL_URL {*portal_url*}
 ./mbr gw set USER_ID {{user_id}}
 ./mbr gw set ID {{id}}
 ./mbr gw set IP $IP
 ./mbr gw set TOKEN {{token}}
 ./mbr gw set BLOCKCHAIN {{blockchain}}
 ./mbr gw set NETWORK {{network}}
+./mbr gw set APP_KEY {{app_key}}
 ./mbr gw set SITE_ROOT "$SITE_ROOT"
+
+$SITE_ROOT/scripts/run _install
+
+rm -f $SITE_ROOT/http.d/*
 
 ./mbr gw register
 

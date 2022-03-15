@@ -1,5 +1,7 @@
-export MBR_API=
-export GIT_DOMAIN=
+export DOMAIN=massbitroute.dev
+export MBR_API=http://api.$DOMAIN
+export PRIVATE_GIT_DOMAIN=git.$DOMAIN
+export PUBLIC_GIT_DOMAIN=github.com
 export GIT_AUTH_MAIL=
 export GIT_AUTH_NAME=
 export GIT_READ=
