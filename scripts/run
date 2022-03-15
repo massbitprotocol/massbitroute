@@ -71,16 +71,16 @@ _install() {
 	git -C /etc/letsencrypt remote set-url origin http://$GIT_READ@$PRIVATE_GIT_DOMAIN/massbitroute/${service}.git
 
 	service=mkagent
-	git clone http://$GIT_READ@$PRIVATE_GIT_DOMAIN/massbitroute/${service}.git $SITE_ROOT/etc/$service
+	git clone http://$PUBLIC_GIT_DOMAIN/massbitroute/massbitroute_${service}.git $SITE_ROOT/etc/$service
 
-	git -C $SITE_ROOT/etc/$service remote set-url origin http://$GIT_READ@$PRIVATE_GIT_DOMAIN/massbitroute/${service}.git
+	git -C $SITE_ROOT/etc/$service remote set-url origin http://$GIT_READ@$PRIVATE_GIT_DOMAIN/massbitroute/massbitroute_${service}.git
 
-	service=node
-	git clone https://$PUBLIC_GIT_DOMAIN/massbitprotocol/massbitroute_${service} $service_dir/$service
+	# service=node
+	# git clone https://$PUBLIC_GIT_DOMAIN/massbitprotocol/massbitroute_${service} $service_dir/$service
 
-	service=gateway
-	git clone https://$PUBLIC_GIT_DOMAIN/massbitprotocol/massbitroute_${service} $service_dir/$service
-	git -C $service_dir/$service remote set-url origin http://$PUBLIC_GIT_DOMAIN/massbitprotocol/massbitroute_${service}
+	# service=gateway
+	# git clone https://$PUBLIC_GIT_DOMAIN/massbitprotocol/massbitroute_${service} $service_dir/$service
+	# git -C $service_dir/$service remote set-url origin http://$PUBLIC_GIT_DOMAIN/massbitprotocol/massbitroute_${service}
 
 	service=gwman
 	git clone http://$GIT_GWMAN_WRITE@$PRIVATE_GIT_DOMAIN/massbitroute/${service}.git $service_dir/$service
