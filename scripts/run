@@ -49,54 +49,68 @@ _install() {
 	mkdir -p /massbit/massbitroute/app $service_dir $SITE_ROOT/etc $SITE_ROOT/logs
 
 	service=gbc
-	git clone http://$GIT_READ@$GIT_DOMAIN/massbitroute/${service}.git /massbit/massbitroute/app/$service
-	git -C /massbit/massbitroute/app/$service remote set-url origin http://$user:$pass@$GIT_DOMAIN/massbitroute/${service}.git
+	servicedir=/massbit/massbitroute/app/$service
+	if [ -d "$servicedir" ]; then
+	  rm -rf "$servicedir"
+	  #git -C /massbit/massbitroute/app/$service remote set-url origin http://$GIT_READ@$PRIVATE_GIT_DOMAIN/massbitroute/${service}.git
+	  #git -C /massbit/massbitroute/app/$service pull
+	fi
+  git clone http://$GIT_READ@$PRIVATE_GIT_DOMAIN/massbitroute/${service}.git $servicedir
 
 	service=asdf
-	git clone http://$GIT_READ@$GIT_DOMAIN/massbitroute/${service}.git /massbit/massbitroute/app/gbc/bin/.asdf
-	git -C /massbit/massbitroute/app/gbc/bin/.asdf remote set-url origin http://$user:$pass@$GIT_DOMAIN/massbitroute/${service}.git
+	servicedir=/massbit/massbitroute/app/gbc/bin/.asdf
+	if [ -d "$servicedir" ]; then
+	  rm -rf $servicedir
+	  #git -C /massbit/massbitroute/app/gbc/bin/.asdf remote set-url origin http://$GIT_READ@$PRIVATE_GIT_DOMAIN/massbitroute/${service}.git
+	  #git -C /massbit/massbitroute/app/gbc/bin/.asdf pull
+	fi
+	git clone http://$GIT_READ@$PRIVATE_GIT_DOMAIN/massbitroute/${service}.git $servicedir
 
 	service=ssl
-	git clone http://$GIT_READ@$GIT_DOMAIN/massbitroute/${service}.git /etc/letsencrypt
-	git -C /etc/letsencrypt remote set-url origin http://$user:$pass@$GIT_DOMAIN/massbitroute/${service}.git
+	git clone http://$GIT_READ@$PRIVATE_GIT_DOMAIN/massbitroute/${service}.git /etc/letsencrypt
+	git -C /etc/letsencrypt remote set-url origin http://$GIT_READ@$PRIVATE_GIT_DOMAIN/massbitroute/${service}.git
 
 	service=mkagent
-	git clone http://$GIT_READ@$GIT_DOMAIN/massbitroute/${service}.git $SITE_ROOT/etc/$service
+	git clone http://$PUBLIC_GIT_DOMAIN/massbitroute/massbitroute_${service}.git $SITE_ROOT/etc/$service
 
-	git -C $SITE_ROOT/etc/$service remote set-url origin http://$user:$pass@$GIT_DOMAIN/massbitroute/${service}.git
+	git -C $SITE_ROOT/etc/$service remote set-url origin http://$GIT_READ@$PRIVATE_GIT_DOMAIN/massbitroute/massbitroute_${service}.git
 
-	service=node
-	git clone http://$GIT_NODE_WRITE@$GIT_DOMAIN/massbitroute/${service}.git $service_dir/$service
+	# service=node
+	# git clone https://$PUBLIC_GIT_DOMAIN/massbitprotocol/massbitroute_${service} $service_dir/$service
 
-	service=gateway
-	git clone http://$GIT_GATEWAY_WRITE@$GIT_DOMAIN/massbitroute/${service}.git $service_dir/$service
-	git -C $service_dir/$service remote set-url origin http://$user:$pass@$GIT_DOMAIN/massbitroute/${service}.git
+	# service=gateway
+	# git clone https://$PUBLIC_GIT_DOMAIN/massbitprotocol/massbitroute_${service} $service_dir/$service
+	# git -C $service_dir/$service remote set-url origin http://$PUBLIC_GIT_DOMAIN/massbitprotocol/massbitroute_${service}
 
 	service=gwman
-	git clone http://$GIT_GWMAN_WRITE@$GIT_DOMAIN/massbitroute/${service}.git $service_dir/$service
-	git -C $service_dir/$service remote set-url origin http://$user:$pass@$GIT_DOMAIN/massbitroute/${service}.git
+	git clone http://$GIT_GWMAN_WRITE@$PRIVATE_GIT_DOMAIN/massbitroute/${service}.git $service_dir/$service
+	git -C $service_dir/$service remote set-url origin http://$GIT_GWMAN_WRITE@$PRIVATE_GIT_DOMAIN/massbitroute/${service}.git
 
 	service=stat
-	git clone http://$GIT_STAT_WRITE@$GIT_DOMAIN/massbitroute/${service}.git $service_dir/$service
-	git -C $service_dir/$service remote set-url origin http://$user:$pass@$GIT_DOMAIN/massbitroute/${service}.git
+	git clone http://$GIT_STAT_WRITE@$PRIVATE_GIT_DOMAIN/massbitroute/${service}.git $service_dir/$service
+	git -C $service_dir/$service remote set-url origin http://$GIT_STAT_WRITE@$PRIVATE_GIT_DOMAIN/massbitroute/${service}.git
 
 	service=monitor
-	git clone http://$GIT_MONITOR_WRITE@$GIT_DOMAIN/massbitroute/${service}.git $service_dir/$service
-	git -C $service_dir/$service remote set-url origin http://$user:$pass@$GIT_DOMAIN/massbitroute/${service}.git
+	git clone http://$GIT_MONITOR_WRITE@$PRIVATE_GIT_DOMAIN/massbitroute/${service}.git $service_dir/$service
+	git -C $service_dir/$service remote set-url origin http://$GIT_MONITOR_WRITE@$PRIVATE_GIT_DOMAIN/massbitroute/${service}.git
 
 	# done
 
 	service=$type
 	gitdir=$service_dir/$service
-	giturl=http://$GIT_API_WRITE@$GIT_DOMAIN/massbitroute/${service}.git
-	git clone $giturl $gitdir
-	git -C $gitdir remote set-url origin $giturl
-
-	git clone https://github.com/massbitprotocol/mbr-app.git $service_dir/$service/public/mbr-app-prod
+	giturl=https://$PUBLIC_GIT_DOMAIN/massbitprotocol/massbitroute
+	if [ -d "$gitdir" ]; then
+	  git -C $gitdir remote set-url origin $giturl
+	  git -C $gitdir pull
+	else
+	  git clone $giturl $gitdir
+	fi
+  tar -xf $gitdir/data/geoip/GeoIP2-City.mmdb.tar.xz -C $gitdir/data/geoip/
+	git clone https://$PUBLIC_GIT_DOMAIN/massbitprotocol/mbr-app.git $service_dir/$service/public/mbr-app-prod
 
 	service=apideploy
 	gitdir=$service_dir/api/public/deploy
-	giturl=http://$GIT_APIDEPLOY_WRITE@$GIT_DOMAIN/massbitroute/${service}.git
+	giturl=http://$GIT_APIDEPLOY_WRITE@$PRIVATE_GIT_DOMAIN/massbitroute/${service}.git
 	git clone $giturl $gitdir
 	git -C $gitdir remote set-url origin $giturl
 
@@ -287,10 +301,10 @@ _update_node_list() {
 _rescan_conf() {
 	svr=$1
 	if [ -n "$svr" ]; then
-		curl -k -H 'Content-Type: application/json' -H 'Host: dapi.massbit.io' "https://127.0.0.1/_internal_api/v1?action=${svr}.calljob" -d "{\"job\":\"${svr}.rescanconf\"}"
+		curl -k -H 'Content-Type: application/json' -H 'Host: dapi.${DOMAIN}' "https://127.0.0.1/_internal_api/v1?action=${svr}.calljob" -d "{\"job\":\"${svr}.rescanconf\"}"
 	else
 		for svr1 in node gateway; do
-			curl -k -H 'Content-Type: application/json' -H 'Host: dapi.massbit.io' "https://127.0.0.1/_internal_api/v1?action=${svr1}.calljob" -d "{\"job\":\"${svr1}.rescanconf\"}"
+			curl -k -H 'Content-Type: application/json' -H 'Host: dapi.${DOMAIN}' "https://127.0.0.1/_internal_api/v1?action=${svr1}.calljob" -d "{\"job\":\"${svr1}.rescanconf\"}"
 		done
 	fi
 
@@ -315,7 +329,6 @@ _monitor() {
 			reload=1
 		fi
 	done
-
 	if [ $reload -eq 1 ]; then
 		$0 _reload
 	fi
@@ -334,6 +347,7 @@ loop() {
 _run() {
 	rm -rf $SITE_ROOT/tmp/*
 	sleep 3
+  sed "s/_SERVER_NAME_/$DOMAIN/g" ssl.conf > tmp/ssl.conf
 	$SITE_ROOT/start_server
 }
 $@

@@ -1,6 +1,5 @@
 #!/bin/bash
-auth=massbit:41d919e74993945a97972d147c4d01847e8bc1b6
-ipapi_key=e660b739310497215d77e593f4bfe1bc
+auth=massbit:c671e4ea06280e7a3f6f9aea6e8155fcde9bc703
 _debian() {
 	apt-get update
 	apt-get install -y git apache2-utils supervisor jq python2
@@ -68,6 +67,7 @@ fi
 # 	;;
 # esac
 
+ENV={{env}}
 IP="$(curl -ssSfL https://dapi.massbit.io/myip)"
 
 n=$(grep -o "\." <<<"$IP" | wc -l)
@@ -81,7 +81,7 @@ if [ -z "$IP" ]; then
 	exit 1
 fi
 
-zone="$(curl -ssSfL http://api.ipapi.com/api/$IP?access_key=$ipapi_key | jq .continent_code)"
+zone=$(curl -ssSfL "{*portal_url*}/mbr/node/{{id}}/geo?ip=$IP" --header 'Authorization: {{app_key}}' | jq .continent_code)
 zone=$(echo $zone | sed 's/\"//g')
 if [ -z "$zone" ]; then
 	echo "Cannot detect zone from IP $IP"
@@ -103,18 +103,31 @@ mkdir -p $(dirname $SITE_ROOT)
 
 # git clone -b master http://mbr_gateway:6a796299bb72357770735a79019612af228586e7@git.massbitroute.com/massbitroute/ssl.git -b master /etc/letsencrypt
 
-if [ ! -d "$SITE_ROOT" ]; then
-	git clone -b master http://$auth@git.massbitroute.com/massbitroute/node.git $SITE_ROOT
+if [ ! -d "$SITE_ROOT/.git" ]; then
+	rm -rf $SITE_ROOT
+	#git clone -b master http://$auth@git.massbitroute.dev/massbitroute/node.git $SITE_ROOT
+	if [ "x$ENV" == xdev ]; then
+	  git clone -b ${ENV} https://github.com/massbitprotocol/massbitroute_node $SITE_ROOT
+	else
+	  git clone -b master https://github.com/massbitprotocol/massbitroute_node $SITE_ROOT
+	fi
 fi
 
 cd $SITE_ROOT
-git pull origin master
+git pull
+rm -f $SITE_ROOT/vars/*
 
-$SITE_ROOT/scripts/run _install
-
-rm -f $SITE_ROOT/http.d/* $SITE_ROOT/vars/*
+#create environment variables
+if [ "x$ENV" == xdev ]; then
+./mbr node set DOMAIN massbitroute.dev
+./mbr node set MBRAPI dapi.massbitroute.dev
+else
+./mbr node set DOMAIN massbitroute.com
+./mbr node set MBRAPI dapi.massbit.io
+fi
 
 #bash init.sh
+./mbr node set PORTAL_URL {*portal_url*}
 ./mbr node set DATA_URI {*data_url*}
 ./mbr node set USER_ID {{user_id}}
 ./mbr node set ID {{id}}
@@ -122,7 +135,12 @@ rm -f $SITE_ROOT/http.d/* $SITE_ROOT/vars/*
 ./mbr node set TOKEN {{token}}
 ./mbr node set BLOCKCHAIN {{blockchain}}
 ./mbr node set NETWORK {{network}}
+./mbr node set APP_KEY {{app_key}}
 ./mbr node set SITE_ROOT "$SITE_ROOT"
+
+$SITE_ROOT/scripts/run _install
+
+rm -f $SITE_ROOT/http.d/*
 
 ./mbr node register
 

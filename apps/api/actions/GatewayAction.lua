@@ -131,12 +131,13 @@ function Action:pingAction(args)
     if not user_id then
         return {result = false, err_msg = "User ID missing"}
     end
-
+    --[[
     local token = set_var.set_decode_base32(_token)
     local id = set_var.set_decrypt_session(token)
     if not id or id ~= args.id then
         return {result = false, err_msg = "Token not correct"}
     end
+    ]]
     local _data = {
         id = id,
         user_id = user_id
@@ -163,13 +164,14 @@ function Action:registerAction(args)
     if not user_id then
         return {result = false, err_msg = "User ID missing"}
     end
-
+    --[[
     local token = set_var.set_decode_base32(_token)
     local id = set_var.set_decrypt_session(token)
 
     if not id or id ~= args.id then
         return {result = false, err_msg = "Token not correct"}
     end
+    ]]
     local ip = ngx.var.realip
 
     local _data = {
@@ -181,9 +183,9 @@ function Action:registerAction(args)
         status = 0
     }
 
-    local _geo = _get_geo(ip, _config)
-    if _geo then
-        _data.geo = _geo
+    --local _geo = _get_geo(ip, _config)
+    if args.geo then
+        _data.geo = args.geo
     end
 
     local model = Model:new(instance)
