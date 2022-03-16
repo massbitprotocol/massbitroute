@@ -281,6 +281,90 @@ function Action:updateAction(args)
     return _result
 end
 
+function Action:updatemultiAction(args)
+    _print(inspect(args))
+    local _ids
+
+    if not args.ids then
+        return {
+            result = false,
+            err_msg = "params 'ids' missing"
+        }
+    else
+        _ids = json.decode(args.ids)
+    end
+    if not _ids then
+        return {
+            result = false,
+            err_msg = "params 'ids' invalid"
+        }
+    end
+
+    args.action = nil
+    args.id = nil
+    args.ids = nil
+    local instance = self:getInstance()
+    local _res = _authorize_whitelist(self, args)
+    _print("_authorize_whitelist:" .. inspect(_res))
+    local user_id
+    if _res then
+        user_id = args.user_id
+    else
+        local _session = _opensession(instance, args)
+
+        if not _session then
+            return {result = false, err_code = ERROR.NOT_LOGIN}
+        end
+        user_id = _session:get("id")
+        if user_id then
+            args.user_id = user_id
+        end
+    end
+
+    local model = Model:new(instance)
+    for _, _id in ipairs(_ids) do
+        local _arg = table.merge({id = _id}, args)
+        model:update(_arg)
+    end
+
+    -- local _result = {result = true}
+    -- if not _detail then
+    --     _result = {
+    --         result = false,
+    --         err_msg = _err_msg
+    --     }
+    -- end
+    local _ok, _err
+    if tonumber(args.status) == 0 then
+        local jobs = instance:getJobs()
+        local job = {
+            action = "/jobs/" .. mytype .. ".removemulticonf",
+            delay = 1,
+            data = {
+                _is_delete = false,
+                ids = _ids,
+                user_id = user_id
+            }
+        }
+        _ok, _err = jobs:add(job)
+    else
+        local jobs = instance:getJobs()
+        local job = {
+            action = "/jobs/" .. mytype .. ".generatemulticonf",
+            delay = 1,
+            data = {
+                ids = _ids,
+                user_id = user_id
+            }
+        }
+        _ok, _err = jobs:add(job)
+    end
+
+    _print({ok = _ok, err = _err}, true)
+    instance:getRedis():setKeepAlive()
+    return {result = true}
+end
+
 function Action:deleteAction(args)
     if not args.id then
         return {
