@@ -26,7 +26,8 @@ _build_prod() {
 	export PORT=3001
 	export API_BASE_URL=https://$type.$DOMAIN
 	export API_CORE_URL=http://api.$DOMAIN
-	export API_USER_URL=https://dev.user.massbit.io
+	export API_USER_URL=https://portal.massbitroute.dev
+  export API_PORTAL_URL=https://portal.massbitroute.dev
 	export GATEWAY_INSTALL_URL=https://$type.$DOMAIN/api/v1/gateway_install
 	export NODE_INSTALL_URL=https://$type.$DOMAIN/api/v1/node_install
 	#git submodule update --init --remote mbr-app
@@ -48,7 +49,8 @@ _start_prod() {
 	export PORT=3001
 	export API_BASE_URL=https://$type.$DOMAIN
 	export API_CORE_URL=http://api.$DOMAIN
-  export API_USER_URL=https://dev.user.massbit.io
+  export API_USER_URL=https://portal.massbitroute.dev
+  export API_PORTAL_URL=https://portal.massbitroute.dev  
 	export GATEWAY_INSTALL_URL=https://$type.$DOMAIN/api/v1/gateway_install
 	export NODE_INSTALL_URL=https://$type.$DOMAIN/api/v1/node_install
 	rsync -avz assets dist/
