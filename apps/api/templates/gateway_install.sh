@@ -82,7 +82,7 @@ if [ -z "$IP" ]; then
 	exit 1
 fi
 
-zone=$(curl -ssSfL "{*portal_url*}/mbr/node/{{id}}/geo?ip=$IP" --header 'Authorization: {{app_key}}' | jq .continent_code)
+zone=$(curl -ssSfL "{*portal_url*}/mbr/gateway/{{id}}/geo?ip=$IP" --header 'Authorization: {{app_key}}' | jq .continent_code)
 zone=$(echo $zone | sed 's/\"//g')
 if [ -z "$zone" ]; then
 	echo "Cannot detect zone from IP $IP"
