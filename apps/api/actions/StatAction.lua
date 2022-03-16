@@ -246,9 +246,10 @@ function Action:overviewAction(args)
     }
 end
 
-local function _stat_get(_proxy_id, _req_body, _field)
+local function _stat_get(_proxy_id, _req_body, _field, _server_name)
+
     local _url =
-        "https://stat.mbr.massbitroute.com/__internal_grafana/api/datasources/proxy/" .. _proxy_id .. "/api/v1/series"
+        "https://stat.mbr." .. _server_name .. "/__internal_grafana/api/datasources/proxy/" .. _proxy_id .. "/api/v1/series"
     local _res, _err =
         httpc:request_uri(
         _url,
@@ -282,7 +283,9 @@ local function _stat_get(_proxy_id, _req_body, _field)
 end
 
 function Action:getinstanceAction(args)
-    local _instances = _stat_get(1, "match[]=nginx_vts_server_bytes_total", "instance")
+    local _config = self:getInstanceConfig()
+    local _server_name = _config.app.server_name or "massbitroute.com"
+    local _instances = _stat_get(1, "match[]=nginx_vts_server_bytes_total", "instance", _server_name)
     _instances =
         table.concat(
         _instances -- ), --     end --         return _v:gsub("%.", "\\\\.") --     function(_v) --     _instances, -- table.map(

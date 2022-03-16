@@ -24,6 +24,7 @@ local v = require "validation"
 local schema_create =
     v.is_table {
     sid = v.optional(v.is_string()),
+    app_key = v.optional(v.is_string()),
     user_id = v.optional(v.is_string()),
     partner_id = v.optional(v.is_string()),
     name = v.is_string(),
@@ -100,8 +101,9 @@ end
 function Action:createAction(args)
     _print(inspect(args))
     args.action = nil
-    args.id = nil
-
+    --args.id = nil
+    local _config = self:getInstanceConfig()
+    args.server_name = _config.app.server_name or "massbitroute.com"
     local _valid, _err = schema_create(args)
     _print("validator:" .. inspect(_valid))
     _print("err:" .. inspect(_err))

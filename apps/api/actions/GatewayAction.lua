@@ -288,6 +288,7 @@ function Action:createAction(args)
 end
 
 function Action:nodeverifyAction(args)
+    local _config = self:getInstanceConfig()
     _print(args, true)
     local ip = args.ip
     local _id = args.id
@@ -306,7 +307,7 @@ function Action:nodeverifyAction(args)
         {
             method = "GET",
             headers = {
-                ["Host"] = "gw.mbr.massbitroute.com"
+                ["Host"] = "gw.mbr." .. _config.app.server_name
             },
             ssl_verify = false
         }
