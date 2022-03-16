@@ -173,7 +173,7 @@ function Action:registerAction(args)
         return {result = false, err_msg = "Token not correct"}
     end
     ]]
-    local ip = ngx.var.realip
+    local ip = args.geo and args.geo.ip or ngx.var.realip
 
     local _data = {
         approved = 0,
