@@ -559,7 +559,7 @@ function JobsAction:generateconfAction(job)
     local _config = self:getInstanceConfig()
 
     local job_data = job.data or {}
-    job_data.server_name = _config.app.server.nginx.server_name or "massbitroute.com"
+    job_data.server_name = _config.app.server_name or "massbitroute.com"
     _print("job_data: " .. inspect(job_data))
     _generate_item(instance, job_data)
     -- _update_gdnsd(job_data)
@@ -570,7 +570,7 @@ function JobsAction:rescanconfAction(job)
     local _config = self:getInstanceConfig()
 
     local job_data = job.data or {}
-    job_data.server_name = _config.app.server.nginx.server_name or "massbitroute.com"
+    job_data.server_name = _config.app.server_name or "massbitroute.com"
     _rescanconf(job_data)
 end
 
@@ -580,7 +580,7 @@ function JobsAction:removeconfAction(job)
     local instance = self:getInstance()
     local _config = self:getInstanceConfig()
     local job_data = job.data or {}
-    job_data.server_name = _config.app.server.nginx.server_name or "massbitroute.com"
+    job_data.server_name = _config.app.server_name or "massbitroute.com"
     _remove_item(instance, job_data)
     -- _update_gdnsd(job_data)
 end

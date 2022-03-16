@@ -585,9 +585,9 @@ end
 
 function JobsAction:rescanconfAction(job)
     -- local instance = self:getInstance()
-    local config = self:getInstanceConfig();
+    local _config = self:getInstanceConfig();
     local job_data = job.data
-    job_data.server_name = config.server.nginx.server_name
+    job_data.server_name = _config.app.server_name
     _rescanconf(job_data)
 end
 
@@ -598,9 +598,9 @@ function JobsAction:generateconfAction(job)
     print(inspect(job))
 
     local instance = self:getInstance()
-    local config = self:getInstanceConfig();
+    local _config = self:getInstanceConfig();
     local job_data = job.data
-    job_data.server_name = config.server.nginx.server_name
+    job_data.server_name = _config.app.server_name
     _generate_item(instance, job_data)
 end
 
