@@ -548,7 +548,7 @@ local function _generate_item(instance, args)
     -- }
     -- _print("files:" .. inspect(_files))
     -- _git_push(_deploy_dir, _files)
-    _rescanconf_blockchain_network(_item.blockchain, _item.network)
+    _rescanconf_blockchain_network(_item.blockchain, _item.network, args)
     return true
 end
 

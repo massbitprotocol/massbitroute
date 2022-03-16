@@ -19,13 +19,13 @@ function User:create(args)
     local _now = ngx and ngx.time() or os.time()
     -- uuid.seed(_now)
     -- args.id = uuid()
-    args.id = util.get_uuid(_now)
-    args.api_key = args.id
+    args.id = args.id or util.get_uuid(_now)
+    args.api_key = args.app_key or args.id
     -- args.api_key = uuid()
     args.status = 1
     args.api_id = util.random_string(12)
     if args.blockchain and args.network then
-        args.gateway_domain = args.api_id .. "." .. args.blockchain .. "-" .. args.network .. ".massbitroute.com"
+        args.gateway_domain = args.api_id .. "." .. args.blockchain .. "-" .. args.network .. "." .. args.server_name
         args.gateway_url = args.gateway_domain .. "/" .. args.api_key .. "/"
         args.gateway_http = "https://" .. args.gateway_url
         args.gateway_wss = "wss://" .. args.gateway_url
