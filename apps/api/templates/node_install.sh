@@ -1,5 +1,6 @@
 #!/bin/bash
 auth=massbit:c671e4ea06280e7a3f6f9aea6e8155fcde9bc703
+GITHUB_TRIES=10
 _debian() {
 	apt-get update
 	apt-get install -y git apache2-utils supervisor jq python2
@@ -18,6 +19,27 @@ _centos() {
 _nodeverify(){
   res=$($SITE_ROOT/mbr node nodeverify | tail -1 | jq .status | sed s/\"//g)
   return $res
+}
+_gitclone() {
+  repo=$1
+  dest=$2
+  shift 2
+  rem="$@"
+  cmd="git clone $repo $dest $rem"
+  $cmd
+  st=$?
+  i=0
+  while [ \( $i -lt $GITHUB_TRIES \) -a \( $st -ne 0 \) ]; do
+    echo "Can not clone code from github $repo. Retrying ${i}th ... !"
+    $cmd
+    st=$?
+    i=$((i + 1))
+  done
+  if [ $st -ne 0 ]; then
+    echo "Can not clone code from github $repo after $GITHUB_TRIES tries!"
+    exit 1
+  fi
+  git -C $dest remote set-url origin $repo
 }
 if [ -f /etc/os-release ]; then
 	# freedesktop.org and systemd
@@ -110,20 +132,12 @@ if [ ! -d "$SITE_ROOT/.git" ]; then
 	rm -rf $SITE_ROOT
 	#git clone -b master http://$auth@git.massbitroute.dev/massbitroute/node.git $SITE_ROOT
 	if [ "x$ENV" == "x" ]; then
-	  git clone -b master https://github.com/massbitprotocol/massbitroute_node $SITE_ROOT
+	  _gitclone https://github.com/massbitprotocol/massbitroute_node $SITE_ROOT -b master
+	  #git clone -b master https://github.com/massbitprotocol/massbitroute_node $SITE_ROOT
 	else
-	  git clone -b ${ENV} https://github.com/massbitprotocol/massbitroute_node $SITE_ROOT
+	  _gitclone https://github.com/massbitprotocol/massbitroute_node $SITE_ROOT -b ${ENV}
+	  #git clone -b ${ENV} https://github.com/massbitprotocol/massbitroute_node $SITE_ROOT
 	fi
-	st=$?
-	while [ $st -ne 0 ]; do
-	  echo "Can not clone code from github. Retrying... !"
-	  if [ "x$ENV" == "x" ]; then
-    	git clone -b master https://github.com/massbitprotocol/massbitroute_node $SITE_ROOT
-    else
-    	git clone -b ${ENV} https://github.com/massbitprotocol/massbitroute_node $SITE_ROOT
-    fi
-    st=$?
-   done
 fi
 
 cd $SITE_ROOT
