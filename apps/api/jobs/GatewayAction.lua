@@ -226,7 +226,7 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
     end
     _print("datacenters:")
     _print(_datacenters, true)
-    if _datacenters["blocknet"] and #_datacenters["blocknet"] > 0 then
+    if _datacenters["blocknet"] and next(_datacenters["blocknet"]) ~= nil then
         local _geo_val = _datacenters["blocknet"]
         local _v_maps = {}
         local _v_datacenters = {}
@@ -300,7 +300,8 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
         _print(_file)
         _write_file(_file, _str)
 
-        -- local _tmpl = _get_tmpl(rules, {nodes = _datacenter_ids_all})
+
+
         local _str_listid = _tmpl("_listids")
         mkdirp(_info_dir .. "/" .. mytype)
         local _file_listid = _info_dir .. "/" .. mytype .. "/listid-" .. _blocknet_id
