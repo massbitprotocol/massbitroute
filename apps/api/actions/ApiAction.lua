@@ -26,6 +26,7 @@ local schema_create =
     sid = v.optional(v.is_string()),
     user_id = v.optional(v.is_string()),
     partner_id = v.optional(v.is_string()),
+    partner_quota = v.optional(v.is_string()),
     name = v.is_string(),
     blockchain = v.in_list {"avax", "bsc", "dot", "eth", "ftm", "hmny", "matic", "near", "sol"},
     network = v.in_list {
