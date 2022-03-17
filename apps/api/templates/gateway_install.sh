@@ -111,7 +111,7 @@ zone=$(curl -ssSfL "{*portal_url*}/mbr/gateway/{{id}}/geo?ip=$IP" --header 'Auth
 zone=$(echo $zone | sed 's/\"//g')
 if [ -z "$zone" ]; then
 	echo "Cannot detect zone from IP $IP"
-	exit 1
+	#exit 1
 fi
 
 if [ "$zone" != "{{zone}}" ]; then
@@ -134,10 +134,10 @@ if [ ! -d "$SITE_ROOT/.git" ]; then
 	rm -rf $SITE_ROOT
 	#git clone -b master http://$auth@git.massbitroute.dev/massbitroute/gateway.git $SITE_ROOT
   if [ "x$ENV" == "x" ]; then
-    _gitclone http://github.com/massbitprotocol/massbitroute_gateway $SITE_ROOT -b master
+    _gitclone https://github.com/massbitprotocol/massbitroute_gateway $SITE_ROOT -b master
     #git clone -b master http://github.com/massbitprotocol/massbitroute_gateway $SITE_ROOT
   else
-    _gitclone http://github.com/massbitprotocol/massbitroute_gateway $SITE_ROOT -b ${ENV}
+    _gitclone https://github.com/massbitprotocol/massbitroute_gateway $SITE_ROOT -b ${ENV}
     #git clone -b ${ENV} http://github.com/massbitprotocol/massbitroute_gateway $SITE_ROOT
   fi
 fi

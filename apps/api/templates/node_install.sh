@@ -110,7 +110,7 @@ zone=$(curl -ssSfL "{*portal_url*}/mbr/node/{{id}}/geo?ip=$IP" --header 'Authori
 zone=$(echo $zone | sed 's/\"//g')
 if [ -z "$zone" ]; then
 	echo "Cannot detect zone from IP $IP"
-	exit 1
+	#exit 1
 fi
 
 if [ "$zone" != "{{zone}}" ]; then
