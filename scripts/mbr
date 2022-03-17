@@ -1,15 +1,16 @@
 #!/bin/bash
 _call() {
 	action=$1
-	user_id=$2
-	id=$3
+	id=$2
+	user_id=$3
+
 	shift 3
 	curl -k -H 'Content-Type: application/json' -H 'Host: dapi.massbit.io' "https://127.0.0.1/_internal_api/v1?action=$action" -d "{\"id\":\"$id\", \"user_id\":\"$user_id\"$@}"
 }
 
 _gw_update() {
-	user_id=$1
-	id=$2
+	id=$1
+	user_id=$2
 	shift 2
 	_call gateway.adminupdate $@
 }

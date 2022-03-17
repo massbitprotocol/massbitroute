@@ -80,7 +80,12 @@ server {
     set $api_method '';
     set $jsonrpc_whitelist '';
 
+    encrypted_session_key abcdefghijmbrbaysaklmnopqrstuvwo;
+    encrypted_session_iv 123mbrbaysao4567;
+    encrypted_session_expires 30d;
+
     location /${api_key} {
+        set $mbr_token ${api_key};
         rewrite /(.*) / break;
         ${security._is_limit_rate_per_sec?_limit_rate_per_sec2()}
         ${_allow_methods1()}
@@ -381,26 +386,6 @@ local function _generate_item(instance, args)
     -- _write_file(_file_dapi, "*." .. _blocknet .. " 60/60 DYNA	geoip!mbr-map-" .. _blocknet .. "\n")
 end
 
-local function _generate_multi_item(instance, args)
-    local _ids = args.ids
-    args.ids = nil
-    if _ids then
-        for _, _id in ipairs(_ids) do
-            _generate_item(instance, table.merge({id = _id}, args))
-        end
-    end
-end
-
-local function _remove_multi_item(instance, args)
-    local _ids = args.ids
-    args.ids = nil
-    if _ids then
-        for _, _id in ipairs(_ids) do
-            _remove_item(instance, table.merge({id = _id}, args))
-        end
-    end
-end
-
 --- Job handler for generate conf
 --
 function JobsAction:generateconfAction(job)
@@ -410,14 +395,6 @@ function JobsAction:generateconfAction(job)
     local job_data = job.data
     job_data.server_name = _config.app.server_name or "massbitroute.com"
     _generate_item(instance, job_data)
-end
-
-function JobsAction:generatemulticonfAction(job)
-    print(inspect(job))
-
-    local instance = self:getInstance()
-    local job_data = job.data
-    _generate_multi_item(instance, job_data)
 end
 
 --- Job handler for remove conf
@@ -430,11 +407,4 @@ function JobsAction:removeconfAction(job)
     _remove_item(instance, job_data)
 end
 
-function JobsAction:removemulticonfAction(job)
-    print(inspect(job))
-
-    local instance = self:getInstance()
-    local job_data = job.data
-    _remove_multi_item(instance, job_data)
-end
 return JobsAction
