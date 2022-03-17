@@ -154,6 +154,6 @@ while [ "$status" != "verified" ]; do
 	status=$($SITE_ROOT/mbr node nodeverify | tail -1 | jq .status | sed s/\"//g)
 done
 
-if [ "$status" = "true" ]; then
+if [ "$status" = "verified" ]; then
 	echo "Installed node successfully !"
 fi
