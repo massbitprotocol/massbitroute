@@ -145,13 +145,13 @@ $SITE_ROOT/cmd_server status
 $SITE_ROOT/cmd_server nginx -t
 
 sleep 3
-cmd_verify=$SITE_ROOT/mbr node nodeverify | tail -1 | jq .status | sed s/\"//g
-status=$($cmd_verify)
+
+status=$($SITE_ROOT/mbr node nodeverify | tail -1 | jq .status | sed s/\"//g)
 
 while [ "$status" != "verified" ]; do
 	echo "Verifying firewall ... Please make sure your firewall is open and try run again."
 	sleep 10
-	status=$($cmd_verify)
+	status=$($SITE_ROOT/mbr node nodeverify | tail -1 | jq .status | sed s/\"//g)
 done
 
 if [ "$status" = "true" ]; then
