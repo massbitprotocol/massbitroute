@@ -18,7 +18,7 @@ _centos() {
 
 _nodeverify(){
   res=$($SITE_ROOT/mbr node nodeverify | tail -1 | jq .status | sed s/\"//g)
-  return $res
+  echo $res
 }
 _gitclone() {
   repo=$1
