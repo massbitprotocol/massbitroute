@@ -109,9 +109,9 @@ if [ ! -d "$SITE_ROOT/.git" ]; then
 	rm -rf $SITE_ROOT
 	#git clone -b master http://$auth@git.massbitroute.dev/massbitroute/gateway.git $SITE_ROOT
   if [ "x$ENV" == "x" ]; then
-    git clone -b master https://github.com/massbitprotocol/massbitroute_gateway $SITE_ROOT
+    git clone -b master http://github.com/massbitprotocol/massbitroute_gateway $SITE_ROOT
   else
-    git clone -b ${ENV} https://github.com/massbitprotocol/massbitroute_gateway $SITE_ROOT
+    git clone -b ${ENV} http://github.com/massbitprotocol/massbitroute_gateway $SITE_ROOT
   fi
 fi
 
@@ -146,13 +146,19 @@ $SITE_ROOT/cmd_server status
 $SITE_ROOT/cmd_server nginx -t
 
 sleep 3
-
-status=$($SITE_ROOT/mbr gw nodeverify | tail -1 | jq .status | sed s/\"//g)
-
+if [ "x$ENV" == "x" ]; then
+  status=$($SITE_ROOT/mbr gw nodeverify | tail -1 | jq .status | sed s/\"//g)
+else
+  status=$(bash -x $SITE_ROOT/mbr gw nodeverify | tail -1 | jq .status | sed s/\"//g)
+fi
 while [ "$status" != "verified" ]; do
 	echo "Verifying firewall ... Please make sure your firewall is open and try run again."
 	sleep 10
-	status=$($SITE_ROOT/mbr gw nodeverify | tail -1 | jq .status | sed s/\"//g)
+	if [ "x$ENV" == "x" ]; then
+    status=$($SITE_ROOT/mbr gw nodeverify | tail -1 | jq .status | sed s/\"//g)
+  else
+    status=$(bash -x $SITE_ROOT/mbr gw nodeverify | tail -1 | jq .status | sed s/\"//g)
+  fi
 done
 if [ "$status" = "verified" ]; then
 	echo "Installed gateway successfully !"
