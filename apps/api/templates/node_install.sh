@@ -174,19 +174,11 @@ $SITE_ROOT/cmd_server status
 $SITE_ROOT/cmd_server nginx -t
 
 sleep 3
-if [ "x$ENV" == "x" ]; then
-  status=$(_nodeverify)
-else
-  status=$(_nodeverify)
-fi
+status=$(_nodeverify)
 while [ "$status" != "verified" ]; do
 	echo "Verifying firewall ... Please make sure your firewall is open and try run again."
 	sleep 10
-	if [ "x$ENV" == "x" ]; then
-    status=$(_nodeverify)
-  else
-    status=$(_nodeverify)
-  fi
+  status=$(_nodeverify)
 done
 
 if [ "$status" = "verified" ]; then
