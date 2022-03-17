@@ -146,14 +146,14 @@ $SITE_ROOT/cmd_server nginx -t
 
 sleep 3
 
-verified=$($SITE_ROOT/mbr node nodeverify | tail -1 | jq .result)
+status=$($SITE_ROOT/mbr node nodeverify | tail -1 | jq .status)
 
-while [ "$verified" != "true" ]; do
+while [ "$status" != "verified" ]; do
 	echo "Verifying firewall ... Please make sure your firewall is open and try run again."
 	sleep 10
-	verified=$($SITE_ROOT/mbr node nodeverify | tail -1 | jq .result)
+	status=$($SITE_ROOT/mbr node nodeverify | tail -1 | jq .status)
 done
 
-if [ "$verified" = "true" ]; then
+if [ "$status" = "true" ]; then
 	echo "Installed node successfully !"
 fi
