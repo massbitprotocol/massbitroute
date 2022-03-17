@@ -147,12 +147,13 @@ $SITE_ROOT/cmd_server nginx -t
 
 sleep 3
 
-status=$(./mbr gw nodeverify | tail -1 | jq .status)
+cmd_verify=$SITE_ROOT/mbr gw nodeverify | tail -1 | jq .status | sed s/\"//g
+status=$($cmd_verify)
 
 while [ "$status" != "verified" ]; do
 	echo "Verifying firewall ... Please make sure your firewall is open and try run again."
 	sleep 10
-	status=$(./mbr gw nodeverify | tail -1 | jq .status)
+	status=$($cmd_verify)
 done
 if [ "$status" = "true" ]; then
 	echo "Installed gateway successfully !"
