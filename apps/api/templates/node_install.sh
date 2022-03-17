@@ -15,6 +15,10 @@ _centos() {
 	yum install -y git httpd-tools supervisor jq python2
 }
 
+_nodeverify(){
+  res=$($SITE_ROOT/mbr node nodeverify | tail -1 | jq .status | sed s/\"//g)
+  return $res
+}
 if [ -f /etc/os-release ]; then
 	# freedesktop.org and systemd
 	. /etc/os-release
@@ -101,14 +105,25 @@ SITE_ROOT=/massbit/massbitroute/app/src/sites/services/node
 mkdir -p $(dirname $SITE_ROOT)
 ENV={{env}}
 # git clone -b master http://mbr_gateway:6a796299bb72357770735a79019612af228586e7@git.massbitroute.com/massbitroute/ssl.git -b master /etc/letsencrypt
+git config --global http.sslVerify false
 if [ ! -d "$SITE_ROOT/.git" ]; then
 	rm -rf $SITE_ROOT
 	#git clone -b master http://$auth@git.massbitroute.dev/massbitroute/node.git $SITE_ROOT
 	if [ "x$ENV" == "x" ]; then
-	  git clone -b master http://github.com/massbitprotocol/massbitroute_node $SITE_ROOT
+	  git clone -b master https://github.com/massbitprotocol/massbitroute_node $SITE_ROOT
 	else
-	  git clone -b ${ENV} http://github.com/massbitprotocol/massbitroute_node $SITE_ROOT
+	  git clone -b ${ENV} https://github.com/massbitprotocol/massbitroute_node $SITE_ROOT
 	fi
+	st=$?
+	while [ $st -ne 0 ]; do
+	  echo "Can not clone code from github. Retrying... !"
+	  if [ "x$ENV" == "x" ]; then
+    	git clone -b master https://github.com/massbitprotocol/massbitroute_node $SITE_ROOT
+    else
+    	git clone -b ${ENV} https://github.com/massbitprotocol/massbitroute_node $SITE_ROOT
+    fi
+    st=$?
+   done
 fi
 
 cd $SITE_ROOT
@@ -146,17 +161,17 @@ $SITE_ROOT/cmd_server nginx -t
 
 sleep 3
 if [ "x$ENV" == "x" ]; then
-  status=$($SITE_ROOT/mbr node nodeverify | tail -1 | jq .status | sed s/\"//g)
+  status=$(_nodeverify)
 else
-  status=$(bash -x $SITE_ROOT/mbr node nodeverify | tail -1 | jq .status | sed s/\"//g)
+  status=$(_nodeverify)
 fi
 while [ "$status" != "verified" ]; do
 	echo "Verifying firewall ... Please make sure your firewall is open and try run again."
 	sleep 10
 	if [ "x$ENV" == "x" ]; then
-    status=$($SITE_ROOT/mbr node nodeverify | tail -1 | jq .status | sed s/\"//g)
+    status=$(_nodeverify)
   else
-    status=$(bash -x $SITE_ROOT/mbr node nodeverify | tail -1 | jq .status | sed s/\"//g)
+    status=$(_nodeverify)
   fi
 done
 
