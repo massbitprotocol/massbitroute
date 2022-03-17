@@ -154,6 +154,6 @@ while [ "$status" != "verified" ]; do
 	sleep 10
 	status=$($SITE_ROOT/mbr gw nodeverify | tail -1 | jq .status | sed s/\"//g)
 done
-if [ "$status" = "true" ]; then
+if [ "$status" = "verified" ]; then
 	echo "Installed gateway successfully !"
 fi
