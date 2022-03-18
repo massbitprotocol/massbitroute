@@ -170,11 +170,9 @@ supervisorctl status
 
 $SCRIPTS_RUN _load_config
 
-$SCRIPTS_RUN _reload
+$SITE_ROOT/cmd_server _update
 
 $SITE_ROOT/cmd_server status
-
-$SITE_ROOT/cmd_server nginx -t
 
 status=$(_nodeverify)
 while [ "$status" != "verified" ]; do
