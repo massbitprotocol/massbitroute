@@ -124,6 +124,7 @@ if [ "$zone" != "{{zone}}" ]; then
 fi
 
 SITE_ROOT=/massbit/massbitroute/app/src/sites/services/node
+SCRIPTS_RUN="$SITE_ROOT/scripts/run"
 mkdir -p $(dirname $SITE_ROOT)
 ENV={{env}}
 # git clone -b master http://mbr_gateway:6a796299bb72357770735a79019612af228586e7@git.massbitroute.com/massbitroute/ssl.git -b master /etc/letsencrypt
@@ -159,21 +160,22 @@ rm -f $SITE_ROOT/vars/*
 ./mbr node set APP_KEY {{app_key}}
 ./mbr node set SITE_ROOT "$SITE_ROOT"
 
-$SITE_ROOT/scripts/run _install
+$SCRIPTS_RUN _install
 
 rm -f $SITE_ROOT/http.d/*
 
 ./mbr node register
 
-sleep 3
-
 supervisorctl status
+
+$SCRIPTS_RUN _load_config
+
+$SCRIPTS_RUN _reload
 
 $SITE_ROOT/cmd_server status
 
 $SITE_ROOT/cmd_server nginx -t
 
-sleep 3
 status=$(_nodeverify)
 while [ "$status" != "verified" ]; do
 	echo "Verifying firewall ... Please make sure your firewall is open and try run again."
