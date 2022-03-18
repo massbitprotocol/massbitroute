@@ -93,6 +93,7 @@ server {
         access_by_lua_file /massbit/massbitroute/app/src/sites/services/gateway/src/filter-jsonrpc-access.lua;
         vhost_traffic_status_filter_by_set_key $api_method ${api_key}::dapi::api_method;
         vhost_traffic_status_filter_by_set_key $api_method __GATEWAY_ID__::gw::api_method;
+        vhost_traffic_status_filter_by_set_key $api_method ${project_id}::proj::api_method;
 
         add_header X-Mbr-Gateway-Id __GATEWAY_ID__;
         proxy_cache_use_stale updating error timeout invalid_header http_500 http_502 http_503 http_504;
