@@ -108,17 +108,17 @@ function Action:createAction(args)
     args.action = nil
     --args.id = nil
     local _config = self:getInstanceConfig()
-    local _valid, _err = schema_create(args)
+    --[[local _valid, _err = schema_create(args)
     _print("validator:" .. inspect(_valid))
     _print("err:" .. inspect(_err))
-    args.server_name = _config.app.server_name or "massbitroute.com"
     if not _valid then
         return {
             result = false,
             err_msg = "Arguments not valid"
         }
     end
-
+    ]]
+    args.server_name = _config.app.server_name or "massbitroute.com"
     args = _norm_schema(args)
 
     local instance = self:getInstance()
