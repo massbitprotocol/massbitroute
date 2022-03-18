@@ -34,7 +34,6 @@ local schema_create =
     partner_id = v.optional(v.is_string()),
     project_id = v.optional(v.is_string()),
     project_quota = v.optional(v.is_string()),
-    project_quota = v.optional(v.is_string()),
     sid = v.optional(v.is_string()),
     status = v.is_number(),
     user_id = v.optional(v.is_string()),
@@ -109,11 +108,10 @@ function Action:createAction(args)
     args.action = nil
     --args.id = nil
     local _config = self:getInstanceConfig()
-    args.server_name = _config.app.server_name or "massbitroute.com"
     local _valid, _err = schema_create(args)
     _print("validator:" .. inspect(_valid))
     _print("err:" .. inspect(_err))
-
+    args.server_name = _config.app.server_name or "massbitroute.com"
     if not _valid then
         return {
             result = false,
