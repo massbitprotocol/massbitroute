@@ -168,7 +168,6 @@ rm -f $SITE_ROOT/http.d/*
 supervisorctl status
 
 $SCRIPTS_RUN _load_config
-
 $SITE_ROOT/cmd_server _update
 
 $SITE_ROOT/cmd_server status
@@ -178,6 +177,8 @@ status=$(_nodeverify)
 while [ "$status" != "verified" ]; do
 	echo "Verifying firewall ... Please make sure your firewall is open and try run again."
 	sleep 10
+	$SCRIPTS_RUN _load_config
+  $SITE_ROOT/cmd_server _update
 	status=$(_nodeverify)
 done
 if [ "$status" = "verified" ]; then
