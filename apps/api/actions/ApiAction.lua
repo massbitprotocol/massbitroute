@@ -23,18 +23,23 @@ local v = require "validation"
 
 local schema_create =
     v.is_table {
-    sid = v.optional(v.is_string()),
+    action = v.optional(v.is_string()),
+    allow_methods = v.optional(v.is_table()),
+    app_id = v.optional(v.is_string()),
     app_key = v.optional(v.is_string()),
-    user_id = v.optional(v.is_string()),
-    partner_id = v.optional(v.is_string()),
-    project_quota = v.optional(v.is_string()),
-    name = v.is_string(),
     blockchain = v.in_list {"avax", "bsc", "dot", "eth", "ftm", "hmny", "matic", "near", "sol"},
-    network = v.in_list {
-        "mainnet",
-        "devnet",
-        "testnet"
-    }
+    id = v.optional(v.is_string()),
+    limit_rate_per_day = v.optional(v.is_integer()),
+    limit_rate_per_sec = v.optional(v.is_integer()),
+    partner_id = v.optional(v.is_string()),
+    project_id = v.optional(v.is_string()),
+    project_quota = v.optional(v.is_string()),
+    project_quota = v.optional(v.is_string()),
+    sid = v.optional(v.is_string()),
+    status = v.is_number(),
+    user_id = v.optional(v.is_string()),
+    name = v.is_string(),
+    network = v.is_string()
 }
 
 local function _norm_schema(args)
