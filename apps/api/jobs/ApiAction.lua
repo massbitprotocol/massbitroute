@@ -229,6 +229,7 @@ local function _norm_entrypoint(_ent, _item)
 
     _ent.api_key = _item.api_key
     _ent.server_name = _item.api_key .. "-" .. _ent.provider_id
+    _ent._domain_name = _item._domain_name
     _ent.blockchain = _item.blockchain
     _ent.network = _item.network
     return _ent
