@@ -23,9 +23,9 @@ function User:create(args)
     args.api_key = args.app_key or args.id
     -- args.api_key = uuid()
     args.status = 1
-    args.api_id = args.api_id or util.random_string(12)
+    args.app_id = args.app_id or util.random_string(12)
     if args.blockchain and args.network then
-        args.gateway_domain = args.api_id .. "." .. args.blockchain .. "-" .. args.network .. "." .. args.server_name
+        args.gateway_domain = args.app_id .. "." .. args.blockchain .. "-" .. args.network .. "." .. args.server_name
         args.gateway_url = args.gateway_domain .. "/" .. args.api_key .. "/"
         args.gateway_http = "https://" .. args.gateway_url
         args.gateway_wss = "wss://" .. args.gateway_url
