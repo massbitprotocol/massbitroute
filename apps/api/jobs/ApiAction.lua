@@ -68,8 +68,8 @@ ${security._is_limit_rate_per_sec?_limit_rate_per_sec1()}
 server {
     listen 80;
     listen 443 ssl;
-    ssl_certificate /etc/letsencrypt/live/${blockchain}-${network}.${server_name}/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/${blockchain}-${network}.${server_name}/privkey.pem;
+    ssl_certificate /etc/letsencrypt/live/${blockchain}-${network}.${_domain_name}/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/${blockchain}-${network}.${_domain_name}/privkey.pem;
     resolver 8.8.4.4 ipv6=off;
     client_body_buffer_size 512K;
     client_max_body_size 1G;
@@ -201,7 +201,7 @@ server {
         proxy_send_timeout 3;
         proxy_read_timeout 3;
 
-        proxy_pass http://${blockchain}-${network}.node.mbr.${server_name};
+        proxy_pass http://${blockchain}-${network}.node.mbr.${_domain_name};
         proxy_ssl_verify off;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
@@ -293,7 +293,7 @@ local function _generate_item(instance, args)
 
     -- query dapi from db
     local _item = _norm(model:get(args))
-    _item.server_name = args.server_name
+    _item._domain_name = args._domain_name
     if not _item.id or not _item.blockchain or not _item.network then
         return false
     end
@@ -394,7 +394,7 @@ function JobsAction:generateconfAction(job)
     local _config = self:getInstanceConfig()
     local instance = self:getInstance()
     local job_data = job.data
-    job_data.server_name = _config.app.server_name or "massbitroute.com"
+    job_data._domain_name = _config.app.server_name or "massbitroute.com"
     _generate_item(instance, job_data)
 end
 
