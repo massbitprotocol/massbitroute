@@ -8,7 +8,7 @@ local json = cc.import("#json")
 local table_map = table.map
 local table_walk = table.walk
 local table_concat = table.concat
-
+local env = require("env")
 local cjson = require("cjson")
 
 local JobsAction = cc.class(mytype .. "JobsAction", gbc.ActionBase)
@@ -27,7 +27,9 @@ local inspect = require "inspect"
 JobsAction.ACCEPTED_REQUEST_TYPE = "worker"
 
 local Model = cc.import("#" .. mytype)
-
+local _session_key = env.SESSION_KEY or ""
+local _session_iv = env.SESSION_IV or ""
+local _session_expires = env.SESSION_EXPIRES or "1d"
 local _service_dir = "/massbit/massbitroute/app/src/sites/services"
 local _portal_dir = _service_dir .. "/api"
 local _deploy_dir = _portal_dir .. "/public/deploy/dapi"
@@ -80,9 +82,9 @@ server {
     set $api_method '';
     set $jsonrpc_whitelist '';
 
-    encrypted_session_key abcdefghijmbrbaysaklmnopqrstuvwo;
-    encrypted_session_iv 123mbrbaysao4567;
-    encrypted_session_expires 30d;
+    encrypted_session_key ]] .. _session_key .. [[;
+    encrypted_session_iv ]] .. _session_iv .. [[;
+    encrypted_session_expires ]] .. _session_expires .. [[;
 
     location /${api_key} {
         set $mbr_token ${api_key};
