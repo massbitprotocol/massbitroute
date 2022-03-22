@@ -29,6 +29,7 @@ _build_prod() {
   export API_USER_URL=https://portal.$DOMAIN
   export API_PORTAL_URL=https://portal.$DOMAIN
   export DAPI_PROVIDER_DOMAIN=$DOMAIN
+  export STAT_URL=https://stat.mbr.$DOMAIN/
 	export GATEWAY_INSTALL_URL=https://$type.$DOMAIN/api/v1/gateway_install
 	export NODE_INSTALL_URL=https://$type.$DOMAIN/api/v1/node_install
 	#git submodule update --init --remote mbr-app
@@ -53,6 +54,7 @@ _start_prod() {
   export API_USER_URL=https://portal.$DOMAIN
   export API_PORTAL_URL=https://portal.$DOMAIN
   export DAPI_PROVIDER_DOMAIN=$DOMAIN
+  export STAT_URL=https://stat.mbr.$DOMAIN/
 	export GATEWAY_INSTALL_URL=https://$type.$DOMAIN/api/v1/gateway_install
 	export NODE_INSTALL_URL=https://$type.$DOMAIN/api/v1/node_install
 	rsync -avz assets dist/
