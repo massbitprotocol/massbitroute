@@ -45,7 +45,7 @@ local rules = {
     _dcmap_map = [[${id} =>  [ ${ip} , 10 ],]],
     _dcmap_v1 = [[
 ${geo_id} => {
-${id} =>  [ ${ip} , 10 ],
+${datacenters/_dcmap_map(); separator='\n'}
 },
 ]],
     _dcmap = [[
@@ -85,7 +85,7 @@ ${datacenters/_datacenter(); separator=',\n'}
 ]],
     _gw_zone = [[${id}.gw.mbr 60 A ${ip}]],
     _gw_zones = [[${nodes/_gw_zone(); separator='\n'}]],
-    _gw_stat_target = [[          - ${id}.gw.mbr.${server_name}]],
+    _gw_stat_target = [[          - ${id}.gw.mbr.massbitroute.com]],
     _gw_stat_v1 = [[${nodes/_gw_stat_target(); separator='\n'}]],
     _gw_stat = [[
 scrape_configs:
@@ -163,7 +163,7 @@ end
 --- Rescan gateway only for specific blockchain and network
 -- using after update gateway
 --
-local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
+local function _rescanconf_blockchain_network(_blockchain, _network)
     _print("rescanconf_blockchain_network:" .. _blockchain .. ":" .. _network)
     local _datacenters = {}
     local _actives = {}
@@ -177,6 +177,8 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
         local _continent_dir = _network_dir .. "/" .. _continent
         for _, _country in ipairs(show_folder(_continent_dir)) do
             local _geo_id = _blocknet_id .. "-" .. _continent .. "-" .. _country
+            local _geo_country_default = _blocknet_id .. "-" .. _continent .. "-default"
+            local _geo_continent_default = _blocknet_id .. "-default-default"
 
             local _country_dir = _continent_dir .. "/" .. _country
             for _, _user_id in ipairs(show_folder(_country_dir)) do
@@ -189,7 +191,6 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
                         if type(_item) == "string" then
                             _item = json.decode(_item)
                         end
-                        _item.server_name = _job_data.server_name
                         -- local _ip = _item.ip
                         -- print("ip:" .. inspect(_ip))
                         local _obj = {
@@ -215,8 +216,19 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
                                 -- _dc_block[_blocknet_id] = _dc_block[_blocknet_id] or {}
                                 _dc_block[_continent] = _dc_block[_continent] or {}
                                 _dc_block[_continent][_country] = _dc_block[_continent][_country] or {}
+                                _dc_block[_continent]["default"] = _dc_block[_continent]["default"] or {}
+                                _dc_block["default"] = _dc_block["default"] or {}
+
                                 _dc_block[_continent][_country] = _geo_id
-                                table_insert(_dc_geo, _obj)
+                                table.insert(_dc_block[_continent]["default"], _geo_id)
+                                table.insert(_dc_block["default"], _geo_id)
+
+                                _dc_geo[_geo_id] = _dc_geo[_geo_id] or {}
+                                _dc_geo[_geo_country_default] = _dc_geo[_geo_country_default] or {}
+                                _dc_geo[_geo_continent_default] = _dc_geo[_geo_continent_default] or {}
+                                table_insert(_dc_geo[_geo_id], _obj)
+                                table_insert(_dc_geo[_geo_country_default], _obj)
+                                table_insert(_dc_geo[_geo_continent_default], _obj)
                             end
                         end
                     end
@@ -230,15 +242,45 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
         local _geo_val = _datacenters["blocknet"]
         local _v_maps = {}
         local _v_datacenters = {}
-
         table_insert(_v_maps, _blocknet_id .. " => { ")
         for _k3, _v3 in pairs(_geo_val) do
-            table_insert(_v_maps, _k3 .. " => { ")
-            for _k4, _v4 in pairs(_v3) do
-                table_insert(_v_maps, _k4 .. " => [ " .. _v4 .. "]")
-                _v_datacenters[#_v_datacenters + 1] = _v4
+            if _k3 ~= "default" then
+                table_insert(_v_maps, _k3 .. " => { ")
+                for _k4, _v4 in pairs(_v3) do
+                    if _k4 and _k4 ~= "default" then
+                        table_insert(_v_maps, _k4 .. " => [ " .. _v4 .. "],")
+                        _v_datacenters[_v4] = 1
+                    else
+                        _v_datacenters[_blocknet_id .. "-" .. _k3 .. "-" .. _k4] = 1
+                        -- if _v4 then
+                        --     table.insert(_v_datacenters, _v4)
+                        -- end
+                        local _cache = {}
+                        table_insert(_v_maps, _k4 .. " => [ ")
+                        for _, _v5 in ipairs(_v4) do
+                            if _v5 and not _cache[_v5] then
+                                table_insert(_v_maps, _v5 .. ",")
+                                _cache[_v5] = 1
+                                _v_datacenters[_v5] = 1
+                            end
+                        end
+                        table_insert(_v_maps, "],")
+                    end
+                end
+                table_insert(_v_maps, "},")
+            else
+                _v_datacenters[_blocknet_id .. "-" .. _k3 .. "-" .. _k3] = 1
+                table_insert(_v_maps, _k3 .. " => [ ")
+                local _cache = {}
+                for _, _v4 in ipairs(_v3) do
+                    if _v4 and not _cache[_v4] then
+                        table_insert(_v_maps, _v4 .. ",")
+                        _v_datacenters[_v4] = 1
+                        _cache[_v4] = 1
+                    end
+                end
+                table_insert(_v_maps, "],")
             end
-            table_insert(_v_maps, "}")
         end
 
         table_insert(_v_maps, "}")
@@ -249,7 +291,7 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
             rules,
             {
                 id = _blocknet_id,
-                datacenters = _v_datacenters,
+                datacenters = table.keys(_v_datacenters),
                 map = table_concat(_v_maps, "\n")
             }
         )
@@ -260,14 +302,30 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
         _write_file(_file_map, _geo_map)
     end
 
-    if _datacenters["geo"] and #_datacenters["geo"] > 0 then
+    if _datacenters["geo"] and next(_datacenters["geo"]) ~= nil then
         local _geo_val = _datacenters["geo"]
+        -- _print("_geo_val:" .. inspect(_geo_val))
+        local _dc_maps_new = {}
+        for _geo_id, _geo_svrs in pairs(_geo_val) do
+            -- _print("_geo_id:" .. inspect(_geo_id))
+            -- _print("_geo_svrs:" .. inspect(_geo_svrs))
+            table.insert(
+                _dc_maps_new,
+                {
+                    geo_id = _geo_id,
+                    datacenters = _geo_svrs
+                }
+            )
+        end
+
+        -- _print("_dc_maps_new:" .. inspect(_dc_maps_new))
+
         local _tmpl_res =
             _get_tmpl(
             rules,
             {
                 blocknet_id = _blocknet_id,
-                dcmaps = _geo_val
+                dcmaps = _dc_maps_new
             }
         )
         local _geo_res = _tmpl_res("_dns_geo_resource_v1")
@@ -300,7 +358,13 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
         _print(_file)
         _write_file(_file, _str)
 
-
+        -- local _tmpl = _get_tmpl(rules, {nodes = _datacenter_ids_all})
+        -- local _str_stat = _tmpl("_gw_stat_v1")
+        -- mkdirp(stat_dir .. "/etc/prometheus/stat_gw")
+        -- local _file_stat = stat_dir .. "/etc/prometheus/stat_gw/" .. _blocknet_id .. ".yml"
+        -- _print(_str_stat)
+        -- _print(_file_stat)
+        -- _write_file(_file_stat, _str_stat)
 
         local _str_listid = _tmpl("_listids")
         mkdirp(_info_dir .. "/" .. mytype)
@@ -311,15 +375,15 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
     end
 end
 
-local function _rescanconf(_job_data)
+local function _rescanconf()
     for _, _blockchain in ipairs(show_folder(_deploy_dir)) do
         local _blockchain_dir = _deploy_dir .. "/" .. _blockchain
         for _, _network in ipairs(show_folder(_blockchain_dir)) do
-            _rescanconf_blockchain_network(_blockchain, _network, _job_data)
+            _rescanconf_blockchain_network(_blockchain, _network)
         end
     end
 end
---[[
+
 local function _rescanconf1()
     -- local _commit_files = {}
 
@@ -534,7 +598,7 @@ local function _rescanconf1()
     print(_file_stat)
     _write_file(_file_stat, _str_stat)
 end
-]]
+
 --- Generate gateway conf
 --
 local function _generate_item(instance, args)
@@ -542,7 +606,7 @@ local function _generate_item(instance, args)
 
     -- query db for detail
     local _item = _norm(model:get(args))
-    _print("stored item: " .. inspect(_item))
+
     if
         not _item or not _item.id or not _item.ip or not _item.blockchain or not _item.network or not _item.geo or
             not _item.geo.continent_code or
@@ -576,7 +640,7 @@ local function _generate_item(instance, args)
     -- dump detail
     _write_file(_deploy_file, json.encode(_item))
 
-    _rescanconf_blockchain_network(_item.blockchain, _item.network, args)
+    _rescanconf_blockchain_network(_item.blockchain, _item.network)
     return true
 end
 
@@ -586,10 +650,8 @@ end
 
 function JobsAction:rescanconfAction(job)
     -- local instance = self:getInstance()
-    local _config = self:getInstanceConfig();
-    local job_data = job.data
-    job_data.server_name = _config.app.server_name
-    _rescanconf(job_data)
+    -- local job_data = job.data
+    _rescanconf()
 end
 
 --- Job handler for generate conf
@@ -599,9 +661,7 @@ function JobsAction:generateconfAction(job)
     print(inspect(job))
 
     local instance = self:getInstance()
-    local _config = self:getInstanceConfig();
     local job_data = job.data
-    job_data.server_name = _config.app.server_name
     _generate_item(instance, job_data)
 end
 
