@@ -6,7 +6,7 @@ local json = cc.import("#json")
 local JobsAction = cc.class(mytype .. "JobsAction", gbc.ActionBase)
 
 local mbrutil = require "mbutil" --cc.import("#mbrutil")
-
+local env = require("env")
 local read_dir = mbrutil.read_dir
 local read_file = mbrutil.read_file
 local show_folder = mbrutil.show_folder
@@ -29,7 +29,7 @@ local mkdirp = require "mkdirp"
 JobsAction.ACCEPTED_REQUEST_TYPE = "worker"
 
 local Model = cc.import("#" .. mytype)
-
+local _domain_name = env.DOMAIN or "massbitroute.com"
 local _service_dir = "/massbit/massbitroute/app/src/sites/services"
 local _portal_dir = _service_dir .. "/api"
 local _deploy_dir = _portal_dir .. "/public/deploy/gateway"
@@ -651,9 +651,8 @@ end
 
 function JobsAction:rescanconfAction(job)
     -- local instance = self:getInstance()
-    local _config = self:getInstanceConfig();
     local job_data = job.data
-    job_data._domain_name = _config.app.server_name
+    job_data._domain_name = _domain_name
     _rescanconf(job_data)
 end
 
@@ -663,9 +662,8 @@ end
 function JobsAction:generateconfAction(job)
     print(inspect(job))
     local instance = self:getInstance()
-    local _config = self:getInstanceConfig();
     local job_data = job.data
-    job_data._domain_name = _config.app.server_name
+    job_data._domain_name = _domain_name
     _generate_item(instance, job_data)
 end
 

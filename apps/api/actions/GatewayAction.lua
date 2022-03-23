@@ -4,7 +4,7 @@ local mytype = "gateway"
 local Session = cc.import("#session")
 local util = require "mbutil"
 -- local util = cc.import("#mbrutil")
-
+local env = require("env")
 local json = cc.import("#json")
 -- local cjson = require "cjson"
 local Action = cc.class(mytype .. "Action", gbc.ActionBase)
@@ -22,7 +22,7 @@ local Model = cc.import("#" .. mytype)
 
 local _print = util.print
 local _get_geo = util.get_geo
-
+local _server_name = env.DOMAIN or "massbitroute.com"
 local function _norm_json(_v, _field)
     if _v[_field] and type(_v[_field]) == "string" then
         _v[_field] = json.decode(_v[_field])
@@ -307,7 +307,7 @@ function Action:nodeverifyAction(args)
         {
             method = "GET",
             headers = {
-                ["Host"] = "gw.mbr." .. _config.app.server_name
+                ["Host"] = "gw.mbr." .. _server_name
             },
             ssl_verify = false
         }
