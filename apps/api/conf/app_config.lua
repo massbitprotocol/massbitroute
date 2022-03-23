@@ -4,7 +4,6 @@ local _config = {
     sessionExpiredTime = 60 * 30,
     numOfJobWorkers = 10,
     sengrid_key = "",
-    ipapi_token = "",
-    server_name = "massbitroute.com"
+    ipapi_token = ""
 }
 return _config

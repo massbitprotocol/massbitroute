@@ -27,6 +27,7 @@ local inspect = require "inspect"
 JobsAction.ACCEPTED_REQUEST_TYPE = "worker"
 
 local Model = cc.import("#" .. mytype)
+local _domain_name = env.DOMAIN or "massbitroute.com"
 local _session_key = env.SESSION_KEY or ""
 local _session_iv = env.SESSION_IV or ""
 local _session_expires = env.SESSION_EXPIRES or "1d"
@@ -414,10 +415,10 @@ end
 --
 function JobsAction:generateconfAction(job)
     print(inspect(job))
-    local _config = self:getInstanceConfig()
+
     local instance = self:getInstance()
     local job_data = job.data
-    job_data._domain_name = _config.app.server_name or "massbitroute.com"
+    job_data._domain_name = _domain_name
     _generate_item(instance, job_data)
 end
 
