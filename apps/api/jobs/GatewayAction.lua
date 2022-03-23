@@ -121,7 +121,7 @@ local function _remove_item(instance, args)
     _print("remove_item:" .. inspect(args))
     local model = Model:new(instance)
     local _item = _norm(model:get(args))
-
+    _print("stored_item:" .. inspect(_item))
     if args._is_delete then
         model:delete({id = args.id, user_id = args.user_id})
     end
@@ -156,7 +156,7 @@ local function _remove_item(instance, args)
         _item._is_delete = nil
         _write_file(_deploy_file, json.encode(_item))
     end
-
+    _rescanconf_blockchain_network(_item.blockchain, _item.network, args)
     return true
 end
 
