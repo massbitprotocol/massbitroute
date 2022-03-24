@@ -31,6 +31,10 @@ JobsAction.ACCEPTED_REQUEST_TYPE = "worker"
 
 local Model = cc.import("#" .. mytype)
 
+local _domain_name = env.DOMAIN or "massbitroute.com"
+local _session_key = env.SESSION_KEY or ""
+local _session_iv = env.SESSION_IV or ""
+local _session_expires = env.SESSION_EXPIRES or "1d"
 local _service_dir = "/massbit/massbitroute/app/src/sites/services"
 local _portal_dir = _service_dir .. "/api"
 local _deploy_dir = _portal_dir .. "/public/deploy/dapi"
@@ -429,7 +433,9 @@ function JobsAction:generateconfAction(job)
 
     local instance = self:getInstance()
     local job_data = job.data
-    return _generate_item(instance, job_data)
+
+    job_data._domain_name = _domain_name
+    _generate_item(instance, job_data)
 end
 
 --- Job handler for remove conf

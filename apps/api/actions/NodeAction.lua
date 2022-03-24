@@ -2,7 +2,7 @@ local cc, ndk, ngx = cc, ndk, ngx
 local gbc = cc.import("#gbc")
 local mytype = "node"
 local Session = cc.import("#session")
-
+local env = require("env")
 local json = cc.import("#json")
 local util = require "mbutil" -- cc.import("#mbrutil")
 -- local cjson = require "cjson"
@@ -24,7 +24,7 @@ local ERROR = {
 local Model = cc.import("#" .. mytype)
 
 local _get_geo = util.get_geo
-
+local _server_name = env.DOMAIN or "massbitroute.com"
 local function _norm_json(_v, _field)
     if _v[_field] and type(_v[_field]) == "string" then
         _v[_field] = json.decode(_v[_field])
@@ -279,7 +279,7 @@ function Action:nodeverifyAction(args)
         {
             method = "GET",
             headers = {
-                ["Host"] = "node.mbr." .. _config.app.server_name
+                ["Host"] = "node.mbr." .. _server_name
             },
             ssl_verify = false
         }

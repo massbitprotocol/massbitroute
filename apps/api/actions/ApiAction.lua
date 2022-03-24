@@ -6,7 +6,7 @@ local Session = cc.import("#session")
 
 local json = cc.import("#json")
 local util = require "mbutil" -- cc.import("#mbrutil")
-
+local env = require("env")
 -- local cjson = require "cjson"
 local Action = cc.class(mytype .. "Action", gbc.ActionBase)
 
@@ -20,7 +20,7 @@ local ERROR = {
 local Model = cc.import("#" .. mytype)
 
 local v = require "validation"
-
+local _domain_name = env.DOMAIN or "massbitroute.com"
 local schema_create =
     v.is_table {
     action = v.optional(v.is_string()),
@@ -107,7 +107,6 @@ function Action:createAction(args)
     _print(inspect(args))
     args.action = nil
     --args.id = nil
-    local _config = self:getInstanceConfig()
     --[[local _valid, _err = schema_create(args)
     _print("validator:" .. inspect(_valid))
     _print("err:" .. inspect(_err))
@@ -118,7 +117,7 @@ function Action:createAction(args)
         }
     end
     ]]
-    args.server_name = _config.app.server_name or "massbitroute.com"
+    args.server_name = _domain_name
     args = _norm_schema(args)
 
     local instance = self:getInstance()

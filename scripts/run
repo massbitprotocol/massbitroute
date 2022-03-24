@@ -2,7 +2,7 @@
 SITE_ROOT=$(realpath $(dirname $(realpath $0))/..)
 cd $SITE_ROOT
 . $SITE_ROOT/.env
-
+GITHUB_TRIES=10
 export HOME=$SITE_ROOT
 export ASDF=/massbit/massbitroute/app/src/bin/.asdf/installs
 GRAFANA_VERSION=v8.2.1
@@ -19,6 +19,7 @@ service_dir=/massbit/massbitroute/app/src/sites/services
 type=api
 gdnsd="/massbit/massbitroute/app/gbc/bin/.asdf/installs/gdnsd/v3.8.0/sbin/gdnsd -c $gwman_dir"
 nginx="/massbit/massbitroute/app/src/bin/openresty/nginx/sbin/nginx -c /massbit/massbitroute/app/src/tmp/nginx.conf"
+auth=$GIT_READ
 
 _supervisor() {
 	cat <<EOF >/etc/supervisor/conf.d/mbr_portal.conf
@@ -53,6 +54,27 @@ _git_config() {
 	git -C $_dir config --global user.name $GIT_AUTH_NAME
 	git -C $_dir config --global user.email $GIT_AUTH_MAIL
 }
+_gitclone() {
+  repo=$1
+  dest=$2
+  shift 2
+  rem="$@"
+  cmd="git clone $repo $dest $rem"
+  $cmd
+  st=$?
+  i=0
+  while [ \( $i -lt $GITHUB_TRIES \) -a \( $st -ne 0 \) ]; do
+    echo "Can not clone code from github $repo. Retrying ${i}th ... !"
+    $cmd
+    st=$?
+    i=$((i + 1))
+  done
+  if [ $st -ne 0 ]; then
+    echo "Can not clone code from github $repo after $GITHUB_TRIES tries!"
+    exit 1
+  fi
+  git -C $dest remote set-url origin $repo
+}
 _reload() {
 	if [ ! -f "/usr/bin/parallel" ]; then apt install -y parallel; fi
 	$cmd _update
@@ -67,23 +89,44 @@ _reload() {
 }
 _install() {
 	mkdir -p /massbit/massbitroute/app $service_dir $SITE_ROOT/etc $SITE_ROOT/logs
-
+	git config --global http.sslverify false
 	service=gbc
-	git clone http://$GIT_READ@$GIT_DOMAIN/massbitroute/${service}.git /massbit/massbitroute/app/$service
-	git -C /massbit/massbitroute/app/$service remote set-url origin http://$user:$pass@$GIT_DOMAIN/massbitroute/${service}.git
 
-	service=asdf
-	git clone http://$GIT_READ@$GIT_DOMAIN/massbitroute/${service}.git /massbit/massbitroute/app/gbc/bin/.asdf
-	git -C /massbit/massbitroute/app/gbc/bin/.asdf remote set-url origin http://$user:$pass@$GIT_DOMAIN/massbitroute/${service}.git
+	dest=/massbit/massbitroute/app/$service
+	if [ -d "$dest" ]; then
+	  rm -rf $dest
+	fi
+	_gitclone https://github.com/massbitprotocol/massbitroute_gbc  $dest
+
+	asdfdest=/massbit/massbitroute/app/gbc/bin/.asdf
+	if [ -d "$asdfdest" ]; then
+	  rm -rf $asdfdest
+	fi
+	_gitclone https://github.com/massbitprotocol/massbitroute_asdf  $asdfdest
+	#servicedir=/massbit/massbitroute/app/gbc/bin/.asdf
+	#if [ -d "$servicedir" ]; then
+	#  rm -rf $servicedir
+	#fi
+	#git clone http://$GIT_READ@$PRIVATE_GIT_DOMAIN/massbitroute/${service}.git $servicedir
 
 	service=ssl
-	git clone http://$GIT_READ@$GIT_DOMAIN/massbitroute/${service}.git /etc/letsencrypt
-	git -C /etc/letsencrypt remote set-url origin http://$user:$pass@$GIT_DOMAIN/massbitroute/${service}.git
+	dest=/etc/letsencrypt/$service
+	if [ -d "$dest" ]; then
+	  rm -rf $dest
+	fi
+	_gitclone https://$auth@git.${DOMAIN}/massbitroute/${service}.git  $dest
+	#git clone http://$GIT_READ@$PRIVATE_GIT_DOMAIN/massbitroute/${service}.git /etc/letsencrypt
+	#git -C /etc/letsencrypt remote set-url origin http://$GIT_READ@$PRIVATE_GIT_DOMAIN/massbitroute/${service}.git
 
 	service=mkagent
-	git clone http://$GIT_READ@$GIT_DOMAIN/massbitroute/${service}.git $SITE_ROOT/etc/$service
+	dest=$SITE_ROOT/etc/$service
+	if [ -d "$dest" ]; then
+	  rm -rf $dest
+	fi
+	_gitclone https://github.com/massbitprotocol/massbitroute_mkagent  $dest
+	#git clone http://$PUBLIC_GIT_DOMAIN/massbitroute/massbitroute_${service}.git $SITE_ROOT/etc/$service
+	#git -C $SITE_ROOT/etc/$service remote set-url origin http://$GIT_READ@$PRIVATE_GIT_DOMAIN/massbitroute/massbitroute_${service}.git
 
-	git -C $SITE_ROOT/etc/$service remote set-url origin http://$user:$pass@$GIT_DOMAIN/massbitroute/${service}.git
 
 	service=node
 	git clone http://$GIT_NODE_WRITE@$GIT_DOMAIN/massbitroute/${service}.git $service_dir/$service
