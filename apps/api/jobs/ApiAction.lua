@@ -8,7 +8,7 @@ local json = cc.import("#json")
 local table_map = table.map
 local table_walk = table.walk
 local table_concat = table.concat
-local env = require("env")
+
 local cjson = require("cjson")
 
 local JobsAction = cc.class(mytype .. "JobsAction", gbc.ActionBase)
@@ -24,12 +24,13 @@ local _print = mbrutil.print
 local mkdirp = require "mkdirp"
 local inspect = require "inspect"
 
+-- local shell = require "shell"
+local shell =  require "shell-games"
+
 JobsAction.ACCEPTED_REQUEST_TYPE = "worker"
 
 local Model = cc.import("#" .. mytype)
-local _session_key = env.SESSION_KEY or ""
-local _session_iv = env.SESSION_IV or ""
-local _session_expires = env.SESSION_EXPIRES or "1d"
+
 local _service_dir = "/massbit/massbitroute/app/src/sites/services"
 local _portal_dir = _service_dir .. "/api"
 local _deploy_dir = _portal_dir .. "/public/deploy/dapi"
@@ -70,8 +71,8 @@ ${security._is_limit_rate_per_sec?_limit_rate_per_sec1()}
 server {
     listen 80;
     listen 443 ssl;
-    ssl_certificate /etc/letsencrypt/live/${blockchain}-${network}.${_domain_name}/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/${blockchain}-${network}.${_domain_name}/privkey.pem;
+    ssl_certificate /etc/letsencrypt/live/${blockchain}-${network}.massbitroute.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/${blockchain}-${network}.massbitroute.com/privkey.pem;
     resolver 8.8.4.4 ipv6=off;
     client_body_buffer_size 512K;
     client_max_body_size 1G;
@@ -82,9 +83,9 @@ server {
     set $api_method '';
     set $jsonrpc_whitelist '';
 
-    encrypted_session_key ]] .. _session_key .. [[;
-    encrypted_session_iv ]] .. _session_iv .. [[;
-    encrypted_session_expires ]] .. _session_expires .. [[;
+    encrypted_session_key abcdefghijmbrbaysaklmnopqrstuvwo;
+    encrypted_session_iv 123mbrbaysao4567;
+    encrypted_session_expires 30d;
 
     location /${api_key} {
         set $mbr_token ${api_key};
@@ -95,7 +96,6 @@ server {
         access_by_lua_file /massbit/massbitroute/app/src/sites/services/gateway/src/filter-jsonrpc-access.lua;
         vhost_traffic_status_filter_by_set_key $api_method ${api_key}::dapi::api_method;
         vhost_traffic_status_filter_by_set_key $api_method __GATEWAY_ID__::gw::api_method;
-        vhost_traffic_status_filter_by_set_key $api_method ${project_id}::proj::api_method;
 
         add_header X-Mbr-Gateway-Id __GATEWAY_ID__;
         proxy_cache_use_stale updating error timeout invalid_header http_500 http_502 http_503 http_504;
@@ -203,7 +203,7 @@ server {
         proxy_send_timeout 3;
         proxy_read_timeout 3;
 
-        proxy_pass http://${blockchain}-${network}.node.mbr.${_domain_name};
+        proxy_pass http://${blockchain}-${network}.node.mbr.massbitroute.com;
         proxy_ssl_verify off;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
@@ -224,14 +224,13 @@ local function _norm_entrypoint(_ent, _item)
         _ent._is_backup = true
     end
 
-    _ent.provider_id = PROVIDERS[_ent.provider] .. "-" .. _ent.id
+    _ent.provider_id = PROVIDERS[_ent.type] .. "-" .. _ent.id
     if _ent.api_key then
         _ent.ent_api_key = _ent.api_key
     end
 
     _ent.api_key = _item.api_key
     _ent.server_name = _item.api_key .. "-" .. _ent.provider_id
-    _ent._domain_name = _item._domain_name
     _ent.blockchain = _item.blockchain
     _ent.network = _item.network
     return _ent
@@ -296,7 +295,7 @@ local function _generate_item(instance, args)
 
     -- query dapi from db
     local _item = _norm(model:get(args))
-    _item._domain_name = args._domain_name
+
     if not _item.id or not _item.blockchain or not _item.network then
         return false
     end
@@ -333,7 +332,7 @@ local function _generate_item(instance, args)
                 function(_ent)
                     _ent = _norm_entrypoint(_ent, _item)
                     local _tmpl = _get_tmpl(rules, _ent)
-                    local _str_tmpl = _tmpl("_server_backend_" .. _ent.provider)
+                    local _str_tmpl = _tmpl("_server_backend_" .. _ent.type)
                     _content[#_content + 1] = _str_tmpl
                     return _ent
                 end
@@ -378,7 +377,19 @@ local function _generate_item(instance, args)
     -- write conf for dapi in blocknet dir
     _write_file(_deploy_file, table_concat(_content, "\n"))
 
-    -- read all file in blocknet dir
+    local _cmd = { _portal_dir .. "/scripts/run",
+		    "_test_node",
+		    _item.id,
+		    _blocknet,
+		    _deploy_file
+    }
+    local _res = shell.run(_cmd)
+    
+    if _res.status ~= 0 then
+       os.remove(_deploy_file)
+       return false
+    end
+           -- read all file in blocknet dir
     local _content_all = _read_dir(_blocknet_dir)
     local _combine_file = _deploy_confdir .. "/" .. _blocknet .. ".conf"
 
@@ -388,6 +399,7 @@ local function _generate_item(instance, args)
     -- create new rule for domain with blockchain-network
     -- local _file_dapi = gwman_dir .. "/data/zones/dapi/" .. _blocknet .. ".zone"
     -- _write_file(_file_dapi, "*." .. _blocknet .. " 60/60 DYNA	geoip!mbr-map-" .. _blocknet .. "\n")
+    return true
 end
 
 local function _generate_multi_item(instance, args)
@@ -414,11 +426,10 @@ end
 --
 function JobsAction:generateconfAction(job)
     print(inspect(job))
-    local _config = self:getInstanceConfig()
+
     local instance = self:getInstance()
     local job_data = job.data
-    job_data._domain_name = _config.app.server_name or "massbitroute.com"
-    _generate_item(instance, job_data)
+    return _generate_item(instance, job_data)
 end
 
 --- Job handler for remove conf
