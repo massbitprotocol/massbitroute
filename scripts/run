@@ -164,7 +164,7 @@ _test_node() {
 	cd $service_dir/node
 	rsync -avz * $_dir/ >/dev/null
 	cd $_dir
-	mkdir -p http.d/
+	mkdir -p http.d logs
 	cat <<EOF >http.d/${_id}.conf
 upstream ${_blocknet}.node.mbr.${DOMAIN} {
 server 127.0.0.1;
