@@ -156,6 +156,30 @@ _install() {
 
 }
 
+_test_node(){
+    _id=$1
+    _blocknet=$2
+    _conf=$3
+    _dir=$(mktemp -d)
+    cd $service_dir/node
+    rsync -avz * $_dir/ >/dev/null
+    cd $_dir
+    mkdir -p http.d/
+    cat <<EOF >http.d/${_id}.conf
+upstream ${_blocknet}.node.mbr.massbitroute.com {
+server 127.0.0.1;
+}
+EOF
+    cat $_conf >> http.d/${_id}.conf
+    # cat http.d/${_id}.conf
+
+    ./cmd_server _updateconf
+    ./cmd_server nginx -t
+    st=$?
+    # ./cmd_server nginx -T
+    rm -rf $_dir
+    return $st
+}
 _git() {
 	git "$@"
 	st=$?
