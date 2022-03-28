@@ -6,7 +6,7 @@ local mytype = "node"
 local JobsAction = cc.class(mytype .. "JobsAction", gbc.ActionBase)
 
 local mbrutil = require "mbutil" -- cc.import("#mbrutil")
-
+local env = require("env")
 local read_dir = mbrutil.read_dir
 local read_file = mbrutil.read_file
 local show_folder = mbrutil.show_folder
@@ -35,7 +35,7 @@ local _deploy_nodeconfdir = _portal_dir .. "/public/deploy/nodeconf"
 local _deploy_gatewayconfdir = _portal_dir .. "/public/deploy/gatewayconf"
 
 local Model = cc.import("#" .. mytype)
-
+local _domain_name = env.DOMAIN or "massbitroute.com"
 local mkdirp = require "mkdirp"
 local _gwman_dir = _service_dir .. "/gwman"
 local _stat_dir = _service_dir .. "/stat"
@@ -45,7 +45,7 @@ local rules = {
     _listids = [[${nodes/_listid(); separator='\n'}]],
     _node_zone = [[${id}.node.mbr 60 A ${ip}]],
     _node_zones = [[${nodes/_node_zone(); separator='\n'}]],
-    _node_stat_target = [[          - ${id}.node.mbr.${server_name}]],
+    _node_stat_target = [[          - ${id}.node.mbr.${_domain_name}]],
     _node_stat_v1 = [[${nodes/_node_stat_target(); separator='\n'}]],
     _node_stat = [[
 scrape_configs:
@@ -79,7 +79,7 @@ ${_is_enabled?_gw_node()}
 ${_is_approved?_gw_node_upstream()}
 ]],
     _gw_node_upstreams = [[
-upstream ${node_type}.node.mbr.${server_name} {
+upstream ${node_type}.node.mbr.${_domain_name} {
 ${nodes/_gw_node_upstream_approved()}
 }
 ]],
@@ -90,7 +90,7 @@ server {
         proxy_redirect off;
         proxy_ssl_server_name on;
         proxy_set_header X-Api-Key ${token};
-        proxy_set_header Host ${id}.node.mbr.${server_name};
+        proxy_set_header Host ${id}.node.mbr.${_domain_name};
         add_header X-Mbr-GNode-Id ${id};
         proxy_pass https://${ip};
         proxy_http_version 1.1;
@@ -116,12 +116,12 @@ map $http_x_api_key $api_realm {
 server {
     listen 80;
     listen 443 ssl;
-    ssl_certificate  /massbit/massbitroute/app/src/sites/services/node/ssl/node.mbr.${server_name}/fullchain.pem;
-    ssl_certificate_key  /massbit/massbitroute/app/src/sites/services/node/ssl/node.mbr.${server_name}/privkey.pem;
+    ssl_certificate  /massbit/massbitroute/app/src/sites/services/node/ssl/node.mbr.${_domain_name}/fullchain.pem;
+    ssl_certificate_key  /massbit/massbitroute/app/src/sites/services/node/ssl/node.mbr.${_domain_name}/privkey.pem;
     resolver 8.8.4.4 ipv6=off;
     client_body_buffer_size 512K;
     client_max_body_size 1G;
-    server_name ${id}.node.mbr.${server_name};
+    server_name ${id}.node.mbr.${_domain_name};
   
 
     set $api_method '';
@@ -184,7 +184,7 @@ server {
 ]],
     _upstream_server = [[server unix:/tmp/${id}.sock max_fails=1 fail_timeout=3s;]],
     _upstream = [[
-upstream eth-mainnet.node.mbr.${_domain} {
+upstream eth-mainnet.node.mbr.${_domain_name} {
 ${_upstream_server}
 }
 ]],
@@ -201,7 +201,7 @@ server {
         proxy_redirect off;
         proxy_ssl_server_name on;
         proxy_set_header X-Api-Key ${token};
-        proxy_set_header Host ${id}.node.mbr.${_domain};
+        proxy_set_header Host ${id}.node.mbr.${_domain_name};
         proxy_pass https://${ip};
         proxy_http_version 1.1;
         proxy_ssl_verify off;
@@ -299,7 +299,7 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
                                         if type(_item) == "string" then
                                             _item = json.decode(_item)
                                         end
-                                        _item.server_name = _job_data.server_name
+                                        _item._domain_name = _job_data._domain_name
                                         if tonumber(_item.status) == 1 then
                                             _item._is_enabled = true
                                             _actives[#_actives + 1] = _item
@@ -323,8 +323,10 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
     _print("datacenters:" .. inspect(_datacenters))
     if _datacenters and #_datacenters > 0 then
         -- _print("actives:" .. inspect(_actives))
-        local _tmpl =
-            _get_tmpl(rules, {node_type = _blocknet_id, nodes = _datacenters, server_name = _job_data.server_name})
+
+
+        local _tmpl = _get_tmpl(rules, {node_type = _blocknet_id, nodes = _datacenters, _domain_name = _job_data._domain_name})
+
         local _str_tmpl = _tmpl("_gw_conf")
         _print(_str_tmpl)
         local _file_gw = _deploy_gatewayconfdir .. "/" .. _blocknet_id .. ".conf"
@@ -333,7 +335,7 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
     end
 
     if _approved and #_approved > 0 then
-        local _tmpl = _get_tmpl(rules, {nodes = _approved, server_name = _job_data.server_name})
+        local _tmpl = _get_tmpl(rules, {nodes = _approved, _domain_name = _job_data._domain_name})
         local _str_stat = _tmpl("_node_stat_v1")
 
         mkdirp(_stat_dir .. "/etc/prometheus/stat_node/")
@@ -344,7 +346,7 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
     end
 
     if _actives and #_actives > 0 then
-        local _tmpl = _get_tmpl(rules, {nodes = _actives, server_name = _job_data.server_name})
+        local _tmpl = _get_tmpl(rules, {nodes = _actives, _domain_name = _job_data._domain_name})
         local _str = _tmpl("_node_zones")
         local _file = _gwman_dir .. "/data/zones/" .. mytype .. "/" .. _blocknet_id .. ".zone"
         _print(_str)
@@ -416,7 +418,7 @@ local function _generate_item(instance, args)
     -- keep create dir blockchain/network
     local _deploy_file1 = _deploy_dir .. "/" .. _k2 .. "/.gitkeep"
     _write_file(_deploy_file1, "")
-    _item.server_name = args.server_name
+    _item._domain_name = args._domain_name
     local _tmpl = _get_tmpl(rules, _item)
     local _str_tmpl = _tmpl("_local")
 
@@ -439,10 +441,9 @@ function JobsAction:generateconfAction(job)
     _print("generateconf:" .. inspect(job))
 
     local instance = self:getInstance()
-    local _config = self:getInstanceConfig()
 
     local job_data = job.data or {}
-    job_data.server_name = _config.app.server_name or "massbitroute.com"
+    job_data._domain_name = _domain_name
     _print("job_data: " .. inspect(job_data))
     _generate_item(instance, job_data)
     -- _update_gdnsd(job_data)
@@ -450,10 +451,8 @@ end
 
 function JobsAction:rescanconfAction(job)
     -- local instance = self:getInstance()
-    local _config = self:getInstanceConfig()
-
     local job_data = job.data or {}
-    job_data.server_name = _config.app.server_name or "massbitroute.com"
+    job_data._domain_name = _domain_name
     _rescanconf(job_data)
 end
 
@@ -463,7 +462,7 @@ function JobsAction:removeconfAction(job)
     local instance = self:getInstance()
     local _config = self:getInstanceConfig()
     local job_data = job.data or {}
-    job_data.server_name = _config.app.server_name or "massbitroute.com"
+    job_data._domain_name = _domain_name
     _remove_item(instance, job_data)
     -- _update_gdnsd(job_data)
 end

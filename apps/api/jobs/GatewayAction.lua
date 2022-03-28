@@ -6,7 +6,7 @@ local json = cc.import("#json")
 local JobsAction = cc.class(mytype .. "JobsAction", gbc.ActionBase)
 
 local mbrutil = require "mbutil" --cc.import("#mbrutil")
-
+local env = require("env")
 local read_dir = mbrutil.read_dir
 local read_file = mbrutil.read_file
 local show_folder = mbrutil.show_folder
@@ -29,7 +29,7 @@ local mkdirp = require "mkdirp"
 JobsAction.ACCEPTED_REQUEST_TYPE = "worker"
 
 local Model = cc.import("#" .. mytype)
-
+local _domain_name = env.DOMAIN or "massbitroute.com"
 local _service_dir = "/massbit/massbitroute/app/src/sites/services"
 local _portal_dir = _service_dir .. "/api"
 local _deploy_dir = _portal_dir .. "/public/deploy/gateway"
@@ -85,7 +85,7 @@ ${datacenters/_datacenter(); separator=',\n'}
 ]],
     _gw_zone = [[${id}.gw.mbr 60 A ${ip}]],
     _gw_zones = [[${nodes/_gw_zone(); separator='\n'}]],
-    _gw_stat_target = [[          - ${id}.gw.mbr.massbitroute.com]],
+    _gw_stat_target = [[          - ${id}.gw.mbr.${_domain_name}]],
     _gw_stat_v1 = [[${nodes/_gw_stat_target(); separator='\n'}]],
     _gw_stat = [[
 scrape_configs:
@@ -117,53 +117,10 @@ local function _norm(_v)
     return _v
 end
 
-local function _remove_item(instance, args)
-    _print("remove_item:" .. inspect(args))
-    local model = Model:new(instance)
-    local _item = _norm(model:get(args))
-
-    if args._is_delete then
-        model:delete({id = args.id, user_id = args.user_id})
-    end
-
-    if
-        not _item or not _item.id or not _item.ip or not _item.blockchain or not _item.network or not _item.geo or
-            not _item.geo.continent_code or
-            not _item.geo.country_code
-     then
-        return nil, "invalid data"
-    end
-
-    local _item_path =
-        table_concat(
-        {
-            _deploy_dir,
-            _item.blockchain,
-            _item.network,
-            _item.geo.continent_code,
-            _item.geo.country_code,
-            _item.user_id
-        },
-        "/"
-    )
-    local _deploy_file = _item_path .. "/" .. _item.id
-
-    if args._is_delete then
-        _print("remove_file:" .. _deploy_file)
-        os.remove(_deploy_file)
-    else
-        table_merge(_item, args)
-        _item._is_delete = nil
-        _write_file(_deploy_file, json.encode(_item))
-    end
-
-    return true
-end
-
 --- Rescan gateway only for specific blockchain and network
 -- using after update gateway
 --
-local function _rescanconf_blockchain_network(_blockchain, _network)
+local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
     _print("rescanconf_blockchain_network:" .. _blockchain .. ":" .. _network)
     local _datacenters = {}
     local _actives = {}
@@ -191,6 +148,7 @@ local function _rescanconf_blockchain_network(_blockchain, _network)
                         if type(_item) == "string" then
                             _item = json.decode(_item)
                         end
+                        _item._domain_name = _job_data._domain_name
                         -- local _ip = _item.ip
                         -- print("ip:" .. inspect(_ip))
                         local _obj = {
@@ -358,14 +316,6 @@ local function _rescanconf_blockchain_network(_blockchain, _network)
         _print(_file)
         _write_file(_file, _str)
 
-        -- local _tmpl = _get_tmpl(rules, {nodes = _datacenter_ids_all})
-        -- local _str_stat = _tmpl("_gw_stat_v1")
-        -- mkdirp(stat_dir .. "/etc/prometheus/stat_gw")
-        -- local _file_stat = stat_dir .. "/etc/prometheus/stat_gw/" .. _blocknet_id .. ".yml"
-        -- _print(_str_stat)
-        -- _print(_file_stat)
-        -- _write_file(_file_stat, _str_stat)
-
         local _str_listid = _tmpl("_listids")
         mkdirp(_info_dir .. "/" .. mytype)
         local _file_listid = _info_dir .. "/" .. mytype .. "/listid-" .. _blocknet_id
@@ -375,14 +325,59 @@ local function _rescanconf_blockchain_network(_blockchain, _network)
     end
 end
 
-local function _rescanconf()
+local function _rescanconf(_job_data)
     for _, _blockchain in ipairs(show_folder(_deploy_dir)) do
         local _blockchain_dir = _deploy_dir .. "/" .. _blockchain
         for _, _network in ipairs(show_folder(_blockchain_dir)) do
-            _rescanconf_blockchain_network(_blockchain, _network)
+            _rescanconf_blockchain_network(_blockchain, _network, _job_data)
         end
     end
 end
+
+
+local function _remove_item(instance, args)
+    _print("remove_item:" .. inspect(args))
+    local model = Model:new(instance)
+    local _item = _norm(model:get(args))
+    _print("stored_item:" .. inspect(_item))
+    if args._is_delete then
+        model:delete({id = args.id, user_id = args.user_id})
+    end
+
+    if
+        not _item or not _item.id or not _item.ip or not _item.blockchain or not _item.network or not _item.geo or
+            not _item.geo.continent_code or
+            not _item.geo.country_code
+     then
+        return nil, "invalid data"
+    end
+
+    local _item_path =
+        table_concat(
+        {
+            _deploy_dir,
+            _item.blockchain,
+            _item.network,
+            _item.geo.continent_code,
+            _item.geo.country_code,
+            _item.user_id
+        },
+        "/"
+    )
+    local _deploy_file = _item_path .. "/" .. _item.id
+
+    if args._is_delete then
+        _print("remove_file:" .. _deploy_file)
+        os.remove(_deploy_file)
+    else
+        table_merge(_item, args)
+        _item._is_delete = nil
+        _write_file(_deploy_file, json.encode(_item))
+    end
+    _rescanconf_blockchain_network(_item.blockchain, _item.network, args)
+    return true
+end
+
 
 --- Generate gateway conf
 --
@@ -425,7 +420,7 @@ local function _generate_item(instance, args)
     -- dump detail
     _write_file(_deploy_file, json.encode(_item))
 
-    _rescanconf_blockchain_network(_item.blockchain, _item.network)
+    _rescanconf_blockchain_network(_item.blockchain, _item.network, args)
     return true
 end
 
@@ -435,8 +430,9 @@ end
 
 function JobsAction:rescanconfAction(job)
     -- local instance = self:getInstance()
-    -- local job_data = job.data
-    _rescanconf()
+    local job_data = job.data
+    job_data._domain_name = _domain_name
+    _rescanconf(job_data)
 end
 
 --- Job handler for generate conf
@@ -444,9 +440,9 @@ end
 
 function JobsAction:generateconfAction(job)
     print(inspect(job))
-
     local instance = self:getInstance()
     local job_data = job.data
+    job_data._domain_name = _domain_name
     _generate_item(instance, job_data)
 end
 
