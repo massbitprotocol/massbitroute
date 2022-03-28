@@ -27,6 +27,7 @@ local inspect = require "inspect"
 -- local shell = require "shell"
 local shell =  require "shell-games"
 
+
 JobsAction.ACCEPTED_REQUEST_TYPE = "worker"
 
 local Model = cc.import("#" .. mytype)
@@ -380,6 +381,18 @@ local function _generate_item(instance, args)
 
     -- write conf for dapi in blocknet dir
     _write_file(_deploy_file, table_concat(_content, "\n"))
+     local _cmd = { _portal_dir .. "/scripts/run",
+		    "_test_node",
+		    _item.id,
+		    _blocknet,
+		    _deploy_file
+    }
+    local _res = shell.run(_cmd)
+    
+    if _res.status ~= 0 then
+       os.remove(_deploy_file)
+       return false
+    end
 
     local _cmd = { _portal_dir .. "/scripts/run",
 		    "_test_node",

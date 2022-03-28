@@ -316,14 +316,6 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
         _print(_file)
         _write_file(_file, _str)
 
-        -- local _tmpl = _get_tmpl(rules, {nodes = _datacenter_ids_all})
-        -- local _str_stat = _tmpl("_gw_stat_v1")
-        -- mkdirp(stat_dir .. "/etc/prometheus/stat_gw")
-        -- local _file_stat = stat_dir .. "/etc/prometheus/stat_gw/" .. _blocknet_id .. ".yml"
-        -- _print(_str_stat)
-        -- _print(_file_stat)
-        -- _write_file(_file_stat, _str_stat)
-
         local _str_listid = _tmpl("_listids")
         mkdirp(_info_dir .. "/" .. mytype)
         local _file_listid = _info_dir .. "/" .. mytype .. "/listid-" .. _blocknet_id
@@ -340,6 +332,50 @@ local function _rescanconf(_job_data)
             _rescanconf_blockchain_network(_blockchain, _network, _job_data)
         end
     end
+end
+
+
+local function _remove_item(instance, args)
+    _print("remove_item:" .. inspect(args))
+    local model = Model:new(instance)
+    local _item = _norm(model:get(args))
+    _print("stored_item:" .. inspect(_item))
+    if args._is_delete then
+        model:delete({id = args.id, user_id = args.user_id})
+    end
+
+    if
+        not _item or not _item.id or not _item.ip or not _item.blockchain or not _item.network or not _item.geo or
+            not _item.geo.continent_code or
+            not _item.geo.country_code
+     then
+        return nil, "invalid data"
+    end
+
+    local _item_path =
+        table_concat(
+        {
+            _deploy_dir,
+            _item.blockchain,
+            _item.network,
+            _item.geo.continent_code,
+            _item.geo.country_code,
+            _item.user_id
+        },
+        "/"
+    )
+    local _deploy_file = _item_path .. "/" .. _item.id
+
+    if args._is_delete then
+        _print("remove_file:" .. _deploy_file)
+        os.remove(_deploy_file)
+    else
+        table_merge(_item, args)
+        _item._is_delete = nil
+        _write_file(_deploy_file, json.encode(_item))
+    end
+    _rescanconf_blockchain_network(_item.blockchain, _item.network, args)
+    return true
 end
 
 

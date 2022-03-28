@@ -55,25 +55,25 @@ _git_config() {
 	git -C $_dir config --global user.email $GIT_AUTH_MAIL
 }
 _gitclone() {
-  repo=$1
-  dest=$2
-  shift 2
-  rem="$@"
-  cmd="git clone $repo $dest $rem"
-  $cmd
-  st=$?
-  i=0
-  while [ \( $i -lt $GITHUB_TRIES \) -a \( $st -ne 0 \) ]; do
-    echo "Can not clone code from github $repo. Retrying ${i}th ... !"
-    $cmd
-    st=$?
-    i=$((i + 1))
-  done
-  if [ $st -ne 0 ]; then
-    echo "Can not clone code from github $repo after $GITHUB_TRIES tries!"
-    exit 1
-  fi
-  git -C $dest remote set-url origin $repo
+	repo=$1
+	dest=$2
+	shift 2
+	rem="$@"
+	cmd="git clone $repo $dest $rem"
+	$cmd
+	st=$?
+	i=0
+	while [ \( $i -lt $GITHUB_TRIES \) -a \( $st -ne 0 \) ]; do
+		echo "Can not clone code from github $repo. Retrying ${i}th ... !"
+		$cmd
+		st=$?
+		i=$((i + 1))
+	done
+	if [ $st -ne 0 ]; then
+		echo "Can not clone code from github $repo after $GITHUB_TRIES tries!"
+		exit 1
+	fi
+	git -C $dest remote set-url origin $repo
 }
 _reload() {
 	if [ ! -f "/usr/bin/parallel" ]; then apt install -y parallel; fi
@@ -94,15 +94,15 @@ _install() {
 
 	dest=/massbit/massbitroute/app/$service
 	if [ -d "$dest" ]; then
-	  rm -rf $dest
+		rm -rf $dest
 	fi
-	_gitclone https://github.com/massbitprotocol/massbitroute_gbc  $dest
+	_gitclone https://github.com/massbitprotocol/massbitroute_gbc $dest
 
 	asdfdest=/massbit/massbitroute/app/gbc/bin/.asdf
 	if [ -d "$asdfdest" ]; then
-	  rm -rf $asdfdest
+		rm -rf $asdfdest
 	fi
-	_gitclone https://github.com/massbitprotocol/massbitroute_asdf  $asdfdest
+	_gitclone https://github.com/massbitprotocol/massbitroute_asdf $asdfdest
 	#servicedir=/massbit/massbitroute/app/gbc/bin/.asdf
 	#if [ -d "$servicedir" ]; then
 	#  rm -rf $servicedir
@@ -112,18 +112,18 @@ _install() {
 	service=ssl
 	dest=/etc/letsencrypt/$service
 	if [ -d "$dest" ]; then
-	  rm -rf $dest
+		rm -rf $dest
 	fi
-	_gitclone https://$auth@git.${DOMAIN}/massbitroute/${service}.git  $dest
+	_gitclone https://$auth@git.${DOMAIN}/massbitroute/${service}.git $dest
 	#git clone http://$GIT_READ@$PRIVATE_GIT_DOMAIN/massbitroute/${service}.git /etc/letsencrypt
 	#git -C /etc/letsencrypt remote set-url origin http://$GIT_READ@$PRIVATE_GIT_DOMAIN/massbitroute/${service}.git
 
 	service=mkagent
 	dest=$SITE_ROOT/etc/$service
 	if [ -d "$dest" ]; then
-	  rm -rf $dest
+		rm -rf $dest
 	fi
-	_gitclone https://github.com/massbitprotocol/massbitroute_mkagent  $dest
+	_gitclone https://github.com/massbitprotocol/massbitroute_mkagent $dest
 	#git clone http://$PUBLIC_GIT_DOMAIN/massbitroute/massbitroute_${service}.git $SITE_ROOT/etc/$service
 	#git -C $SITE_ROOT/etc/$service remote set-url origin http://$GIT_READ@$PRIVATE_GIT_DOMAIN/massbitroute/massbitroute_${service}.git
 
@@ -151,11 +151,17 @@ _install() {
 
 	service=$type
 	gitdir=$service_dir/$service
-	giturl=http://$GIT_API_WRITE@$GIT_DOMAIN/massbitroute/${service}.git
-	git clone $giturl $gitdir
-	git -C $gitdir remote set-url origin $giturl
+<
+	giturl=https://$PUBLIC_GIT_DOMAIN/massbitprotocol/massbitroute
+	if [ -d "$gitdir" ]; then
+		git -C $gitdir remote set-url origin $giturl
+		git -C $gitdir pull
+	else
+		git clone $giturl $gitdir
+	fi
+	tar -xf $gitdir/data/geoip/GeoIP2-City.mmdb.tar.xz -C $gitdir/data/geoip/
+	git clone https://$PUBLIC_GIT_DOMAIN/massbitprotocol/mbr-app.git $service_dir/$service/public/mbr-app-prod
 
-	git clone https://github.com/massbitprotocol/mbr-app.git $service_dir/$service/public/mbr-app-prod
 
 	service=apideploy
 	gitdir=$service_dir/api/public/deploy
@@ -174,29 +180,30 @@ _install() {
 
 }
 
-_test_node(){
-    _id=$1
-    _blocknet=$2
-    _conf=$3
-    _dir=$(mktemp -d)
-    cd $service_dir/node
-    rsync -avz * $_dir/ >/dev/null
-    cd $_dir
-    mkdir -p http.d/
-    cat <<EOF >http.d/${_id}.conf
-upstream ${_blocknet}.node.mbr.massbitroute.com {
+_test_node() {
+	_id=$1
+	_blocknet=$2
+	_conf=$3
+	_dir=$(mktemp -d)
+	cd $service_dir/node
+	rsync -avz * $_dir/ >/dev/null
+	cd $_dir
+	mkdir -p http.d logs
+	cat <<EOF >http.d/${_id}.conf
+upstream ${_blocknet}.node.mbr.${DOMAIN} {
 server 127.0.0.1;
 }
 EOF
-    cat $_conf >> http.d/${_id}.conf
-    # cat http.d/${_id}.conf
+	cat $_conf >>http.d/${_id}.conf
+	# cat http.d/${_id}.conf
 
-    ./cmd_server _updateconf
-    ./cmd_server nginx -t
-    st=$?
-    # ./cmd_server nginx -T
-    rm -rf $_dir
-    return $st
+	./cmd_server _updateconf
+	./cmd_server nginx -t
+	st=$?
+	# ./cmd_server nginx -T
+	rm -rf $_dir
+	return $st
+
 }
 _git() {
 	git "$@"
@@ -386,9 +393,11 @@ _rescan_conf() {
 }
 _update_listid() {
 	_update_gateway_list
-	# _update_dapi_list
+
+	_update_dapi_list
 	_update_node_list
-	# _update_user_list
+	_update_user_list
+
 }
 _monitor() {
 
@@ -425,6 +434,9 @@ loop() {
 _run() {
 	rm -rf $SITE_ROOT/tmp/*
 	sleep 3
+
+	sed "s/_SERVER_NAME_/$DOMAIN/g" ssl.conf >tmp/ssl.conf
+
 	$SITE_ROOT/start_server
 }
 $@
