@@ -10,6 +10,14 @@ if [ ! -f "$cur/../.env" ]; then
 else
 	. $cur/../.env
 fi
+SITE_ROOT=$(realpath $(dirname $(realpath $0))/..)
+export HOME=$SITE_ROOT
+ROOT_DIR=$SITE_ROOT
+
+source $SITE_ROOT/scripts/base.sh
+cd $SITE_ROOT
+_load_env $SITE_ROOT
+
 _prod() {
 	cd $mbr_app
 	type=dapi
@@ -25,11 +33,11 @@ _build_prod() {
 	type=dapi
 	export PORT=3001
 	export API_BASE_URL=https://$type.$DOMAIN
-  export API_CORE_URL=http://api.$DOMAIN
-  export API_USER_URL=https://portal.$DOMAIN
-  export API_PORTAL_URL=https://portal.$DOMAIN
-  export DAPI_PROVIDER_DOMAIN=$DOMAIN
-  export STAT_URL=https://stat.mbr.$DOMAIN/
+	export API_CORE_URL=http://api.$DOMAIN
+	export API_USER_URL=https://portal.$DOMAIN
+	export API_PORTAL_URL=https://portal.$DOMAIN
+	export DAPI_PROVIDER_DOMAIN=$DOMAIN
+	export STAT_URL=https://stat.mbr.$DOMAIN/
 	export GATEWAY_INSTALL_URL=https://$type.$DOMAIN/api/v1/gateway_install
 	export NODE_INSTALL_URL=https://$type.$DOMAIN/api/v1/node_install
 	#git submodule update --init --remote mbr-app
@@ -51,10 +59,10 @@ _start_prod() {
 	export PORT=3001
 	export API_BASE_URL=https://$type.$DOMAIN
 	export API_CORE_URL=http://api.$DOMAIN
-  export API_USER_URL=https://portal.$DOMAIN
-  export API_PORTAL_URL=https://portal.$DOMAIN
-  export DAPI_PROVIDER_DOMAIN=$DOMAIN
-  export STAT_URL=https://stat.mbr.$DOMAIN/
+	export API_USER_URL=https://portal.$DOMAIN
+	export API_PORTAL_URL=https://portal.$DOMAIN
+	export DAPI_PROVIDER_DOMAIN=$DOMAIN
+	export STAT_URL=https://stat.mbr.$DOMAIN/
 	export GATEWAY_INSTALL_URL=https://$type.$DOMAIN/api/v1/gateway_install
 	export NODE_INSTALL_URL=https://$type.$DOMAIN/api/v1/node_install
 	rsync -avz assets dist/
