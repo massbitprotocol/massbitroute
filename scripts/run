@@ -151,7 +151,6 @@ _install() {
 
 	service=$type
 	gitdir=$service_dir/$service
-<
 	giturl=https://$PUBLIC_GIT_DOMAIN/massbitprotocol/massbitroute
 	if [ -d "$gitdir" ]; then
 		git -C $gitdir remote set-url origin $giturl
