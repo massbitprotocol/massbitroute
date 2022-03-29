@@ -127,7 +127,6 @@ _install() {
 	#git clone http://$PUBLIC_GIT_DOMAIN/massbitroute/massbitroute_${service}.git $SITE_ROOT/etc/$service
 	#git -C $SITE_ROOT/etc/$service remote set-url origin http://$GIT_READ@$PRIVATE_GIT_DOMAIN/massbitroute/massbitroute_${service}.git
 
-
 	service=node
 	git clone http://$GIT_NODE_WRITE@$GIT_DOMAIN/massbitroute/${service}.git $service_dir/$service
 
@@ -160,7 +159,6 @@ _install() {
 	fi
 	tar -xf $gitdir/data/geoip/GeoIP2-City.mmdb.tar.xz -C $gitdir/data/geoip/
 	git clone https://$PUBLIC_GIT_DOMAIN/massbitprotocol/mbr-app.git $service_dir/$service/public/mbr-app-prod
-
 
 	service=apideploy
 	gitdir=$service_dir/api/public/deploy
@@ -444,7 +442,7 @@ _run() {
 	rm -rf $SITE_ROOT/tmp/*
 	sleep 3
 
-	sed "s/_SERVER_NAME_/$DOMAIN/g" ssl.conf >tmp/ssl.conf
+	# sed "s/_SERVER_NAME_/$DOMAIN/g" ssl.conf >tmp/ssl.conf
 
 	$SITE_ROOT/start_server
 }
