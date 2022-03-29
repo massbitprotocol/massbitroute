@@ -16,30 +16,30 @@ _centos() {
 	yum update
 	yum install -y git httpd-tools supervisor jq python2
 }
-_nodeverify(){
-  res=$($SITE_ROOT/mbr node nodeverify | tail -1 | jq .status | sed s/\"//g)
-  echo $res
+_nodeverify() {
+	res=$($SITE_ROOT/mbr node nodeverify | tail -1 | jq .status | sed s/\"//g)
+	echo $res
 }
 _gitclone() {
-  repo=$1
-  dest=$2
-  shift 2
-  rem="$@"
-  cmd="git clone $repo $dest $rem"
-  $cmd
-  st=$?
-  i=0
-  while [ \( $i -lt $GITHUB_TRIES \) -a \( $st -ne 0 \) ]; do
-    echo "Can not clone code from github $repo. Retrying ${i}th ... !"
-    $cmd
-    st=$?
-    i=$((i + 1))
-  done
-  if [ $st -ne 0 ]; then
-    echo "Can not clone code from github $repo after $GITHUB_TRIES tries!"
-    exit 1
-  fi
-  git -C $dest remote set-url origin $repo
+	repo=$1
+	dest=$2
+	shift 2
+	rem="$@"
+	cmd="git clone $repo $dest $rem"
+	$cmd
+	st=$?
+	i=0
+	while [ \( $i -lt $GITHUB_TRIES \) -a \( $st -ne 0 \) ]; do
+		echo "Can not clone code from github $repo. Retrying ${i}th ... !"
+		$cmd
+		st=$?
+		i=$((i + 1))
+	done
+	if [ $st -ne 0 ]; then
+		echo "Can not clone code from github $repo after $GITHUB_TRIES tries!"
+		exit 1
+	fi
+	git -C $dest remote set-url origin $repo
 }
 if [ -f /etc/os-release ]; then
 	# freedesktop.org and systemd
@@ -115,13 +115,13 @@ if [ -z "$zone" ]; then
 fi
 
 if [ "$zone" != "{{zone}}" ]; then
-	echo "Your IP $IP not in zone {{zone}}"
-	read -p "Are you sure ? (y/n) " -n 1 -r
-	echo # (optional) move to a new line
-	if [[ ! "$REPLY" =~ ^[Yy]$ ]]; then
-		echo "Please install in correct Zone"
-		exit 1
-	fi
+	echo "WARNING: Your IP $IP not in zone {{zone}}"
+	# read -p "Are you sure ? (y/n) " -n 1 -r
+	# echo # (optional) move to a new line
+	# if [[ ! "$REPLY" =~ ^[Yy]$ ]]; then
+	# 	echo "Please install in correct Zone"
+	# 	exit 1
+	# fi
 
 fi
 
@@ -134,13 +134,13 @@ mkdir -p $(dirname $SITE_ROOT)
 if [ ! -d "$SITE_ROOT/.git" ]; then
 	rm -rf $SITE_ROOT
 	#git clone -b master http://$auth@git.massbitroute.dev/massbitroute/gateway.git $SITE_ROOT
-  if [ "x$ENV" == "x" ]; then
-    _gitclone https://github.com/massbitprotocol/massbitroute_gateway $SITE_ROOT -b master
-    #git clone -b master http://github.com/massbitprotocol/massbitroute_gateway $SITE_ROOT
-  else
-    _gitclone https://github.com/massbitprotocol/massbitroute_gateway $SITE_ROOT -b ${ENV}
-    #git clone -b ${ENV} http://github.com/massbitprotocol/massbitroute_gateway $SITE_ROOT
-  fi
+	if [ "x$ENV" == "x" ]; then
+		_gitclone https://github.com/massbitprotocol/massbitroute_gateway $SITE_ROOT -b master
+		#git clone -b master http://github.com/massbitprotocol/massbitroute_gateway $SITE_ROOT
+	else
+		_gitclone https://github.com/massbitprotocol/massbitroute_gateway $SITE_ROOT -b ${ENV}
+		#git clone -b ${ENV} http://github.com/massbitprotocol/massbitroute_gateway $SITE_ROOT
+	fi
 fi
 
 cd $SITE_ROOT
@@ -172,13 +172,12 @@ $SITE_ROOT/cmd_server _update
 
 $SITE_ROOT/cmd_server status
 
-
 status=$(_nodeverify)
 while [ "$status" != "verified" ]; do
 	echo "Verifying firewall ... Please make sure your firewall is open and try run again."
 	sleep 10
 	$SCRIPTS_RUN _load_config
-  $SITE_ROOT/cmd_server _update
+	$SITE_ROOT/cmd_server _update
 	status=$(_nodeverify)
 done
 if [ "$status" = "verified" ]; then
