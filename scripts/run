@@ -424,9 +424,19 @@ _monitor() {
 	$0 _git_cmd push
 	$cmd start all
 }
+
+_timeout() {
+	t=$1
+	if [ -n "$t" ]; then
+		shift
+		timeout $t $0 $@
+	else
+		$0 $@
+	fi
+}
 loop() {
 	while true; do
-		timeout 60 $0 $@
+		$0 $@
 		sleep 3
 	done
 
