@@ -621,7 +621,9 @@ function Action:updateAction(args)
     local model = Model:new(instance)
     local _detail, _err_msg = model:update(args)
     -- _export_data(model, args)
-    local _result
+    local _result = {
+        result = true
+    }
     if _detail then
         local jobs = instance:getJobs()
 
@@ -641,16 +643,13 @@ function Action:updateAction(args)
             }
         end
         jobs:add(job)
-        _result = {
-            result = true
-        }
     else
         _result = {
             result = false,
             err_msg = _err_msg
         }
     end
-
+    _print("_result:" .. inspect(_result))
     instance:getRedis():setKeepAlive()
     return _result
 end
