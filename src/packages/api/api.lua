@@ -1,4 +1,4 @@
-local User = cc.class("Api")
+local Api = cc.class("Api")
 local json = cc.import("#json")
 
 local model_type = "api"
@@ -7,12 +7,12 @@ local util = require "mbutil" -- cc.import("#mbrutil")
 local Model = cc.import("#model")
 -- local uuid = require "jit-uuid"
 
-function User:ctor(instance)
+function Api:ctor(instance)
     self._instance = instance
     self._redis = instance:getRedis()
     self._model = Model:new(instance)
 end
-function User:create(args)
+function Api:create(args)
     args.action = nil
     local user_id = args.user_id
     -- args.id = objectid.generate_id(model_id)
@@ -37,41 +37,41 @@ function User:create(args)
     return args
 end
 
-function User:update(args)
+function Api:update(args)
     args.action = nil
     local user_id = args.user_id
     local _detail = self._model:_get_key(user_id .. ":" .. model_type, args.id)
 
     if _detail then
         _detail = json.decode(_detail)
-
         table.merge(_detail, args)
-        _detail.action = nil
-        local _now = ngx and ngx.time() or os.time()
-        _detail.updated_at = _now
-        self._model:_save_key(user_id .. ":" .. model_type, {[_detail.id] = json.encode(_detail)})
     end
+
+    _detail.action = nil
+    local _now = ngx and ngx.time() or os.time()
+    _detail.updated_at = _now
+    self._model:_save_key(user_id .. ":" .. model_type, {[_detail.id] = json.encode(_detail)})
 
     return _detail
 end
-function User:delete(args)
+function Api:delete(args)
     args.action = nil
     local user_id = args.user_id
     self._model:_del_key(user_id .. ":" .. model_type, args.id)
     return args
 end
 
-function User:list(args)
+function Api:list(args)
     args.action = nil
     local user_id = args.user_id
     local _res = self._model:_getall_key(user_id .. ":" .. model_type)
     return _res
 end
-function User:get(args)
+function Api:get(args)
     args.action = nil
     local user_id = args.user_id
     local _detail = self._model:_get_key(user_id .. ":" .. model_type, args.id)
     return _detail
 end
 
-return User
+return Api
