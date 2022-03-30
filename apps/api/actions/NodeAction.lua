@@ -211,7 +211,7 @@ function Action:registerAction(args)
         return {result = false, err_msg = "Token not correct"}
     end
     ]]
-    local ip =  args.geo and args.geo.ip or ngx.var.realip
+    local ip = args.geo and args.geo.ip or ngx.var.realip
 
     _print("ip:" .. ip)
 
@@ -460,6 +460,11 @@ function Action:adminupdateAction(args)
     local instance = self:getInstance()
     local model = Model:new(instance)
     local _ok, _err = model:update(args)
+    local result = {
+        ok = _ok,
+        err = _err
+    }
+    _print("result:" .. inspect(result))
     if _ok then
         local jobs = instance:getJobs()
         local job
@@ -479,10 +484,8 @@ function Action:adminupdateAction(args)
         end
         jobs:add(job)
     end
-    return {
-        ok = _ok,
-        err = _err
-    }
+
+    return result
 end
 
 -- local _portal_dir = "/massbit/massbitroute/app/src/sites/services/api"
