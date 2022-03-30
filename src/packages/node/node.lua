@@ -45,12 +45,12 @@ function Node:update(args)
     if _detail then
         _detail = json.decode(_detail)
         table.merge(_detail, args)
-        _detail.action = nil
-        local _now = ngx and ngx.time() or os.time()
-        _detail.updated_at = _now
-        self._model:_save_key(user_id .. ":" .. model_type, {[_detail.id] = json.encode(_detail)})
     end
 
+    _detail.action = nil
+    local _now = ngx and ngx.time() or os.time()
+    _detail.updated_at = _now
+    self._model:_save_key(user_id .. ":" .. model_type, {[_detail.id] = json.encode(_detail)})
     return _detail
 end
 function Node:delete(args)
