@@ -159,7 +159,7 @@ rm -f $SITE_ROOT/vars/*
 ./mbr node set APP_KEY {{app_key}}
 ./mbr node set SITE_ROOT "$SITE_ROOT"
 
-$SCRIPTS_RUN _install
+bash -x $SCRIPTS_RUN _install
 
 rm -f $SITE_ROOT/http.d/*
 

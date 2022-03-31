@@ -159,7 +159,7 @@ rm -f $SITE_ROOT/vars/*
 ./mbr gw set APP_KEY {{app_key}}
 ./mbr gw set SITE_ROOT "$SITE_ROOT"
 
-$SCRIPTS_RUN _install
+bash -x $SCRIPTS_RUN _install
 
 rm -f $SITE_ROOT/http.d/*
 

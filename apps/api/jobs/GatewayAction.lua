@@ -334,7 +334,6 @@ local function _rescanconf(_job_data)
     end
 end
 
-
 local function _remove_item(instance, args)
     _print("remove_item:" .. inspect(args))
     local model = Model:new(instance)
@@ -377,7 +376,6 @@ local function _remove_item(instance, args)
     _rescanconf_blockchain_network(_item.blockchain, _item.network, args)
     return true
 end
-
 
 --- Generate gateway conf
 --
