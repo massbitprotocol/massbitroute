@@ -253,7 +253,7 @@ _git_cmd() {
 	if [ -z "$cmd" ]; then cmd=push; fi
 
 	_dir_def=$service_dir
-	for _service in api gateway node gwman stat; do
+	for _service in api gwman stat; do
 		_dir="$_dir_def/$_service"
 
 		# if [ "$cmd" = "push" ]; then
