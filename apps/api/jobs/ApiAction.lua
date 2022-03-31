@@ -229,7 +229,7 @@ local function _norm_entrypoint(_ent, _item)
         _ent._is_backup = true
     end
 
-    _ent.provider_id = PROVIDERS[_ent.type] .. "-" .. _ent.id
+    _ent.provider_id = PROVIDERS[_ent.provider] .. "-" .. _ent.id
     if _ent.api_key then
         _ent.ent_api_key = _ent.api_key
     end
@@ -337,7 +337,7 @@ local function _generate_item(instance, args)
                 function(_ent)
                     _ent = _norm_entrypoint(_ent, _item)
                     local _tmpl = _get_tmpl(rules, _ent)
-                    local _str_tmpl = _tmpl("_server_backend_" .. _ent.type)
+                    local _str_tmpl = _tmpl("_server_backend_" .. _ent.provider)
                     _content[#_content + 1] = _str_tmpl
                     return _ent
                 end
