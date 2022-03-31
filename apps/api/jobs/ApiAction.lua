@@ -30,12 +30,11 @@ local shell = require "shell-games"
 JobsAction.ACCEPTED_REQUEST_TYPE = "worker"
 
 local Model = cc.import("#" .. mytype)
-
 local env = require "env"
 local _domain_name = env.DOMAIN or "massbitroute.com"
--- local _session_key = env.SESSION_KEY or ""
--- local _session_iv = env.SESSION_IV or ""
--- local _session_expires = env.SESSION_EXPIRES or "1d"
+local _session_key = env.SESSION_KEY or ""
+local _session_iv = env.SESSION_IV or ""
+local _session_expires = env.SESSION_EXPIRES or "1d"
 local _service_dir = "/massbit/massbitroute/app/src/sites/services"
 local _portal_dir = _service_dir .. "/api"
 local _deploy_dir = _portal_dir .. "/public/deploy/dapi"
@@ -76,8 +75,12 @@ ${security._is_limit_rate_per_sec?_limit_rate_per_sec1()}
 server {
     listen 80;
     listen 443 ssl;
-    ssl_certificate /etc/letsencrypt/live/${blockchain}-${network}.massbitroute.com/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/${blockchain}-${network}.massbitroute.com/privkey.pem;
+    ssl_certificate /etc/letsencrypt/live/${blockchain}-${network}.]] ..
+        _domain_name ..
+            [[/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/${blockchain}-${network}.]] ..
+                _domain_name ..
+                    [[/privkey.pem;
     resolver 8.8.4.4 ipv6=off;
     client_body_buffer_size 512K;
     client_max_body_size 1G;
@@ -88,9 +91,15 @@ server {
     set $api_method '';
     set $jsonrpc_whitelist '';
 
-    encrypted_session_key abcdefghijmbrbaysaklmnopqrstuvwo;
-    encrypted_session_iv 123mbrbaysao4567;
-    encrypted_session_expires 30d;
+    encrypted_session_key ]] ..
+                        _session_key ..
+                            [[;
+    encrypted_session_iv ]] ..
+                                _session_iv ..
+                                    [[;
+    encrypted_session_expires ]] ..
+                                        _session_expires ..
+                                            [[;
 
     location /${api_key} {
         set $mbr_token ${api_key};
@@ -208,7 +217,9 @@ server {
         proxy_send_timeout 3;
         proxy_read_timeout 3;
 
-        proxy_pass http://${blockchain}-${network}.node.mbr.massbitroute.com;
+        proxy_pass http://${blockchain}-${network}.node.mbr.]] ..
+        _domain_name ..
+            [[;
         proxy_ssl_verify off;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
@@ -229,7 +240,7 @@ local function _norm_entrypoint(_ent, _item)
         _ent._is_backup = true
     end
 
-    _ent.provider_id = PROVIDERS[_ent.provider] .. "-" .. _ent.id
+    _ent.provider_id = PROVIDERS[_ent.type] .. "-" .. _ent.id
     if _ent.api_key then
         _ent.ent_api_key = _ent.api_key
     end
@@ -337,7 +348,7 @@ local function _generate_item(instance, args)
                 function(_ent)
                     _ent = _norm_entrypoint(_ent, _item)
                     local _tmpl = _get_tmpl(rules, _ent)
-                    local _str_tmpl = _tmpl("_server_backend_" .. _ent.provider)
+                    local _str_tmpl = _tmpl("_server_backend_" .. _ent.type)
                     _content[#_content + 1] = _str_tmpl
                     return _ent
                 end
