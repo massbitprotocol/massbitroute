@@ -400,7 +400,7 @@ local function _generate_item(instance, args)
         _deploy_file
     }
     local _res = shell.run(_cmd)
-
+    _print("test dapi result:" .. inspect(_res))
     if _res.status ~= 0 then
         os.remove(_deploy_file)
         return false
