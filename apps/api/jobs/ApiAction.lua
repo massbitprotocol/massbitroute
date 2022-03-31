@@ -25,17 +25,17 @@ local mkdirp = require "mkdirp"
 local inspect = require "inspect"
 
 -- local shell = require "shell"
-local shell =  require "shell-games"
-
+local shell = require "shell-games"
 
 JobsAction.ACCEPTED_REQUEST_TYPE = "worker"
 
 local Model = cc.import("#" .. mytype)
 
+local env = require "env"
 local _domain_name = env.DOMAIN or "massbitroute.com"
-local _session_key = env.SESSION_KEY or ""
-local _session_iv = env.SESSION_IV or ""
-local _session_expires = env.SESSION_EXPIRES or "1d"
+-- local _session_key = env.SESSION_KEY or ""
+-- local _session_iv = env.SESSION_IV or ""
+-- local _session_expires = env.SESSION_EXPIRES or "1d"
 local _service_dir = "/massbit/massbitroute/app/src/sites/services"
 local _portal_dir = _service_dir .. "/api"
 local _deploy_dir = _portal_dir .. "/public/deploy/dapi"
@@ -381,32 +381,34 @@ local function _generate_item(instance, args)
 
     -- write conf for dapi in blocknet dir
     _write_file(_deploy_file, table_concat(_content, "\n"))
-     local _cmd = { _portal_dir .. "/scripts/run",
-		    "_test_node",
-		    _item.id,
-		    _blocknet,
-		    _deploy_file
+    local _cmd = {
+        _portal_dir .. "/scripts/run",
+        "_test_node",
+        _item.id,
+        _blocknet,
+        _deploy_file
     }
     local _res = shell.run(_cmd)
-    
+
     if _res.status ~= 0 then
-       os.remove(_deploy_file)
-       return false
+        os.remove(_deploy_file)
+        return false
     end
 
-    local _cmd = { _portal_dir .. "/scripts/run",
-		    "_test_node",
-		    _item.id,
-		    _blocknet,
-		    _deploy_file
+    local _cmd = {
+        _portal_dir .. "/scripts/run",
+        "_test_node",
+        _item.id,
+        _blocknet,
+        _deploy_file
     }
     local _res = shell.run(_cmd)
-    
+
     if _res.status ~= 0 then
-       os.remove(_deploy_file)
-       return false
+        os.remove(_deploy_file)
+        return false
     end
-           -- read all file in blocknet dir
+    -- read all file in blocknet dir
     local _content_all = _read_dir(_blocknet_dir)
     local _combine_file = _deploy_confdir .. "/" .. _blocknet .. ".conf"
 
