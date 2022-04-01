@@ -80,7 +80,7 @@ _git_clone() {
 }
 _update_sources() {
 	_git_config
-	is_reload=0
+	_is_reload=0
 	branch=$MBR_ENV
 	for _pathgit in $@; do
 		_path=$(echo $_pathgit | cut -d'|' -f1)
@@ -88,10 +88,10 @@ _update_sources() {
 		st=$?
 		echo $_path $st
 		if [ $st -eq 0 ]; then
-			is_reload=1
+			_is_reload=1
 		fi
 	done
-	return $is_reload
+	return $_is_reload
 }
 loop() {
 	while true; do
