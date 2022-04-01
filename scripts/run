@@ -4,11 +4,11 @@ SITE_ROOT=$(realpath $(dirname $(realpath $0))/..)
 export HOME=$SITE_ROOT
 # export ROOT_DIR=$SITE_ROOT
 # source $ROOT_DIR/bin/shell_func.sh
-cd $SITE_ROOT
-
-source $SITE_ROOT/scripts/base.sh
 bash $SITE_ROOT/cmd_server _env
 source $SITE_ROOT/.env_raw
+source $SITE_ROOT/scripts/base.sh
+
+cd $SITE_ROOT
 # _load_env $SITE_ROOT
 
 service_dir=/massbit/massbitroute/app/src/sites/services
