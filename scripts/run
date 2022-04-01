@@ -2,6 +2,7 @@
 TYPE="api"
 SITE_ROOT=$(realpath $(dirname $(realpath $0))/..)
 export HOME=$SITE_ROOT
+export ROOT_DIR=$SITE_ROOT
 cd $SITE_ROOT
 source $ROOT_DIR/bin/shell_func.sh
 source $SITE_ROOT/scripts/base.sh
