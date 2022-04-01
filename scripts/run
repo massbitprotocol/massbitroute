@@ -288,9 +288,9 @@ _git_cmd() {
 		esac
 		# fi
 
-		if [ "$cmd" = "pull" ]; then
-			git -C $_dir reset --hard
-		fi
+		# if [ "$cmd" = "pull" ]; then
+		# 	git -C $_dir reset --hard
+		# fi
 
 		if [ "$cmd" = "commit" ]; then
 			_mydir=""
