@@ -7,6 +7,7 @@ export HOME=$SITE_ROOT
 cd $SITE_ROOT
 
 source $SITE_ROOT/scripts/base.sh
+bash $SITE_ROOT/cmd_server _env
 source $SITE_ROOT/.env_raw
 # _load_env $SITE_ROOT
 
