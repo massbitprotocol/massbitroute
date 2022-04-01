@@ -3,8 +3,9 @@ TYPE="api"
 SITE_ROOT=$(realpath $(dirname $(realpath $0))/..)
 export HOME=$SITE_ROOT
 cd $SITE_ROOT
+source $ROOT_DIR/bin/shell_func.sh
 source $SITE_ROOT/scripts/base.sh
-_load_env $SITE_ROOT
+loadEnv $SITE_ROOT
 
 service_dir=/massbit/massbitroute/app/src/sites/services
 REPOS="/etc/letsencrypt|$GIT_PRIVATE_READ_URL/massbitroute/ssl.git|master \
