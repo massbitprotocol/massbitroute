@@ -24,8 +24,11 @@ _load_env() {
 		tmp=$(mktemp)
 		echo "export MBR_ENV=$MBR_ENV" >$tmp
 		cat $_file | awk 'NF > 0 && !/^\s*source/ && !/^\s*#/' >>$tmp
-		# echo >>$tmp
-		cat $_file | awk '/^\s*source/ {print $2}' | while read f; do cat $f; done | awk "NF > 0 && !/^#/" >>$tmp
+		echo >>$tmp
+		cat $_file | awk '/^\s*source/ {print $2}' | while read f; do
+			cat $f
+			echo
+		done | awk "NF > 0 && !/^#/" >>$tmp
 		source $tmp
 		cat $tmp
 		cat $tmp | sed 's/export\s*//g' | awk -F '=' '{print $1}' | while read k; do

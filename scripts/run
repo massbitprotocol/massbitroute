@@ -2,11 +2,12 @@
 TYPE="api"
 SITE_ROOT=$(realpath $(dirname $(realpath $0))/..)
 export HOME=$SITE_ROOT
-export ROOT_DIR=$SITE_ROOT
+# export ROOT_DIR=$SITE_ROOT
+# source $ROOT_DIR/bin/shell_func.sh
 cd $SITE_ROOT
-source $ROOT_DIR/bin/shell_func.sh
+
 source $SITE_ROOT/scripts/base.sh
-loadEnv $SITE_ROOT
+_load_env $SITE_ROOT
 
 service_dir=/massbit/massbitroute/app/src/sites/services
 REPOS="/etc/letsencrypt|$GIT_PRIVATE_READ_URL/massbitroute/ssl.git|master \
@@ -19,7 +20,7 @@ $service_dir/stat|http://$GIT_STAT_WRITE@$GIT_DOMAIN/massbitroute/stat.git \
 $service_dir/gwman|http://$GIT_GWMAN_WRITE@$GIT_DOMAIN/massbitroute/gwman.git \
 $service_dir/monitor|http://$GIT_MONITOR_WRITE@$GIT_DOMAIN/massbitroute/${service}.git \
 $service_dir/api/public/deploy|http://$GIT_APIDEPLOY_WRITE@$GIT_DOMAIN/massbitroute/apideploy.git \
-$service_dir/$service/public/mbr-app-prod|https://$PUBLIC_GIT_DOMAIN/massbitprotocol/mbr-app.git \
+$SITE_ROOT/public/mbr-app-prod|https://$PUBLIC_GIT_DOMAIN/massbitprotocol/mbr-app.git \
 "
 
 # SITE_ROOT=$(realpath $(dirname $(realpath $0))/..)
