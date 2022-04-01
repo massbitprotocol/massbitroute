@@ -6,6 +6,7 @@ cd $SITE_ROOT
 source $SITE_ROOT/scripts/base.sh
 _load_env $SITE_ROOT
 
+service_dir=/massbit/massbitroute/app/src/sites/services
 REPOS="/etc/letsencrypt|$GIT_PRIVATE_READ_URL/massbitroute/ssl.git|master \
 /massbit/massbitroute/app/gbc|$GIT_PUBLIC_URL/massbitprotocol/massbitroute_gbc.git \
 $SITE_ROOT|$GIT_PUBLIC_URL/massbitprotocol/massbitroute_${TYPE}.git \
@@ -35,7 +36,7 @@ gwman_dir=/massbit/massbitroute/app/src/sites/services/gwman
 gw_dir=/massbit/massbitroute/app/src/sites/services/gateway
 
 cmd_server=$SITE_ROOT/cmd_server
-service_dir=/massbit/massbitroute/app/src/sites/services
+
 # type=api
 # gdnsd="/massbit/massbitroute/app/gbc/bin/.asdf/installs/gdnsd/v3.8.0/sbin/gdnsd -c $gwman_dir"
 # nginx="/massbit/massbitroute/app/src/bin/openresty/nginx/sbin/nginx -c /massbit/massbitroute/app/src/tmp/nginx.conf"
