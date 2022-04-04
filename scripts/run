@@ -15,16 +15,14 @@ service_dir=/massbit/massbitroute/app/src/sites/services
 
 _repo() {
   REPOS="/etc/letsencrypt|$GIT_PRIVATE_READ_URL/massbitroute/ssl.git|master \
-  /massbit/massbitroute/app/gbc|$GIT_PUBLIC_URL/massbitprotocol/massbitroute_gbc.git \
+  /massbit/massbitroute/app/gbc|https://$GIT_PUBLIC_DOMAIN/massbitprotocol/massbitroute_gbc.git \
   $SITE_ROOT|$GIT_PUBLIC_URL/massbitprotocol/massbitroute_${TYPE}.git \
-  $SITE_ROOT/etc/mkagent|$GIT_PUBLIC_URL/massbitprotocol/massbitroute_mkagent.git \
-  $service_dir/node|http://$GIT_NODE_WRITE@$GIT_DOMAIN/massbitroute/node.git \
-  $service_dir/gateway|http://$GIT_GATEWAY_WRITE@$GIT_DOMAIN/massbitroute/gateway.git \
-  $service_dir/stat|http://$GIT_STAT_WRITE@$GIT_DOMAIN/massbitroute/stat.git \
-  $service_dir/gwman|http://$GIT_GWMAN_WRITE@$GIT_DOMAIN/massbitroute/gwman.git \
-  $service_dir/monitor|http://$GIT_MONITOR_WRITE@$GIT_DOMAIN/massbitroute/${service}.git \
-  $service_dir/api/public/deploy|http://$GIT_APIDEPLOY_WRITE@$GIT_DOMAIN/massbitroute/apideploy.git \
-  $SITE_ROOT/public/mbr-app-prod|https://$PUBLIC_GIT_DOMAIN/massbitprotocol/mbr-app.git \
+  $SITE_ROOT/etc/mkagent|https://$GIT_PUBLIC_DOMAIN/massbitprotocol/massbitroute_mkagent.git \
+  $service_dir/stat|http://$GIT_STAT_WRITE@$GIT_PRIVATE_DOMAIN/massbitroute/stat.git \
+  $service_dir/gwman|http://$GIT_GWMAN_WRITE@$GIT_PRIVATE_DOMAIN/massbitroute/gwman.git \
+  $service_dir/monitor|http://$GIT_MONITOR_WRITE@$GIT_PRIVATE_DOMAIN/massbitroute/${service}.git \
+  $service_dir/api/public/deploy|http://$GIT_APIDEPLOY_WRITE@$GIT_PRIVATE_DOMAIN/massbitroute/apideploy.git \
+  $SITE_ROOT/public/mbr-app-prod|https://$GIT_PUBLIC_DOMAIN/massbitprotocol/mbr-app.git \
   "
 }
 _repo
