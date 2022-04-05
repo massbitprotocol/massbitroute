@@ -60,6 +60,9 @@ _prepare() {
 	fi
 	mkdir -p $SITE_ROOT/public/mbr-app-prod
 	_git_clone https://$GIT_PUBLIC_DOMAIN/massbitprotocol/mbr-app.git $SITE_ROOT/public/mbr-app-prod $MBRAPP_BRANCH
+	export NODE_DIR=/massbit/massbitroute/app/gbc/bin/.asdf/installs/nodejs/16.14.0
+	export PATH=$PATH:$NODE_DIR/bin:$NODE_DIR/lib/node_modules/corepack/shims
+	bash $SITE_ROOT/scripts/mbr_app.sh _build_prod
 }
 _install() {
 	mkdir -p $SITE_ROOT/logs $SITE_ROOT/db
