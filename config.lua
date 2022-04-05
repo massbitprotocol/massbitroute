@@ -12,6 +12,15 @@ local _config = {
         node = "apps/node",
         gateway = "apps/gateway"
     },
+    supervisors = {
+        ["monitor_client"] = [[
+[program:monitor_client]
+command=/bin/bash _SITE_ROOT_/etc/mkagent/agents/push.sh _SITE_ROOT_
+autorestart=true
+redirect_stderr=true
+stdout_logfile=_SITE_ROOT_/logs/monitor_client.log
+    ]]
+    },
     supervisor = [[
 [program:portal_update_listid]
 command=/bin/bash _SITE_ROOT_/scripts/run loop _update_listid
