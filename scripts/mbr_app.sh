@@ -1,22 +1,22 @@
 #!/bin/bash
-node=/massbit/massbitroute/app/gbc/bin/.asdf/installs/nodejs/16.11.1
+node=/massbit/massbitroute/app/gbc/bin/.asdf/installs/nodejs/16.14.0
 chmod +x $node/bin/* $node/lib/node_modules/corepack/shims/*
 export PATH=$PATH:$node/bin:$node/lib/node_modules/corepack/shims
 cur=$(dirname $(realpath $0))
 mbr_app=$cur/../public/mbr-app-prod
-if [ ! -f "$cur/../.env" ]; then
-	echo "Please set environment variables and reinstall!"
-	exit 1
-else
-	. $cur/../.env
-fi
-SITE_ROOT=$(realpath $(dirname $(realpath $0))/..)
-export HOME=$SITE_ROOT
-ROOT_DIR=$SITE_ROOT
+# if [ ! -f "$cur/../.env" ]; then
+# 	echo "Please set environment variables and reinstall!"
+# 	exit 1
+# else
+# 	. $cur/../.env
+# fi
+# SITE_ROOT=$(realpath $(dirname $(realpath $0))/..)
+# export HOME=$SITE_ROOT
+# ROOT_DIR=$SITE_ROOT
 
-source $SITE_ROOT/scripts/base.sh
-cd $SITE_ROOT
-_load_env $SITE_ROOT
+# source $SITE_ROOT/scripts/base.sh
+# cd $SITE_ROOT
+# _load_env $SITE_ROOT
 
 _prod() {
 	cd $mbr_app
