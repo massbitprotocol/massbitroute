@@ -3,6 +3,7 @@ node=/massbit/massbitroute/app/gbc/bin/.asdf/installs/nodejs/16.14.0
 chmod +x $node/bin/* $node/lib/node_modules/corepack/shims/*
 export PATH=$PATH:$node/bin:$node/lib/node_modules/corepack/shims
 cur=$(dirname $(realpath $0))
+export NUXT_TELEMETRY_DISABLED=1
 mbr_app=$cur/../public/mbr-app-prod
 # if [ ! -f "$cur/../.env" ]; then
 # 	echo "Please set environment variables and reinstall!"
