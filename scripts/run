@@ -2,19 +2,17 @@
 TYPE="api"
 SITE_ROOT=$(realpath $(dirname $(realpath $0))/..)
 export HOME=$SITE_ROOT
-# export ROOT_DIR=$SITE_ROOT
-# source $ROOT_DIR/bin/shell_func.sh
+
 if [ -e "$SITE_ROOT/cmd_server" ]; then bash $SITE_ROOT/cmd_server _env; fi
 if [ -f "$SITE_ROOT/.env_raw" ]; then source $SITE_ROOT/.env_raw; fi
 source $SITE_ROOT/scripts/base.sh
 
 cd $SITE_ROOT
-# _load_env $SITE_ROOT
-GIT_PUBLIC_URL="https://github.com"
+
 service_dir=/massbit/massbitroute/app/src/sites/services
 
 _repo() {
-  REPOS="/etc/letsencrypt|$GIT_PRIVATE_READ_URL/massbitroute/ssl.git|master \
+	REPOS="/etc/letsencrypt|$GIT_PRIVATE_READ_URL/massbitroute/ssl.git|master \
   /massbit/massbitroute/app/gbc|https://$GIT_PUBLIC_DOMAIN/massbitprotocol/massbitroute_gbc.git \
   $SITE_ROOT|$GIT_PUBLIC_URL/massbitprotocol/massbitroute_${TYPE}.git \
   $SITE_ROOT/etc/mkagent|https://$GIT_PUBLIC_DOMAIN/massbitprotocol/massbitroute_mkagent.git \
@@ -54,9 +52,13 @@ _init() {
 	source $SITE_ROOT/.env_raw
 	_repo
 }
+_prepare() {
+	tar -xvJf $SITE_ROOT/data/geoip/GeoIP2-City.mmdb.tar.xz -C $SITE_ROOT/data/geoip
+}
 _install() {
 	mkdir -p $SITE_ROOT/logs $SITE_ROOT/db
 	_git_config
+	_prepare
 	_init
 	for _pathgit in $REPOS; do
 		_path=$(echo $_pathgit | cut -d'|' -f1)
