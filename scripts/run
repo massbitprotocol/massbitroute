@@ -9,7 +9,8 @@ source $SITE_ROOT/scripts/base.sh
 
 cd $SITE_ROOT
 
-service_dir=/massbit/massbitroute/app/src/sites/services
+mbr_root=/massbit/massbitroute/app
+service_dir=$mbr_root/src/sites/services
 
 export MBRAPP_BRANCH=${MBRAPP_BRANCH:-staging}
 export ASDF_BRANCH=${ASDF_BRANCH:-dev}
