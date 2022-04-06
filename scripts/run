@@ -55,7 +55,9 @@ _init() {
 	_repo
 }
 _prepare() {
+
 	if [ ! -f "$SITE_ROOT/data/geoip/GeoIP2-City.mmdb" ]; then
+		apt-get install -y xz-utils
 		tar -xvJf $SITE_ROOT/data/geoip/GeoIP2-City.mmdb.tar.xz -C $SITE_ROOT/data/geoip
 	fi
 	mkdir -p $SITE_ROOT/public/mbr-app-prod
