@@ -82,9 +82,13 @@ _init() {
 }
 _prepare() {
 
-	if [ ! -f "/usr/bin/parallel" ]; then apt install -y parallel; fi
+	if [ ! -f "/usr/bin/parallel" ]; then
+		apt update
+		apt install -y parallel
+	fi
 
 	if [ ! -f "$SITE_ROOT/data/geoip/GeoIP2-City.mmdb" ]; then
+		apt update
 		apt-get install -y xz-utils
 		tar -xvJf $SITE_ROOT/data/geoip/GeoIP2-City.mmdb.tar.xz -C $SITE_ROOT/data/geoip
 	fi
