@@ -105,6 +105,8 @@ _install() {
 		exit 1
 	fi
 
+	git clone $GIT_PRIVATE_READ_URL/massbitroute/env.git $SITE_ROOT/env -b $BRANCH
+
 	mkdir -p $SITE_ROOT/logs $SITE_ROOT/db
 	_git_config
 	_prepare
