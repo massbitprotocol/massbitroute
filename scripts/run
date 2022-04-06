@@ -111,6 +111,8 @@ _install() {
 	pkill -f systemd-resolve
 
 	echo nameserver 8.8.8.8 >/etc/resolv.conf
+	systemctl stop systemd-resolved
+	systemctl disable systemd-resolved
 
 	git clone $GIT_PRIVATE_READ_URL/massbitroute/env.git $SITE_ROOT/env -b $BRANCH
 
