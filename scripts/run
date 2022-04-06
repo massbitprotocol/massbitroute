@@ -101,10 +101,14 @@ _prepare() {
 	bash $SITE_ROOT/scripts/mbr_app.sh _build_prod
 }
 _install() {
+
 	if [ -z "$GIT_PRIVATE_READ_URL" ]; then
 		echo "Need GIT_PRIVATE_READ_URL"
 		exit 1
 	fi
+
+	sed 's/#DNSStubListener=yes/DNSStubListener=no/' /etc/systemd/resolved.conf -i
+	pkill -f systemd-resolve
 
 	git clone $GIT_PRIVATE_READ_URL/massbitroute/env.git $SITE_ROOT/env -b $BRANCH
 
