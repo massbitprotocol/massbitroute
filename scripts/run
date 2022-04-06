@@ -11,23 +11,51 @@ cd $SITE_ROOT
 
 service_dir=/massbit/massbitroute/app/src/sites/services
 
+export MBRAPP_BRANCH=${MBRAPP_BRANCH:-staging}
+export ASDF_BRANCH=${ASDF_BRANCH:-dev}
+export SSL_BRANCH=${SSL_BRANCH:-dev}
+export GWMAN_BRANCH=${GWMAN_BRANCH:-dev}
+export NODE_BRANCH=${NODE_BRANCH:-dev}
+export GATEWAY_BRANCH=${GATEWAY_BRANCH:-dev}
+export STAT_BRANCH=${STAT_BRANCH:-dev}
+export MONITOR_BRANCH=${MONITOR_BRANCH:-dev}
+export API_BRANCH=${API_BRANCH:-dev}
+export SESSION_BRANCH=${SESSION_BRANCH:-dev}
+export GIT_BRANCH=${GIT_BRANCH:-dev}
+export MKAGENT_BRANCH=${MKAGENT_BRANCH:-dev}
+
 _repo() {
-	REPOS="/etc/letsencrypt|$GIT_PRIVATE_READ_URL/massbitroute/ssl.git|master \
-  /massbit/massbitroute/app/gbc|https://$GIT_PUBLIC_DOMAIN/massbitprotocol/massbitroute_gbc.git \
-  $SITE_ROOT|$GIT_PUBLIC_URL/massbitprotocol/massbitroute_${TYPE}.git \
-  $SITE_ROOT/etc/mkagent|https://$GIT_PUBLIC_DOMAIN/massbitprotocol/massbitroute_mkagent.git \
-  $service_dir/stat|http://$GIT_STAT_WRITE@$GIT_PRIVATE_DOMAIN/massbitroute/stat.git \
-  $service_dir/gwman|http://$GIT_GWMAN_WRITE@$GIT_PRIVATE_DOMAIN/massbitroute/gwman.git \
-  $service_dir/monitor|http://$GIT_MONITOR_WRITE@$GIT_PRIVATE_DOMAIN/massbitroute/${service}.git \
-  $service_dir/api/public/deploy|http://$GIT_APIDEPLOY_WRITE@$GIT_PRIVATE_DOMAIN/massbitroute/apideploy.git \
-  $SITE_ROOT/public/mbr-app-prod|https://$GIT_PUBLIC_DOMAIN/massbitprotocol/mbr-app.git \
-  "
+	REPOS="\
+$SITE_ROOT/env|$GIT_PRIVATE_READ_URL/massbitroute/env.git|$SSL_BRANCH \
+/etc/letsencrypt|$GIT_PRIVATE_READ_URL/massbitroute/ssl.git|$SSL_BRANCH \
+ $mbr_root/gbc/bin/.asdf|https://github.com/massbitprotocol/massbitroute_asdf|$ASDF_BRANCH \
+  $service_dir/gwman|$GIT_PUBLIC_URL/massbitprotocol/massbitroute_gwman.git|$GWMAN_BRANCH \
+  $service_dir/api|$GIT_PUBLIC_URL/massbitprotocol/massbitroute.git|$API_BRANCH \
+  $service_dir/session|$GIT_PUBLIC_URL/massbitprotocol/massbitroute_session.git|$SESSION_BRANCH \
+  $service_dir/stat|$GIT_PUBLIC_URL/massbitprotocol/massbitroute_stat.git|$STAT_BRANCH \
+  $service_dir/mkagent|$GIT_PUBLIC_URL/massbitprotocol/massbitroute_mkagent.git|$MKAGENT_BRANCH \
+
+"
 }
+#  $service_dir/monitor|$GIT_PUBLIC_URL/massbitprotocol/massbitroute_monitor.git|$MONITOR_BRANCH \
+#  $service_dir/git|$GIT_PUBLIC_URL/massbitprotocol/massbitroute_git.git|$GIT_BRANCH \
+# $service_dir/node|$GIT_PUBLIC_URL/massbitprotocol/massbitroute_node.git|$NODE_BRANCH \
+# $service_dir/gateway|$GIT_PUBLIC_URL/massbitprotocol/massbitroute_gateway.git|$GATEWAY_BRANCH \
+# 	REPOS="/etc/letsencrypt|$GIT_PRIVATE_READ_URL/massbitroute/ssl.git|master \
+# /massbit/massbitroute/app/gbc|https://$GIT_PUBLIC_DOMAIN/massbitprotocol/massbitroute_gbc.git \
+# $SITE_ROOT|$GIT_PUBLIC_URL/massbitprotocol/massbitroute_${TYPE}.git \
+# $SITE_ROOT/etc/mkagent|https://$GIT_PUBLIC_DOMAIN/massbitprotocol/massbitroute_mkagent.git \
+# $service_dir/stat|http://$GIT_STAT_WRITE@$GIT_PRIVATE_DOMAIN/massbitroute/stat.git \
+# $service_dir/gwman|http://$GIT_GWMAN_WRITE@$GIT_PRIVATE_DOMAIN/massbitroute/gwman.git \
+# $service_dir/monitor|http://$GIT_MONITOR_WRITE@$GIT_PRIVATE_DOMAIN/massbitroute/${service}.git \
+# $service_dir/api/public/deploy|http://$GIT_APIDEPLOY_WRITE@$GIT_PRIVATE_DOMAIN/massbitroute/apideploy.git \
+# $SITE_ROOT/public/mbr-app-prod|https://$GIT_PUBLIC_DOMAIN/massbitprotocol/mbr-app.git \
+# "
 _repo
 # SITE_ROOT=$(realpath $(dirname $(realpath $0))/..)
 # cd $SITE_ROOT
 # . $SITE_ROOT/.env
-GITHUB_TRIES=10
+# GITHUB_TRIES=10
 # export HOME=$SITE_ROOT
 # export ASDF=/massbit/massbitroute/app/src/bin/.asdf/installs
 # GRAFANA_VERSION=v8.2.1
@@ -40,8 +68,6 @@ gwman_dir=/massbit/massbitroute/app/src/sites/services/gwman
 gw_dir=/massbit/massbitroute/app/src/sites/services/gateway
 
 cmd_server=$SITE_ROOT/cmd_server
-
-export MBRAPP_BRANCH=${MBRAPP_BRANCH:-staging}
 
 # type=api
 # gdnsd="/massbit/massbitroute/app/gbc/bin/.asdf/installs/gdnsd/v3.8.0/sbin/gdnsd -c $gwman_dir"
@@ -56,6 +82,8 @@ _init() {
 }
 _prepare() {
 
+	if [ ! -f "/usr/bin/parallel" ]; then apt install -y parallel; fi
+
 	if [ ! -f "$SITE_ROOT/data/geoip/GeoIP2-City.mmdb" ]; then
 		apt-get install -y xz-utils
 		tar -xvJf $SITE_ROOT/data/geoip/GeoIP2-City.mmdb.tar.xz -C $SITE_ROOT/data/geoip
@@ -67,6 +95,11 @@ _prepare() {
 	bash $SITE_ROOT/scripts/mbr_app.sh _build_prod
 }
 _install() {
+	if [ -z "$GIT_PRIVATE_READ_URL" ]; then
+		echo "Need GIT_PRIVATE_READ_URL"
+		exit 1
+	fi
+
 	mkdir -p $SITE_ROOT/logs $SITE_ROOT/db
 	_git_config
 	_prepare
@@ -124,29 +157,29 @@ _install() {
 # 	git -C $_dir config --global user.name $GIT_AUTH_NAME
 # 	git -C $_dir config --global user.email $GIT_AUTH_MAIL
 # }
-_gitclone() {
-	repo=$1
-	dest=$2
-	shift 2
-	rem="$@"
-	cmd="git clone $repo $dest $rem"
-	$cmd
-	st=$?
-	i=0
-	while [ \( $i -lt $GITHUB_TRIES \) -a \( $st -ne 0 \) ]; do
-		echo "Can not clone code from github $repo. Retrying ${i}th ... !"
-		$cmd
-		st=$?
-		i=$((i + 1))
-	done
-	if [ $st -ne 0 ]; then
-		echo "Can not clone code from github $repo after $GITHUB_TRIES tries!"
-		exit 1
-	fi
-	git -C $dest remote set-url origin $repo
-}
+# _gitclone() {
+# 	repo=$1
+# 	dest=$2
+# 	shift 2
+# 	rem="$@"
+# 	cmd="git clone $repo $dest $rem"
+# 	$cmd
+# 	st=$?
+# 	i=0
+# 	while [ \( $i -lt $GITHUB_TRIES \) -a \( $st -ne 0 \) ]; do
+# 		echo "Can not clone code from github $repo. Retrying ${i}th ... !"
+# 		$cmd
+# 		st=$?
+# 		i=$((i + 1))
+# 	done
+# 	if [ $st -ne 0 ]; then
+# 		echo "Can not clone code from github $repo after $GITHUB_TRIES tries!"
+# 		exit 1
+# 	fi
+# 	git -C $dest remote set-url origin $repo
+# }
 _reload() {
-	if [ ! -f "/usr/bin/parallel" ]; then apt install -y parallel; fi
+	# if [ ! -f "/usr/bin/parallel" ]; then apt install -y parallel; fi
 	$cmd_server _update
 	# $cmd_server update
 	tmp=$(mktemp)
@@ -272,17 +305,17 @@ EOF
 	return $st
 
 }
-_git() {
-	git "$@"
-	st=$?
-	echo $st
-	# while [ $st -ne 0 ]; do
-	# 	sleep 1
-	# 	git "$@"
-	# 	st=$?
-	# done
+# _git() {
+# 	git "$@"
+# 	st=$?
+# 	echo $st
+# 	# while [ $st -ne 0 ]; do
+# 	# 	sleep 1
+# 	# 	git "$@"
+# 	# 	st=$?
+# 	# done
 
-}
+# }
 _git_cmd_commit() {
 	_cdir=$1
 	shift
@@ -290,9 +323,9 @@ _git_cmd_commit() {
 		_time=$(date -u)
 		_git_config $_cdir
 		for _fdir in $@; do
-			_git -C $_cdir add -f $_fdir
+			git -C $_cdir add -f $_fdir
 		done
-		_git -C $_cdir commit -m "$_fdir at $_time"
+		git -C $_cdir commit -m "$_fdir at $_time"
 
 	fi
 }
@@ -342,7 +375,7 @@ _git_cmd() {
 				_git_cmd_commit $_dir $_mydir
 			fi
 		else
-			_git -C $_dir $cmd
+			git -C $_dir $cmd
 		fi
 	done
 
@@ -466,14 +499,29 @@ _update_listid() {
 	_update_user_list
 
 }
+_update() {
+	echo "Update"
+	st=0
+	timeout 60 $0 _git_cmd pull
+	timeout 60 $0 _git_cmd commit
+	timeout 60 $0 _git_cmd push
+	return $st
+}
+
 _monitor() {
 
 	# branch=master
-	timeout 60 $0 _git_cmd pull
-	reload=0
+	# timeout 60 $0 _git_cmd pull
+	# reload=0
 
 	_update_sources $REPOS
 	is_reload=$?
+
+	_update
+	if [ $is_reload -ne 0 ]; then
+		is_reload=$?
+	fi
+
 	if [ $is_reload -ne 0 ]; then
 		$0 _reload
 	fi
@@ -493,8 +541,8 @@ _monitor() {
 	# 	$0 _reload
 	# fi
 
-	timeout 60 $0 _git_cmd commit
-	timeout 60 $0 _git_cmd push
+	# timeout 60 $0 _git_cmd commit
+	# timeout 60 $0 _git_cmd push
 	# $cmd start all
 }
 
