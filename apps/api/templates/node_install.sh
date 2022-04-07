@@ -148,12 +148,6 @@ export GIT_PUBLIC_URL="https://github.com"
 export MBR_ENV=${ENV}
 EOF
 
-if [ "${ENV}" == "dev" ]; then
-	cat >.env.${ENV} <<EOF
-export DOMAIN="massbitroute.dev"
-EOF
-fi
-
 git pull
 rm -f $SITE_ROOT/vars/*
 
