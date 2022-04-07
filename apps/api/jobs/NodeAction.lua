@@ -152,7 +152,7 @@ server {
         proxy_cache_methods GET HEAD POST;
         proxy_cache_key $request_uri|$request_body;
         proxy_cache_min_uses 1;
-        proxy_cache cache;
+        proxy_cache cache_node;
         proxy_cache_valid 200 10s;
         proxy_cache_background_update on;
         proxy_cache_lock on;
@@ -324,8 +324,8 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
     if _datacenters and #_datacenters > 0 then
         -- _print("actives:" .. inspect(_actives))
 
-
-        local _tmpl = _get_tmpl(rules, {node_type = _blocknet_id, nodes = _datacenters, _domain_name = _job_data._domain_name})
+        local _tmpl =
+            _get_tmpl(rules, {node_type = _blocknet_id, nodes = _datacenters, _domain_name = _job_data._domain_name})
 
         local _str_tmpl = _tmpl("_gw_conf")
         _print(_str_tmpl)
