@@ -175,13 +175,13 @@ _git_cmd() {
 	if [ -z "$cmd" ]; then cmd=push; fi
 
 	_dir_def=$service_dir
-	for _service in api gwman gwmandeploy stat; do
+	for _service in api gwmandeploy stat; do
 		_dir="$_dir_def/$_service"
 
 		# if [ "$cmd" = "push" ]; then
 		case "$_service" in
 		gwmandeploy)
-			_dir="$_dir_def/$_service/data"
+			_dir="$_dir_def/gwman/data"
 			;;
 		api)
 			_dir="$_dir_def/$_service/public/deploy"
@@ -202,7 +202,7 @@ _git_cmd() {
 				# _dir=$_mydir
 				;;
 			gwmandeploy)
-				_mydir="$_dir/data"
+				_mydir="$_dir"
 				;;
 			gwman)
 				_mydir="$_dir/data $_dir/conf.d $_dir/zones"
