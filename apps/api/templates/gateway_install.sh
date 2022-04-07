@@ -94,6 +94,7 @@ fi
 # esac
 
 ENV={{env}}
+MBR_ENV={{env}}
 IP="$(curl -ssSfL http://ipv4.icanhazip.com)"
 
 n=$(grep -o "\." <<<"$IP" | wc -l)
@@ -144,11 +145,24 @@ if [ ! -d "$SITE_ROOT/.git" ]; then
 fi
 
 cd $SITE_ROOT
+cat >.env <<EOF
+export GIT_PUBLIC_URL="https://github.com"
+export MBR_ENV=${ENV}
+EOF
+
+if [ "${ENV}" == "dev" ]; then
+	export GIT_PRIVATE_READ_URL="http://massbit:c671e4ea06280e7a3f6f9aea6e8155fcde9bc703@git.massbitroute.dev"
+	cat >.env.${ENV} <<EOF
+export DOMAIN="massbitroute.dev"
+EOF
+fi
+
 git pull
 rm -f $SITE_ROOT/vars/*
 
 #create environment variables
 ./mbr node set ENV {{env}}
+./mbr node set MBR_ENV {{env}}
 ./mbr node set PORTAL_URL {*portal_url*}
 ./mbr gw set USER_ID {{user_id}}
 ./mbr gw set ID {{id}}

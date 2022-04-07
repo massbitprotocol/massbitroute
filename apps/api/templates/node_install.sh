@@ -126,6 +126,7 @@ SITE_ROOT=/massbit/massbitroute/app/src/sites/services/node
 SCRIPTS_RUN="$SITE_ROOT/scripts/run"
 mkdir -p $(dirname $SITE_ROOT)
 ENV={{env}}
+MBR_ENV={{env}}
 # git clone -b master http://mbr_gateway:6a796299bb72357770735a79019612af228586e7@git.massbitroute.com/massbitroute/ssl.git -b master /etc/letsencrypt
 git config --global http.sslVerify false
 if [ ! -d "$SITE_ROOT/.git" ]; then
@@ -141,11 +142,24 @@ if [ ! -d "$SITE_ROOT/.git" ]; then
 fi
 
 cd $SITE_ROOT
+
+cat >.env <<EOF
+export GIT_PUBLIC_URL="https://github.com"
+export MBR_ENV=${ENV}
+EOF
+
+if [ "${ENV}" == "dev" ]; then
+	cat >.env.${ENV} <<EOF
+export DOMAIN="massbitroute.dev"
+EOF
+fi
+
 git pull
 rm -f $SITE_ROOT/vars/*
 
 #create environment variables
 ./mbr node set ENV {{env}}
+./mbr node set MBR_ENV {{env}}
 
 #bash init.sh
 ./mbr node set PORTAL_URL {*portal_url*}
