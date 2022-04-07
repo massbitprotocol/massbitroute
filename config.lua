@@ -25,13 +25,15 @@ stdout_logfile=_SITE_ROOT_/../mkagent/logs/monitor_client.log
 command=/bin/bash _SITE_ROOT_/scripts/run loop _update_listid
 autorestart=true
 redirect_stderr=true
+stopasgroup=true
+killasgroup=true
+stopsignal=INT
 stdout_logfile=_SITE_ROOT_/logs/update_listid.log
 
 [program:portal_homepage_prod]
 command=/bin/bash _SITE_ROOT_/scripts/mbr_app.sh _start_prod
 autorestart=true
 redirect_stderr=true
-autorestart=true
 stopasgroup=true
 killasgroup=true
 stopsignal=INT
