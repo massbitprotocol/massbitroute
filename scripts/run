@@ -133,7 +133,7 @@ _test_node() {
 	_blocknet=$2
 	_conf=$3
 	_dir=$(mktemp -d)
-	cd $service_dir/node
+	cd $service_dir/gateway
 	rsync -avz * $_dir/ >/dev/null
 	cd $_dir
 	mkdir -p http.d logs
