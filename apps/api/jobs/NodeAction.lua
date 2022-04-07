@@ -152,7 +152,7 @@ server {
         proxy_cache_methods GET HEAD POST;
         proxy_cache_key $request_uri|$request_body;
         proxy_cache_min_uses 1;
-        proxy_cache cache;
+        proxy_cache cache_node;
         proxy_cache_valid 200 10s;
         proxy_cache_background_update on;
         proxy_cache_lock on;
