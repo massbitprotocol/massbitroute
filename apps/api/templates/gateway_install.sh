@@ -150,13 +150,6 @@ export GIT_PUBLIC_URL="https://github.com"
 export MBR_ENV=${ENV}
 EOF
 
-if [ "${ENV}" == "dev" ]; then
-	export GIT_PRIVATE_READ_URL="http://massbit:c671e4ea06280e7a3f6f9aea6e8155fcde9bc703@git.massbitroute.dev"
-	cat >.env.${ENV} <<EOF
-export DOMAIN="massbitroute.dev"
-EOF
-fi
-
 git pull
 rm -f $SITE_ROOT/vars/*
 
