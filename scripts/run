@@ -110,13 +110,14 @@ _install() {
 	_git_config
 	_prepare
 	_init
-	for _pathgit in $REPOS; do
-		_path=$(echo $_pathgit | cut -d'|' -f1)
-		_url=$(echo $_pathgit | cut -d'|' -f2)
-		_branch=$(echo $_pathgit | cut -d'|' -f3)
-		_git_clone $_url $_path $_branch
-	done
+	# for _pathgit in $REPOS; do
+	# 	_path=$(echo $_pathgit | cut -d'|' -f1)
+	# 	_url=$(echo $_pathgit | cut -d'|' -f2)
+	# 	_branch=$(echo $_pathgit | cut -d'|' -f3)
+	# 	_git_clone $_url $_path $_branch
+	# done
 
+	_install_repos
 	ln -sf /massbit/massbitroute/app/gbc /massbit/massbitroute/app/src/gbc
 	ln -sf /massbit/massbitroute/app/gbc/bin/openresty /usr/local/openresty
 	apt-get update
@@ -376,11 +377,14 @@ _update() {
 _update_repos() {
 	_repo
 	_update_sources $REPOS
+	st=$?
+	return $st
 }
 
 _monitor() {
 
-	_update_sources $REPOS
+	# _update_sources $REPOS
+	_update_repos
 	is_reload=$?
 
 	_update
