@@ -87,6 +87,7 @@ _tune_os() {
 	systemctl disable systemd-resolved
 }
 _install_repos() {
+	_repo
 	for _pathgit in $REPOS; do
 		_path=$(echo $_pathgit | cut -d'|' -f1)
 		_url=$(echo $_pathgit | cut -d'|' -f2)
