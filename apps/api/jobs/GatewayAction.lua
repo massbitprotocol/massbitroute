@@ -35,8 +35,8 @@ local _portal_dir = _service_dir .. "/api"
 local _deploy_dir = _portal_dir .. "/public/deploy/gateway"
 local _info_dir = _portal_dir .. "/public/deploy/info"
 
-local gwman_dir = _service_dir .. "/gwman"
-local stat_dir = _service_dir .. "/stat"
+local gwman_dir = _service_dir .. "/gwman/data"
+local stat_dir = _service_dir .. "/stat/etc/conf"
 
 local _print = mbrutil.print
 local rules = {
@@ -292,7 +292,7 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
         _print(_file_res)
         _write_file(_file_res, _geo_res)
 
-        local _file_dapi = gwman_dir .. "/data/zones/dapi/" .. _blocknet_id .. ".zone"
+        local _file_dapi = gwman_dir .. "/zones/dapi/" .. _blocknet_id .. ".zone"
         print(_file_dapi)
         _write_file(_file_dapi, "*." .. _blocknet_id .. " 60/60 DYNA	geoip!mbr-map-" .. _blocknet_id .. "\n")
     end
@@ -312,7 +312,7 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
         local _tmpl = _get_tmpl(rules, {nodes = _actives})
         local _str = _tmpl("_gw_zones")
         _print(_str)
-        local _file = gwman_dir .. "/data/zones/" .. mytype .. "/" .. _blocknet_id .. ".zone"
+        local _file = gwman_dir .. "/zones/" .. mytype .. "/" .. _blocknet_id .. ".zone"
         _print(_file)
         _write_file(_file, _str)
 

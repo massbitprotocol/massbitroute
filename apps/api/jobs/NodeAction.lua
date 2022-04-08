@@ -37,8 +37,8 @@ local _deploy_gatewayconfdir = _portal_dir .. "/public/deploy/gatewayconf"
 local Model = cc.import("#" .. mytype)
 local _domain_name = env.DOMAIN or "massbitroute.com"
 local mkdirp = require "mkdirp"
-local _gwman_dir = _service_dir .. "/gwman"
-local _stat_dir = _service_dir .. "/stat"
+local _gwman_dir = _service_dir .. "/gwman/data"
+local _stat_dir = _service_dir .. "/stat/etc/conf"
 
 local rules = {
     _listid = [[${id} ${user_id} ${blockchain} ${network} ${ip} ${geo.continent_code} ${geo.country_code} ${token} ${status} ${approved}]],
@@ -348,7 +348,7 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
     if _actives and #_actives > 0 then
         local _tmpl = _get_tmpl(rules, {nodes = _actives, _domain_name = _job_data._domain_name})
         local _str = _tmpl("_node_zones")
-        local _file = _gwman_dir .. "/data/zones/" .. mytype .. "/" .. _blocknet_id .. ".zone"
+        local _file = _gwman_dir .. "/zones/" .. mytype .. "/" .. _blocknet_id .. ".zone"
         _print(_str)
         _print(_file)
         _write_file(_file, _str)
