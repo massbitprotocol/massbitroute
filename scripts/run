@@ -182,10 +182,25 @@ _git_cmd_commit() {
 _git_cmd() {
 	cmd=$1
 	shift
+	list_push="apideploy gwmandeploy statdeploy"
+	list_pull="api apideploy gwman gwmandeploy stat statdeploy"
 	if [ -z "$cmd" ]; then cmd=push; fi
 
+	list=""
+	case "$cmd" in
+	pull)
+		list="$list_pull"
+		;;
+	push)
+		list="$list_push"
+		;;
+	commit)
+		list="$list_push"
+		;;
+	esac
+
 	_dir_def=$service_dir
-	for _service in api gwmandeploy stat; do
+	for _service in $list; do
 		_dir="$_dir_def/$_service"
 
 		# if [ "$cmd" = "push" ]; then
