@@ -354,6 +354,10 @@ _update() {
 	timeout 60 $0 _git_cmd push
 	return $st
 }
+_update_repos() {
+	_repo
+	_update_sources $REPOS
+}
 
 _monitor() {
 
