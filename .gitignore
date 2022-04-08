@@ -6,3 +6,7 @@
 **/db
 *.pyc
 /data/geoip/GeoIP2-City.mmdb
+/src/env.lua
+/.env_raw
+/.gitconfig
+/env/
