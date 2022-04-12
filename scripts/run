@@ -55,15 +55,28 @@ gw_dir=/massbit/massbitroute/app/src/sites/services/gateway
 
 cmd_server=$SITE_ROOT/cmd_server
 
-_init() {
+_tune_os() {
+	#dns
+	sed 's/#DNSStubListener=yes/DNSStubListener=no/' /etc/systemd/resolved.conf -i
+	pkill -f systemd-resolve
+
+	rm /etc/resolv.conf
+	echo nameserver 8.8.8.8 >/etc/resolv.conf
+	systemctl stop systemd-resolved
+	systemctl disable systemd-resolved
+}
+
+_prepare() {
+	_tune_os
+
+	_git_clone $GIT_PRIVATE_READ_URL/massbitroute/env.git /massbit/massbitroute/app/src/env $BRANCH
+
 	source $SITE_ROOT/.env
 	_git_clone $GIT_PUBLIC_URL/massbitprotocol/massbitroute_gbc.git /massbit/massbitroute/app/gbc
 	_git_clone https://github.com/massbitprotocol/massbitroute_asdf $mbr_root/gbc/bin/.asdf $ASDF_BRANCH
 	bash $SITE_ROOT/cmd_server _env
 	source $SITE_ROOT/.env_raw
 	_repo
-}
-_prepare() {
 
 	if [ ! -f "/usr/bin/parallel" ]; then
 		apt update
@@ -78,7 +91,7 @@ _prepare() {
 	mkdir -p $SITE_ROOT/public/mbr-app-prod
 	_git_clone $GIT_PUBLIC_URL/massbitprotocol/mbr-app.git $SITE_ROOT/public/mbr-app-prod $MBRAPP_BRANCH
 
-	bash $SITE_ROOT/scripts/mbr_app.sh _build_prod
+	bash $SITE_ROOT/scripts/mbr_app.sh _build_prod $MBRAPP_BRANCH
 }
 _tune_os() {
 	#dns
