@@ -348,6 +348,7 @@ local function _remove_item(instance, args)
         "/"
     )
     local _deploy_file = _item_path .. "/" .. _item.id
+    local _deploy_conf_file = _deploy_nodeconfdir .. "/" .. _item.id .. ".conf"
     if args._is_delete then
         -- _git_push(
         --     _deploy_dir,
@@ -361,7 +362,9 @@ local function _remove_item(instance, args)
         -- mkdirp(_deploy_dir .. "/" .. _k1)
         -- local _deploy_file = _deploy_dir .. "/" .. _k1 .. "/" .. _item.id
         _print("remove file:" .. _deploy_file)
+        _print("remove conf file:" .. _deploy_conf_file)
         os.remove(_deploy_file)
+        os.remove(_deploy_conf_file)
     else
         table.merge(_item, args)
         _item._is_delete = nil
