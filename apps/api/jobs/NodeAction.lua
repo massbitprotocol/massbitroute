@@ -362,14 +362,15 @@ local function _remove_item(instance, args)
         -- mkdirp(_deploy_dir .. "/" .. _k1)
         -- local _deploy_file = _deploy_dir .. "/" .. _k1 .. "/" .. _item.id
         _print("remove file:" .. _deploy_file)
-        _print("remove conf file:" .. _deploy_conf_file)
+
         os.remove(_deploy_file)
-        os.remove(_deploy_conf_file)
     else
         table.merge(_item, args)
         _item._is_delete = nil
         _write_file(_deploy_file, json.encode(_item))
     end
+    _print("remove conf file:" .. _deploy_conf_file)
+    os.remove(_deploy_conf_file)
 
     _rescanconf_blockchain_network(_item.blockchain, _item.network, args)
 
