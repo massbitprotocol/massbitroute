@@ -93,15 +93,15 @@ _prepare() {
 
 	bash $SITE_ROOT/scripts/mbr_app.sh _build_prod $MBRAPP_BRANCH
 }
-_tune_os() {
-	#dns
-	sed 's/#DNSStubListener=yes/DNSStubListener=no/' /etc/systemd/resolved.conf -i
-	pkill -f systemd-resolve
+# _tune_os() {
+# 	#dns
+# 	sed 's/#DNSStubListener=yes/DNSStubListener=no/' /etc/systemd/resolved.conf -i
+# 	pkill -f systemd-resolve
 
-	echo nameserver 8.8.8.8 >/etc/resolv.conf
-	systemctl stop systemd-resolved
-	systemctl disable systemd-resolved
-}
+# 	echo nameserver 8.8.8.8 >/etc/resolv.conf
+# 	systemctl stop systemd-resolved
+# 	systemctl disable systemd-resolved
+# }
 _install_repos() {
 	_repo
 	for _pathgit in $REPOS; do
@@ -120,12 +120,12 @@ _install() {
 
 	_tune_os
 
-	git clone $GIT_PRIVATE_READ_URL/massbitroute/env.git $SITE_ROOT/env -b $BRANCH
+	# git clone $GIT_PRIVATE_READ_URL/massbitroute/env.git $SITE_ROOT/env -b $BRANCH
 
 	mkdir -p $SITE_ROOT/logs/nginx $SITE_ROOT/db $SITE_ROOT/tmp
 	_git_config
 	_prepare
-	_init
+	# _init
 	# for _pathgit in $REPOS; do
 	# 	_path=$(echo $_pathgit | cut -d'|' -f1)
 	# 	_url=$(echo $_pathgit | cut -d'|' -f2)
