@@ -220,59 +220,6 @@ local function _norm(_v)
     return _v
 end
 
-local function _remove_item(instance, args)
-    _print("remove_item:" .. inspect(args))
-    local model = Model:new(instance)
-    local _item = _norm(model:get(args))
-    -- _print(inspect(_item))
-    if args._is_delete then
-        model:delete({id = args.id, user_id = args.user_id})
-    -- else
-    --     model:update({id = args.id, user_id = args.user_id, status = 0})
-    end
-    if
-        not _item or not _item.id or not _item.ip or not _item.blockchain or not _item.network or not _item.geo or
-            not _item.geo.continent_code or
-            not _item.geo.country_code
-     then
-        return nil, "invalid data"
-    end
-    local _item_path =
-        table.concat(
-        {
-            _deploy_dir,
-            _item.blockchain,
-            _item.network,
-            _item.geo.continent_code,
-            _item.geo.country_code,
-            _item.user_id
-        },
-        "/"
-    )
-    local _deploy_file = _item_path .. "/" .. _item.id
-    if args._is_delete then
-        -- _git_push(
-        --     _deploy_dir,
-        --     {},
-        --     {
-        --         _deploy_file
-        --     }
-        -- )
-        -- local _k1 =
-        --     _item.blockchain .. "/" .. _item.network .. "/" .. _item.geo.continent_code .. "/" .. _item.geo.country_code
-        -- mkdirp(_deploy_dir .. "/" .. _k1)
-        -- local _deploy_file = _deploy_dir .. "/" .. _k1 .. "/" .. _item.id
-        _print("remove file:" .. _deploy_file)
-        os.remove(_deploy_file)
-    else
-        table.merge(_item, args)
-        _item._is_delete = nil
-        _write_file(_deploy_file, json.encode(_item))
-    end
-
-    return true
-end
-
 local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
     local _datacenters = {}
     local _actives = {}
@@ -369,6 +316,61 @@ local function _rescanconf(_job_data)
             _rescanconf_blockchain_network(_blockchain, _network, _job_data)
         end
     end
+end
+
+local function _remove_item(instance, args)
+    _print("remove_item:" .. inspect(args))
+    local model = Model:new(instance)
+    local _item = _norm(model:get(args))
+    -- _print(inspect(_item))
+    if args._is_delete then
+        model:delete({id = args.id, user_id = args.user_id})
+    -- else
+    --     model:update({id = args.id, user_id = args.user_id, status = 0})
+    end
+    if
+        not _item or not _item.id or not _item.ip or not _item.blockchain or not _item.network or not _item.geo or
+            not _item.geo.continent_code or
+            not _item.geo.country_code
+     then
+        return nil, "invalid data"
+    end
+    local _item_path =
+        table.concat(
+        {
+            _deploy_dir,
+            _item.blockchain,
+            _item.network,
+            _item.geo.continent_code,
+            _item.geo.country_code,
+            _item.user_id
+        },
+        "/"
+    )
+    local _deploy_file = _item_path .. "/" .. _item.id
+    if args._is_delete then
+        -- _git_push(
+        --     _deploy_dir,
+        --     {},
+        --     {
+        --         _deploy_file
+        --     }
+        -- )
+        -- local _k1 =
+        --     _item.blockchain .. "/" .. _item.network .. "/" .. _item.geo.continent_code .. "/" .. _item.geo.country_code
+        -- mkdirp(_deploy_dir .. "/" .. _k1)
+        -- local _deploy_file = _deploy_dir .. "/" .. _k1 .. "/" .. _item.id
+        _print("remove file:" .. _deploy_file)
+        os.remove(_deploy_file)
+    else
+        table.merge(_item, args)
+        _item._is_delete = nil
+        _write_file(_deploy_file, json.encode(_item))
+    end
+
+    _rescanconf_blockchain_network(_item.blockchain, _item.network, args)
+
+    return true
 end
 
 local function _generate_item(instance, args)
