@@ -382,31 +382,36 @@ _update_listid() {
 	_update_user_list
 
 }
-_update() {
-	echo "Update"
-	st=0
-	timeout 60 $0 _git_cmd pull
-	timeout 60 $0 _git_cmd commit
-	timeout 60 $0 _git_cmd push
-	return $st
-}
 _update_repos() {
 	_repo
 	_update_sources $REPOS
-	st=$?
-	return $st
+	_st_repo=$?
+	return $_st_repo
+}
+
+_update() {
+	echo "Update"
+	_st_update=0
+	timeout 60 $0 _git_cmd pull
+	timeout 60 $0 _git_cmd commit
+	timeout 60 $0 _git_cmd push
+
+	_update_repos
+	_st_update=$?
+
+	return $_st_update
 }
 
 _monitor() {
 
 	# _update_sources $REPOS
-	_update_repos
-	is_reload=$?
+	# _update_repos
+	# is_reload=$?
 
 	_update
-	if [ $is_reload -ne 0 ]; then
-		is_reload=$?
-	fi
+	# if [ $is_reload -ne 0 ]; then
+	is_reload=$?
+	# fi
 
 	if [ $is_reload -ne 0 ]; then
 		$0 _reload
