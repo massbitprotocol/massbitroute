@@ -84,9 +84,6 @@ _prepare() {
 		apt-get install -y xz-utils
 		tar -xvJf $SITE_ROOT/data/geoip/GeoIP2-City.mmdb.tar.xz -C $SITE_ROOT/data/geoip
 	fi
-	# mkdir -p $SITE_ROOT/public/mbr-app-prod
-	# _git_clone $GIT_PUBLIC_URL/massbitprotocol/mbr-app.git $SITE_ROOT/public/mbr-app-prod $MBRAPP_BRANCH
-	# bash $SITE_ROOT/scripts/mbr_app.sh _build_prod $MBRAPP_BRANCH
 }
 
 _install_repos() {
@@ -118,6 +115,7 @@ _init() {
 	bash $SITE_ROOT/cmd_server _env
 	source $SITE_ROOT/.env_raw
 	_repo
+	bash $SITE_ROOT/scripts/mbr_app.sh _build_prod $MBRAPP_BRANCH
 }
 _supervisor() {
 	ln -sf /massbit/massbitroute/app/gbc /massbit/massbitroute/app/src/gbc
@@ -135,6 +133,7 @@ _supervisor() {
 }
 _install() {
 	_init
+	_prepare
 	_install_repos
 	_supervisor
 }
