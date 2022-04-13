@@ -129,10 +129,14 @@ _supervisor() {
 	cp supervisor.conf /etc/supervisor/conf.d/${TYPE}.conf
 	supervisorctl update
 }
-_install() {
+_install_one() {
 	_init
 	_prepare
 	_install_repos
+}
+
+_install() {
+	_install_one
 	_supervisor
 }
 _reload() {
