@@ -59,16 +59,16 @@ $SITE_ROOT/env|$GIT_PRIVATE_READ_URL/massbitroute/env.git|$MBR_ENV \
 
 _repo
 
-_tune_os() {
-	#dns
-	sed 's/#DNSStubListener=yes/DNSStubListener=no/' /etc/systemd/resolved.conf -i
-	pkill -f systemd-resolve
+# _tune_os() {
+# 	#dns
+# 	sed 's/#DNSStubListener=yes/DNSStubListener=no/' /etc/systemd/resolved.conf -i
+# 	pkill -f systemd-resolve
 
-	rm /etc/resolv.conf
-	echo nameserver 8.8.8.8 >/etc/resolv.conf
-	systemctl stop systemd-resolved
-	systemctl disable systemd-resolved
-}
+# 	rm /etc/resolv.conf
+# 	echo nameserver 8.8.8.8 >/etc/resolv.conf
+# 	systemctl stop systemd-resolved
+# 	systemctl disable systemd-resolved
+# }
 
 _prepare() {
 	echo "Prepare"
@@ -101,7 +101,6 @@ _init() {
 		echo "Need GIT_PRIVATE_READ_URL"
 		exit 1
 	fi
-	_tune_os
 	if [ ! -f "$SITE_ROOT/.env" ]; then
 		echo "$MBR_ENV" >$SITE_ROOT/.env
 	fi
@@ -121,8 +120,7 @@ _supervisor() {
 	ln -sf /massbit/massbitroute/app/gbc /massbit/massbitroute/app/src/gbc
 	ln -sf /massbit/massbitroute/app/gbc/bin/openresty /usr/local/openresty
 	apt-get update
-	apt-get install -y git apache2-utils supervisor jq python-is-python2 libssl-dev \
-		liburcu-dev libev-dev libsodium-dev libtool libunwind-dev libmaxminddb-dev
+	apt-get install -y git apache2-utils supervisor jq python-is-python2 libssl-dev
 
 	systemctl enable supervisor
 	systemctl start supervisor
@@ -182,7 +180,7 @@ _git_cmd_commit() {
 		for _fdir in $@; do
 			git -C $_cdir add -f $_fdir
 		done
-		git -C $_cdir commit -m "$_fdir at $_time"
+		git -C $_cdir commit -m "${HOSTNAME}: $_fdir at $_time"
 
 	fi
 }
@@ -374,6 +372,7 @@ _update_listid() {
 
 }
 _update_repos() {
+	_git_config
 	_repo
 	_update_sources $REPOS
 	_st_repo=$?
@@ -394,20 +393,11 @@ _update() {
 }
 
 _monitor() {
-
-	# _update_sources $REPOS
-	# _update_repos
-	# is_reload=$?
-
 	_update
-	# if [ $is_reload -ne 0 ]; then
 	is_reload=$?
-	# fi
-
 	if [ $is_reload -ne 0 ]; then
 		$0 _reload
 	fi
-
 }
 
 _run() {
