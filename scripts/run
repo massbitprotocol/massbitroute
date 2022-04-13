@@ -12,9 +12,11 @@ cd $SITE_ROOT
 mbr_root=/massbit/massbitroute/app
 service_dir=$mbr_root/src/sites/services
 
+export MBR_ENV=${MBR_ENV:-dev}
 export BRANCH=${BRANCH:-dev}
 export MBRAPP_BRANCH=${MBRAPP_BRANCH:-dev}
 export ASDF_BRANCH=${ASDF_BRANCH:-dev}
+export GBC_BRANCH=${GBC_BRANCH:-dev}
 export SSL_BRANCH=${SSL_BRANCH:-dev}
 export GWMAN_BRANCH=${GWMAN_BRANCH:-dev}
 export NODE_BRANCH=${NODE_BRANCH:-dev}
@@ -26,15 +28,26 @@ export SESSION_BRANCH=${SESSION_BRANCH:-dev}
 export GIT_BRANCH=${GIT_BRANCH:-dev}
 export MKAGENT_BRANCH=${MKAGENT_BRANCH:-dev}
 
+monitor_dir=/massbit/massbitroute/app/src/sites/services/monitor
+portal_dir=/massbit/massbitroute/app/src/sites/services/api
+
+deploy_dir=$portal_dir/public/deploy
+gwman_dir=/massbit/massbitroute/app/src/sites/services/gwman
+gw_dir=/massbit/massbitroute/app/src/sites/services/gateway
+
+cmd_server=$SITE_ROOT/cmd_server
+
 _repo() {
 	REPOS="\
 $SITE_ROOT/env|$GIT_PRIVATE_READ_URL/massbitroute/env.git|$MBR_ENV \
 /etc/letsencrypt|$GIT_PRIVATE_READ_URL/massbitroute/ssl.git|$SSL_BRANCH \
+ $mbr_root/gbc|https://github.com/massbitprotocol/massbitroute_gbc|$GBC_BRANCH \
  $mbr_root/gbc/bin/.asdf|https://github.com/massbitprotocol/massbitroute_asdf|$ASDF_BRANCH \
   $service_dir/gwman|$GIT_PUBLIC_URL/massbitprotocol/massbitroute_gwman.git|$GWMAN_BRANCH \
   $service_dir/gwman/data|https://$GIT_GWMANDEPLOY_WRITE@$GIT_PRIVATE_DOMAIN/massbitroute/gwmandeploy.git|$GWMAN_BRANCH \
   $service_dir/api|$GIT_PUBLIC_URL/massbitprotocol/massbitroute.git|$API_BRANCH \
   $service_dir/api/public/deploy|https://$GIT_APIDEPLOY_WRITE@$GIT_PRIVATE_DOMAIN/massbitroute/apideploy.git|$API_BRANCH \
+  $service_dir/api/public/mbr-app-prod|$GIT_PUBLIC_URL/massbitprotocol/mbr-app.git|$MBRAPP_BRANCH \
   $service_dir/stat|$GIT_PUBLIC_URL/massbitprotocol/massbitroute_stat.git|$STAT_BRANCH \
   $service_dir/stat/etc/conf|https://$GIT_STATDEPLOY_WRITE@$GIT_PRIVATE_DOMAIN/massbitroute/statdeploy.git|$STAT_BRANCH \
   $service_dir/mkagent|$GIT_PUBLIC_URL/massbitprotocol/massbitroute_mkagent.git|$MKAGENT_BRANCH \
@@ -45,15 +58,6 @@ $SITE_ROOT/env|$GIT_PRIVATE_READ_URL/massbitroute/env.git|$MBR_ENV \
 }
 
 _repo
-
-monitor_dir=/massbit/massbitroute/app/src/sites/services/monitor
-portal_dir=/massbit/massbitroute/app/src/sites/services/api
-
-deploy_dir=$portal_dir/public/deploy
-gwman_dir=/massbit/massbitroute/app/src/sites/services/gwman
-gw_dir=/massbit/massbitroute/app/src/sites/services/gateway
-
-cmd_server=$SITE_ROOT/cmd_server
 
 _tune_os() {
 	#dns
@@ -67,16 +71,8 @@ _tune_os() {
 }
 
 _prepare() {
-	_tune_os
-
-	_git_clone $GIT_PRIVATE_READ_URL/massbitroute/env.git /massbit/massbitroute/app/src/env $BRANCH
-
-	source $SITE_ROOT/.env
-	_git_clone $GIT_PUBLIC_URL/massbitprotocol/massbitroute_gbc.git /massbit/massbitroute/app/gbc
-	# _git_clone https://github.com/massbitprotocol/massbitroute_asdf $mbr_root/gbc/bin/.asdf $ASDF_BRANCH
-	bash $SITE_ROOT/cmd_server _env
-	source $SITE_ROOT/.env_raw
-	_repo
+	echo "Prepare"
+	mkdir -p $SITE_ROOT/logs/nginx $SITE_ROOT/db $SITE_ROOT/tmp $SITE_ROOT/db
 
 	if [ ! -f "/usr/bin/parallel" ]; then
 		apt update
@@ -88,21 +84,13 @@ _prepare() {
 		apt-get install -y xz-utils
 		tar -xvJf $SITE_ROOT/data/geoip/GeoIP2-City.mmdb.tar.xz -C $SITE_ROOT/data/geoip
 	fi
-	mkdir -p $SITE_ROOT/public/mbr-app-prod
-	_git_clone $GIT_PUBLIC_URL/massbitprotocol/mbr-app.git $SITE_ROOT/public/mbr-app-prod $MBRAPP_BRANCH
-
-	bash $SITE_ROOT/scripts/mbr_app.sh _build_prod $MBRAPP_BRANCH
+	# mkdir -p $SITE_ROOT/public/mbr-app-prod
+	# _git_clone $GIT_PUBLIC_URL/massbitprotocol/mbr-app.git $SITE_ROOT/public/mbr-app-prod $MBRAPP_BRANCH
+	# bash $SITE_ROOT/scripts/mbr_app.sh _build_prod $MBRAPP_BRANCH
 }
-# _tune_os() {
-# 	#dns
-# 	sed 's/#DNSStubListener=yes/DNSStubListener=no/' /etc/systemd/resolved.conf -i
-# 	pkill -f systemd-resolve
 
-# 	echo nameserver 8.8.8.8 >/etc/resolv.conf
-# 	systemctl stop systemd-resolved
-# 	systemctl disable systemd-resolved
-# }
 _install_repos() {
+	_git_config
 	_repo
 	for _pathgit in $REPOS; do
 		_path=$(echo $_pathgit | cut -d'|' -f1)
@@ -111,33 +99,32 @@ _install_repos() {
 		_git_clone $_url $_path $_branch
 	done
 }
-_install() {
-
+_init() {
 	if [ -z "$GIT_PRIVATE_READ_URL" ]; then
 		echo "Need GIT_PRIVATE_READ_URL"
 		exit 1
 	fi
-
 	_tune_os
+	if [ ! -f "$SITE_ROOT/.env" ]; then
+		echo "$MBR_ENV" >$SITE_ROOT/.env
+	fi
 
-	# git clone $GIT_PRIVATE_READ_URL/massbitroute/env.git $SITE_ROOT/env -b $BRANCH
+	source $SITE_ROOT/.env
 
-	mkdir -p $SITE_ROOT/logs/nginx $SITE_ROOT/db $SITE_ROOT/tmp
-	_git_config
-	_prepare
-	# _init
-	# for _pathgit in $REPOS; do
-	# 	_path=$(echo $_pathgit | cut -d'|' -f1)
-	# 	_url=$(echo $_pathgit | cut -d'|' -f2)
-	# 	_branch=$(echo $_pathgit | cut -d'|' -f3)
-	# 	_git_clone $_url $_path $_branch
-	# done
+	_git_clone $GIT_PRIVATE_READ_URL/massbitroute/env.git /massbit/massbitroute/app/src/env $MBR_ENV
+	_git_clone $GIT_PUBLIC_URL/massbitprotocol/massbitroute_gbc.git /massbit/massbitroute/app/gbc
+	_git_clone $GIT_PUBLIC_URL/massbitprotocol/mbr-app.git $SITE_ROOT/public/mbr-app-prod $MBRAPP_BRANCH
 
-	_install_repos
+	bash $SITE_ROOT/cmd_server _env
+	source $SITE_ROOT/.env_raw
+	_repo
+}
+_supervisor() {
 	ln -sf /massbit/massbitroute/app/gbc /massbit/massbitroute/app/src/gbc
 	ln -sf /massbit/massbitroute/app/gbc/bin/openresty /usr/local/openresty
 	apt-get update
-	apt-get install -y git apache2-utils supervisor jq python-is-python2 libssl-dev libmaxminddb-dev
+	apt-get install -y git apache2-utils supervisor jq python-is-python2 libssl-dev \
+		liburcu-dev libev-dev libsodium-dev libtool libunwind-dev libmaxminddb-dev
 
 	systemctl enable supervisor
 	systemctl start supervisor
@@ -145,6 +132,11 @@ _install() {
 	mkdir -p /etc/supervisor/conf.d
 	cp supervisor.conf /etc/supervisor/conf.d/${TYPE}.conf
 	supervisorctl update
+}
+_install() {
+	_init
+	_install_repos
+	_supervisor
 }
 _reload() {
 	$cmd_server _update
