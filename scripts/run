@@ -181,7 +181,8 @@ _git_cmd_commit() {
 			git -C $_cdir add -f $_fdir
 		done
 		mid=$(cat /etc/machine-id)
-		git -C $_cdir commit -m "${mid}: ${HOSTNAME}: $_fdir at $_time"
+		ip=$(curl ipv4.icanhazip.com)
+		git -C $_cdir commit -m "${ip}: ${mid}: ${HOSTNAME}: $_fdir at $_time"
 
 	fi
 }
