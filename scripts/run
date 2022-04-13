@@ -180,7 +180,8 @@ _git_cmd_commit() {
 		for _fdir in $@; do
 			git -C $_cdir add -f $_fdir
 		done
-		git -C $_cdir commit -m "${HOSTNAME}: $_fdir at $_time"
+		mid=$(cat /etc/machine-id)
+		git -C $_cdir commit -m "${mid}: ${HOSTNAME}: $_fdir at $_time"
 
 	fi
 }
