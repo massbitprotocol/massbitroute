@@ -229,29 +229,8 @@ _git_cmd() {
 
 		if [ "$cmd" = "commit" ]; then
 			_mydir="$_dir"
-			# case "$_service" in
-			# api)
-			# 	_mydir="$_dir_def/$_service/public/deploy"
-			# 	# _dir=$_mydir
-			# 	;;
-			# gwmandeploy)
-			# 	_mydir="$_dir"
-			# 	;;
-			# gwman)
-			# 	_mydir="$_dir/data $_dir/conf.d $_dir/zones"
-			# 	;;
-			# stat)
-			# 	_mydir="$_dir/etc/prometheus"
-			# 	;;
-			# monitor)
-			# 	_mydir="$_dir/etc/main.mk $_dir/scripts/tokens.txt"
-			# 	;;
-
-			# esac
-
-			# if [ -n "$_mydir" ]; then
 			_git_cmd_commit $_dir $_mydir
-			# fi
+
 		else
 			git -C $_dir $cmd
 		fi
