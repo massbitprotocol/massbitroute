@@ -145,7 +145,7 @@ _reload() {
 	if [ -z "$_cmd_server" ]; then _cmd_server=$cmd_server; fi
 
 	tmp=$(mktemp)
-	$_cmd_server status | grep worker-portal-api | awk '{print $1}' >$tmp
+	$_cmd_server status | grep worker- | awk '{print $1}' >$tmp
 	n=$(cat $tmp | wc -l)
 	cat $tmp | while read f; do
 		echo $_cmd_server restart $f
