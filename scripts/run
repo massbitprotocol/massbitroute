@@ -140,11 +140,6 @@ _install() {
 	_supervisor
 }
 _reload() {
-	_site_root=$1
-	if [ -n "$_site_root" ]; then
-		cmd_server=$_site_root/cmd_server
-	fi
-
 	$cmd_server _update
 	tmp=$(mktemp)
 	$cmd_server status | grep worker-portal-api | awk '{print $1}' >$tmp
