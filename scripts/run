@@ -367,9 +367,9 @@ _update_repos() {
 _update() {
 	echo "Update"
 	_st_update=0
-	timeout 60 $0 _git_cmd pull
-	timeout 60 $0 _git_cmd commit
-	timeout 60 $0 _git_cmd push
+	$0 _git_cmd pull
+	$0 _git_cmd commit
+	$0 _git_cmd push
 
 	_update_repos
 	_st_update=$?
@@ -378,7 +378,7 @@ _update() {
 }
 
 _monitor() {
-	_update
+	timeout 300 $0 _update
 	is_reload=$?
 	if [ $is_reload -ne 0 ]; then
 		$0 _reload
