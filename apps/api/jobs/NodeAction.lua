@@ -221,6 +221,8 @@ local function _norm(_v)
 end
 
 local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
+    _print("rescanconf_blockchain_network:" .. _blockchain .. ":" .. _network)
+    _print(inspect(_job_data))
     local _datacenters = {}
     local _actives = {}
     local _approved = {}
