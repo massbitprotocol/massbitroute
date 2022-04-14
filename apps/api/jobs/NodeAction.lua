@@ -312,6 +312,7 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
 end
 
 local function _rescanconf(_job_data)
+    _print("rescanconf:" .. inspect(_job_data))
     for _, _blockchain in ipairs(show_folder(_deploy_dir)) do
         local _blockchain_dir = _deploy_dir .. "/" .. _blockchain
         for _, _network in ipairs(show_folder(_blockchain_dir)) do
