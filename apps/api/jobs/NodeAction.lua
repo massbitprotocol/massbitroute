@@ -270,18 +270,18 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
         end
     end
     _print("datacenters:" .. inspect(_datacenters))
-    if _datacenters and #_datacenters > 0 then
-        -- _print("actives:" .. inspect(_actives))
+    -- if _datacenters and #_datacenters > 0 then
+    -- _print("actives:" .. inspect(_actives))
 
-        local _tmpl =
-            _get_tmpl(rules, {node_type = _blocknet_id, nodes = _datacenters, _domain_name = _job_data._domain_name})
+    local _tmpl =
+        _get_tmpl(rules, {node_type = _blocknet_id, nodes = _datacenters, _domain_name = _job_data._domain_name})
 
-        local _str_tmpl = _tmpl("_gw_conf")
-        _print(_str_tmpl)
-        local _file_gw = _deploy_gatewayconfdir .. "/" .. _blocknet_id .. ".conf"
-        _print(_file_gw)
-        _write_file(_file_gw, _str_tmpl)
-    end
+    local _str_tmpl = _tmpl("_gw_conf")
+    _print(_str_tmpl)
+    local _file_gw = _deploy_gatewayconfdir .. "/" .. _blocknet_id .. ".conf"
+    _print(_file_gw)
+    _write_file(_file_gw, _str_tmpl)
+    -- end
 
     if _approved and #_approved > 0 then
         local _tmpl = _get_tmpl(rules, {nodes = _approved, _domain_name = _job_data._domain_name})
