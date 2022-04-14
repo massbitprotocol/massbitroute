@@ -369,8 +369,8 @@ _update_repos() {
 _update() {
 	echo "Update"
 	_st_update=0
-	$0 _git_cmd pull
-	$0 _git_cmd commit
+	# $0 _git_cmd pull
+	# $0 _git_cmd commit
 	# $0 _git_cmd push
 
 	_update_repos
