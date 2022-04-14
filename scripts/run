@@ -141,12 +141,14 @@ _install() {
 	_supervisor
 }
 _reload() {
-	$cmd_server _update
+	_cmd_server=$1
+	if [ -z "$_cmd_server" ]; then _cmd_server=$cmd_server; fi
+	$_cmd_server _update
 	tmp=$(mktemp)
-	$cmd_server status | grep worker-portal-api | awk '{print $1}' >$tmp
+	$_cmd_server status | grep worker-portal-api | awk '{print $1}' >$tmp
 	n=$(cat $tmp | wc -l)
 	cat $tmp | while read f; do
-		echo $cmd_server restart $f
+		echo $_cmd_server restart $f
 	done | parallel -j$n
 	rm $tmp
 }
