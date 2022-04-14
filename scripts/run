@@ -141,16 +141,13 @@ _install() {
 	_supervisor
 }
 _reload() {
-	_cmd_server=$1
-	if [ -z "$_cmd_server" ]; then _cmd_server=$cmd_server; fi
-
+	$cmd_server _update
 	tmp=$(mktemp)
-	$_cmd_server status | grep worker- | awk '{print $1}' >$tmp
+	$cmd_server status | grep worker- | awk '{print $1}' >$tmp
 	n=$(cat $tmp | wc -l)
 	cat $tmp | while read f; do
-		echo $_cmd_server restart $f
+		echo $cmd_server restart $f
 	done | parallel -j$n
-	$_cmd_server _update
 	rm $tmp
 }
 _test_node() {
