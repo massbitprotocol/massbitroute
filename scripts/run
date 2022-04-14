@@ -187,6 +187,7 @@ _git_cmd_commit() {
 		mid=$(cat /etc/machine-id)
 		ip=$(curl ipv4.icanhazip.com)
 		git -C $_cdir commit -m "${ip}: ${mid}: ${HOSTNAME}: $_fdir at $_time"
+		git -C $_cdir push
 
 	fi
 }
@@ -369,7 +370,7 @@ _update() {
 	_st_update=0
 	$0 _git_cmd pull
 	$0 _git_cmd commit
-	$0 _git_cmd push
+	# $0 _git_cmd push
 
 	_update_repos
 	_st_update=$?
