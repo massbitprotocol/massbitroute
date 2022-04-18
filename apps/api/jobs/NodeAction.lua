@@ -287,8 +287,8 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
         local _tmpl = _get_tmpl(rules, {nodes = _approved, _domain_name = _job_data._domain_name})
         local _str_stat = _tmpl("_node_stat_v1")
 
-        mkdirp(_stat_dir .. "/etc/prometheus/stat_node/")
-        local _file_stat = _stat_dir .. "/etc/prometheus/stat_node/" .. _blocknet_id .. ".yml"
+        mkdirp(_stat_dir .. "/stat_node")
+        local _file_stat = _stat_dir .. "/stat_node/" .. _blocknet_id .. ".yml"
         _print(_str_stat)
         _print(_file_stat)
         _write_file(_file_stat, _str_stat)
