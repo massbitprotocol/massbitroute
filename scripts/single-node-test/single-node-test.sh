@@ -204,7 +204,7 @@ echo "Checking node verified status: Passed"
 # Test staking for NODES/GW
 #-------------------------------------------
 # register gateway
-gateway_register_response=$(curl --location --request POST 'https://staking.massbitroute.dev/massbit/admin/register-provider' \
+gateway_register_response=$(curl -s --location --request POST 'https://staking.massbitroute.dev/massbit/admin/register-provider' \
 --header 'Content-Type: application/json' \
 --data-raw "{
     \"providerId\": \"$GATEWAY_ID\",
@@ -229,14 +229,14 @@ gateway_staking_response=$(curl -s --location --request POST 'https://staking.ma
     \"network\": \"mainnet\",
     \"amount\": \"100\"
 }" | jq -r ". | .status")
-if [[ "$gateway_staking_status" != "success" ]]; then
+if [[ "$gateway_staking_response" != "success" ]]; then
   echo "Gateway staking status: Failed "
   exit 1
 fi
 echo "Gateway staking status: Passed"
 
 # register Node
-node_register_response=$(curl --location --request POST 'https://staking.massbitroute.dev/massbit/admin/register-provider' \
+node_register_response=$(curl -s --location --request POST 'https://staking.massbitroute.dev/massbit/admin/register-provider' \
 --header 'Content-Type: application/json' \
 --data-raw "{
     \"providerId\": \"$GATEWAY_ID\",
@@ -260,7 +260,7 @@ node_staking_response=$(curl -s --location --request POST 'https://staking.massb
     \"network\": \"mainnet\",
     \"amount\": \"100\"
 }" | jq -r ". | .status")
-if [[ "$node_staking_status" != "success" ]]; then
+if [[ "$node_staking_response" != "success" ]]; then
   echo "Node staking: Failed"
   exit 1
 fi
