@@ -12,11 +12,7 @@ fi
 
 blockchain="$1"
 
-# MEMONIC="peanut thank prevent burden erode welcome dust one develop code lamp rule"
-# TEST_USERNAME="Juanito"
-# TEST_PASSWORD="Defense22"
-# USER_ID="772efcb1-f14e-4e7b-a5a7-d17d97fff8e5"
-# WALLET_ADDRESS="5DHumimsr4XjcJCmKY7Ei8MAtxrradcZqTdPha4XqGbjmpyJ"
+source .env
 
 if [ "$blockchain" = "eth" ]
 then
