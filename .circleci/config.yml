@@ -17,11 +17,16 @@ jobs:
           name: Obtain GCE key
           command: echo $PROJECT_KEY > scripts/single-node-test/project_key.json
       - run: 
-          name: Test main flow for ETH nodes/GW
-          command: cd scripts/single-node-test && sudo bash ./single-node-test.sh eth
+          name: Test main flow for DOT nodes/GW
+          command: |
+            cd scripts/single-node-test
+            sudo bash -x ./single-node-test.sh dot
       - run: 
           name: Test main flow for ETH nodes/GW
-          command: cd scripts/single-node-test && sudo bash ./single-node-test.sh dot
+          command: |
+            cd scripts/single-node-test
+            sudo bash -x ./single-node-test.sh eth
+
 
 # Orchestrate our job run sequence
 workflows:
