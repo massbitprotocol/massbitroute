@@ -15,7 +15,7 @@ jobs:
       - checkout
       - run: 
           name: Obtain GCE key
-          command: echo $PROJECT_KEY > project_key.json
+          command: echo $PROJECT_KEY > scripts/single-node-test/project_key.json
       - run: 
           name: Test main flow for ETH nodes/GW
           command: cd scripts/single-node-test && sudo bash ./single-node-test.sh eth
