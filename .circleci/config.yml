@@ -21,22 +21,16 @@ jobs:
           command: |
             cd scripts/single-node-test
             echo "
-            export MEMONIC="$MEMONIC"
-            export TEST_USERNAME="$TEST_USERNAME"
-            export TEST_PASSWORD="$TEST_PASSWORD"
-            export USER_ID="$USER_ID"
-            export WALLET_ADDRESS="$WALLET_ADDRESS" > .env 
+            export MEMONIC=$MEMONIC
+            export TEST_USERNAME=$TEST_USERNAME
+            export TEST_PASSWORD=$TEST_PASSWORD
+            export USER_ID=$USER_ID
+            export WALLET_ADDRESS=$WALLET_ADDRESS" > .env 
             sudo bash -x ./single-node-test.sh dot
       - run: 
           name: Test main flow for ETH nodes/GW
           command: |
             cd scripts/single-node-test
-            echo "
-            export MEMONIC="$MEMONIC"
-            export TEST_USERNAME="$TEST_USERNAME"
-            export TEST_PASSWORD="$TEST_PASSWORD"
-            export USER_ID="$USER_ID"
-            export WALLET_ADDRESS="$WALLET_ADDRESS" > .env 
             sudo bash -x ./single-node-test.sh eth
 
 
