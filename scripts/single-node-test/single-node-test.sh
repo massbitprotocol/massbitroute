@@ -23,7 +23,7 @@ then
   dataSource="http:\/\/34.87.241.136:8545"
 elif [ "$blockchain" = "dot" ]
 then
-  PROJECT_ID="ea36a4b2-655b-4e89-9f5c-6a53cdce909f"
+  PROJECT_ID="c664ec9e-e412-4200-a5ac-b879383b8151"
   dataSource="https:\/\/34.116.128.226"
 else
   echo "ERROR. Blockchain unspecified or invalid"
