@@ -1,8 +1,5 @@
 #!/bin/bash
 
-# blockchain="eth"
-# dataSource="http:\/\/34.87.241.136:8545"
-
 if [ -z "$1" ]
   then
     echo "ERROR: Blockchain is required"
