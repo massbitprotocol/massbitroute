@@ -239,7 +239,7 @@ echo "Gateway staking status: Passed"
 node_register_response=$(curl -s --location --request POST 'https://staking.massbitroute.dev/massbit/admin/register-provider' \
 --header 'Content-Type: application/json' \
 --data-raw "{
-    \"providerId\": \"$GATEWAY_ID\",
+    \"providerId\": \"$NODE_ID\",
     \"operator\": \"$WALLET_ADDRESS\",
     \"providerType\": \"Node\",
     \"blockchain\": \"$blockchain\",
