@@ -1,0 +1,65 @@
+
+resource "google_compute_instance" "gateway-[[GATEWAY_ID]]" {
+  name         = "${var.project_prefix}-${var.environment}-gateway-[[BLOCKCHAIN]]-[[GATEWAY_ID]]"
+  machine_type = var.map_machine_types["gateway"]
+  zone         = "${var.default_zone}"
+
+  tags = ["http-server", "https-server"]
+
+  boot_disk {
+    initialize_params {
+      image = "projects/ubuntu-os-cloud/global/images/ubuntu-2004-focal-v20210720"
+      size = 2000
+    }
+  }
+
+  network_interface {
+    network = "${var.network_interface}"
+
+    access_config {
+      // Ephemeral IP
+    }
+  }
+
+  metadata_startup_script =  <<EOH
+  #!/bin/bash
+  #-------------------------------------------
+  #  Update host file for Massbitroute.dev
+  #-------------------------------------------
+  # sudo echo '
+# [[MASSBITROUTE_CORE_IP]] hostmaster.massbitroute.dev
+# [[MASSBITROUTE_CORE_IP]] ns1.massbitroute.dev
+# [[MASSBITROUTE_CORE_IP]] ns2.massbitroute.dev
+# [[MASSBITROUTE_CORE_IP]] massbitroute.devdmin.massbitroute.dev
+# [[MASSBITROUTE_CORE_IP]] dapi.massbitroute.dev
+# [[MASSBITROUTE_CORE_IP]] massbitroute.devpi.massbitroute.dev
+# [[MASSBITROUTE_CORE_IP]] dev.massbitroute.dev
+# [[MASSBITROUTE_CORE_IP]] staging.massbitroute.dev
+# [[MASSBITROUTE_CORE_IP]] production.massbitroute.dev
+# [[MASSBITROUTE_CORE_IP]] status.dapi.massbitroute.dev
+# [[MASSBITROUTE_CORE_IP]] session.mbr.massbitroute.dev
+# [[MASSBITROUTE_CORE_IP]] monitor.mbr.massbitroute.dev
+# [[MASSBITROUTE_CORE_IP]] glmr1.bc.massbitroute.dev
+# [[MASSBITROUTE_CORE_IP]] dot1.bc.massbitroute.dev
+# [[MASSBITROUTE_CORE_IP]] chain.massbitroute.dev
+# 
+# [[MASSBITROUTE_PORTAL_IP]] portal.massbitroute.dev
+# [[MASSBITROUTE_PORTAL_IP]] staking.massbitroute.dev
+# 
+# [[MASSBITROUTE_RUST_IP]] verify.massbitroute.dev
+# [[MASSBITROUTE_RUST_IP]] fisherman.massbitroute.dev
+# [[MASSBITROUTE_RUST_IP]] stat.mbr.massbitroute.dev>> /etc/hosts
+
+
+  #-------------------------------------------
+  #  Install script for GATEWAY
+  #-------------------------------------------
+  sudo bash -c "$(curl -sSfL 'https://dapi.massbitroute.dev/api/v1/gateway_install?id=[[GATEWAY_ID]]&user_id=[[USER_ID]]&blockchain=[[BLOCKCHAIN]]&network=mainnet&zone=[[ZONE]]&app_key=[[APP_KEY]]&portal_url=https://portal.massbitroute.dev&env=dev')"  >> /home/verification.log
+  EOH
+
+  service_account {
+    # Google recommends custom service accounts that have cloud-platform scope and permissions granted via IAM Roles.
+    email = "${var.email}"
+    scopes = ["cloud-platform"]
+  }
+}
