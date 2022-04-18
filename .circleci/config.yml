@@ -19,11 +19,21 @@ jobs:
       - run: 
           name: Test main flow for DOT nodes/GW
           command: |
+            export MEMONIC="peanut thank prevent burden erode welcome dust one develop code lamp rule"
+            export TEST_USERNAME="Juanito"
+            export TEST_PASSWORD="Defense22"
+            export USER_ID="772efcb1-f14e-4e7b-a5a7-d17d97fff8e5"
+            export WALLET_ADDRESS="5DHumimsr4XjcJCmKY7Ei8MAtxrradcZqTdPha4XqGbjmpyJ" 
             cd scripts/single-node-test
             sudo bash -x ./single-node-test.sh dot
       - run: 
           name: Test main flow for ETH nodes/GW
           command: |
+            export MEMONIC="peanut thank prevent burden erode welcome dust one develop code lamp rule"
+            export TEST_USERNAME="Juanito"
+            export TEST_PASSWORD="Defense22"
+            export USER_ID="772efcb1-f14e-4e7b-a5a7-d17d97fff8e5"
+            export WALLET_ADDRESS="5DHumimsr4XjcJCmKY7Ei8MAtxrradcZqTdPha4XqGbjmpyJ" 
             cd scripts/single-node-test
             sudo bash -x ./single-node-test.sh eth
 

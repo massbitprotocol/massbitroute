@@ -9,13 +9,14 @@ if [ -z "$1" ]
     exit 1
 fi
 
+
 blockchain="$1"
 
-MEMONIC="peanut thank prevent burden erode welcome dust one develop code lamp rule"
-TEST_USERNAME="Juanito"
-TEST_PASSWORD="Defense22"
-USER_ID="772efcb1-f14e-4e7b-a5a7-d17d97fff8e5"
-WALLET_ADDRESS="5DHumimsr4XjcJCmKY7Ei8MAtxrradcZqTdPha4XqGbjmpyJ"
+# MEMONIC="peanut thank prevent burden erode welcome dust one develop code lamp rule"
+# TEST_USERNAME="Juanito"
+# TEST_PASSWORD="Defense22"
+# USER_ID="772efcb1-f14e-4e7b-a5a7-d17d97fff8e5"
+# WALLET_ADDRESS="5DHumimsr4XjcJCmKY7Ei8MAtxrradcZqTdPha4XqGbjmpyJ"
 
 if [ "$blockchain" = "eth" ]
 then
@@ -364,8 +365,6 @@ fi
 
 dapi_response_code=$(curl -o /dev/null -s -w "%{http_code}\n" --location --request POST "$dapiURL" \
   --header 'Content-Type: application/json' \
-  --header "Host: $apiId.$blockchain-mainnet.massbitroute.dev" \
-  --header "x-api-key: $appKey" \
   --data-raw "$http_data")
 if [[ "$dapi_response_code" != "200" ]]; then
   echo "Calling dAPI: Failed"
