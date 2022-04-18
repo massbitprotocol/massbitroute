@@ -79,6 +79,7 @@ _cleanupmeforsure() {
 		echo "Clean dapideploy"
 		for d in node nodeconf gateway gatewayconf dapi dapiconf info; do
 			find $SITE_ROOT/public/deploy/$d -type f -delete
+
 		done
 		find $SITE_ROOT/../gwman/data/conf.d/geolocation.d -type f -delete
 		find $SITE_ROOT/../gwman/data/zones -type f -delete
@@ -394,8 +395,8 @@ _update_repos() {
 _update() {
 	echo "Update"
 	_st_update=0
-	# $0 _git_cmd pull
-	# $0 _git_cmd commit
+	$0 _git_cmd pull
+	$0 _git_cmd commit
 	# $0 _git_cmd push
 
 	_update_repos
