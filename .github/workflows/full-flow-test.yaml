@@ -2,7 +2,7 @@ name: Test main flow ETH/DOT Node/GW
 
 on:
   push:
-    branches: [feature/testci]
+    branches: [dev]
 
 
 jobs:
