@@ -1,4 +1,4 @@
-name: Test run full flow
+name: Test main flow ETH/DOT Node/GW 
 
 on:
   push:
@@ -31,7 +31,7 @@ jobs:
           export TEST_PASSWORD=$TEST_PASSWORD
           export USER_ID=$USER_ID
           export WALLET_ADDRESS=$WALLET_ADDRESS" > .env 
-          sudo bash -x ./single-node-test.sh eth
+          sudo bash ./single-node-test.sh eth
   test-nodes-dot:
     runs-on: ubuntu-latest
     container: hoanito/mbr-ubuntu:1.1
@@ -57,4 +57,4 @@ jobs:
           export TEST_PASSWORD=$TEST_PASSWORD
           export USER_ID=$USER_ID
           export WALLET_ADDRESS=$WALLET_ADDRESS" > .env 
-          sudo bash -x ./single-node-test.sh dot
+          sudo bash ./single-node-test.sh dot
