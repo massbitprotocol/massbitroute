@@ -70,6 +70,30 @@ _repo
 # 	systemctl disable systemd-resolved
 # }
 
+_cleanupmeforsure() {
+	read -p "Are you sure? " -n 1 -r
+	echo # (optional) move to a new line
+	if [[ $REPLY =~ ^[Yy]$ ]]; then
+		echo "Clean redis"
+		$cmd_server redis -n 1 flushall
+		echo "Clean dapideploy"
+		for d in node nodeconf gateway gatewayconf dapi dapiconf info; do
+			find $SITE_ROOT/public/deploy/$d -type f -delete
+
+		done
+		find $SITE_ROOT/../gwman/data/conf.d/geolocation.d -type f -delete
+		find $SITE_ROOT/../gwman/data/zones -type f -delete
+		# $SITE_ROOT/../gwman/scripts/run _prepare
+		$SITE_ROOT/../gwman/scripts/run _rebuild_conf
+
+		for d in stat_gw stat_node; do
+			find $SITE_ROOT/../stat/etc/conf/$d -type f -delete
+		done
+		$SITE_ROOT/../stat/scripts/run _rebuild_conf
+	fi
+
+}
+
 _prepare() {
 	echo "Prepare"
 	mkdir -p $SITE_ROOT/logs/nginx $SITE_ROOT/db $SITE_ROOT/tmp $SITE_ROOT/db
@@ -371,8 +395,8 @@ _update_repos() {
 _update() {
 	echo "Update"
 	_st_update=0
-	# $0 _git_cmd pull
-	# $0 _git_cmd commit
+	$0 _git_cmd pull
+	$0 _git_cmd commit
 	# $0 _git_cmd push
 
 	_update_repos
