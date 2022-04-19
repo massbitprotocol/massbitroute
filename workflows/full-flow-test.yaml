@@ -1,0 +1,25 @@
+name: Test run full flow
+
+on:
+  push:
+    branches: [feature/testci]
+
+
+jobs:
+  test-nodes:
+    runs-on: ubuntu-latest
+    container: hoanito/mbr-ubuntu:1.1
+    steps:
+      - uses: actions/checkout@v3
+      - name: Obtain GCE key
+        env: 
+          PROJECT_KEY: ${{ secrets.PROJECT_KEY }}
+        run: echo $PROJECT_KEY > scripts/single-node-test/project_key.json
+      - name: 
+        env:
+          MEMONIC: ${{ secrets.MEMONIC }}
+          TEST_PASSWORD: ${{ secrets.TEST_PASSWORD }}
+          TEST_USERNAME: ${{ secrets.TEST_USERNAME }}
+          USER_ID: ${{ secrets.USER_ID }}
+          WALLET_ADDRESS: ${{ secrets.WALLET_ADDRESS }}
+        run: sudo bash -x ./single-node-test.sh eth
