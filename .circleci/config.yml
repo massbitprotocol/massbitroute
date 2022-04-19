@@ -4,7 +4,30 @@ parameters:
     type: boolean
     default: false
 jobs:
-  test_main_flow:
+  test_main_flow_eth:
+    docker:
+      - image: hoanito/mbr-ubuntu:1.1
+        # auth:
+        #   username: mydockerhub-user
+        #   password: $DOCKERHUB_PASSWORD  # context / project UI env-var reference
+    steps:
+      - run: mkdir -p /massbitroute/nodetest && cd /massbitroute/nodetest
+      - checkout
+      - run: 
+          name: Obtain GCE key
+          command: echo $PROJECT_KEY > scripts/single-node-test/project_key.json
+      - run: 
+          name: Test main flow for ETH nodes/GW
+          command: |
+            cd scripts/single-node-test
+            echo "
+            export MEMONIC=\"$MEMONIC\"
+            export TEST_USERNAME=$TEST_USERNAME
+            export TEST_PASSWORD=$TEST_PASSWORD
+            export USER_ID=$USER_ID
+            export WALLET_ADDRESS=$WALLET_ADDRESS" > .env 
+            sudo bash -x ./single-node-test.sh eth
+  test_main_flow_dot:
     docker:
       - image: hoanito/mbr-ubuntu:1.1
         # auth:
@@ -21,18 +44,12 @@ jobs:
           command: |
             cd scripts/single-node-test
             echo "
-            export MEMONIC=$MEMONIC
+            export MEMONIC=\"$MEMONIC\"
             export TEST_USERNAME=$TEST_USERNAME
             export TEST_PASSWORD=$TEST_PASSWORD
             export USER_ID=$USER_ID
             export WALLET_ADDRESS=$WALLET_ADDRESS" > .env 
             sudo bash -x ./single-node-test.sh dot
-      - run: 
-          name: Test main flow for ETH nodes/GW
-          command: |
-            cd scripts/single-node-test
-            sudo bash -x ./single-node-test.sh eth
-
 
 # Orchestrate our job run sequence
 workflows:
@@ -40,8 +57,11 @@ workflows:
 
   massbitroute-ci-dev:
     jobs:
-      - test_main_flow:
+      - test_main_flow_eth:
           filters:
             branches:
               only: dev
-
+      - test_main_flow_dot:
+          filters:
+            branches:
+              only: dev
