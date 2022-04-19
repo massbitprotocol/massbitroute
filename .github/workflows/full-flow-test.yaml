@@ -6,7 +6,7 @@ on:
 
 
 jobs:
-  test-nodes:
+  test-nodes-eth:
     runs-on: ubuntu-latest
     container: hoanito/mbr-ubuntu:1.1
     steps:
@@ -16,7 +16,6 @@ jobs:
           PROJECT_KEY: ${{ secrets.PROJECT_KEY }}
         run: |
           echo $PROJECT_KEY  > scripts/single-node-test/project_key.json 
-          cat scripts/single-node-test/project_key.json 
       - name: Run full flow check for ETH nodes
         env:
           MEMONIC: ${{ secrets.MEMONIC }}
@@ -33,3 +32,29 @@ jobs:
           export USER_ID=$USER_ID
           export WALLET_ADDRESS=$WALLET_ADDRESS" > .env 
           sudo bash -x ./single-node-test.sh eth
+  test-nodes-dot:
+    runs-on: ubuntu-latest
+    container: hoanito/mbr-ubuntu:1.1
+    steps:
+      - uses: actions/checkout@v3
+      - name: Obtain GCE key
+        env: 
+          PROJECT_KEY: ${{ secrets.PROJECT_KEY }}
+        run: |
+          echo $PROJECT_KEY  > scripts/single-node-test/project_key.json 
+      - name: Run full flow check for ETH nodes
+        env:
+          MEMONIC: ${{ secrets.MEMONIC }}
+          TEST_PASSWORD: ${{ secrets.TEST_PASSWORD }}
+          TEST_USERNAME: ${{ secrets.TEST_USERNAME }}
+          USER_ID: ${{ secrets.USER_ID }}
+          WALLET_ADDRESS: ${{ secrets.WALLET_ADDRESS }}
+        run: |
+          cd scripts/single-node-test
+          echo "
+          export MEMONIC=\"$MEMONIC\"
+          export TEST_USERNAME=$TEST_USERNAME
+          export TEST_PASSWORD=$TEST_PASSWORD
+          export USER_ID=$USER_ID
+          export WALLET_ADDRESS=$WALLET_ADDRESS" > .env 
+          sudo bash -x ./single-node-test.sh dot
