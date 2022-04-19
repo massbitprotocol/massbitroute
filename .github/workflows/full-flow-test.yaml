@@ -24,10 +24,4 @@ jobs:
           WALLET_ADDRESS: ${{ secrets.WALLET_ADDRESS }}
         run: |
           cd scripts/single-node-test
-          echo "
-          export MEMONIC=\"$MEMONIC\"
-          export TEST_USERNAME=$TEST_USERNAME
-          export TEST_PASSWORD=$TEST_PASSWORD
-          export USER_ID=$USER_ID
-          export WALLET_ADDRESS=$WALLET_ADDRESS" > .env 
           sudo bash -x ./single-node-test.sh eth
