@@ -2,15 +2,15 @@
 SITE_ROOT=$(realpath $(dirname $(realpath $0))/..)
 
 _git_config() {
-	if [ ! -f "$HOME/.gitconfig" ]; then
-		cat >$HOME/.gitconfig <<EOF
+	# if [ ! -f "$HOME/.gitconfig" ]; then
+	cat >$HOME/.gitconfig <<EOF
    [http]
         sslverify = false
     [user]
 	email = baysao@gmail.com
 	name = Baysao
 EOF
-	fi
+	# fi
 
 }
 _git_clone() {
@@ -27,6 +27,9 @@ _git_clone() {
 		git -C $_dir pull origin $_branch
 	fi
 	if [ -f "$_dir/scripts/run" ]; then
+		echo "========================="
+		echo "$_dir/scripts/run _prepare"
+		echo "========================="
 		$_dir/scripts/run _prepare
 	fi
 
@@ -38,12 +41,21 @@ _update_sources() {
 	branch=$MBR_ENV
 	for _pathgit in $@; do
 		_path=$(echo $_pathgit | cut -d'|' -f1)
-		timeout 60 git -C $_path pull | grep -i "updating"
+		tmp="$(timeout 60 git -C $_path pull origin $branch 2>&1)"
+		echo "$tmp"
+		echo "$tmp" | grep -i "error"
+		if [ $? -eq 0 ]; then
+			timeout 60 git -C $_path reset --hard
+			tmp="$(timeout 60 git -C $_path pull origin $branch 2>&1)"
+		fi
+
+		echo "$tmp" | grep -i "updating"
 		st=$?
 		echo $_path $st
 		if [ $st -eq 0 ]; then
 			_is_reload=1
 		fi
+
 	done
 	return $_is_reload
 }
