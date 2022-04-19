@@ -14,7 +14,7 @@ local _config = {
     supervisors = {
         ["monitor_client"] = [[
 [program:monitor_client]
-command=/bin/bash _SITE_ROOT_/../mkagent/agents/push.sh _SITE_ROOT_/../mkagent
+command=/bin/bash _SITE_ROOT_/../mkagent/agents/push.sh _SITE_ROOT_
 autorestart=true
 redirect_stderr=true
 stopasgroup=true
