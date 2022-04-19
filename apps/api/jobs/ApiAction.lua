@@ -112,8 +112,8 @@ server {
         vhost_traffic_status_filter_by_set_key $api_method __GATEWAY_ID__::gw::api_method;
 
         add_header X-Mbr-Gateway-Id __GATEWAY_ID__;
-        proxy_cache_use_stale updating error timeout invalid_header http_500 http_502 http_503 http_504;
-        proxy_next_upstream error timeout invalid_header http_500 http_502 http_503 http_504;
+#        proxy_cache_use_stale updating error timeout invalid_header http_500 http_502 http_503 http_504;
+        proxy_next_upstream error timeout invalid_header http_429 http_500 http_502 http_503 http_504;
 
         proxy_connect_timeout 3;
         proxy_send_timeout 3;
@@ -212,7 +212,7 @@ server {
        ${_api_method1()}
         proxy_redirect off;
         proxy_ssl_server_name on;
-        proxy_next_upstream error timeout invalid_header http_500 http_502 http_503 http_504;
+        proxy_next_upstream error timeout invalid_header http_429 http_500 http_502 http_503 http_504;
         proxy_connect_timeout 3;
         proxy_send_timeout 3;
         proxy_read_timeout 3;

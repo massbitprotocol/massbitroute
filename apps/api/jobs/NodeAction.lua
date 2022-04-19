@@ -101,7 +101,7 @@ server {
 }
 ]],
     _gw_nodes = [[
-${nodes/_gw_node_approved()}
+${nodes/_gw_node()}
 ]],
     _gw_conf = [[
 ${_gw_nodes()}
@@ -143,8 +143,8 @@ server {
         access_by_lua_file /massbit/massbitroute/app/src/sites/services/node/src/jsonrpc-access.lua;
         vhost_traffic_status_filter_by_set_key $api_method ${id}::node::api_method;
 
-        proxy_cache_use_stale updating error timeout invalid_header http_500 http_502 http_503 http_504;
-        proxy_next_upstream error timeout invalid_header http_500 http_502 http_503 http_504;
+#        proxy_cache_use_stale updating error timeout invalid_header proxy_cache_use_stale http_500 http_502 http_503 http_504;
+        proxy_next_upstream error timeout invalid_header http_429 http_500 http_502 http_503 http_504;
         proxy_connect_timeout 3;
         proxy_send_timeout 3;
         proxy_read_timeout 3;
@@ -223,6 +223,7 @@ end
 local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
     _print("rescanconf_blockchain_network:" .. _blockchain .. ":" .. _network)
     _print(inspect(_job_data))
+    local _nodes = {}
     local _datacenters = {}
     local _actives = {}
     local _approved = {}
@@ -256,6 +257,17 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
                                                 _approved[#_approved + 1] = _item
                                                 _item._is_approved = true
                                                 table.insert(_datacenters, _item)
+                                                local _blocknet_continent =
+                                                    _blocknet_id .. "-" .. _item.geo.continent_code
+                                                local _blocknet_country =
+                                                    _blocknet_id ..
+                                                    "-" .. _item.geo.continent_code .. "-" .. _item.geo.country_code
+                                                _nodes[_blocknet_id] = _nodes[_blocknet_id] or {}
+                                                _nodes[_blocknet_continent] = _nodes[_blocknet_continent] or {}
+                                                _nodes[_blocknet_country] = _nodes[_blocknet_country] or {}
+                                                table.insert(_nodes[_blocknet_id], _item)
+                                                table.insert(_nodes[_blocknet_continent], _item)
+                                                table.insert(_nodes[_blocknet_country], _item)
                                             end
                                         end
 
@@ -269,19 +281,51 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
             end
         end
     end
-    _print("datacenters:" .. inspect(_datacenters))
-    -- if _datacenters and #_datacenters > 0 then
-    -- _print("actives:" .. inspect(_actives))
+    _print("nodes:" .. inspect(_nodes))
+    do
+        local _tmpl =
+            _get_tmpl(
+            rules,
+            {
+                node_type = _blocknet_id,
+                nodes = _nodes[_blocknet_id],
+                _domain_name = _job_data._domain_name
+            }
+        )
 
-    local _tmpl =
-        _get_tmpl(rules, {node_type = _blocknet_id, nodes = _datacenters, _domain_name = _job_data._domain_name})
+        local _str_tmpl = _tmpl("_gw_conf")
+        _print(_str_tmpl)
+        local _file_gw = _deploy_gatewayconfdir .. "/" .. _blocknet_id .. ".conf"
+        _print(_file_gw)
+        _write_file(_file_gw, _str_tmpl)
+    end
+    do
+        local _tmpl =
+            _get_tmpl(
+            rules,
+            {
+                node_type = _blocknet_id,
+                nodes = _nodes[_blocknet_id],
+                _domain_name = _job_data._domain_name
+            }
+        )
 
-    local _str_tmpl = _tmpl("_gw_conf")
-    _print(_str_tmpl)
-    local _file_gw = _deploy_gatewayconfdir .. "/" .. _blocknet_id .. ".conf"
-    _print(_file_gw)
-    _write_file(_file_gw, _str_tmpl)
-    -- end
+        local _str_tmpl = _tmpl("_gw_nodes")
+        _print(_str_tmpl)
+        local _file_gw = _deploy_gatewayconfdir .. "/" .. _blocknet_id .. "-nodes.conf"
+        _print(_file_gw)
+        _write_file(_file_gw, _str_tmpl)
+    end
+    for _k, _v in pairs(_nodes) do
+        local _tmpl = _get_tmpl(rules, {node_type = _k, nodes = _v, _domain_name = _job_data._domain_name})
+
+        local _str_tmpl = _tmpl("_gw_node_upstreams")
+        _print(_str_tmpl)
+        local _file_gw = _deploy_gatewayconfdir .. "/" .. _k .. "-upstream.conf"
+        _print(_file_gw)
+        _write_file(_file_gw, _str_tmpl)
+        -- end
+    end
 
     if _approved and #_approved > 0 then
         local _tmpl = _get_tmpl(rules, {nodes = _approved, _domain_name = _job_data._domain_name})
@@ -353,17 +397,6 @@ local function _remove_item(instance, args)
     local _deploy_file = _item_path .. "/" .. _item.id
     local _deploy_conf_file = _deploy_nodeconfdir .. "/" .. _item.id .. ".conf"
     if args._is_delete then
-        -- _git_push(
-        --     _deploy_dir,
-        --     {},
-        --     {
-        --         _deploy_file
-        --     }
-        -- )
-        -- local _k1 =
-        --     _item.blockchain .. "/" .. _item.network .. "/" .. _item.geo.continent_code .. "/" .. _item.geo.country_code
-        -- mkdirp(_deploy_dir .. "/" .. _k1)
-        -- local _deploy_file = _deploy_dir .. "/" .. _k1 .. "/" .. _item.id
         _print("remove file:" .. _deploy_file)
 
         os.remove(_deploy_file)
@@ -411,13 +444,6 @@ local function _generate_item(instance, args)
     mkdirp(_item_path)
     local _deploy_file = _item_path .. "/" .. _item.id
 
-    -- local _k1 = _k2 .. "/" .. _item.geo.continent_code .. "/" .. _item.geo.country_code
-    -- mkdirp(_deploy_dir .. "/" .. _k1)
-    -- local _deploy_file = _deploy_dir .. "/" .. _k1 .. "/" .. _item.id
-
-    -- write data output for later inspector
-    -- easy for other task follow
-    -- _print(_deploy_file)
     _item._is_delete = nil
     args._is_delete = nil
     table.merge(_item, args)
@@ -436,13 +462,6 @@ local function _generate_item(instance, args)
     _print(_file_main)
     _write_file(_file_main, _str_tmpl)
 
-    -- local _files = {
-    --     _deploy_file,
-    --     _deploy_file1,
-    --     _deploy_nodeconfdir .. "/" .. _item.id .. ".conf"
-    -- }
-    -- _print("files:" .. inspect(_files))
-    -- _git_push(_deploy_dir, _files)
     _rescanconf_blockchain_network(_item.blockchain, _item.network, args)
     return true
 end
