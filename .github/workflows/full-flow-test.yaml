@@ -15,11 +15,13 @@ jobs:
         env: 
           PROJECT_KEY: ${{ secrets.PROJECT_KEY }}
         run: echo $PROJECT_KEY > scripts/single-node-test/project_key.json
-      - name: 
+      - name: Run full flow check for ETH nodes
         env:
           MEMONIC: ${{ secrets.MEMONIC }}
           TEST_PASSWORD: ${{ secrets.TEST_PASSWORD }}
           TEST_USERNAME: ${{ secrets.TEST_USERNAME }}
           USER_ID: ${{ secrets.USER_ID }}
           WALLET_ADDRESS: ${{ secrets.WALLET_ADDRESS }}
-        run: sudo bash -x ./single-node-test.sh eth
+        run: |
+          cd scripts/single-node-test
+          sudo bash -x ./single-node-test.sh eth
