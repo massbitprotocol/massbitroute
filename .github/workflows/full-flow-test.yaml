@@ -14,7 +14,9 @@ jobs:
       - name: Obtain GCE key
         env: 
           PROJECT_KEY: ${{ secrets.PROJECT_KEY }}
-        run: echo $PROJECT_KEY > scripts/single-node-test/project_key.json
+        run: |
+          echo $PROJECT_KEY  > scripts/single-node-test/project_key.json 
+          cat scripts/single-node-test/project_key.json 
       - name: Run full flow check for ETH nodes
         env:
           MEMONIC: ${{ secrets.MEMONIC }}
