@@ -407,6 +407,10 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
         local _str_tmpl1 = _tmpl1("_gw_node_upstreams_v1")
         table.insert(_upstream_str, _str_tmpl1)
         for _k2, _v2 in pairs(_v1) do
+            local _backup2 = ";"
+            if #_nodes1[_k1][_k2] > 0 then
+                _backup2 = " backup;"
+            end
             local _tmpl2 =
                 _get_tmpl(
                 rules,
@@ -414,7 +418,7 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
                     node_type = _k1 .. "-" .. _k2,
                     nodes = _nodes1[_k1][_k2],
                     _domain_name = _job_data._domain_name,
-                    upstream_backup = "server unix:/tmp/" .. _k1 .. ".node.mbr." .. _job_data._domain_name .. " backup;"
+                    upstream_backup = "server unix:/tmp/" .. _k1 .. ".node.mbr." .. _job_data._domain_name .. _backup2
                 }
             )
 
@@ -422,6 +426,10 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
             table.insert(_upstream_str, _str_tmpl2)
 
             for _k3, _v3 in pairs(_v2) do
+                local _backup3 = ";"
+                if #_v3 > 0 then
+                    _backup3 = " backup;"
+                end
                 local _tmpl3 =
                     _get_tmpl(
                     rules,
@@ -430,7 +438,7 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
                         nodes = _v3,
                         _domain_name = _job_data._domain_name,
                         upstream_backup = "server unix:/tmp/" ..
-                            _k1 .. "-" .. _k2 .. ".node.mbr." .. _job_data._domain_name .. ".sock backup;"
+                            _k1 .. "-" .. _k2 .. ".node.mbr." .. _job_data._domain_name .. ".sock " .. _backup3
                     }
                 )
 
