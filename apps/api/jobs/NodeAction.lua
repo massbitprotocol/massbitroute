@@ -78,9 +78,63 @@ ${_is_enabled?_gw_node()}
     _gw_node_upstream_approved = [[
 ${_is_approved?_gw_node_upstream()}
 ]],
-    _gw_node_upstreams = [[
+    _gw_node_upstreams_v1 = [[
+ ${upstream_extra}
 upstream ${node_type}.node.mbr.${_domain_name} {
-${nodes/_gw_node_upstream_approved()}
+  ${nodes/_gw_node_upstream()}
+  ${upstream_backup}
+}
+server {
+    listen unix:/tmp/${node_type}.node.mbr.${_domain_name}.sock;
+    location / {
+        proxy_redirect off;
+        proxy_pass http://${node_type}.node.mbr.${_domain_name};
+        proxy_http_version 1.1;
+        proxy_ssl_verify off;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection $connection_upgrade;
+    }
+}
+]],
+    ["_gw_upstream_backup_name_dot-mainnet"] = [[ unix:/tmp/dot-mainnet-getblock-1.sock ]],
+    ["_gw_upstream_backup_dot-mainnet"] = [[
+server {
+    listen unix:/tmp/dot-mainnet-getblock-1.sock;
+    location / {
+        proxy_redirect off;
+        proxy_ssl_server_name on;
+        add_header X-Mbr-GNode-Id dot-mainnet-getblock-1;
+        proxy_set_header X-Api-Key 6c4ddad0-7646-403e-9c10-744f91d37ccf;
+        proxy_pass https://dot.getblock.io/mainnet/;
+        proxy_http_version 1.1;
+        proxy_ssl_verify off;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection $connection_upgrade;
+    }
+}
+ ]],
+    ["_gw_upstream_backup_name_eth-mainnet"] = [[ unix:/tmp/eth-mainnet-getblock-1.sock ]],
+    ["_gw_upstream_backup_eth-mainnet"] = [[
+server {
+    listen unix:/tmp/eth-mainnet-getblock-1.sock;
+    location / {
+        proxy_redirect off;
+        proxy_ssl_server_name on;
+        add_header X-Mbr-GNode-Id eth-mainnet-getblock-1;
+        proxy_set_header X-Api-Key 6c4ddad0-7646-403e-9c10-744f91d37ccf;
+        proxy_pass https://eth.getblock.io/mainnet/;
+        proxy_http_version 1.1;
+        proxy_ssl_verify off;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection $connection_upgrade;
+    }
+}
+]],
+    _gw_node_upstreams = [[
+
+upstream ${node_type}.node.mbr.${_domain_name} {
+  ${nodes/_gw_node_upstream()}
+  ${upstream_backup}
 }
 ]],
     _gw_node = [[
@@ -144,7 +198,7 @@ server {
         vhost_traffic_status_filter_by_set_key $api_method ${id}::node::api_method;
 
 #        proxy_cache_use_stale updating error timeout invalid_header proxy_cache_use_stale http_500 http_502 http_503 http_504;
-        proxy_next_upstream error timeout invalid_header http_429 http_500 http_502 http_503 http_504;
+        proxy_next_upstream error timeout non_idempotent invalid_header http_429 http_500 http_502 http_503 http_504;
         proxy_connect_timeout 3;
         proxy_send_timeout 3;
         proxy_read_timeout 3;
@@ -157,7 +211,7 @@ server {
         proxy_cache_background_update on;
         proxy_cache_lock on;
         proxy_cache_revalidate on;
-        add_header X-Cached-Node $upstream_cache_status;
+        add_header X-Mbr-Cached $upstream_cache_status;
         proxy_ssl_verify off;
 
         proxy_redirect off;
@@ -224,6 +278,8 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
     _print("rescanconf_blockchain_network:" .. _blockchain .. ":" .. _network)
     _print(inspect(_job_data))
     local _nodes = {}
+    local _nodes1 = {}
+    local _nodes2 = {}
     local _datacenters = {}
     local _actives = {}
     local _approved = {}
@@ -257,17 +313,26 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
                                                 _approved[#_approved + 1] = _item
                                                 _item._is_approved = true
                                                 table.insert(_datacenters, _item)
-                                                local _blocknet_continent =
-                                                    _blocknet_id .. "-" .. _item.geo.continent_code
-                                                local _blocknet_country =
-                                                    _blocknet_id ..
-                                                    "-" .. _item.geo.continent_code .. "-" .. _item.geo.country_code
+                                                local _blocknet_continent = _item.geo.continent_code
+                                                local _blocknet_country = _item.geo.country_code
                                                 _nodes[_blocknet_id] = _nodes[_blocknet_id] or {}
-                                                _nodes[_blocknet_continent] = _nodes[_blocknet_continent] or {}
-                                                _nodes[_blocknet_country] = _nodes[_blocknet_country] or {}
+                                                _nodes1[_blocknet_id] = _nodes1[_blocknet_id] or {}
+                                                _nodes2[_blocknet_id] = _nodes2[_blocknet_id] or {}
+
+                                                _nodes1[_blocknet_id][_blocknet_continent] =
+                                                    _nodes1[_blocknet_id][_blocknet_continent] or {}
+
+                                                _nodes2[_blocknet_id][_blocknet_continent] =
+                                                    _nodes2[_blocknet_id][_blocknet_continent] or {}
+
+                                                _nodes2[_blocknet_id][_blocknet_continent][_blocknet_country] =
+                                                    _nodes2[_blocknet_id][_blocknet_continent][_blocknet_country] or {}
                                                 table.insert(_nodes[_blocknet_id], _item)
-                                                table.insert(_nodes[_blocknet_continent], _item)
-                                                table.insert(_nodes[_blocknet_country], _item)
+                                                table.insert(_nodes1[_blocknet_id][_blocknet_continent], _item)
+                                                table.insert(
+                                                    _nodes2[_blocknet_id][_blocknet_continent][_blocknet_country],
+                                                    _item
+                                                )
                                             end
                                         end
 
@@ -282,6 +347,8 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
         end
     end
     _print("nodes:" .. inspect(_nodes))
+    _print("nodes1:" .. inspect(_nodes1))
+    _print("nodes2:" .. inspect(_nodes2))
     do
         local _tmpl =
             _get_tmpl(
@@ -299,6 +366,7 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
         _print(_file_gw)
         _write_file(_file_gw, _str_tmpl)
     end
+
     do
         local _tmpl =
             _get_tmpl(
@@ -316,16 +384,62 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
         _print(_file_gw)
         _write_file(_file_gw, _str_tmpl)
     end
-    for _k, _v in pairs(_nodes) do
-        local _tmpl = _get_tmpl(rules, {node_type = _k, nodes = _v, _domain_name = _job_data._domain_name})
 
-        local _str_tmpl = _tmpl("_gw_node_upstreams")
-        _print(_str_tmpl)
-        local _file_gw = _deploy_gatewayconfdir .. "/" .. _k .. "-upstream.conf"
-        _print(_file_gw)
-        _write_file(_file_gw, _str_tmpl)
-        -- end
+    local _upstream_str = {}
+    for _k1, _v1 in pairs(_nodes2) do
+        local _tmpl1 =
+            _get_tmpl(
+            rules,
+            {
+                node_type = _k1,
+                nodes = _nodes[_k1],
+                _domain_name = _job_data._domain_name,
+                upstream_backup = "server " .. rules["_gw_upstream_backup_name_" .. _k1] .. " backup;",
+                upstream_extra = rules["_gw_upstream_backup_" .. _k1]
+            }
+        )
+
+        local _str_tmpl1 = _tmpl1("_gw_node_upstreams_v1")
+        table.insert(_upstream_str, _str_tmpl1)
+        for _k2, _v2 in pairs(_v1) do
+            local _tmpl2 =
+                _get_tmpl(
+                rules,
+                {
+                    node_type = _k1 .. "-" .. _k2,
+                    nodes = _nodes1[_k1][_k2],
+                    _domain_name = _job_data._domain_name,
+                    upstream_backup = "server unix:/tmp/" .. _k1 .. ".node.mbr." .. _job_data._domain_name .. " backup;"
+                }
+            )
+
+            local _str_tmpl2 = _tmpl2("_gw_node_upstreams_v1")
+            table.insert(_upstream_str, _str_tmpl2)
+
+            for _k3, _v3 in pairs(_v2) do
+                local _tmpl3 =
+                    _get_tmpl(
+                    rules,
+                    {
+                        node_type = _k1 .. "-" .. _k2 .. "-" .. _k3,
+                        nodes = _v3,
+                        _domain_name = _job_data._domain_name,
+                        upstream_backup = "server unix:/tmp/" ..
+                            _k1 .. "-" .. _k2 .. ".node.mbr." .. _job_data._domain_name .. ".sock backup;"
+                    }
+                )
+
+                local _str_tmpl3 = _tmpl3("_gw_node_upstreams_v1")
+                table.insert(_upstream_str, _str_tmpl3)
+            end
+        end
     end
+    _print("upstream_str:" .. table.concat(_upstream_str, "\n"))
+
+    local _file_gw = _deploy_gatewayconfdir .. "/" .. _blocknet_id .. "-upstreams.conf"
+    local _str_tmpl = table.concat(_upstream_str, "\n")
+    _print(_file_gw)
+    _write_file(_file_gw, _str_tmpl)
 
     if _approved and #_approved > 0 then
         local _tmpl = _get_tmpl(rules, {nodes = _approved, _domain_name = _job_data._domain_name})
