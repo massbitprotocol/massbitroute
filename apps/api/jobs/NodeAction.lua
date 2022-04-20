@@ -387,6 +387,11 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
 
     local _upstream_str = {}
     for _k1, _v1 in pairs(_nodes2) do
+        local _backup = ";"
+        if #_nodes[_k1] > 0 then
+            _backup = " backup;"
+        end
+
         local _tmpl1 =
             _get_tmpl(
             rules,
@@ -394,7 +399,7 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
                 node_type = _k1,
                 nodes = _nodes[_k1],
                 _domain_name = _job_data._domain_name,
-                upstream_backup = "server " .. rules["_gw_upstream_backup_name_" .. _k1] .. " backup;",
+                upstream_backup = "server " .. rules["_gw_upstream_backup_name_" .. _k1] .. _backup,
                 upstream_extra = rules["_gw_upstream_backup_" .. _k1]
             }
         )
