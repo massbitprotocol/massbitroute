@@ -218,7 +218,7 @@ server {
         proxy_send_timeout 3;
         proxy_read_timeout 3;
 
-        proxy_pass http://${blockchain}-${network}-${geo.continent_code}-${geo.country_code}.node.mbr.]] ..
+        proxy_pass http://${blockchain}-${network}.node.mbr.]] ..
         _domain_name ..
             [[;
         proxy_ssl_verify off;
