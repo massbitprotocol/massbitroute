@@ -1,5 +1,4 @@
 #!/bin/bash
-auth=massbit:c671e4ea06280e7a3f6f9aea6e8155fcde9bc703
 GITHUB_TRIES=10
 _debian() {
 	apt-get update
@@ -59,15 +58,7 @@ elif [ -f /etc/debian_version ]; then
 	# Older Debian/Ubuntu/etc.
 	OS=Debian
 	VER=$(cat /etc/debian_version)
-# elif [ -f /etc/SuSe-release ]; then
-# 	# Older SuSE/etc.
 
-# elif [ -f /etc/redhat-release ]; then
-# 	# Older Red Hat, CentOS, etc.
-# else
-# 	# Fall back to uname, e.g. "Linux <version>", also works for BSD, etc.
-# 	OS=$(uname -s)
-# 	VER=$(uname -r)
 fi
 if [ \( "$OS" = "Ubuntu" \) -a \( "$VER" = "20.04" \) ]; then
 	_ubuntu
@@ -75,23 +66,6 @@ else
 	echo "Sorry. Current we only support Ubuntu 20.04. "
 	exit 1
 fi
-
-# case "$OS" in
-# "Debian GNU/Linux")
-# 	_debian
-# 	;;
-# "Ubuntu")
-# 	if [ $VER = "20.04" ]
-# 	_ubuntu
-# 	;;
-# "CentOS Linux")
-# 	_centos
-# 	;;
-# *)
-# 	echo "Sorry. Your OS not support"
-# 	exit 0
-# 	;;
-# esac
 
 ENV={{env}}
 MBR_ENV={{env}}
@@ -130,17 +104,12 @@ SITE_ROOT=/massbit/massbitroute/app/src/sites/services/gateway
 SCRIPTS_RUN="$SITE_ROOT/scripts/run"
 mkdir -p $(dirname $SITE_ROOT)
 
-# git clone -b master http://mbr_gateway:6a796299bb72357770735a79019612af228586e7@git.massbitroute.com/massbitroute/ssl.git -b master /etc/letsencrypt
-
 if [ ! -d "$SITE_ROOT/.git" ]; then
 	rm -rf $SITE_ROOT
-	#git clone -b master http://$auth@git.massbitroute.dev/massbitroute/gateway.git $SITE_ROOT
 	if [ "x$ENV" == "x" ]; then
 		_gitclone https://github.com/massbitprotocol/massbitroute_gateway $SITE_ROOT -b master
-		#git clone -b master http://github.com/massbitprotocol/massbitroute_gateway $SITE_ROOT
 	else
 		_gitclone https://github.com/massbitprotocol/massbitroute_gateway $SITE_ROOT -b ${ENV}
-		#git clone -b ${ENV} http://github.com/massbitprotocol/massbitroute_gateway $SITE_ROOT
 	fi
 fi
 
