@@ -75,10 +75,10 @@ ${security._is_limit_rate_per_sec?_limit_rate_per_sec1()}
 server {
     listen 80;
     listen 443 ssl;
-    ssl_certificate /etc/letsencrypt/live/${blockchain}-${network}.]] ..
+    ssl_certificate /massbit/massbitroute/app/src/sites/services/gateway/ssl/live/${blockchain}-${network}.]] ..
         _domain_name ..
             [[/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/${blockchain}-${network}.]] ..
+    ssl_certificate_key  /massbit/massbitroute/app/src/sites/services/gateway/ssl/live/${blockchain}-${network}.]] ..
                 _domain_name ..
                     [[/privkey.pem;
     resolver 8.8.4.4 ipv6=off;
@@ -113,7 +113,7 @@ server {
 
         add_header X-Mbr-Gateway-Id __GATEWAY_ID__;
 #        proxy_cache_use_stale updating error timeout invalid_header http_500 http_502 http_503 http_504;
-        proxy_next_upstream error timeout invalid_header http_429 http_500 http_502 http_503 http_504;
+        proxy_next_upstream error timeout non_idempotent http_429 http_500 http_502 http_503 http_504;
 
         proxy_connect_timeout 3;
         proxy_send_timeout 3;
@@ -128,7 +128,7 @@ server {
         proxy_cache_background_update on;
         proxy_cache_lock on;
         proxy_cache_revalidate on;
-        add_header X-Cached $upstream_cache_status;
+        add_header X-Mbr-Cached $upstream_cache_status;
         proxy_ssl_verify off;
         proxy_pass http://upstream_${api_key}/;
 
@@ -212,7 +212,8 @@ server {
        ${_api_method1()}
         proxy_redirect off;
         proxy_ssl_server_name on;
-        proxy_next_upstream error timeout invalid_header http_429 http_500 http_502 http_503 http_504;
+#        proxy_cache_use_stale updating error timeout invalid_header http_500 http_502 http_503 http_504;
+        proxy_next_upstream error timeout non_idempotent http_429 http_500 http_502 http_503 http_504;
         proxy_connect_timeout 3;
         proxy_send_timeout 3;
         proxy_read_timeout 3;
