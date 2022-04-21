@@ -63,6 +63,7 @@ _build_prod() {
 
 	rm -rf .nuxt dist
 	yarn install && yarn build && yarn generate
+	pkill -f node
 }
 _start_prod() {
 	cd $mbr_app
