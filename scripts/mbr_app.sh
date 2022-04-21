@@ -4,9 +4,9 @@ chmod +x $node/bin/* $node/lib/node_modules/corepack/shims/*
 export PATH=$PATH:$node/bin:$node/lib/node_modules/corepack/shims
 cur=$(dirname $(realpath $0))
 
-if [ -f "$cur/../.env_raw" ]; then
-	source $cur/../.env_raw
-fi
+# if [ -f "$cur/../.env_raw" ]; then
+# 	source $cur/../.env_raw
+# fi
 
 export NUXT_TELEMETRY_DISABLED=1
 mbr_app=$cur/../public/mbr-app-prod
