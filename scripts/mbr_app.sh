@@ -63,6 +63,8 @@ _build_prod() {
 
 	rm -rf .nuxt dist
 	yarn install && yarn build && yarn generate
+	echo "Build DONE"
+	echo "Kill node for restart"
 	pkill -f node
 }
 _start_prod() {
