@@ -7,6 +7,10 @@ cur=$(dirname $(realpath $0))
 # if [ -f "$cur/../.env_raw" ]; then
 # 	source $cur/../.env_raw
 # fi
+if [ -z "$DOMAIN" ]; then
+	echo "Env DOMAIN not set"
+	exit 1
+fi
 
 export NUXT_TELEMETRY_DISABLED=1
 mbr_app=$cur/../public/mbr-app-prod
