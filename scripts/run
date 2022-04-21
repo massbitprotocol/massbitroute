@@ -87,7 +87,9 @@ _cleanupmeforsure() {
 		$SITE_ROOT/../gwman/scripts/run _rebuild_conf
 
 		for d in stat_gw stat_node; do
-			find $SITE_ROOT/../stat/etc/conf/$d -type f -delete
+			if [ -d "$SITE_ROOT/../stat/etc/conf/$d" ]; then
+				find $SITE_ROOT/../stat/etc/conf/$d -type f -delete
+			fi
 		done
 		$SITE_ROOT/../stat/scripts/run _rebuild_conf
 	fi
