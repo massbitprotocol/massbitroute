@@ -59,6 +59,7 @@ local rules = {
     _upstreams = [[
 upstream upstream_${api_key} {
     ${entrypoints/_upstream()}
+ keepalive 100;
 }
 ]],
     _api_method1 = "",
