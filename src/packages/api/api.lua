@@ -44,8 +44,10 @@ function Api:update(args)
 
     if _detail then
         _detail = json.decode(_detail)
-        table.merge(_detail, args)
+    else
+        _detail = {}
     end
+    table.merge(_detail, args)
 
     _detail.action = nil
     local _now = ngx and ngx.time() or os.time()
