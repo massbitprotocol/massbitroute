@@ -13,7 +13,7 @@ local httpc = require("resty.http").new()
 local inspect = require "inspect"
 
 local _opensession
-local set_var = ndk.set_var
+-- local set_var = ndk.set_var
 
 local ERROR = {
     NOT_LOGIN = 100
@@ -21,7 +21,7 @@ local ERROR = {
 local Model = cc.import("#" .. mytype)
 
 local _print = util.print
-local _get_geo = util.get_geo
+-- local _get_geo = util.get_geo
 local _server_name = env.DOMAIN or "massbitroute.com"
 local function _norm_json(_v, _field)
     if _v[_field] and type(_v[_field]) == "string" then

@@ -73,23 +73,17 @@ upstream upstream_${api_key} {
 ${security._is_limit_rate_per_sec?_limit_rate_per_sec1()}
 
 server {
-    listen 80;
-    listen 443 ssl;
+    include /massbit/massbitroute/app/src/sites/services/gateway/etc/_pre_server.conf;
     ssl_certificate /massbit/massbitroute/app/src/sites/services/gateway/ssl/live/${blockchain}-${network}.]] ..
         _domain_name ..
             [[/fullchain.pem;
     ssl_certificate_key  /massbit/massbitroute/app/src/sites/services/gateway/ssl/live/${blockchain}-${network}.]] ..
                 _domain_name ..
                     [[/privkey.pem;
-    resolver 8.8.4.4 ipv6=off;
-    client_body_buffer_size 512K;
-    client_max_body_size 1G;
     server_name ${gateway_domain};
     access_log /massbit/massbitroute/app/src/sites/services/gateway/logs/nginx-${gateway_domain}-access.log main_json;
     error_log /massbit/massbitroute/app/src/sites/services/gateway/logs/nginx-${gateway_domain}-error.log debug;
 
-    set $api_method '';
-    set $jsonrpc_whitelist '';
 
     encrypted_session_key ]] ..
                         _session_key ..
@@ -103,41 +97,16 @@ server {
 
     location /${api_key} {
         set $mbr_token ${api_key};
-        rewrite /(.*) / break;
+
         ${security._is_limit_rate_per_sec?_limit_rate_per_sec2()}
         ${_allow_methods1()}
 
-        access_by_lua_file /massbit/massbitroute/app/src/sites/services/gateway/src/filter-jsonrpc-access.lua;
         vhost_traffic_status_filter_by_set_key $api_method ${api_key}::dapi::api_method;
         vhost_traffic_status_filter_by_set_key $api_method __GATEWAY_ID__::gw::api_method;
 
         add_header X-Mbr-Gateway-Id __GATEWAY_ID__;
-#        proxy_cache_use_stale updating error timeout invalid_header http_500 http_502 http_503 http_504;
-        proxy_next_upstream error timeout non_idempotent http_429 http_500 http_502 http_503 http_504;
-
-        proxy_connect_timeout 3;
-        proxy_send_timeout 3;
-        proxy_read_timeout 3;
-        send_timeout 3;
-
-        proxy_cache_methods GET HEAD POST;
-        proxy_cache_key $request_uri|$request_body;
-        proxy_cache_min_uses 1;
-        proxy_cache cache_gateway;
-        proxy_cache_valid 200 10s;
-        proxy_cache_background_update on;
-        proxy_cache_lock on;
-        proxy_cache_revalidate on;
-        add_header X-Mbr-Cached $upstream_cache_status;
-        proxy_ssl_verify off;
         proxy_pass http://upstream_${api_key}/;
-
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection $connection_upgrade;
-#      proxy_set_header X-Real-IP $remote_addr;
-#      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-# proxy_set_header Host $http_host;
+  include /massbit/massbitroute/app/src/sites/services/gateway/etc/_node_server.conf;
     }
 }
 ]],
@@ -146,15 +115,12 @@ server {
     listen unix:/tmp/${server_name}.sock;
     location / {
        ${_api_method1()}
-        proxy_redirect off;
+
         set_encode_base64 $digest :${project_secret};
         proxy_set_header Authorization 'Basic $digest';
-        proxy_ssl_verify off;
-        proxy_ssl_server_name on;
         proxy_pass https://mainnet.infura.io/v3/${project_id};
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection $connection_upgrade;
+  include /massbit/massbitroute/app/src/sites/services/gateway/etc/_provider_server.conf;
+   
     }
 }
 ]],
@@ -163,13 +129,9 @@ server {
     listen unix:/tmp/${server_name}.sock;
     location / {
        ${_api_method1()}
-        proxy_redirect off;
-        proxy_ssl_server_name on;
         proxy_pass ${api_uri};
-        proxy_http_version 1.1;
-        proxy_ssl_verify off;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection $connection_upgrade;
+  include /massbit/massbitroute/app/src/sites/services/gateway/etc/_provider_server.conf;
+
     }
 }
 ]],
@@ -178,13 +140,8 @@ server {
     listen unix:/tmp/${server_name}.sock;
     location / {
        ${_api_method1()}
-        proxy_redirect off;
-        proxy_ssl_server_name on;
         proxy_pass ${api_uri};
-        proxy_http_version 1.1;
-        proxy_ssl_verify off;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection $connection_upgrade;
+  include /massbit/massbitroute/app/src/sites/services/gateway/etc/_provider_server.conf;
     }
 }
 ]],
@@ -193,15 +150,10 @@ server {
     listen unix:/tmp/${server_name}.sock;
     location / {
        ${_api_method1()}
-        proxy_redirect off;
-        proxy_ssl_server_name on;
         proxy_set_header X-Api-Key '${ent_api_key}';
         proxy_set_header Host ${blockchain}.getblock.io;
         proxy_pass https://${blockchain}.getblock.io/${network}/;
-        proxy_ssl_verify off;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection $connection_upgrade;
+  include /massbit/massbitroute/app/src/sites/services/gateway/etc/_provider_server.conf;
     }
 }
 ]],
@@ -210,21 +162,11 @@ server {
     listen unix:/tmp/${server_name}.sock;
     location / {
        ${_api_method1()}
-        proxy_redirect off;
-        proxy_ssl_server_name on;
-#        proxy_cache_use_stale updating error timeout invalid_header http_500 http_502 http_503 http_504;
-        proxy_next_upstream error timeout non_idempotent http_429 http_500 http_502 http_503 http_504;
-        proxy_connect_timeout 3;
-        proxy_send_timeout 3;
-        proxy_read_timeout 3;
-
         proxy_pass http://${blockchain}-${network}.node.mbr.]] ..
         _domain_name ..
             [[;
-        proxy_ssl_verify off;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection $connection_upgrade;
+  include /massbit/massbitroute/app/src/sites/services/gateway/etc/_proxy_server.conf;
+  include /massbit/massbitroute/app/src/sites/services/gateway/etc/_provider_server.conf;
     }
 }
 ]]
