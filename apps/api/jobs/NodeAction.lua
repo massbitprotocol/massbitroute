@@ -87,12 +87,9 @@ upstream ${node_type}.node.mbr.${_domain_name} {
 server {
     listen unix:/tmp/${node_type}.node.mbr.${_domain_name}.sock;
     location / {
-        proxy_redirect off;
         proxy_pass http://${node_type}.node.mbr.${_domain_name};
-        proxy_http_version 1.1;
-        proxy_ssl_verify off;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection $connection_upgrade;
+
+  include /massbit/massbitroute/app/src/sites/services/gateway/etc/_provider_server.conf;
     }
 }
 ]],
@@ -101,15 +98,11 @@ server {
 server {
     listen unix:/tmp/dot-mainnet-getblock-1.sock;
     location / {
-        proxy_redirect off;
-        proxy_ssl_server_name on;
         #add_header X-Mbr-GNode-Id dot-mainnet-getblock-1;
         proxy_set_header X-Api-Key 6c4ddad0-7646-403e-9c10-744f91d37ccf;
         proxy_pass https://dot.getblock.io/mainnet/;
-        proxy_http_version 1.1;
-        proxy_ssl_verify off;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection $connection_upgrade;
+
+  include /massbit/massbitroute/app/src/sites/services/gateway/etc/_provider_server.conf;
     }
 }
  ]],
@@ -118,15 +111,11 @@ server {
 server {
     listen unix:/tmp/eth-mainnet-getblock-1.sock;
     location / {
-        proxy_redirect off;
-        proxy_ssl_server_name on;
+      
         #add_header X-Mbr-GNode-Id eth-mainnet-getblock-1;
         proxy_set_header X-Api-Key 6c4ddad0-7646-403e-9c10-744f91d37ccf;
         proxy_pass https://eth.getblock.io/mainnet/;
-        proxy_http_version 1.1;
-        proxy_ssl_verify off;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection $connection_upgrade;
+  include /massbit/massbitroute/app/src/sites/services/gateway/etc/_provider_server.conf;
     }
 }
 ]],
@@ -141,16 +130,12 @@ upstream ${node_type}.node.mbr.${_domain_name} {
 server {
     listen unix:/tmp/${id}.sock;
     location / {
-        proxy_redirect off;
-        proxy_ssl_server_name on;
         proxy_set_header X-Api-Key ${token};
         proxy_set_header Host ${id}.node.mbr.${_domain_name};
         #add_header X-Mbr-GNode-Id ${id};
         proxy_pass https://${ip};
-        proxy_http_version 1.1;
-        proxy_ssl_verify off;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection $connection_upgrade;
+
+  include /massbit/massbitroute/app/src/sites/services/gateway/etc/_provider_server.conf;
     }
 }
 ]],
@@ -203,15 +188,11 @@ server {
     listen unix:/tmp/${id}.sock;
     location / {
        ${_api_method()}
-        proxy_redirect off;
-        proxy_ssl_server_name on;
         proxy_set_header X-Api-Key ${token};
         proxy_set_header Host ${id}.node.mbr.${_domain_name};
         proxy_pass https://${ip};
-        proxy_http_version 1.1;
-        proxy_ssl_verify off;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection $connection_upgrade;
+
+  include /massbit/massbitroute/app/src/sites/services/gateway/etc/_provider_server.conf;
     }
 }
 ]]
