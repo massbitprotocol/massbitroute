@@ -194,45 +194,17 @@ server {
 
         add_header X-Mbr-Node-Id ${id};
 
-        access_by_lua_file /massbit/massbitroute/app/src/sites/services/node/src/jsonrpc-access.lua;
+
         vhost_traffic_status_filter_by_set_key $api_method ${id}::node::api_method;
-
-#        proxy_cache_use_stale updating error timeout invalid_header proxy_cache_use_stale http_500 http_502 http_503 http_504;
-        proxy_next_upstream error timeout non_idempotent invalid_header http_429 http_500 http_502 http_503 http_504;
-        proxy_connect_timeout 3;
-        proxy_send_timeout 3;
-        proxy_read_timeout 3;
-        send_timeout 3;
-        proxy_cache_methods GET HEAD POST;
-        proxy_cache_key $request_uri|$request_body;
-        proxy_cache_min_uses 1;
-        proxy_cache cache_node;
-        proxy_cache_valid 200 10s;
-        proxy_cache_background_update on;
-        proxy_cache_lock on;
-        proxy_cache_revalidate on;
-        #add_header X-Mbr-Cached $upstream_cache_status
-        proxy_ssl_verify off;
-
-        proxy_redirect off;
-        proxy_ssl_server_name on;
         proxy_pass ${data_url};
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection $connection_upgrade;
-        if ($request_method = OPTIONS) {
-            add_header Access-Control-Allow-Headers 'X-API-Key, Authorization';
-        }
+
+        include /massbit/massbitroute/app/src/sites/services/node/etc/_node_server.conf;
+
     }
     location /__internal_status_vhost/ {
   access_log /massbit/massbitroute/app/src/sites/services/node/logs/stat-${id}-access.log main_json;
     error_log /massbit/massbitroute/app/src/sites/services/node/logs/stat-${id}-error.log debug;
-        # auth_basic 'MBR admin';
-        # auth_basic_user_file /massbit/massbitroute/app/src/sites/services/node/etc/htpasswd;
-        vhost_traffic_status_bypass_limit on;
-        vhost_traffic_status_bypass_stats on;
-        vhost_traffic_status_display;
-        vhost_traffic_status_display_format html;
+               include /massbit/massbitroute/app/src/sites/services/node/etc/_vts_server.conf;
     }
 }
 ]],
