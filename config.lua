@@ -8,8 +8,8 @@ local _config = {
     },
     templates = {},
     apps = {
-        api = "apps/api",
-        tests = "apps/tests"
+        api = "apps/api"
+        -- tests = "apps/tests"
     },
     supervisors = {
         ["monitor_client"] = [[
