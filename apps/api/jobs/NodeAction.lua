@@ -168,38 +168,17 @@ map $http_x_api_key $api_realm {
 }
 
 server {
-    listen 80;
-    listen 443 ssl;
     ssl_certificate  /massbit/massbitroute/app/src/sites/services/node/ssl/node.mbr.${_domain_name}/fullchain.pem;
     ssl_certificate_key  /massbit/massbitroute/app/src/sites/services/node/ssl/node.mbr.${_domain_name}/privkey.pem;
-    resolver 8.8.4.4 ipv6=off;
-    client_body_buffer_size 512K;
-    client_max_body_size 1G;
     server_name ${id}.node.mbr.${_domain_name};
-  
-
-    set $api_method '';
-    set $jsonrpc_whitelist '';
-   
-    location /ping {
-        return 200 pong;
-    }
+        include /massbit/massbitroute/app/src/sites/services/node/etc/_pre_server.conf;
     location / {
   access_log /massbit/massbitroute/app/src/sites/services/node/logs/api-${id}-access.log main_json;
     error_log /massbit/massbitroute/app/src/sites/services/node/logs/api-${id}-error.log debug;
-
-       if ($api_realm = '') {
-            return 403; # Forbidden
-        }
-
         add_header X-Mbr-Node-Id ${id};
-
-
         vhost_traffic_status_filter_by_set_key $api_method ${id}::node::api_method;
         proxy_pass ${data_url};
-
         include /massbit/massbitroute/app/src/sites/services/node/etc/_node_server.conf;
-
     }
     location /__internal_status_vhost/ {
   access_log /massbit/massbitroute/app/src/sites/services/node/logs/stat-${id}-access.log main_json;
