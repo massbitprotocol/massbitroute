@@ -16,7 +16,7 @@ jobs:
           PROJECT_KEY: ${{ secrets.PROJECT_KEY }}
         run: |
           echo $PROJECT_KEY  > scripts/single-node-test/project_key.json 
-      - name: Run full flow check for ETH nodes
+      - name: Building test environment
         env:
           PRIVATE_GIT_DOMAIN: ${{ secrets.PRIVATE_GIT_DOMAIN }}
           PRIVATE_GIT_READ_PASSWORD: ${{ secrets.PRIVATE_GIT_READ_PASSWORD }}
@@ -26,6 +26,7 @@ jobs:
           PRIVATE_GIT_SSH_USERNAME: ${{ secrets.PRIVATE_GIT_SSH_USERNAME }}
           PRIVATE_GIT_SSH_PASSWORD: ${{ secrets.PRIVATE_GIT_SSH_PASSWORD }}
         run: |
+          cd scripts/single-node-test
           echo "
           export PRIVATE_GIT_DOMAIN=$PRIVATE_GIT_DOMAIN
           export PRIVATE_GIT_READ_PASSWORD=$PRIVATE_GIT_READ_PASSWORD
@@ -36,6 +37,8 @@ jobs:
           export PRIVATE_GIT_SSH_PASSWORD=$PRIVATE_GIT_SSH_PASSWORD" > .env
           sudo bash deploy-mb-core.sh dev
           sleep 15
+      - name: MUpdating hosts file for test environment
+        run: |
           sudo bash build-hosts-file.sh
   test-nodes-eth:
     needs: set-up-test-env
