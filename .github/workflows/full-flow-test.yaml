@@ -39,6 +39,7 @@ jobs:
           sleep 15
       - name: MUpdating hosts file for test environment
         run: |
+          sudo apt install git -y
           cd scripts/single-node-test
           sudo bash build-hosts-file.sh
   test-nodes-eth:
