@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# blockchain="eth"
+# dataSource="http:\/\/34.87.241.136:8545"
+
 if [ -z "$1" ]
   then
     echo "ERROR: Blockchain is required"
@@ -10,20 +13,50 @@ fi
 blockchain="$1"
 
 source .env
+export MEMONIC="peanut thank prevent burden erode welcome dust one develop code lamp rule"
+export TEST_USERNAME="Juanito"
+export TEST_PASSWORD="Defense22"
+export USER_ID="772efcb1-f14e-4e7b-a5a7-d17d97fff8e5"
+export WALLET_ADDRESS="5DHumimsr4XjcJCmKY7Ei8MAtxrradcZqTdPha4XqGbjmpyJ"
+export ETH_PROJECT="a32cf28a-3fc0-4ef5-9303-7b6fb6d43cd2"
+export DOT_PROJECT="8d8b4fe6-495a-4942-bc53-9c7a3bb18e2b"
 
 if [ "$blockchain" = "eth" ]
 then
-  PROJECT_ID="2a961159-a1da-4611-a329-881d2459b3ff"
+  PROJECT_ID=$ETH_PROJECT
   dataSource="http:\/\/34.87.241.136:8545"
 elif [ "$blockchain" = "dot" ]
 then
-  PROJECT_ID="c664ec9e-e412-4200-a5ac-b879383b8151"
+  PROJECT_ID=$DOT_PROJECT
   dataSource="https:\/\/34.116.128.226"
 else
   echo "ERROR. Blockchain unspecified or invalid"
   exit 1
 fi
 
+# echo "Setting up Test environment ..."
+# sleep 300
+
+# #-------------------------------------------
+# # Wait for core component to finish setup
+# #-------------------------------------------
+# while [[ "$core_ready_response" != "200" ]] && [[ "$portal_ready_response" != "200" ]] && [[ "$rust_ready_response" != "200" ]] && [[ "$staking_ready_response" != "200" ]] && \
+# [[ "$core_ready_response" != "404" ]] && [[ "$portal_ready_response" != "404" ]] && [[ "$rust_ready_response" != "400" ]] && [[ "$staking_ready_response" != "404" ]] && \
+# [[ "$core_ready_response" != "000" ]] && [[ "$portal_ready_response" != "000" ]] && [[ "$rust_ready_response" != "000" ]] && [[ "$staking_ready_response" != "000" ]]; do
+#   core_ready_response=$(curl -o /dev/null -s -w "%{http_code}\n" --location https://dapi.massbitroute.dev/deploy/build.txt)
+#   echo "CORE response: $core_ready_response"
+  
+#   rust_ready_response=$(curl -o /dev/null -s -w "%{http_code}\n" --location --request POST 'http://verify-as.massbitroute.dev/ping' )
+#   echo "RUST reponse: $rust_ready_response"
+
+#   portal_ready_response=$(curl -o /dev/null -s -w "%{http_code}\n" --location --request POST 'http://portal.massbitroute.dev/health-check' )
+#   echo "PORTAL reponse: $portal_ready_response"
+
+#   staking_ready_response=$(curl -o /dev/null -s -w "%{http_code}\n" --location --request POST 'http://staking.massbitroute.dev/health-check' )
+#   echo "STAKING reponse: $staking_ready_response"
+#   sleep 10
+# done
+# echo "Massbit test env setup completion: Pass"
 
 nodePrefix="$(echo $RANDOM | md5sum | head -c 5)"
 
@@ -38,30 +71,6 @@ if [[ "$bearer" == "null" ]]; then
   exit 1
 fi
 
-
-sudo echo -n >gatewaylist.csv
-sudo echo -n >nodelist.csv
-
-sudo echo 'variable "project_prefix" {
-  type        = string
-  description = "The project prefix (mbr)."
-}
-variable "environment" {
-  type        = string
-  description = "Environment: dev, test..."
-}
-variable "default_zone" {
-  type = string
-}
-variable "network_interface" {
-  type = string
-}
-variable "email" {
-  type = string
-}
-variable "map_machine_types" {
-  type = map
-}' >test-nodes.tf
 
 #-------------------------------------------
 # create  node/gw in Portal
@@ -119,12 +128,17 @@ echo "Create new node in Portal: Passed"
 # create  node/gw tf files
 #-------------------------------------------
 MASSBITROUTE_CORE_IP=$(cat MASSBITROUTE_CORE_IP)
+MASSBITROUTE_PORTAL_IP=$(cat MASSBITROUTE_PORTAL_IP)
+MASSBITROUTE_RUST_IP=$(cat MASSBITROUTE_RUST_IP)
+
 while IFS="," read -r nodeId appId zone; do
   cat gateway-template-single | sed "s/\[\[GATEWAY_ID\]\]/$nodeId/g" | \
     sed "s/\[\[APP_KEY\]\]/$appId/g" | \
     sed "s/\[\[ZONE\]\]/$zone/g" | \
     sed "s/\[\[BLOCKCHAIN\]\]/$blockchain/g" | \
     sed "s/\[\[MASSBITROUTE_CORE_IP\]\]/$MASSBITROUTE_CORE_IP/g" | \
+    sed "s/\[\[MASSBITROUTE_PORTAL_IP\]\]/$MASSBITROUTE_PORTAL_IP/g" | \
+    sed "s/\[\[MASSBITROUTE_RUST_IP\]\]/$MASSBITROUTE_RUST_IP/g" | \
     sed "s/\[\[USER_ID\]\]/$USER_ID/g" >>test-nodes.tf
 done < <(tail gatewaylist.csv)
 
@@ -135,6 +149,8 @@ while IFS="," read -r nodeId appId zone; do
     sed "s/\[\[BLOCKCHAIN\]\]/$blockchain/g" | \
     sed "s/\[\[DATASOURCE\]\]/$dataSource/g" | \
     sed "s/\[\[MASSBITROUTE_CORE_IP\]\]/$MASSBITROUTE_CORE_IP/g" | \
+    sed "s/\[\[MASSBITROUTE_PORTAL_IP\]\]/$MASSBITROUTE_PORTAL_IP/g" | \
+    sed "s/\[\[MASSBITROUTE_RUST_IP\]\]/$MASSBITROUTE_RUST_IP/g" | \
     sed "s/\[\[USER_ID\]\]/$USER_ID/g" >>test-nodes.tf
 done < <(tail nodelist.csv)
 
@@ -148,12 +164,12 @@ if [[ "$?" != "0" ]]; then
   echo "terraform init: Failed "
   exit 1
 fi
-sudo terraform plan -out=tfplan -input=false
+sudo terraform plan -out=tfplan-node-gateway -input=false
 if [[ "$?" != "0" ]]; then
   echo "terraform plan: Failed "
   exit 1
 fi
-sudo terraform apply -input=false tfplan
+sudo terraform apply -input=false tfplan-node-gateway
 if [[ "$?" != "0" ]]; then
   echo "terraform apply: Failed"
   exit 1
@@ -166,18 +182,18 @@ sleep 180
 #-------------------------------------------
 # Check if nodes are verified
 #-------------------------------------------
-while [[ "$gateway_status" != "verified" ]] || [[ "$node_status" != "verified" ]]; do
+while [[ "$gateway_status" != "verified" ]] && [[ "$node_status" != "verified" ]]; do
   echo "Checking node status: In Progress"
 
-  if [[ "$gateway_status" = "failed" ]] || [[ "$node_status" = "failed" ]]
-  then
-    echo "---------------------------------"
-    echo "Gateway status: $gateway_status"
-    echo "Node status: $node_status"
-    echo "---------------------------------"
-    echo "Checking nodes verified status: Failed"
-    exit 1
-  fi
+  # if [[ "$gateway_status" = "failed" ]] && [[ "$node_status" = "failed" ]]
+  # then
+  #   echo "---------------------------------"
+  #   echo "Gateway status: $gateway_status"
+  #   echo "Node status: $node_status"
+  #   echo "---------------------------------"
+  #   echo "Checking nodes verified status: Failed"
+  #   exit 1
+  # fi
 
   gateway_status=$(curl -s --location --request GET "https://portal.massbitroute.dev/mbr/gateway/$GATEWAY_ID" \
     --header "Authorization: Bearer $bearer" | jq -r ". | .status")
@@ -297,7 +313,7 @@ project_staking_response=$(curl -s --location --request POST 'https://staking.ma
 }")
 staking_message=$(echo $project_staking_response | jq -r ". | .message ")
 
-if [[ "$staking_message" -ne 'AlreadyExist (dapi): The provider/project is already registered.' ]]
+if [[ "$staking_message" != "AlreadyExist (dapi): The provider/project is already registered." ]]
 then
   staking_status=$(echo $project_staking_response | jq -r ". | .status ")
   if [[ "$project_staking_response" -eq 'staked' ]]; then
@@ -355,6 +371,8 @@ then
 }'
 fi
 
+sleep 60
+echo "Waiting for dAPI to configure"
 
 dapi_response_code=$(curl -o /dev/null -s -w "%{http_code}\n" --location --request POST "$dapiURL" \
   --header 'Content-Type: application/json' \

@@ -2,10 +2,41 @@ name: Test main flow ETH/DOT Node/GW
 
 on:
   push:
-    branches: [dev-hoang]
+    branches: [feature/fulltest]
 
 
 jobs:
+  set-up-test-env:
+    runs-on: ubuntu-latest
+    container: hoanito/mbr-ubuntu:1.1
+    steps:
+      - uses: actions/checkout@v3
+      - name: Obtain GCE key
+        env: 
+          PROJECT_KEY: ${{ secrets.PROJECT_KEY }}
+        run: |
+          echo $PROJECT_KEY  > scripts/single-node-test/project_key.json 
+      - name: Run full flow check for ETH nodes
+        env:
+          PRIVATE_GIT_DOMAIN: ${{ secrets.PRIVATE_GIT_DOMAIN }}
+          PRIVATE_GIT_READ_PASSWORD: ${{ secrets.PRIVATE_GIT_READ_PASSWORD }}
+          PRIVATE_GIT_READ_USERNAME: ${{ secrets.PRIVATE_GIT_READ_USERNAME }}
+          PRIVATE_GIT_SSL_USERNAME: ${{ secrets.PRIVATE_GIT_SSL_USERNAME }}
+          PRIVATE_GIT_SSL_PASSWORD: ${{ secrets.PRIVATE_GIT_SSL_PASSWORD }}
+          PRIVATE_GIT_SSH_USERNAME: ${{ secrets.PRIVATE_GIT_SSH_USERNAME }}
+          PRIVATE_GIT_SSH_PASSWORD: ${{ secrets.PRIVATE_GIT_SSH_PASSWORD }}
+        run: |
+          echo "
+          export PRIVATE_GIT_DOMAIN=$PRIVATE_GIT_DOMAIN
+          export PRIVATE_GIT_READ_PASSWORD=$PRIVATE_GIT_READ_PASSWORD
+          export PRIVATE_GIT_READ_USERNAME=$PRIVATE_GIT_READ_USERNAME
+          export PRIVATE_GIT_SSL_USERNAME=$PRIVATE_GIT_SSL_USERNAME
+          export PRIVATE_GIT_SSL_PASSWORD=$PRIVATE_GIT_SSL_PASSWORD
+          export PRIVATE_GIT_SSH_USERNAME=$PRIVATE_GIT_SSH_USERNAME
+          export PRIVATE_GIT_SSH_PASSWORD=$PRIVATE_GIT_SSH_PASSWORD" > .env
+          sudo bash deploy-mb-core.sh dev
+          sleep 15
+          sudo bash build-hosts-file.sh
   test-nodes-eth:
     runs-on: ubuntu-latest
     container: hoanito/mbr-ubuntu:1.1
@@ -23,6 +54,8 @@ jobs:
           TEST_USERNAME: ${{ secrets.TEST_USERNAME }}
           USER_ID: ${{ secrets.USER_ID }}
           WALLET_ADDRESS: ${{ secrets.WALLET_ADDRESS }}
+          ETH_PROJECT: ${{ secrets.ETH_PROJECT }}
+          DOT_PROJECT: ${{ secrets.DOT_PROJECT }}
         run: |
           cd scripts/single-node-test
           echo "
@@ -30,7 +63,9 @@ jobs:
           export TEST_USERNAME=$TEST_USERNAME
           export TEST_PASSWORD=$TEST_PASSWORD
           export USER_ID=$USER_ID
-          export WALLET_ADDRESS=$WALLET_ADDRESS" > .env 
+          export WALLET_ADDRESS=$WALLET_ADDRESS
+          export ETH_PROJECT=$ETH_PROJECT
+          export DOT_PROJECT=$DOT_PROJECT" > .env 
           sudo bash ./single-node-test.sh eth
   test-nodes-dot:
     runs-on: ubuntu-latest
@@ -49,6 +84,8 @@ jobs:
           TEST_USERNAME: ${{ secrets.TEST_USERNAME }}
           USER_ID: ${{ secrets.USER_ID }}
           WALLET_ADDRESS: ${{ secrets.WALLET_ADDRESS }}
+          ETH_PROJECT: ${{ secrets.ETH_PROJECT }}
+          DOT_PROJECT: ${{ secrets.DOT_PROJECT }}
         run: |
           cd scripts/single-node-test
           echo "
@@ -56,5 +93,7 @@ jobs:
           export TEST_USERNAME=$TEST_USERNAME
           export TEST_PASSWORD=$TEST_PASSWORD
           export USER_ID=$USER_ID
-          export WALLET_ADDRESS=$WALLET_ADDRESS" > .env 
+          export WALLET_ADDRESS=$WALLET_ADDRESS
+          export ETH_PROJECT=$ETH_PROJECT
+          export DOT_PROJECT=$DOT_PROJECT" > .env 
           sudo bash ./single-node-test.sh dot
