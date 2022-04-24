@@ -62,7 +62,6 @@ jobs:
           cp MASSBITROUTE_PORTAL_IP persistent-artifact
           cp MASSBITROUTE_RUST_IP persistent-artifact
           cp test-hosts-file persistent-artifact
-          cp test-nodes.tf persistent-artifact
       - uses: actions/upload-artifact@master
         with:
           name: persistent-artifact
