@@ -58,9 +58,9 @@ jobs:
           ssh-keyscan -t rsa github.com >> /root/.ssh/known_hosts
           sudo bash build-hosts-file.sh          
           mkdir persistent-artifact
-          cp MASSBIT_ROUTE_CORE_IP persistent-artifact
-          cp MASSBIT_ROUTE_PORTAL_IP persistent-artifact
-          cp MASSBIT_ROUTE_RUST_IP persistent-artifact
+          cp MASSBITROUTE_CORE_IP persistent-artifact
+          cp MASSBITROUTE_PORTAL_IP persistent-artifact
+          cp MASSBITROUTE_RUST_IP persistent-artifact
           cp test-host-file persistent-artifact
       - uses: actions/upload-artifact@master
         with:
