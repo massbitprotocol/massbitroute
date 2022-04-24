@@ -35,8 +35,8 @@ jobs:
           export PRIVATE_GIT_SSL_PASSWORD=$PRIVATE_GIT_SSL_PASSWORD
           export PRIVATE_GIT_SSH_USERNAME=$PRIVATE_GIT_SSH_USERNAME
           export PRIVATE_GIT_SSH_PASSWORD=$PRIVATE_GIT_SSH_PASSWORD" > .env
-          # sudo bash deploy-mb-core.sh dev
-          # sleep 15
+          sudo bash deploy-mb-core.sh dev
+          sleep 15
       - name: Updating hosts file for test environment
         env:
           PRIVATE_GIT_DOMAIN: ${{ secrets.PRIVATE_GIT_DOMAIN }}
