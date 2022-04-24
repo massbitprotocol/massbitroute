@@ -49,10 +49,9 @@ jobs:
         run: |
           sudo mkdir -p /root/.ssh          
           sudo git clone http://$PRIVATE_GIT_SSH_USERNAME:$PRIVATE_GIT_SSH_PASSWORD@$PRIVATE_GIT_DOMAIN/massbitroute/ssh.git -b main /opt/ssh-key
-          ls -l /opt/ssh-key
-          ls -l /root/.ssh
           sudo cp /opt/ssh-key/id_rsa*  /root/.ssh/
           sudo chmod og-rwx /root/.ssh/id_rsa
+          ls -l /root/.ssh
           cd scripts/single-node-test
           sudo bash build-hosts-file.sh
   test-nodes-eth:
