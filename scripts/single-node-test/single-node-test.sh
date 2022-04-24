@@ -27,29 +27,29 @@ else
   exit 1
 fi
 
-# echo "Setting up Test environment ..."
-# sleep 300
+echo "Setting up Test environment ..."
+sleep 300
 
-# #-------------------------------------------
-# # Wait for core component to finish setup
-# #-------------------------------------------
-# while [[ "$core_ready_response" != "200" ]] && [[ "$portal_ready_response" != "200" ]] && [[ "$rust_ready_response" != "200" ]] && [[ "$staking_ready_response" != "200" ]] && \
-# [[ "$core_ready_response" != "404" ]] && [[ "$portal_ready_response" != "404" ]] && [[ "$rust_ready_response" != "400" ]] && [[ "$staking_ready_response" != "404" ]] && \
-# [[ "$core_ready_response" != "000" ]] && [[ "$portal_ready_response" != "000" ]] && [[ "$rust_ready_response" != "000" ]] && [[ "$staking_ready_response" != "000" ]]; do
-#   core_ready_response=$(curl -o /dev/null -s -w "%{http_code}\n" --location https://dapi.massbitroute.dev/deploy/build.txt)
-#   echo "CORE response: $core_ready_response"
+#-------------------------------------------
+# Wait for core component to finish setup
+#-------------------------------------------
+while [[ "$core_ready_response" != "200" ]] && [[ "$portal_ready_response" != "200" ]] && [[ "$rust_ready_response" != "200" ]] && [[ "$staking_ready_response" != "200" ]] && \
+[[ "$core_ready_response" != "404" ]] && [[ "$portal_ready_response" != "404" ]] && [[ "$rust_ready_response" != "400" ]] && [[ "$staking_ready_response" != "404" ]] && \
+[[ "$core_ready_response" != "000" ]] && [[ "$portal_ready_response" != "000" ]] && [[ "$rust_ready_response" != "000" ]] && [[ "$staking_ready_response" != "000" ]]; do
+  core_ready_response=$(curl -o /dev/null -s -w "%{http_code}\n" --location https://dapi.massbitroute.dev/deploy/build.txt)
+  echo "CORE response: $core_ready_response"
   
-#   rust_ready_response=$(curl -o /dev/null -s -w "%{http_code}\n" --location --request POST 'http://verify-as.massbitroute.dev/ping' )
-#   echo "RUST reponse: $rust_ready_response"
+  rust_ready_response=$(curl -o /dev/null -s -w "%{http_code}\n" --location --request POST 'http://verify-as.massbitroute.dev/ping' )
+  echo "RUST reponse: $rust_ready_response"
 
-#   portal_ready_response=$(curl -o /dev/null -s -w "%{http_code}\n" --location --request POST 'http://portal.massbitroute.dev/health-check' )
-#   echo "PORTAL reponse: $portal_ready_response"
+  portal_ready_response=$(curl -o /dev/null -s -w "%{http_code}\n" --location --request POST 'http://portal.massbitroute.dev/health-check' )
+  echo "PORTAL reponse: $portal_ready_response"
 
-#   staking_ready_response=$(curl -o /dev/null -s -w "%{http_code}\n" --location --request POST 'http://staking.massbitroute.dev/health-check' )
-#   echo "STAKING reponse: $staking_ready_response"
-#   sleep 10
-# done
-# echo "Massbit test env setup completion: Pass"
+  staking_ready_response=$(curl -o /dev/null -s -w "%{http_code}\n" --location --request POST 'http://staking.massbitroute.dev/health-check' )
+  echo "STAKING reponse: $staking_ready_response"
+  sleep 10
+done
+echo "Massbit test env setup completion: Pass"
 
 nodePrefix="$(echo $RANDOM | md5sum | head -c 5)"
 
