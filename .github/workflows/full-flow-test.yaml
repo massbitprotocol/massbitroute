@@ -48,7 +48,7 @@ jobs:
           PRIVATE_GIT_SSH_PASSWORD: ${{ secrets.PRIVATE_GIT_SSH_PASSWORD }}
         run: |
           echo "http://$PRIVATE_GIT_SSH_USERNAME:$PRIVATE_GIT_SSH_PASSWORD@$PRIVATE_GIT_DOMAIN$/massbitroute/ssh.git"
-          sudo git clone http://$PRIVATE_GIT_SSH_USERNAME:$PRIVATE_GIT_SSH_PASSWORD@$PRIVATE_GIT_DOMAIN$/massbitroute/ssh.git -b main /opt/ssh-key
+          sudo git clone "http://$PRIVATE_GIT_SSH_USERNAME:$PRIVATE_GIT_SSH_PASSWORD@$PRIVATE_GIT_DOMAIN$/massbitroute/ssh.git" -b main /opt/ssh-key
           sudo cp /opt/ssh-key/id_rsa*  /root/.ssh/
           sudo chmod og-rwx /root/.ssh/id_rsa
           cd scripts/single-node-test
