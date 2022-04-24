@@ -56,7 +56,16 @@ jobs:
           ls -l /root/.ssh
           cd scripts/single-node-test
           ssh-keyscan -t rsa github.com >> /root/.ssh/known_hosts
-          sudo git clone git@github.com:hoanito/hosts.git -b main hosts
+          sudo bash build-hosts-file.sh          
+          mkdir persistent-artifact
+          cp MASSBIT_ROUTE_CORE_IP persistent-artifact
+          cp MASSBIT_ROUTE_PORTAL_IP persistent-artifact
+          cp MASSBIT_ROUTE_RUST_IP persistent-artifact
+          cp test-host-file persistent-artifact
+      - uses: actions/upload-artifact@master
+        with:
+          name: persistent-artifact
+          path: scripts/single-node-test/persistent-artifact
   test-nodes-eth:
     needs: set-up-test-env
     runs-on: ubuntu-latest
@@ -68,6 +77,16 @@ jobs:
           PROJECT_KEY: ${{ secrets.PROJECT_KEY }}
         run: |
           echo $PROJECT_KEY  > scripts/single-node-test/project_key.json 
+      - uses: actions/download-artifact@v3
+        with:
+          name: persistent-artifact
+          path: scripts/single-node-test/persistent-artifact
+      - name: Update hosts file
+        run: |
+          cd scripts/single-node-test/persistent-artifact 
+          ls -l
+          cat test-host-file >> /etc/hosts
+          cp * .. 
       - name: Run full flow check for ETH nodes
         env:
           MEMONIC: ${{ secrets.MEMONIC }}

@@ -13,13 +13,6 @@ fi
 blockchain="$1"
 
 source .env
-export MEMONIC="peanut thank prevent burden erode welcome dust one develop code lamp rule"
-export TEST_USERNAME="Juanito"
-export TEST_PASSWORD="Defense22"
-export USER_ID="772efcb1-f14e-4e7b-a5a7-d17d97fff8e5"
-export WALLET_ADDRESS="5DHumimsr4XjcJCmKY7Ei8MAtxrradcZqTdPha4XqGbjmpyJ"
-export ETH_PROJECT="a32cf28a-3fc0-4ef5-9303-7b6fb6d43cd2"
-export DOT_PROJECT="8d8b4fe6-495a-4942-bc53-9c7a3bb18e2b"
 
 if [ "$blockchain" = "eth" ]
 then
