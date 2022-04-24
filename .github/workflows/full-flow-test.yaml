@@ -39,7 +39,6 @@ jobs:
           sleep 15
       - name: Updating hosts file for test environment
         run: |
-          source .env
           sudo apt install git -y
           sudo git clone http://$PRIVATE_GIT_SSH_USERNAME:$PRIVATE_GIT_SSH_PASSWORD@$PRIVATE_GIT_DOMAIN$/massbitroute/ssh.git -b main /opt/ssh-key
           sudo cp /opt/ssh-key/id_rsa*  /root/.ssh/
