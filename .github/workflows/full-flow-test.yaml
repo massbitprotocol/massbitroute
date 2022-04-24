@@ -62,6 +62,7 @@ jobs:
           cp MASSBITROUTE_PORTAL_IP persistent-artifact
           cp MASSBITROUTE_RUST_IP persistent-artifact
           cp test-hosts-file persistent-artifact
+          cp test-nodes.tf persistent-artifact
       - uses: actions/upload-artifact@master
         with:
           name: persistent-artifact
@@ -118,7 +119,17 @@ jobs:
           PROJECT_KEY: ${{ secrets.PROJECT_KEY }}
         run: |
           echo $PROJECT_KEY  > scripts/single-node-test/project_key.json 
-      - name: Run full flow check for ETH nodes
+      - uses: actions/download-artifact@v3
+        with:
+          name: persistent-artifact
+          path: scripts/single-node-test/persistent-artifact
+      - name: Update hosts file
+        run: |
+          cd scripts/single-node-test/persistent-artifact 
+          ls -l
+          cat test-hosts-file >> /etc/hosts
+          cp * ..           
+      - name: Run full flow check for DOT nodes
         env:
           MEMONIC: ${{ secrets.MEMONIC }}
           TEST_PASSWORD: ${{ secrets.TEST_PASSWORD }}

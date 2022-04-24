@@ -118,28 +118,6 @@ echo "Create new node in Portal: Passed"
 #-------------------------------------------
 # create  node/gw tf files
 #-------------------------------------------
-sudo echo '
-variable "project_prefix" {
-  type        = string
-  description = "The project prefix (mbr)."
-}
-variable "environment" {
-  type        = string
-  description = "Environment: dev, test..."
-}
-variable "default_zone" {
-  type = string
-}
-variable "network_interface" {
-  type = string
-}
-variable "email" {
-  type = string
-}
-variable "map_machine_types" {
-  type = map
-}' >test-nodes.tf
-
 MASSBITROUTE_CORE_IP=$(cat MASSBITROUTE_CORE_IP)
 MASSBITROUTE_PORTAL_IP=$(cat MASSBITROUTE_PORTAL_IP)
 MASSBITROUTE_RUST_IP=$(cat MASSBITROUTE_RUST_IP)
