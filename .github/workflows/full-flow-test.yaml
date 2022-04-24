@@ -8,7 +8,7 @@ on:
 jobs:
   set-up-test-env:
     runs-on: ubuntu-latest
-    container: hoanito/mbr-ubuntu:1.1
+    container: hoanito/mbr-ubuntu:1.2
     steps:
       - uses: actions/checkout@v3
       - name: Obtain GCE key
@@ -49,7 +49,7 @@ jobs:
   test-nodes-eth:
     needs: set-up-test-env
     runs-on: ubuntu-latest
-    container: hoanito/mbr-ubuntu:1.1
+    container: hoanito/mbr-ubuntu:1.2
     steps:
       - uses: actions/checkout@v3
       - name: Obtain GCE key
@@ -80,7 +80,7 @@ jobs:
   test-nodes-dot:
     needs: set-up-test-env
     runs-on: ubuntu-latest
-    container: hoanito/mbr-ubuntu:1.1
+    container: hoanito/mbr-ubuntu:1.2
     steps:
       - uses: actions/checkout@v3
       - name: Obtain GCE key
