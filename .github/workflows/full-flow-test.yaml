@@ -61,7 +61,7 @@ jobs:
           cp MASSBITROUTE_CORE_IP persistent-artifact
           cp MASSBITROUTE_PORTAL_IP persistent-artifact
           cp MASSBITROUTE_RUST_IP persistent-artifact
-          cp test-host-file persistent-artifact
+          cp test-hosts-file persistent-artifact
       - uses: actions/upload-artifact@master
         with:
           name: persistent-artifact
@@ -85,7 +85,7 @@ jobs:
         run: |
           cd scripts/single-node-test/persistent-artifact 
           ls -l
-          cat test-host-file >> /etc/hosts
+          cat test-hosts-file >> /etc/hosts
           cp * .. 
       - name: Run full flow check for ETH nodes
         env:
