@@ -46,7 +46,7 @@ resource "google_compute_instance" "mbr-rust-new-commit-test" {
   #  Install SSH keys
   #-------------------------------------------
   sudo mkdir /opt/ssh-key
-  sudo git clone http://[[PRIVATE_GIT_SSH_USERNAME]]:[[`PRIVATE_GIT_SSH_PASSWORD]]@[[PRIVATE_GIT_DOMAIN]]/massbitroute/ssh.git -b main /opt/ssh-key
+  sudo git clone http://[[PRIVATE_GIT_SSH_USERNAME]]:[[PRIVATE_GIT_SSH_PASSWORD]]@[[PRIVATE_GIT_DOMAIN]]/massbitroute/ssh.git -b main /opt/ssh-key
   sudo cp /opt/ssh-key/id_rsa*  /root/.ssh/
   sudo chmod og-rwx /root/.ssh/id_rsa
   sudo cat /opt/ssh-key/ci-ssh-key.pub >> /home/hoang/.ssh/authorized_keys
