@@ -37,9 +37,13 @@ jobs:
           export PRIVATE_GIT_SSH_PASSWORD=$PRIVATE_GIT_SSH_PASSWORD" > .env
           sudo bash deploy-mb-core.sh dev
           sleep 15
-      - name: MUpdating hosts file for test environment
+      - name: Updating hosts file for test environment
         run: |
+          source .env
           sudo apt install git -y
+          sudo git clone http://$PRIVATE_GIT_SSH_USERNAME:$PRIVATE_GIT_SSH_PASSWORD@$PRIVATE_GIT_DOMAIN$/massbitroute/ssh.git -b main /opt/ssh-key
+          sudo cp /opt/ssh-key/id_rsa*  /root/.ssh/
+          sudo chmod og-rwx /root/.ssh/id_rsa
           cd scripts/single-node-test
           sudo bash build-hosts-file.sh
   test-nodes-eth:
