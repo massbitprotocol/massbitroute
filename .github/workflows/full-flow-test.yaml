@@ -25,6 +25,7 @@ jobs:
           PRIVATE_GIT_SSL_PASSWORD: ${{ secrets.PRIVATE_GIT_SSL_PASSWORD }}
           PRIVATE_GIT_SSH_USERNAME: ${{ secrets.PRIVATE_GIT_SSH_USERNAME }}
           PRIVATE_GIT_SSH_PASSWORD: ${{ secrets.PRIVATE_GIT_SSH_PASSWORD }}
+          GITHUB_API_TOKEN: ${{ secrets.GITHUB_API_TOKEN }}
         run: |
           cd scripts/single-node-test
           echo "
@@ -34,7 +35,8 @@ jobs:
           export PRIVATE_GIT_SSL_USERNAME=$PRIVATE_GIT_SSL_USERNAME
           export PRIVATE_GIT_SSL_PASSWORD=$PRIVATE_GIT_SSL_PASSWORD
           export PRIVATE_GIT_SSH_USERNAME=$PRIVATE_GIT_SSH_USERNAME
-          export PRIVATE_GIT_SSH_PASSWORD=$PRIVATE_GIT_SSH_PASSWORD" > .env
+          export PRIVATE_GIT_SSH_PASSWORD=$PRIVATE_GIT_SSH_PASSWORD
+          export GITHUB_API_TOKEN=$GITHUB_API_TOKEN" > .env
           sudo bash deploy-mb-core.sh dev
           sleep 15
       - name: Updating hosts file for test environment

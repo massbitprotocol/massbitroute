@@ -49,7 +49,8 @@ cat massbitroute-core-template-single | \
     sed "s/\[\[PRIVATE_GIT_DOMAIN\]\]/$PRIVATE_GIT_DOMAIN/g"  | \
     sed "s/\[\[PRIVATE_GIT_SSH_USERNAME\]\]/$PRIVATE_GIT_SSH_USERNAME/g" | \
     sed "s/\[\[PRIVATE_GIT_SSH_PASSWORD\]\]/$PRIVATE_GIT_SSH_PASSWORD/g" | \
-    sed "s/\[\[DEPLOY_BRANCH\]\]/$DEPLOY_BRANCH/g" >> test-nodes.tf
+    sed "s/\[\[DEPLOY_BRANCH\]\]/$DEPLOY_BRANCH/g" | \
+    sed "s/\[\[GITHUB_API_TOKEN\]\]/$GITHUB_API_TOKEN/g"  >> test-nodes.tf
 
 ## PORTAL NODE
 cat massbitroute-portal-template-single | \
@@ -62,7 +63,8 @@ cat massbitroute-portal-template-single | \
     sed "s/\[\[PRIVATE_GIT_SSL_USERNAME\]\]/$PRIVATE_GIT_SSL_USERNAME/g" | \
     sed "s/\[\[PRIVATE_GIT_SSL_PASSWORD\]\]/$PRIVATE_GIT_SSL_PASSWORD/g"  | \
     sed "s/\[\[PRIVATE_GIT_SSH_USERNAME\]\]/$PRIVATE_GIT_SSH_USERNAME/g" | \
-    sed "s/\[\[PRIVATE_GIT_SSH_PASSWORD\]\]/$PRIVATE_GIT_SSH_PASSWORD/g" >> test-nodes.tf
+    sed "s/\[\[PRIVATE_GIT_SSH_PASSWORD\]\]/$PRIVATE_GIT_SSH_PASSWORD/g" | \
+    sed "s/\[\[GITHUB_API_TOKEN\]\]/$GITHUB_API_TOKEN/g">> test-nodes.tf
 
 # RUST NODE
 cat massbitroute-rust-template-single | \
@@ -73,7 +75,8 @@ cat massbitroute-rust-template-single | \
     sed "s/\[\[PRIVATE_GIT_READ_PASSWORD\]\]/$PRIVATE_GIT_READ_PASSWORD/g" | \
     sed "s/\[\[PRIVATE_GIT_DOMAIN\]\]/$PRIVATE_GIT_DOMAIN/g"  | \
     sed "s/\[\[PRIVATE_GIT_SSH_USERNAME\]\]/$PRIVATE_GIT_SSH_USERNAME/g" | \
-    sed "s/\[\[PRIVATE_GIT_SSH_PASSWORD\]\]/$PRIVATE_GIT_SSH_PASSWORD/g" >> test-nodes.tf
+    sed "s/\[\[PRIVATE_GIT_SSH_PASSWORD\]\]/$PRIVATE_GIT_SSH_PASSWORD/g" | \
+    sed "s/\[\[GITHUB_API_TOKEN\]\]/$GITHUB_API_TOKEN/g">> test-nodes.tf
 
 #-------------------------------------------
 #  Spin up new VM on GCE
