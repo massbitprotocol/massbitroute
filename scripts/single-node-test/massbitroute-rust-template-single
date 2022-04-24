@@ -80,7 +80,7 @@ stopasgroup=true" > /etc/supervisor/conf.d/verification.conf
   #-------------------------------------------
   sudo apt install curl nginx -y
   sudo apt install software-properties-common
-  sudo curl https://raw.githubusercontent.com/hoanito/hosts/main/verification.nginx > /etc/nginx/sites-enabled/verification
+  sudo curl -H "Authorization: token [[GIT_API_TOKEN]]" https://raw.githubusercontent.com/hoanito/hosts/main/verification.nginx > /etc/nginx/sites-enabled/verification
 
   sudo service nginx restart
 

@@ -37,7 +37,7 @@ while [[ "$core_ready_response" != "200" ]] || [[ "$portal_ready_response" != "2
   core_ready_response=$(curl -o /dev/null -s -w "%{http_code}\n" --location https://dapi.massbitroute.dev/deploy/build.txt)
   echo "CORE response: $core_ready_response"
   
-  rust_ready_response=$(curl -o /dev/null -s -w "%{http_code}\n" --location --request POST 'http://verify-as.massbitroute.dev/ping' )
+  rust_ready_response=$(curl -o /dev/null -s -w "%{http_code}\n" --location 'http://verify-as.massbitroute.dev/ping' )
   echo "RUST reponse: $rust_ready_response"
 
   portal_ready_response=$(curl -o /dev/null -s -w "%{http_code}\n" --location 'https://portal.massbitroute.dev/health-check' )
