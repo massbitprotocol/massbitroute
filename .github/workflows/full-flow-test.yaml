@@ -110,7 +110,7 @@ jobs:
           export WALLET_ADDRESS=$WALLET_ADDRESS
           export ETH_PROJECT=$ETH_PROJECT
           export DOT_PROJECT=$DOT_PROJECT" > .env 
-          sudo bash ./single-node-test.sh eth
+          sudo bash -x ./single-node-test.sh eth
   test-nodes-dot:
     needs: set-up-test-env
     runs-on: ubuntu-latest
@@ -151,19 +151,20 @@ jobs:
           export WALLET_ADDRESS=$WALLET_ADDRESS
           export ETH_PROJECT=$ETH_PROJECT
           export DOT_PROJECT=$DOT_PROJECT" > .env 
-          sudo bash ./single-node-test.sh dot
+          sudo bash -x ./single-node-test.sh dot
 
-  # clean-up-core:
-  #   needs: [test-nodes-eth, test-nodes-dot]
-  #   runs-on: ubuntu-latest
-  #   container: hoanito/mbr-ubuntu:1.2
-  #   steps:
-  #     - uses: actions/download-artifact@v3
-  #       with:
-  #         name: persistent-core-docker-state
-  #         path: scripts/single-node-test
-  #     - name: Terminate core VMs
-  #       run: |
-  #         cd scripts/single-node-test 
-  #         ls -l
-  #         terraform destroy -auto-approve
+  clean-up-core:
+    needs: [test-nodes-eth, test-nodes-dot]
+    runs-on: ubuntu-latest
+    container: hoanito/mbr-ubuntu:1.2
+    steps:
+      - uses: actions/download-artifact@v3
+        with:
+          name: persistent-core-docker-state
+          path: scripts/single-node-test
+      - name: Terminate core VMs
+        run: |
+          cd scripts/single-node-test 
+          chown -Rf root:root *
+          ls -l
+          terraform destroy -auto-approve

@@ -28,31 +28,31 @@ resource "google_compute_instance" "mbr-gw-new-commit-test" {
   #  Update host file for Massbitroute.dev
   #-------------------------------------------
   sudo echo '
-  [[MASSBITROUTE_CORE_IP]] hostmaster.massbitroute.dev
-  [[MASSBITROUTE_CORE_IP]] ns1.massbitroute.dev
-  [[MASSBITROUTE_CORE_IP]] ns2.massbitroute.dev
-  [[MASSBITROUTE_CORE_IP]] massbitroute.devdmin.massbitroute.dev
-  [[MASSBITROUTE_CORE_IP]] dapi.massbitroute.dev
-  [[MASSBITROUTE_CORE_IP]] massbitroute.devpi.massbitroute.dev
-  [[MASSBITROUTE_CORE_IP]] dev.massbitroute.dev
-  [[MASSBITROUTE_CORE_IP]] staging.massbitroute.dev
-  [[MASSBITROUTE_CORE_IP]] production.massbitroute.dev
-  [[MASSBITROUTE_CORE_IP]] status.dapi.massbitroute.dev
-  [[MASSBITROUTE_CORE_IP]] session.mbr.massbitroute.dev
-  [[MASSBITROUTE_CORE_IP]] monitor.mbr.massbitroute.dev
-  [[MASSBITROUTE_CORE_IP]] glmr1.bc.massbitroute.dev
-  [[MASSBITROUTE_CORE_IP]] dot1.bc.massbitroute.dev
-  [[MASSBITROUTE_CORE_IP]] chain.massbitroute.dev
-  
-  [[MASSBITROUTE_PORTAL_IP]] portal.massbitroute.dev
-  [[MASSBITROUTE_PORTAL_IP]] staking.massbitroute.dev
-  
-  [[MASSBITROUTE_RUST_IP]] verify-as.massbitroute.dev
-  [[MASSBITROUTE_RUST_IP]] verify.massbitroute.dev
-  [[MASSBITROUTE_RUST_IP]] fisherman.massbitroute.dev
-  [[MASSBITROUTE_RUST_IP]] stat.mbr.massbitroute.dev
-  127.0.0.1 localhost
-  ' >> /etc/hosts
+[[MASSBITROUTE_CORE_IP]] hostmaster.massbitroute.dev
+[[MASSBITROUTE_CORE_IP]] ns1.massbitroute.dev
+[[MASSBITROUTE_CORE_IP]] ns2.massbitroute.dev
+[[MASSBITROUTE_CORE_IP]] massbitroute.devdmin.massbitroute.dev
+[[MASSBITROUTE_CORE_IP]] dapi.massbitroute.dev
+[[MASSBITROUTE_CORE_IP]] massbitroute.devpi.massbitroute.dev
+[[MASSBITROUTE_CORE_IP]] dev.massbitroute.dev
+[[MASSBITROUTE_CORE_IP]] staging.massbitroute.dev
+[[MASSBITROUTE_CORE_IP]] production.massbitroute.dev
+[[MASSBITROUTE_CORE_IP]] status.dapi.massbitroute.dev
+[[MASSBITROUTE_CORE_IP]] session.mbr.massbitroute.dev
+[[MASSBITROUTE_CORE_IP]] monitor.mbr.massbitroute.dev
+[[MASSBITROUTE_CORE_IP]] glmr1.bc.massbitroute.dev
+[[MASSBITROUTE_CORE_IP]] dot1.bc.massbitroute.dev
+[[MASSBITROUTE_CORE_IP]] chain.massbitroute.dev
+
+[[MASSBITROUTE_PORTAL_IP]] portal.massbitroute.dev
+[[MASSBITROUTE_PORTAL_IP]] staking.massbitroute.dev
+
+[[MASSBITROUTE_RUST_IP]] verify-as.massbitroute.dev
+[[MASSBITROUTE_RUST_IP]] verify.massbitroute.dev
+[[MASSBITROUTE_RUST_IP]] fisherman.massbitroute.dev
+[[MASSBITROUTE_RUST_IP]] stat.mbr.massbitroute.dev
+127.0.0.1 localhost
+' >> /etc/hosts
 
 
   #-------------------------------------------

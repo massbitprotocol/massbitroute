@@ -372,6 +372,7 @@ gateway_hosts_entry="$apiId.$blockchain-mainnet.massbitroute.dev"
 
 # update host file for dAPI entry
 echo "$GW_IP $gateway_hosts_entry" >> /etc/hosts
+cat /etc/hosts
 
 echo $dapiURL > DAPI_URL
 
