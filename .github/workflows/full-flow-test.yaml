@@ -155,6 +155,7 @@ jobs:
 
   clean-up-core:
     # needs: [test-nodes-eth, test-nodes-dot]
+    needs: [set-up-test-env]
     runs-on: ubuntu-latest
     container: hoanito/mbr-ubuntu:1.2
     steps:
