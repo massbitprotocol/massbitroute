@@ -169,7 +169,6 @@ jobs:
           cd scripts/single-node-test 
           chown -Rf root:root *
           rm -rf .terraform
-
           ls -l
           terraform init
           terraform destroy -auto-approve
