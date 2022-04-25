@@ -154,7 +154,7 @@ jobs:
   #         sudo bash -x ./single-node-test.sh dot
 
   clean-up-core:
-    needs: [test-nodes-eth, test-nodes-dot]
+    # needs: [test-nodes-eth, test-nodes-dot]
     runs-on: ubuntu-latest
     container: hoanito/mbr-ubuntu:1.2
     steps:
