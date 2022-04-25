@@ -153,16 +153,17 @@ jobs:
           export DOT_PROJECT=$DOT_PROJECT" > .env 
           sudo bash ./single-node-test.sh dot
 
-  clean-up-core:
-    needs: set-up-test-env
-    runs-on: ubuntu-latest
-    container: hoanito/mbr-ubuntu:1.2
-    steps:
-      - uses: actions/download-artifact@v3
-        with:
-          name: persistent-core-docker-state
-          path: scripts/single-node-test
-      - name: Terminate core VMs
-        run: |
-          cd scripts/single-node-test 
-          terraform destroy -auto-approve
+  # clean-up-core:
+  #   needs: [test-nodes-eth, test-nodes-dot]
+  #   runs-on: ubuntu-latest
+  #   container: hoanito/mbr-ubuntu:1.2
+  #   steps:
+  #     - uses: actions/download-artifact@v3
+  #       with:
+  #         name: persistent-core-docker-state
+  #         path: scripts/single-node-test
+  #     - name: Terminate core VMs
+  #       run: |
+  #         cd scripts/single-node-test 
+  #         ls -l
+  #         terraform destroy -auto-approve
