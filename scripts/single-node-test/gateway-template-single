@@ -1,5 +1,5 @@
 
-resource "google_compute_instance" "gateway-[[GATEWAY_ID]]" {
+resource "google_compute_instance" "mbr-gw-new-commit-test" {
   name         = "${var.project_prefix}-${var.environment}-gateway-[[BLOCKCHAIN]]-[[GATEWAY_ID]]"
   machine_type = var.map_machine_types["gateway"]
   zone         = "${var.default_zone}"
@@ -71,5 +71,5 @@ resource "google_compute_instance" "gateway-[[GATEWAY_ID]]" {
 
 output "mbr_gw_public_ip" {
   description = "Public IP of GW VM"
-  value = google_compute_instance_from_machine_image.gateway-[[GATEWAY_ID]].network_interface.0.access_config.0.nat_ip
+  value = google_compute_instance_from_machine_image.mbr-gw-new-commit-test.network_interface.0.access_config.0.nat_ip
 }
