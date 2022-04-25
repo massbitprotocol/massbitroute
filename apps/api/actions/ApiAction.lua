@@ -145,8 +145,8 @@ function Action:createAction(args)
 
     args.security = {
         allow_methods = "",
-        limit_rate_per_sec = 100,
-        limit_rate_per_day = 30000
+        limit_rate_per_sec = 0,
+        limit_rate_per_day = 0
     }
     local model = Model:new(instance)
     local _detail, _err_msg = model:create(args)
