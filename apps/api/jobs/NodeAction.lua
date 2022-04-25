@@ -281,26 +281,26 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
             end
         end
     end
-    _print("nodes:" .. inspect(_nodes))
-    _print("nodes1:" .. inspect(_nodes1))
-    _print("nodes2:" .. inspect(_nodes2))
-    do
-        local _tmpl =
-            _get_tmpl(
-            rules,
-            {
-                node_type = _blocknet_id,
-                nodes = _nodes[_blocknet_id],
-                _domain_name = _job_data._domain_name
-            }
-        )
+    -- _print("nodes:" .. inspect(_nodes))
+    -- _print("nodes1:" .. inspect(_nodes1))
+    -- _print("nodes2:" .. inspect(_nodes2))
+    -- do
+    --     local _tmpl =
+    --         _get_tmpl(
+    --         rules,
+    --         {
+    --             node_type = _blocknet_id,
+    --             nodes = _nodes[_blocknet_id],
+    --             _domain_name = _job_data._domain_name
+    --         }
+    --     )
 
-        local _str_tmpl = _tmpl("_gw_conf")
-        _print(_str_tmpl)
-        local _file_gw = _deploy_gatewayconfdir .. "/" .. _blocknet_id .. ".conf"
-        _print(_file_gw)
-        _write_file(_file_gw, _str_tmpl)
-    end
+    --     local _str_tmpl = _tmpl("_gw_conf")
+    --     _print(_str_tmpl)
+    --     local _file_gw = _deploy_gatewayconfdir .. "/" .. _blocknet_id .. ".conf"
+    --     _print(_file_gw)
+    --     _write_file(_file_gw, _str_tmpl)
+    -- end
 
     do
         local _tmpl =
