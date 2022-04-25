@@ -99,7 +99,7 @@ server {
 server {
     listen unix:/tmp/dot-mainnet-getblock-1.sock;
     location / {
-        #add_header X-Mbr-GNode-Id dot-mainnet-getblock-1;
+        add_header X-Mbr-Node-Id dot-mainnet-getblock-1;
         proxy_set_header X-Api-Key 6c4ddad0-7646-403e-9c10-744f91d37ccf;
         proxy_pass https://dot.getblock.io/mainnet/;
 
@@ -112,8 +112,7 @@ server {
 server {
     listen unix:/tmp/eth-mainnet-getblock-1.sock;
     location / {
-      
-        #add_header X-Mbr-GNode-Id eth-mainnet-getblock-1;
+        add_header X-Mbr-Node-Id eth-mainnet-getblock-1;
         proxy_set_header X-Api-Key 6c4ddad0-7646-403e-9c10-744f91d37ccf;
         proxy_pass https://eth.getblock.io/mainnet/;
   include /massbit/massbitroute/app/src/sites/services/gateway/etc/_provider_server.conf;
