@@ -51,7 +51,8 @@ resource "google_compute_instance" "gateway-[[GATEWAY_ID]]" {
   [[MASSBITROUTE_RUST_IP]] verify.massbitroute.dev
   [[MASSBITROUTE_RUST_IP]] fisherman.massbitroute.dev
   [[MASSBITROUTE_RUST_IP]] stat.mbr.massbitroute.dev
-  127.0.0.1 localhost' >> /etc/hosts
+  127.0.0.1 localhost
+  ' >> /etc/hosts
 
 
   #-------------------------------------------
@@ -66,4 +67,9 @@ resource "google_compute_instance" "gateway-[[GATEWAY_ID]]" {
     email = "${var.email}"
     scopes = ["cloud-platform"]
   }
+}
+
+output "mbr_gw_public_ip" {
+  description = "Public IP of GW VM"
+  value = google_compute_instance_from_machine_image.gateway-[[GATEWAY_ID]].network_interface.0.access_config.0.nat_ip
 }

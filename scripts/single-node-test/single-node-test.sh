@@ -192,6 +192,8 @@ echo "Create node VMs on GCE: Passed"
 echo "Waiting for nodes to set up"
 sleep 180
 
+GW_IP=$(terraform output -raw mbr_gw_public_ip)
+
 #-------------------------------------------
 # Check if nodes are verified
 #-------------------------------------------
@@ -361,6 +363,10 @@ echo "Create new dAPI: Passed"
 apiId=$(echo $create_dapi_response | jq -r '. | .entrypoints[0].apiId')
 appKey=$(echo $create_dapi_response | jq -r '. | .appKey')
 dapiURL="https://$apiId.$blockchain-mainnet.massbitroute.dev/$appKey"
+gateway_hosts_entry="$apiId.$blockchain-mainnet.massbitroute.dev"
+
+# update host file for dAPI entry
+echo "$GW_IP $gateway_hosts_entry" >> /etc/hosts
 echo $dapiURL > DAPI_URL
 
 if [ "$blockchain" = "eth" ]
