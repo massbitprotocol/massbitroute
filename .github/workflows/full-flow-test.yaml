@@ -168,8 +168,7 @@ jobs:
           cd scripts/single-node-test 
           chown -Rf root:root *
           rm -rf .terraform
-          rm terraform.tfstate
-          rm terraform.tfstate
+
           ls -l
           terraform init
           terraform destroy -auto-approve
