@@ -28,11 +28,12 @@ else
 fi
 
 echo "Setting up Test environment ..."
-sleep 300
+sleep 420
 
 #-------------------------------------------
 # Wait for core component to finish setup
 #-------------------------------------------
+echo "-----------------------------------------"
 while [[ "$core_ready_response" != "200" ]] || [[ "$portal_ready_response" != "200" ]] || [[ "$rust_ready_response" != "200" ]] || [[ "$staking_ready_response" != "200" ]]; do
   core_ready_response=$(curl -o /dev/null -s -w "%{http_code}\n" --location https://dapi.massbitroute.dev/deploy/build.txt)
   echo "CORE response: $core_ready_response"
@@ -45,7 +46,9 @@ while [[ "$core_ready_response" != "200" ]] || [[ "$portal_ready_response" != "2
 
   staking_ready_response=$(curl -o /dev/null -s -w "%{http_code}\n" --location  'https://staking.massbitroute.dev/health-check' )
   echo "STAKING reponse: $staking_ready_response"
-  sleep 10
+
+  echo "-----------------------------------------"
+  sleep 15
 done
 echo "Massbit test env setup completion: Pass"
 
@@ -391,8 +394,8 @@ then
 }'
 fi
 
-sleep 60
 echo "Waiting for dAPI to configure"
+sleep 60
 
 dapi_response_code=$(curl -o /dev/null -s -w "%{http_code}\n" --location --request POST "$dapiURL" \
   --header 'Content-Type: application/json' \

@@ -66,6 +66,10 @@ jobs:
         with:
           name: persistent-artifact
           path: scripts/single-node-test/persistent-artifact
+      - uses: actions/upload-artifact@master
+        with:
+          name: persistent-core-docker-state
+          path: scripts/single-node-test
   test-nodes-eth:
     needs: set-up-test-env
     runs-on: ubuntu-latest
@@ -148,3 +152,17 @@ jobs:
           export ETH_PROJECT=$ETH_PROJECT
           export DOT_PROJECT=$DOT_PROJECT" > .env 
           sudo bash ./single-node-test.sh dot
+
+  clean-up-core:
+    needs: set-up-test-env
+    runs-on: ubuntu-latest
+    container: hoanito/mbr-ubuntu:1.2
+    steps:
+      - uses: actions/download-artifact@v3
+        with:
+          name: persistent-core-docker-state
+          path: scripts/single-node-test
+      - name: Terminate core VMs
+        run: |
+          cd scripts/single-node-test 
+          terraform destroy -auto-approve
