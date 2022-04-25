@@ -141,7 +141,9 @@ variable "email" {
 }
 variable "map_machine_types" {
   type = map
-}' >test-nodes.tf
+}
+
+' >test-nodes.tf
 
 MASSBITROUTE_CORE_IP=$(cat MASSBITROUTE_CORE_IP)
 MASSBITROUTE_PORTAL_IP=$(cat MASSBITROUTE_PORTAL_IP)
