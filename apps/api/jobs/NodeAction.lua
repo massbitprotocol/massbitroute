@@ -321,18 +321,19 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
     end
 
     local _upstream_str = {}
-    for _k1, _v1 in pairs(_nodes2) do
+    if next(_nodes2) == nil then
+        local _k1 = _blocknet_id
         local _backup = ";"
-        if #_nodes[_k1] > 0 then
-            _backup = " backup;"
-        end
+        -- if #_nodes[_k1] > 0 then
+        --     _backup = " backup;"
+        -- end
 
         local _tmpl1 =
             _get_tmpl(
             rules,
             {
                 node_type = _k1,
-                nodes = _nodes[_k1],
+                nodes = {},
                 _domain_name = _job_data._domain_name,
                 upstream_backup = "server " .. rules["_gw_upstream_backup_name_" .. _k1] .. _backup,
                 upstream_extra = rules["_gw_upstream_backup_" .. _k1]
@@ -341,44 +342,67 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
 
         local _str_tmpl1 = _tmpl1("_gw_node_upstreams_v1")
         table.insert(_upstream_str, _str_tmpl1)
-        for _k2, _v2 in pairs(_v1) do
-            local _backup2 = ";"
-            if #_nodes1[_k1][_k2] > 0 then
-                _backup2 = " backup;"
+    else
+        for _k1, _v1 in pairs(_nodes2) do
+            local _backup = ";"
+            if #_nodes[_k1] > 0 then
+                _backup = " backup;"
             end
-            local _tmpl2 =
+
+            local _tmpl1 =
                 _get_tmpl(
                 rules,
                 {
-                    node_type = _k1 .. "-" .. _k2,
-                    nodes = _nodes1[_k1][_k2],
+                    node_type = _k1,
+                    nodes = _nodes[_k1],
                     _domain_name = _job_data._domain_name,
-                    upstream_backup = "server unix:/tmp/" .. _k1 .. ".node.mbr." .. _job_data._domain_name .. _backup2
+                    upstream_backup = "server " .. rules["_gw_upstream_backup_name_" .. _k1] .. _backup,
+                    upstream_extra = rules["_gw_upstream_backup_" .. _k1]
                 }
             )
 
-            local _str_tmpl2 = _tmpl2("_gw_node_upstreams_v1")
-            table.insert(_upstream_str, _str_tmpl2)
-
-            for _k3, _v3 in pairs(_v2) do
-                local _backup3 = ";"
-                if #_v3 > 0 then
-                    _backup3 = " backup;"
+            local _str_tmpl1 = _tmpl1("_gw_node_upstreams_v1")
+            table.insert(_upstream_str, _str_tmpl1)
+            for _k2, _v2 in pairs(_v1) do
+                local _backup2 = ";"
+                if #_nodes1[_k1][_k2] > 0 then
+                    _backup2 = " backup;"
                 end
-                local _tmpl3 =
+                local _tmpl2 =
                     _get_tmpl(
                     rules,
                     {
-                        node_type = _k1 .. "-" .. _k2 .. "-" .. _k3,
-                        nodes = _v3,
+                        node_type = _k1 .. "-" .. _k2,
+                        nodes = _nodes1[_k1][_k2],
                         _domain_name = _job_data._domain_name,
                         upstream_backup = "server unix:/tmp/" ..
-                            _k1 .. "-" .. _k2 .. ".node.mbr." .. _job_data._domain_name .. ".sock " .. _backup3
+                            _k1 .. ".node.mbr." .. _job_data._domain_name .. _backup2
                     }
                 )
 
-                local _str_tmpl3 = _tmpl3("_gw_node_upstreams_v1")
-                table.insert(_upstream_str, _str_tmpl3)
+                local _str_tmpl2 = _tmpl2("_gw_node_upstreams_v1")
+                table.insert(_upstream_str, _str_tmpl2)
+
+                for _k3, _v3 in pairs(_v2) do
+                    local _backup3 = ";"
+                    if #_v3 > 0 then
+                        _backup3 = " backup;"
+                    end
+                    local _tmpl3 =
+                        _get_tmpl(
+                        rules,
+                        {
+                            node_type = _k1 .. "-" .. _k2 .. "-" .. _k3,
+                            nodes = _v3,
+                            _domain_name = _job_data._domain_name,
+                            upstream_backup = "server unix:/tmp/" ..
+                                _k1 .. "-" .. _k2 .. ".node.mbr." .. _job_data._domain_name .. ".sock " .. _backup3
+                        }
+                    )
+
+                    local _str_tmpl3 = _tmpl3("_gw_node_upstreams_v1")
+                    table.insert(_upstream_str, _str_tmpl3)
+                end
             end
         end
     end
