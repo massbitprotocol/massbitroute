@@ -17,6 +17,7 @@
 [[MASSBITROUTE_PORTAL_IP]] portal.massbitroute.dev
 [[MASSBITROUTE_PORTAL_IP]] staking.massbitroute.dev
 
+[[MASSBITROUTE_RUST_IP]] verify-as.massbitroute.dev
 [[MASSBITROUTE_RUST_IP]] verify.massbitroute.dev
 [[MASSBITROUTE_RUST_IP]] fisherman.massbitroute.dev
 [[MASSBITROUTE_RUST_IP]] stat.mbr.massbitroute.dev

@@ -1,0 +1,119 @@
+
+
+resource "google_compute_instance" "mbr-rust-new-commit-test" {
+  name         = "${var.project_prefix}-${var.environment}-rust-test-[[NODE_ID]]"
+  machine_type = var.map_machine_types["mbr-core"]
+  zone         = "${var.default_zone}"
+  provider = google-beta
+
+  tags = ["http-server", "https-server"]
+
+  boot_disk {
+    initialize_params {
+      image = "projects/ubuntu-os-cloud/global/images/ubuntu-2004-focal-v20210720"
+      size = 20
+    }
+  }
+
+  network_interface {
+    network = "${var.network_interface}"
+
+    access_config {
+      // Ephemeral IP
+    }
+  }
+
+  metadata_startup_script =  <<EOH
+  #!/bin/bash
+  #-------------------------------------------
+  #  Update host file for Massbitroute.dev
+  #-------------------------------------------
+  sudo echo "curl -H \"Authorization: token [[GIT_API_TOKEN]]\" https://raw.githubusercontent.com/hoanito/hosts/main/test-hosts-file > /etc/hosts" >> /opt/update_hosts.sh
+  sudo chmod 770 /opt/update_hosts.sh
+
+  sudo echo "* * * * * root sudo bash /opt/update_hosts.sh" >> /etc/crontab
+  sudo echo "* * * * * sudo bash /opt/update_hosts.sh" > update_hosts.cron
+  sudo crontab update_hosts.cron
+  sudo service cron reload
+
+  sudo sed 's/#DNSStubListener=yes/DNSStubListener=no/' /etc/systemd/resolved.conf -i
+  sudo pkill -f systemd-resolve
+  sudo systemctl stop systemd-resolved
+  sudo systemctl disable systemd-resolved 
+  sudo echo nameserver 8.8.8.8 >/etc/resolv.conf
+  
+  #-------------------------------------------
+  #  Install SSH keys
+  #-------------------------------------------
+  sudo mkdir /opt/ssh-key
+  sudo git clone http://[[PRIVATE_GIT_SSH_USERNAME]]:[[PRIVATE_GIT_SSH_PASSWORD]]@[[PRIVATE_GIT_DOMAIN]]/massbitroute/ssh.git -b main /opt/ssh-key
+  sudo cp /opt/ssh-key/id_rsa*  /root/.ssh/
+  sudo chmod og-rwx /root/.ssh/id_rsa
+  sudo cat /opt/ssh-key/ci-ssh-key.pub >> /home/hoang/.ssh/authorized_keys
+  
+  ssh-keyscan github.com >> ~/.ssh/known_hosts
+
+  #-------------------------------------------
+  #  Install RUST
+  #-------------------------------------------
+  sudo apt update -y
+  curl https://sh.rustup.rs -sSf | sh -s -- -y
+  rustup update nightly
+  rustup update stable
+  rustup target add wasm32-unknown-unknown --toolchain nightly
+  sudo apt install build-essential pkg-config libssl-dev supervisor -y
+
+  #-------------------------------------------
+  #  Set up supervisor
+  #-------------------------------------------
+  echo "[program:verification]
+command=bash /opt/verification/run.sh
+autostart=true
+autorestart=true
+stderr_logfile=/var/log/verification.err.log
+stdout_logfile=/var/log/verification.out.log
+user=root
+stopasgroup=true" > /etc/supervisor/conf.d/verification.conf
+
+  #-------------------------------------------
+  #  Install NGINX
+  #-------------------------------------------
+  sudo apt install curl nginx -y
+  sudo apt install software-properties-common
+  sudo curl -H "Authorization: token [[GIT_API_TOKEN]]" https://raw.githubusercontent.com/hoanito/hosts/main/verification.nginx > /etc/nginx/sites-enabled/verification
+
+  sudo service nginx restart
+
+  #-------------------------------------------
+  #  Install VERIFICATION (RUST)
+  #-------------------------------------------
+  sudo mkdir -p /massbit/massbitroute/app/src/sites/services/monitor
+  sudo git clone https://github.com/massbitprotocol/massbitroute_monitor.git -b dev /massbit/massbitroute/app/src/sites/services/monitor
+  cd /massbit/massbitroute/app/src/sites/services/monitor/check_component
+  /root/.cargo/bin/cargo build --release
+  mkdir -p /opt/verification
+  sudo cp target/release/mbr-check-component /opt/verification/mbr-check-component
+  sudo cp src/archive/check-flow.json /opt/verification/check-flow.json
+  sudo cp /opt/ssh-key/base-endpoint.json  /opt/verification/base-endpoint.json
+  sudo cp script/run.sh /opt/verification/run.sh
+  sudo cp config_check_component_test.json /opt/verification/config_check_component.json
+  
+  sudo chmod 770 /opt/verification/run.sh
+  sudo supervisorctl reread
+  sudo  supervisorctl update
+  sudo supervisorctl start verification
+  EOH
+
+
+  service_account {
+    # Google recommends custom service.massbitroute.devccounts that have cloud-platform scope.massbitroute.devnd permissions granted via IAM Roles.
+    email = "${var.email}"
+    scopes = ["cloud-platform"]
+  }
+
+}
+
+output "mbr_rust_public_ip" {
+  description = "Public IP of new.massbitroute.devPI VM"
+  value = google_compute_instance.mbr-rust-new-commit-test.network_interface.0.access_config.0.nat_ip
+}

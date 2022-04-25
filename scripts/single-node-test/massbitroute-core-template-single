@@ -1,0 +1,63 @@
+
+
+resource "google_compute_instance_from_machine_image" "mbr-core-new-commit-test" {
+  name         = "${var.project_prefix}-${var.environment}-core-test-[[NODE_ID]]"
+  machine_type = var.map_machine_types["mbr-core"]
+  zone         = "${var.default_zone}"
+  provider = google-beta
+
+  tags = ["http-server", "https-server"]
+  source_machine_image = "projects/mbr-test-341307/global/machineImages/mbr-test-core"
+
+
+
+  network_interface {
+    network = "${var.network_interface}"
+
+    access_config {
+      // Ephemeral IP
+    }
+  }
+
+  metadata_startup_script =  <<EOH
+  #!/bin/bash
+  #-------------------------------------------
+  #  Update host file for Massbitroute.dev
+  #-------------------------------------------
+  sudo sed 's/#DNSStubListener=yes/DNSStubListener=no/' /etc/systemd/resolved.conf -i
+  sudo pkill -f systemd-resolve
+  sudo systemctl stop systemd-resolved
+  sudo systemctl disable systemd-resolved 
+  sudo echo nameserver 8.8.8.8 >/etc/resolv.conf
+  
+  sudo echo "curl -H \"Authorization: token [[GIT_API_TOKEN]]\" https://raw.githubusercontent.com/hoanito/hosts/main/test-hosts-file > /etc/hosts" >> /opt/update_hosts.sh
+  sudo chmod 770 /opt/update_hosts.sh
+
+  sudo echo "* * * * * root sudo bash /opt/update_hosts.sh" >> /etc/crontab
+  sudo echo "* * * * * sudo bash /opt/update_hosts.sh" > update_hosts.cron
+  sudo crontab update_hosts.cron
+  sudo service cron reload
+  #-------------------------------------------
+  #  Install massbitroute core components
+  #-------------------------------------------
+  sleep 30
+  export API_BRANCH=[[DEPLOY_BRANCH]]
+  export GIT_PRIVATE_READ_URL="http://[[PRIVATE_GIT_READ_USERNAME]]:[[PRIVATE_GIT_READ_PASSWORD]]@[[PRIVATE_GIT_DOMAIN]]"
+  git -C /massbit/massbitroute/app/src pull
+  cd /massbit/massbitroute/app/src/scripts
+  bash run _refresh >> /home/refresh.log
+  EOH
+
+
+  service_account {
+    # Google recommends custom service.massbitroute.devccounts that have cloud-platform scope.massbitroute.devnd permissions granted via IAM Roles.
+    email = "${var.email}"
+    scopes = ["cloud-platform"]
+  }
+
+}
+
+output "mbr_core_public_ip" {
+  description = "Public IP of new.massbitroute.devPI VM"
+  value = google_compute_instance_from_machine_image.mbr-core-new-commit-test.network_interface.0.access_config.0.nat_ip
+}
