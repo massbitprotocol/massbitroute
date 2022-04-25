@@ -2,13 +2,12 @@ name: Test main flow ETH/DOT Node/GW
 
 # on:
 #   push:
-#     branches: [dev]
+#     branches: [feature/fulltest]
 on:
   pull_request:
     types: [opened, reopened]
-    branches: [dev]
-  push:
     branches: [feature/fulltest]
+
 jobs:
   set-up-test-env:
     runs-on: ubuntu-latest
