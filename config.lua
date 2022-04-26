@@ -23,7 +23,7 @@ stopsignal=INT
 stdout_logfile=_SITE_ROOT_/../mkagent/logs/monitor_client.log
     ]]
     },
-    supervisor = [[
+    supervisor_tmp = [[
 [program:portal_update_listid]
 command=/bin/bash _SITE_ROOT_/scripts/run loop _update_listid
 autorestart=true
@@ -32,7 +32,8 @@ stopasgroup=true
 killasgroup=true
 stopsignal=INT
 stdout_logfile=_SITE_ROOT_/logs/update_listid.log
-
+]],
+    supervisor = [[
 [program:portal_homepage_prod]
 command=/bin/bash _SITE_ROOT_/scripts/mbr_app.sh _start_prod
 autorestart=true
