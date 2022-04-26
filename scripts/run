@@ -202,7 +202,7 @@ _git_cmd_commit() {
 		mkdir -p $SITE_ROOT/public/deploy/version $SITE_ROOT/public/deploy/cmd
 		repo_name=$(basename $($_git remote get-url origin) .git)
 		echo $commit_id >$SITE_ROOT/public/deploy/version/${repo_name}.version
-		cat >$SITE_ROOT/public/deploy/cmd/${commit_id}.sh <<EOF
+		cat >$SITE_ROOT/public/deploy/version/${repo_name}/${commit_id}.sh <<EOF
 #!/bin/bash
 echo "Update for $commit_id"
 EOF
