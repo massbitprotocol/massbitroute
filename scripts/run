@@ -197,7 +197,14 @@ _git_cmd_commit() {
 		git -C $_cdir pull
 		git -C $_cdir commit -m "${ip}: ${mid}: ${HOSTNAME}: $_fdir at $_time"
 		git -C $_cdir push
-
+		commit_id=$(git rev-parse origin/$(git rev-parse --abbrev-ref HEAD))
+		mkdir -p $SITE_ROOT/public/deploy/version $SITE_ROOT/public/deploy/cmd
+		repo_name=$(basename $(git remote get-url origin))
+		echo $commit_id >$SITE_ROOT/public/deploy/version/${repo_name}.version
+		cat >$SITE_ROOT/public/deploy/cmd/${commit_id}.sh <<EOF
+#!/bin/bash
+echo "Update for $commit_id"
+EOF
 	fi
 }
 
