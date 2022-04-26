@@ -42,11 +42,11 @@ local function _authorize_whitelist(self, args)
     local _config = self:getInstanceConfig()
     local _appconf = _config.app
     local whitelist_sid = _appconf.whitelist_sid
-    _print("whitelist_sid:" .. inspect(whitelist_sid))
+    -- _print("whitelist_sid:" .. inspect(whitelist_sid))
     local sid = ngx.var.cookie__slc_web_sid or args.sid
     local _info = whitelist_sid and whitelist_sid[sid]
-    _print("sid:" .. sid)
-    _print("_info:" .. inspect(_info))
+    -- _print("sid:" .. sid)
+    -- _print("_info:" .. inspect(_info))
     if sid and _info then
         local _partner_id = args.partner_id
         local _user_id = args.user_id
@@ -151,7 +151,7 @@ end
 --- Register gateway
 
 function Action:registerAction(args)
-    _print("register:" .. inspect(args))
+    _print(inspect(args))
     args.action = nil
     local _token = args.token
     if not _token then
@@ -205,6 +205,7 @@ function Action:registerAction(args)
 end
 
 function Action:unregisterAction(args)
+    _print(inspect(args))
     args.action = nil
     local _token = args.token
     if not _token then
@@ -248,6 +249,7 @@ function Action:unregisterAction(args)
 end
 
 function Action:createAction(args)
+    _print(inspect(args))
     args.action = nil
     -- args.id = nil
 
@@ -288,7 +290,8 @@ function Action:createAction(args)
 end
 
 function Action:nodeverifyAction(args)
-    local _config = self:getInstanceConfig()
+    _print(inspect(args))
+    -- local _config = self:getInstanceConfig()
     _print(args, true)
     local ip = args.ip
     local _id = args.id
@@ -339,7 +342,7 @@ function Action:nodeverifyAction(args)
 end
 
 function Action:getAction(args)
-    _print(args, true)
+    _print(inspect(args))
     if not args.id then
         return {
             result = false,
@@ -386,7 +389,7 @@ function Action:getAction(args)
 end
 
 function Action:adminupdateAction(args)
-    _print(args, true)
+    _print(inspect(args))
     args.action = nil
     local instance = self:getInstance()
     local model = Model:new(instance)
@@ -424,6 +427,7 @@ function Action:adminupdateAction(args)
 end
 
 function Action:calljobAction(args)
+    _print(inspect(args))
     args.action = nil
     local job_method = args.job
     args.job = nil
@@ -456,6 +460,7 @@ end
 --     }
 -- end
 function Action:updateAction(args)
+    _print(inspect(args))
     -- ngx.log(ngx.ERR, "updateAction" .. inspect(args))
     if not args.id then
         return {
@@ -521,6 +526,7 @@ function Action:updateAction(args)
 end
 
 function Action:deleteAction(args)
+    _print(inspect(args))
     if not args.id then
         return {
             result = false,
@@ -568,6 +574,7 @@ function Action:deleteAction(args)
 end
 
 function Action:listAction(args)
+    _print(inspect(args))
     args.action = nil
     local instance = self:getInstance()
     local _res = _authorize_whitelist(self, args)

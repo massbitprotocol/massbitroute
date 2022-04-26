@@ -35,6 +35,10 @@ function Gateway:update(args)
     local id = args.id
     local _detail = self._model:_get_key(user_id .. ":" .. model_type, id)
 
+    if not _detail then
+        return
+    end
+
     if _detail then
         _detail = json.decode(_detail)
     else
