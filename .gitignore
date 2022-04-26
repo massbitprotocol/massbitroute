@@ -34,3 +34,4 @@ scripts/single-node-test/MASSBITROUTE_RUST_IP
 scripts/single-node-test/test-hosts-file
 scripts/single-node-test/hosts/
 scripts/single-node-test/DAPI_URL
+scripts/single-node-test/.env
