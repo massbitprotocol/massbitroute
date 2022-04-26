@@ -65,6 +65,7 @@ ${dcmaps/_dcmap(); separator='\n'}
     _dns_geo_resource_v1 = [[
 mbr-map-${blocknet_id} =>{
 map => mbr-map-${blocknet_id},
+service_types => gateway_check,
 plugin => weighted,
 dcmap => {
 ${dcmaps/_dcmap_v1(); separator='\n'}
