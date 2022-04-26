@@ -1,9 +1,12 @@
 name: Test main flow ETH/DOT Node/GW 
 
+# on:
+#   push:
+#     branches: [feature/fulltest]
 on:
-  push:
+  pull_request:
+    types: [opened, reopened]
     branches: [dev]
-
 
 jobs:
   set-up-test-env:
@@ -37,7 +40,7 @@ jobs:
           export PRIVATE_GIT_SSH_USERNAME=$PRIVATE_GIT_SSH_USERNAME
           export PRIVATE_GIT_SSH_PASSWORD=$PRIVATE_GIT_SSH_PASSWORD
           export GIT_API_TOKEN=$GIT_API_TOKEN" > .env
-          sudo bash deploy-mb-core.sh dev
+          sudo bash -x deploy-mb-core.sh $GITHUB_HEAD_REF
           sleep 15
       - name: Updating hosts file for test environment
         env:
@@ -167,7 +170,6 @@ jobs:
           cd scripts/single-node-test 
           chown -Rf root:root *
           rm -rf .terraform
-
           ls -l
           terraform init
           terraform destroy -auto-approve
