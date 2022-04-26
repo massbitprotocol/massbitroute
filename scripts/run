@@ -185,21 +185,22 @@ EOF
 
 _git_cmd_commit() {
 	_cdir=$1
+	_git="git -C $_cdir"
 	shift
 	if [ $# -gt 0 ]; then
 		_time=$(date -u)
 		_git_config $_cdir
 		for _fdir in $@; do
-			git -C $_cdir add -f $_fdir
+			$_git add -f $_fdir
 		done
 		mid=$(cat /etc/machine-id)
 		ip=$(curl ipv4.icanhazip.com)
-		git -C $_cdir pull
-		git -C $_cdir commit -m "${ip}: ${mid}: ${HOSTNAME}: $_fdir at $_time"
-		git -C $_cdir push
-		commit_id=$(git rev-parse origin/$(git rev-parse --abbrev-ref HEAD))
+		$_git pull
+		$_git commit -m "${ip}: ${mid}: ${HOSTNAME}: $_fdir at $_time"
+		$_git push
+		commit_id=$($_git rev-parse origin/$($_git rev-parse --abbrev-ref HEAD))
 		mkdir -p $SITE_ROOT/public/deploy/version $SITE_ROOT/public/deploy/cmd
-		repo_name=$(basename $(git remote get-url origin) .git)
+		repo_name=$(basename $($_git remote get-url origin) .git)
 		echo $commit_id >$SITE_ROOT/public/deploy/version/${repo_name}.version
 		cat >$SITE_ROOT/public/deploy/cmd/${commit_id}.sh <<EOF
 #!/bin/bash
