@@ -147,7 +147,7 @@ _install() {
 _reload() {
 
 	$cmd_server _update
-	$cmd_server update
+	# $cmd_server update
 	tmp=$(mktemp)
 	$cmd_server status | grep worker- | awk '{print $1}' >$tmp
 	n=$(cat $tmp | wc -l)
@@ -396,10 +396,9 @@ _rescan_conf() {
 }
 _update_listid() {
 	_update_gateway_list
-
 	_update_dapi_list
 	_update_node_list
-	_update_user_list
+	# _update_user_list
 
 }
 _update_repos() {
