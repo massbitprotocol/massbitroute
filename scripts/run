@@ -144,19 +144,6 @@ _install() {
 	_install_one
 	_supervisor
 }
-_reload() {
-
-	$cmd_server _update
-	# $cmd_server update
-	tmp=$(mktemp)
-	$cmd_server status | grep worker- | awk '{print $1}' >$tmp
-	n=$(cat $tmp | wc -l)
-	cat $tmp | while read f; do
-		echo $cmd_server restart $f
-	done | parallel -j$n
-
-	rm $tmp
-}
 _test_node() {
 	_id=$1
 	_blocknet=$2
@@ -420,6 +407,21 @@ _update() {
 	_st_update=$?
 
 	return $_st_update
+}
+
+_reload() {
+
+	_update_listid
+	$cmd_server _update
+	# $cmd_server update
+	tmp=$(mktemp)
+	$cmd_server status | grep worker- | awk '{print $1}' >$tmp
+	n=$(cat $tmp | wc -l)
+	cat $tmp | while read f; do
+		echo $cmd_server restart $f
+	done | parallel -j$n
+
+	rm $tmp
 }
 
 _monitor() {
