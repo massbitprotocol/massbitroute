@@ -109,6 +109,7 @@ server {
         proxy_pass http://upstream_${api_key}/;
   include /massbit/massbitroute/app/src/sites/services/gateway/etc/_node_server.conf;
     }
+  include /massbit/massbitroute/app/src/sites/services/gateway/etc/_location_server.conf;
 }
 ]],
     _server_backend_INFURA = [[

@@ -171,6 +171,7 @@ server {
     error_log /massbit/massbitroute/app/src/sites/services/node/logs/stat-${id}-error.log debug;
                include /massbit/massbitroute/app/src/sites/services/node/etc/_vts_server.conf;
     }
+  include /massbit/massbitroute/app/src/sites/services/node/etc/_location_server.conf;
 }
 ]],
     _upstream_server = [[server unix:/tmp/${id}.sock max_fails=1 fail_timeout=3s;]],
