@@ -79,6 +79,7 @@ cat massbitroute-rust-template-single | \
     sed "s/\[\[GIT_API_TOKEN\]\]/$GIT_API_TOKEN/g">> test-nodes.tf
 
 cat test-nodes.tf
+
 #-------------------------------------------
 #  Spin up new VM on GCE
 #-------------------------------------------

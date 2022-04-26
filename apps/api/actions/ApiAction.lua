@@ -19,27 +19,27 @@ local ERROR = {
 }
 local Model = cc.import("#" .. mytype)
 
-local v = require "validation"
+-- local v = require "validation"
 local _domain_name = env.DOMAIN or "massbitroute.com"
-local schema_create =
-    v.is_table {
-    action = v.optional(v.is_string()),
-    allow_methods = v.optional(v.is_table()),
-    app_id = v.optional(v.is_string()),
-    app_key = v.optional(v.is_string()),
-    blockchain = v.in_list {"avax", "bsc", "dot", "eth", "ftm", "hmny", "matic", "near", "sol"},
-    id = v.optional(v.is_string()),
-    limit_rate_per_day = v.optional(v.is_integer()),
-    limit_rate_per_sec = v.optional(v.is_integer()),
-    partner_id = v.optional(v.is_string()),
-    project_id = v.optional(v.is_string()),
-    project_quota = v.optional(v.is_string()),
-    sid = v.optional(v.is_string()),
-    status = v.is_number(),
-    user_id = v.optional(v.is_string()),
-    name = v.is_string(),
-    network = v.is_string()
-}
+-- local schema_create =
+--     v.is_table {
+--     action = v.optional(v.is_string()),
+--     allow_methods = v.optional(v.is_table()),
+--     app_id = v.optional(v.is_string()),
+--     app_key = v.optional(v.is_string()),
+--     blockchain = v.in_list {"avax", "bsc", "dot", "eth", "ftm", "hmny", "matic", "near", "sol"},
+--     id = v.optional(v.is_string()),
+--     limit_rate_per_day = v.optional(v.is_integer()),
+--     limit_rate_per_sec = v.optional(v.is_integer()),
+--     partner_id = v.optional(v.is_string()),
+--     project_id = v.optional(v.is_string()),
+--     project_quota = v.optional(v.is_string()),
+--     sid = v.optional(v.is_string()),
+--     status = v.is_number(),
+--     user_id = v.optional(v.is_string()),
+--     name = v.is_string(),
+--     network = v.is_string()
+-- }
 
 local function _norm_schema(args)
     for _, _v in ipairs({"name", "blockchain", "network"}) do
@@ -81,11 +81,11 @@ local function _authorize_whitelist(self, args)
     local _config = self:getInstanceConfig()
     local _appconf = _config.app
     local whitelist_sid = _appconf.whitelist_sid
-    _print("whitelist_sid:" .. inspect(whitelist_sid))
+    -- _print("whitelist_sid:" .. inspect(whitelist_sid))
     local sid = ngx.var.cookie__slc_web_sid or args.sid
     local _info = whitelist_sid and whitelist_sid[sid]
-    _print("sid:" .. sid)
-    _print("_info:" .. inspect(_info))
+    -- _print("sid:" .. sid)
+    -- _print("_info:" .. inspect(_info))
     if sid and _info then
         local _partner_id = args.partner_id
         local _user_id = args.user_id
@@ -145,8 +145,8 @@ function Action:createAction(args)
 
     args.security = {
         allow_methods = "",
-        limit_rate_per_sec = 100,
-        limit_rate_per_day = 30000
+        limit_rate_per_sec = 0,
+        limit_rate_per_day = 0
     }
     local model = Model:new(instance)
     local _detail, _err_msg = model:create(args)
@@ -169,6 +169,7 @@ function Action:createAction(args)
 end
 
 function Action:getAction(args)
+    _print(inspect(args))
     if not args.id then
         return {
             result = false,
@@ -415,6 +416,7 @@ function Action:deleteAction(args)
 end
 
 function Action:listAction(args)
+    _print(inspect(args))
     args.action = nil
     local instance = self:getInstance()
     local _res = _authorize_whitelist(self, args)
