@@ -96,8 +96,11 @@ stopasgroup=true" > /etc/supervisor/conf.d/verification.conf
   sudo cp src/archive/check-flow.json /opt/verification/check-flow.json
   sudo cp /opt/ssh-key/base-endpoint.json  /opt/verification/base-endpoint.json
   sudo cp /opt/ssh-key/.env.check_component  /opt/verification/.env
+  cat script/run.tpl | sed "s/\[\[ZONE\]\]/AS/g" > script/run.sh
   sudo cp script/run.sh /opt/verification/run.sh
   sudo cp config_check_component_test.json /opt/verification/config_check_component.json
+  cp /opt/ssh-key/.env.check_component /opt/verification/.env
+
   
   sudo chmod 770 /opt/verification/run.sh
   sudo supervisorctl reread
