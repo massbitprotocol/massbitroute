@@ -1,11 +1,12 @@
 #!/bin/bash
+source /massbit/massbitroute/app/src/sites/services/api/.env_raw
 _call() {
 	action=$1
 	id=$2
 	user_id=$3
 
 	shift 3
-	curl -k -H 'Content-Type: application/json' -H 'Host: dapi.massbit.io' "https://127.0.0.1/_internal_api/v1?action=$action" -d "{\"id\":\"$id\", \"user_id\":\"$user_id\"$@}"
+	curl -k -H 'Content-Type: application/json' -H "Host: api.${DOMAIN}" "https://127.0.0.1/_internal_api/v1?action=$action" -d "{\"id\":\"$id\", \"user_id\":\"$user_id\"$@}"
 }
 
 _gw_update() {
