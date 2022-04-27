@@ -12,7 +12,6 @@
 [[MASSBITROUTE_CORE_IP]] monitor.mbr.massbitroute.dev
 [[MASSBITROUTE_CORE_IP]] glmr1.bc.massbitroute.dev
 [[MASSBITROUTE_CORE_IP]] dot1.bc.massbitroute.dev
-[[MASSBITROUTE_CORE_IP]] chain.massbitroute.dev
 
 [[MASSBITROUTE_PORTAL_IP]] portal.massbitroute.dev
 [[MASSBITROUTE_PORTAL_IP]] staking.massbitroute.dev
