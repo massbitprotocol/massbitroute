@@ -386,7 +386,10 @@ _update_listid() {
 	_update_dapi_list
 	_update_node_list
 	# _update_user_list
-
+	info_dir=$portal_dir/public/deploy/info/node
+	awk -v domain="$DOMAIN" '{print $5,$1".node.mbr."domain}' $info_dir/listid >$portal_dir/public/deploy/info/hosts
+	info_dir=$portal_dir/public/deploy/info/gateway
+	awk -v domain="$DOMAIN" '{print $5,$1".gw.mbr."domain}' $info_dir/listid >>$portal_dir/public/deploy/info/hosts
 }
 _update_repos() {
 	_git_config
@@ -405,7 +408,7 @@ _update() {
 
 	_update_repos
 	_st_update=$?
-
+	_update_listid
 	return $_st_update
 }
 
