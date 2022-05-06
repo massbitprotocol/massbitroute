@@ -386,8 +386,13 @@ _update_listid() {
 	_update_dapi_list
 	_update_node_list
 	# _update_user_list
+	if [ -f "$portal_dir/public/deploy/hosts" ]; then
+		cat $portal_dir/public/deploy/hosts >$portal_dir/public/deploy/info/hosts
+	else
+		>$portal_dir/public/deploy/info/hosts
+	fi
 	info_dir=$portal_dir/public/deploy/info/node
-	awk -v domain="$DOMAIN" '{print $5,$1".node.mbr."domain}' $info_dir/listid >$portal_dir/public/deploy/info/hosts
+	awk -v domain="$DOMAIN" '{print $5,$1".node.mbr."domain}' $info_dir/listid >>$portal_dir/public/deploy/info/hosts
 	info_dir=$portal_dir/public/deploy/info/gateway
 	awk -v domain="$DOMAIN" '{print $5,$1".gw.mbr."domain}' $info_dir/listid >>$portal_dir/public/deploy/info/hosts
 }
