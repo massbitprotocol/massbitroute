@@ -253,7 +253,8 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
             {
                 id = _blocknet_id,
                 datacenters = table.keys(_v_datacenters),
-                map = table_concat(_v_maps, "\n")
+                map = table_concat(_v_maps, "\n"),
+                _domain_name = _job_data._domain_name
             }
         )
         local _geo_map = _tmpl_map("_dns_geo_map")
@@ -286,7 +287,8 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
             rules,
             {
                 blocknet_id = _blocknet_id,
-                dcmaps = _dc_maps_new
+                dcmaps = _dc_maps_new,
+                _domain_name = _job_data._domain_name
             }
         )
         local _geo_res = _tmpl_res("_dns_geo_resource_v1")
@@ -301,7 +303,7 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
     end
 
     if _approved and #_approved > 0 then
-        local _tmpl = _get_tmpl(rules, {nodes = _approved})
+        local _tmpl = _get_tmpl(rules, {nodes = _approved, _domain_name = _job_data._domain_name})
         local _str_stat = _tmpl("_gw_stat_v1")
         mkdirp(stat_dir .. "/stat_gw")
         local _file_stat = stat_dir .. "/stat_gw/" .. _blocknet_id .. ".yml"
@@ -312,7 +314,7 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
 
     if _actives and #_actives > 0 then
         -- _print(_actives, true)
-        local _tmpl = _get_tmpl(rules, {nodes = _actives})
+        local _tmpl = _get_tmpl(rules, {nodes = _actives, _domain_name = _job_data._domain_name})
         local _str = _tmpl("_gw_zones")
         _print(_str)
         local _file = gwman_dir .. "/zones/" .. mytype .. "/" .. _blocknet_id .. ".zone"
