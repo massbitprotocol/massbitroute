@@ -155,7 +155,7 @@ map $http_x_api_key $api_realm {
 
 server {
     include /massbit/massbitroute/app/src/sites/services/node/etc/_pre_server.conf;
-    include /massbit/massbitroute/app/src/sites/services/node/etc/_ssl_node.mbr.massbitroute.dev.conf;
+    include /massbit/massbitroute/app/src/sites/services/node/etc/_ssl_node.mbr.${_domain_name}.conf;
     server_name ${id}.node.mbr.${_domain_name};
     location / {
         add_header X-Mbr-Node-Id ${id};
