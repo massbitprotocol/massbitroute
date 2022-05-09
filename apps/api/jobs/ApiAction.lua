@@ -72,7 +72,7 @@ ${security._is_limit_rate_per_sec?_limit_rate_per_sec1()}
 
 server {
     include /massbit/massbitroute/app/src/sites/services/gateway/etc/_pre_server.conf;
-    include /massbit/massbitroute/app/src/sites/services/gateway/etc/_ssl_]] ..
+    include /massbit/massbitroute/app/src/sites/services/gateway/etc/_ssl_${blockchain}-${network}.]] ..
         _domain_name ..
             [[.conf;
     server_name ${gateway_domain};
