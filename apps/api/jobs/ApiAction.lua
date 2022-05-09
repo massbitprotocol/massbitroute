@@ -85,9 +85,11 @@ server {
         ${security._is_limit_rate_per_sec?_limit_rate_per_sec2()}
         ${_allow_methods1()}
 
-        vhost_traffic_status_filter_by_set_key $api_method ${api_key}::dapi::api_method;
-        vhost_traffic_status_filter_by_set_key $api_method __GATEWAY_ID__::gw::api_method;
+        vhost_traffic_status_filter_by_set_key $api_method ${user_id}::${project_id}::${id}::__GATEWAY_ID__::v1::api_method;
 
+        add_header X-Mbr-User-Id ${user_id};
+        add_header X-Mbr-Api-Id ${id};
+        add_header X-Mbr-Project-Id ${project_id};
         add_header X-Mbr-Gateway-Id __GATEWAY_ID__;
         proxy_pass http://upstream_${api_key}/;
         include /massbit/massbitroute/app/src/sites/services/gateway/etc/_node_server.conf;
