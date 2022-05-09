@@ -159,7 +159,7 @@ server {
     server_name ${id}.node.mbr.${_domain_name};
     location / {
         add_header X-Mbr-Node-Id ${id};
-        vhost_traffic_status_filter_by_set_key $api_method ${id}::node::api_method;
+        vhost_traffic_status_filter_by_set_key $api_method user::${user_id}::node::${id}::v1::api_method;
         proxy_pass ${data_url};
         include /massbit/massbitroute/app/src/sites/services/node/etc/_node_server.conf;
     }
