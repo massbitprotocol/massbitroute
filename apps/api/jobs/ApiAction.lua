@@ -32,9 +32,6 @@ JobsAction.ACCEPTED_REQUEST_TYPE = "worker"
 local Model = cc.import("#" .. mytype)
 local env = require "env"
 local _domain_name = env.DOMAIN or "massbitroute.com"
-local _session_key = env.SESSION_KEY or ""
-local _session_iv = env.SESSION_IV or ""
-local _session_expires = env.SESSION_EXPIRES or "1d"
 local _service_dir = "/massbit/massbitroute/app/src/sites/services"
 local _portal_dir = _service_dir .. "/api"
 local _deploy_dir = _portal_dir .. "/public/deploy/dapi"
@@ -75,26 +72,12 @@ ${security._is_limit_rate_per_sec?_limit_rate_per_sec1()}
 
 server {
     include /massbit/massbitroute/app/src/sites/services/gateway/etc/_pre_server.conf;
-    ssl_certificate /massbit/massbitroute/app/src/sites/services/gateway/ssl/live/${blockchain}-${network}.]] ..
+    include /massbit/massbitroute/app/src/sites/services/gateway/etc/_ssl_]] ..
         _domain_name ..
-            [[/fullchain.pem;
-    ssl_certificate_key  /massbit/massbitroute/app/src/sites/services/gateway/ssl/live/${blockchain}-${network}.]] ..
-                _domain_name ..
-                    [[/privkey.pem;
+            [[.conf;
     server_name ${gateway_domain};
-    access_log /massbit/massbitroute/app/src/sites/services/gateway/logs/nginx-${gateway_domain}-access.log main_json;
-    error_log /massbit/massbitroute/app/src/sites/services/gateway/logs/nginx-${gateway_domain}-error.log debug;
-
-
-    encrypted_session_key ]] ..
-                        _session_key ..
-                            [[;
-    encrypted_session_iv ]] ..
-                                _session_iv ..
-                                    [[;
-    encrypted_session_expires ]] ..
-                                        _session_expires ..
-                                            [[;
+    include /massbit/massbitroute/app/src/sites/services/gateway/etc/_session.conf;
+    include /massbit/massbitroute/app/src/sites/services/gateway/etc/_location_server.conf;
 
     location /${api_key} {
         set $mbr_token ${api_key};
@@ -107,9 +90,9 @@ server {
 
         add_header X-Mbr-Gateway-Id __GATEWAY_ID__;
         proxy_pass http://upstream_${api_key}/;
-  include /massbit/massbitroute/app/src/sites/services/gateway/etc/_node_server.conf;
+        include /massbit/massbitroute/app/src/sites/services/gateway/etc/_node_server.conf;
     }
-  include /massbit/massbitroute/app/src/sites/services/gateway/etc/_location_server.conf;
+
 }
 ]],
     _server_backend_INFURA = [[
