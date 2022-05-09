@@ -51,6 +51,7 @@ _build_prod() {
 	export STAT_URL=https://stat.mbr.$DOMAIN/
 	export GATEWAY_INSTALL_URL=https://$type.$DOMAIN/api/v1/gateway_install
 	export NODE_INSTALL_URL=https://$type.$DOMAIN/api/v1/node_install
+	export MASSBIT_CHAIN=wss://chain.$DOMAIN
 	#git submodule update --init --remote mbr-app
 	if [ -z "$commit" ]; then
 		git checkout staging
