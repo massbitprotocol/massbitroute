@@ -154,24 +154,19 @@ map $http_x_api_key $api_realm {
 }
 
 server {
-    ssl_certificate  /massbit/massbitroute/app/src/sites/services/node/ssl/node.mbr.${_domain_name}/fullchain.pem;
-    ssl_certificate_key  /massbit/massbitroute/app/src/sites/services/node/ssl/node.mbr.${_domain_name}/privkey.pem;
+    include /massbit/massbitroute/app/src/sites/services/node/etc/_pre_server.conf;
+    include /massbit/massbitroute/app/src/sites/services/node/etc/_ssl_node.mbr.massbitroute.dev.conf;
     server_name ${id}.node.mbr.${_domain_name};
-        include /massbit/massbitroute/app/src/sites/services/node/etc/_pre_server.conf;
     location / {
-  access_log /massbit/massbitroute/app/src/sites/services/node/logs/api-${id}-access.log main_json;
-    error_log /massbit/massbitroute/app/src/sites/services/node/logs/api-${id}-error.log debug;
         add_header X-Mbr-Node-Id ${id};
         vhost_traffic_status_filter_by_set_key $api_method ${id}::node::api_method;
         proxy_pass ${data_url};
         include /massbit/massbitroute/app/src/sites/services/node/etc/_node_server.conf;
     }
     location /__internal_status_vhost/ {
-  access_log /massbit/massbitroute/app/src/sites/services/node/logs/stat-${id}-access.log main_json;
-    error_log /massbit/massbitroute/app/src/sites/services/node/logs/stat-${id}-error.log debug;
-               include /massbit/massbitroute/app/src/sites/services/node/etc/_vts_server.conf;
+        include /massbit/massbitroute/app/src/sites/services/node/etc/_vts_server.conf;
     }
-  include /massbit/massbitroute/app/src/sites/services/node/etc/_location_server.conf;
+    include /massbit/massbitroute/app/src/sites/services/node/etc/_location_server.conf;
 }
 ]],
     _upstream_server = [[server unix:/tmp/${id}.sock max_fails=1 fail_timeout=3s;]],
@@ -195,7 +190,7 @@ server {
         proxy_set_header Host ${id}.node.mbr.${_domain_name};
         proxy_pass https://${ip};
 
-  include /massbit/massbitroute/app/src/sites/services/gateway/etc/_provider_server.conf;
+        include /massbit/massbitroute/app/src/sites/services/gateway/etc/_provider_server.conf;
     }
 }
 ]]
