@@ -45,7 +45,9 @@ resource "google_compute_instance_from_machine_image" "mbr-core-new-commit-test"
   export GIT_PRIVATE_READ_URL="http://[[PRIVATE_GIT_READ_USERNAME]]:[[PRIVATE_GIT_READ_PASSWORD]]@[[PRIVATE_GIT_DOMAIN]]"
   git -C /massbit/massbitroute/app/src pull
   cd /massbit/massbitroute/app/src/scripts
-  bash run _refresh >> /home/refresh.log
+  bash run _refresh >> /home/refresh1.log
+  bash run _refresh >> /home/refresh2.log
+  /massbit/massbitroute/app/src/cmd_server restart all
   EOH
 
 
