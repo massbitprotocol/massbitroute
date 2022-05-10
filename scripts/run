@@ -30,6 +30,8 @@ export APIDEPLOY_BRANCH=${APIDEPLOY_BRANCH:-dev}
 export SESSION_BRANCH=${SESSION_BRANCH:-dev}
 export GIT_BRANCH=${GIT_BRANCH:-dev}
 export MKAGENT_BRANCH=${MKAGENT_BRANCH:-dev}
+export MONITOR_BRANCH=${MONITOR_BRANCH:-dev}
+export SESSION_BRANCH=${SESSION_BRANCH:-dev}
 
 monitor_dir=/massbit/massbitroute/app/src/sites/services/monitor
 portal_dir=/massbit/massbitroute/app/src/sites/services/api
@@ -56,6 +58,8 @@ $SITE_ROOT/env|$GIT_PRIVATE_READ_URL/massbitroute/env.git|$MBR_ENV \
   $service_dir/mkagent|$GIT_PUBLIC_URL/massbitprotocol/massbitroute_mkagent.git|$MKAGENT_BRANCH \
   $service_dir/node|$GIT_PUBLIC_URL/massbitprotocol/massbitroute_node.git|$NODE_BRANCH \
   $service_dir/gateway|$GIT_PUBLIC_URL/massbitprotocol/massbitroute_gateway.git|$GATEWAY_BRANCH \
+  $service_dir/monitor|$GIT_PUBLIC_URL/massbitprotocol/massbitroute_monitor.git|$MONITOR_BRANCH \
+  $service_dir/session|$GIT_PUBLIC_URL/massbitprotocol/massbitroute_session.git|$SESSION_BRANCH \
 
 "
 }
@@ -204,11 +208,17 @@ _git_cmd() {
 	cmd=$1
 	shift
 	list_push="apideploy gwmandeploy statdeploy"
-	list_pull="api apideploy gwman gwmandeploy stat statdeploy"
+	list_pull="api gwman stat $list_push"
+	list_all="$list_pull gateway node mkagent monitor"
 	if [ -z "$cmd" ]; then cmd=push; fi
 
 	list=""
 	case "$cmd" in
+	all)
+		list="$list_all"
+		cmd="pull"
+		;;
+
 	pull)
 		list="$list_pull"
 		;;
