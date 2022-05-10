@@ -88,9 +88,9 @@ _prepare() {
 		apt-get install -y xz-utils
 		tar -xvJf $SITE_ROOT/data/geoip/GeoIP2-City.mmdb.tar.xz -C $SITE_ROOT/data/geoip
 	fi
-	if [ -n "$DOMAIN" ]; then
-		bash $SITE_ROOT/scripts/mbr_app.sh _build_prod $MBRAPP_BRANCH
-	fi
+	# if [ -n "$DOMAIN" ]; then
+	# 	bash $SITE_ROOT/scripts/mbr_app.sh _build_prod $MBRAPP_BRANCH
+	# fi
 
 }
 
@@ -241,7 +241,11 @@ _git_cmd() {
 			_git_cmd_commit $_dir $_mydir
 
 		else
-			git -C $_dir $cmd
+			_git="git -C $_dir"
+			$_git $cmd
+			commit_id=$($_git rev-parse origin/$($_git rev-parse --abbrev-ref HEAD))
+			repo_name=$(basename $($_git remote get-url origin) .git)
+			echo $commit_id >$SITE_ROOT/public/deploy/version/${repo_name}.version
 		fi
 	done
 
