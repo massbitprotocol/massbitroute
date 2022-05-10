@@ -19,11 +19,14 @@ export ASDF_BRANCH=${ASDF_BRANCH:-dev}
 export GBC_BRANCH=${GBC_BRANCH:-dev}
 export SSL_BRANCH=${SSL_BRANCH:-dev}
 export GWMAN_BRANCH=${GWMAN_BRANCH:-dev}
+export GWMANDEPLOY_BRANCH=${GWMANDEPLOY_BRANCH:-dev}
 export NODE_BRANCH=${NODE_BRANCH:-dev}
 export GATEWAY_BRANCH=${GATEWAY_BRANCH:-dev}
 export STAT_BRANCH=${STAT_BRANCH:-dev}
+export STATDEPLOY_BRANCH=${STATDEPLOY_BRANCH:-dev}
 export MONITOR_BRANCH=${MONITOR_BRANCH:-dev}
 export API_BRANCH=${API_BRANCH:-dev}
+export APIDEPLOY_BRANCH=${APIDEPLOY_BRANCH:-dev}
 export SESSION_BRANCH=${SESSION_BRANCH:-dev}
 export GIT_BRANCH=${GIT_BRANCH:-dev}
 export MKAGENT_BRANCH=${MKAGENT_BRANCH:-dev}
@@ -44,12 +47,12 @@ $SITE_ROOT/env|$GIT_PRIVATE_READ_URL/massbitroute/env.git|$MBR_ENV \
  $mbr_root/gbc|https://github.com/massbitprotocol/massbitroute_gbc|$GBC_BRANCH \
  $mbr_root/gbc/bin/.asdf|https://github.com/massbitprotocol/massbitroute_asdf|$ASDF_BRANCH \
   $service_dir/gwman|$GIT_PUBLIC_URL/massbitprotocol/massbitroute_gwman.git|$GWMAN_BRANCH \
-  $service_dir/gwman/data|https://$GIT_GWMANDEPLOY_WRITE@$GIT_PRIVATE_DOMAIN/massbitroute/gwmandeploy.git|$GWMAN_BRANCH \
+  $service_dir/gwman/data|https://$GIT_GWMANDEPLOY_WRITE@$GIT_PRIVATE_DOMAIN/massbitroute/gwmandeploy.git|$GWMANDEPLOY_BRANCH \
   $service_dir/api|$GIT_PUBLIC_URL/massbitprotocol/massbitroute.git|$API_BRANCH \
-  $service_dir/api/public/deploy|https://$GIT_APIDEPLOY_WRITE@$GIT_PRIVATE_DOMAIN/massbitroute/apideploy.git|$API_BRANCH \
+  $service_dir/api/public/deploy|https://$GIT_APIDEPLOY_WRITE@$GIT_PRIVATE_DOMAIN/massbitroute/apideploy.git|$APIDEPLOY_BRANCH \
   $service_dir/api/public/mbr-app-prod|$GIT_PUBLIC_URL/massbitprotocol/mbr-app.git|$MBRAPP_BRANCH \
   $service_dir/stat|$GIT_PUBLIC_URL/massbitprotocol/massbitroute_stat.git|$STAT_BRANCH \
-  $service_dir/stat/etc/conf|https://$GIT_STATDEPLOY_WRITE@$GIT_PRIVATE_DOMAIN/massbitroute/statdeploy.git|$STAT_BRANCH \
+  $service_dir/stat/etc/conf|https://$GIT_STATDEPLOY_WRITE@$GIT_PRIVATE_DOMAIN/massbitroute/statdeploy.git|$STATDEPLOY_BRANCH \
   $service_dir/mkagent|$GIT_PUBLIC_URL/massbitprotocol/massbitroute_mkagent.git|$MKAGENT_BRANCH \
   $service_dir/node|$GIT_PUBLIC_URL/massbitprotocol/massbitroute_node.git|$NODE_BRANCH \
   $service_dir/gateway|$GIT_PUBLIC_URL/massbitprotocol/massbitroute_gateway.git|$GATEWAY_BRANCH \
