@@ -45,9 +45,10 @@ _update_sources() {
 		_branch=$(echo $_pathgit | cut -d'|' -f3)
 		if [ -z "$_branch" ]; then _branch=$branch; fi
 		git -C $_path fetch --all
-		git -C $_path reset --hard $_branch
+
 		git -C $_path checkout $_branch
-		tmp="$(timeout 60 git -C $_path pull origin $_branch 2>&1)"
+		git -C $_path reset --hard
+		tmp="$(git -C $_path pull origin $_branch 2>&1)"
 		# echo "$tmp"
 		# echo "$tmp" | grep -i "error"
 		# if [ $? -eq 0 ]; then
