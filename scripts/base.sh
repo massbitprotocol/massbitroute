@@ -47,7 +47,7 @@ _update_sources() {
 		git -C $_path fetch --all
 
 		git -C $_path checkout $_branch
-		git -C $_path reset --hard
+		# git -C $_path reset --hard
 		tmp="$(git -C $_path pull 2>&1)"
 		# echo "$tmp"
 		# echo "$tmp" | grep -i "error"
