@@ -1,5 +1,4 @@
 #!/bin/bash
-auth=massbit:c671e4ea06280e7a3f6f9aea6e8155fcde9bc703
 GITHUB_TRIES=10
 _debian() {
 	apt-get update
@@ -127,17 +126,17 @@ SCRIPTS_RUN="$SITE_ROOT/scripts/run"
 mkdir -p $(dirname $SITE_ROOT)
 ENV={{env}}
 MBR_ENV={{env}}
-# git clone -b master http://mbr_gateway:6a796299bb72357770735a79019612af228586e7@git.massbitroute.com/massbitroute/ssl.git -b master /etc/letsencrypt
+
 git config --global http.sslVerify false
 if [ ! -d "$SITE_ROOT/.git" ]; then
 	rm -rf $SITE_ROOT
-	#git clone -b master http://$auth@git.massbitroute.dev/massbitroute/node.git $SITE_ROOT
+
 	if [ "x$ENV" == "x" ]; then
 		_gitclone https://github.com/massbitprotocol/massbitroute_node $SITE_ROOT -b master
-		#git clone -b master https://github.com/massbitprotocol/massbitroute_node $SITE_ROOT
+
 	else
 		_gitclone https://github.com/massbitprotocol/massbitroute_node $SITE_ROOT -b ${ENV}
-		#git clone -b ${ENV} https://github.com/massbitprotocol/massbitroute_node $SITE_ROOT
+
 	fi
 fi
 
