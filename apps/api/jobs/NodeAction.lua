@@ -204,6 +204,35 @@ local function _norm(_v)
     return _v
 end
 
+local function _gen_upstream_block(_prefix, _name, _nodes, _job_data, _upstream_backup, _upstream_extra)
+    local _backup3 = ";"
+    if #_nodes > 0 then
+        _backup3 = " backup;"
+    end
+
+    if not _upstream_extra then
+        _upstream_extra = ""
+    end
+
+    if not _upstream_backup then
+        _upstream_backup =
+            "server unix:/tmp/" .. _prefix .. ".node.mbr." .. _job_data._domain_name .. ".sock " .. _backup3
+    end
+    local _tmpl3 =
+        _get_tmpl(
+        rules,
+        {
+            node_type = _prefix .. _name,
+            nodes = _nodes,
+            _domain_name = _job_data._domain_name,
+            upstream_backup = _upstream_backup,
+            upstream_extra = _upstream_extra
+        }
+    )
+
+    return _tmpl3("_gw_node_upstreams_v1")
+end
+
 local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
     _print("rescanconf_blockchain_network:" .. _blockchain .. ":" .. _network)
     _print(inspect(_job_data))
@@ -339,64 +368,83 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
         table.insert(_upstream_str, _str_tmpl1)
     else
         for _k1, _v1 in pairs(_nodes2) do
-            local _backup = ";"
-            if #_nodes[_k1] > 0 then
-                _backup = " backup;"
-            end
-
-            local _tmpl1 =
-                _get_tmpl(
-                rules,
-                {
-                    node_type = _k1,
-                    nodes = _nodes[_k1],
-                    _domain_name = _job_data._domain_name,
-                    upstream_backup = "server " .. rules["_gw_upstream_backup_name_" .. _k1] .. _backup,
-                    upstream_extra = rules["_gw_upstream_backup_" .. _k1]
-                }
-            )
-
-            local _str_tmpl1 = _tmpl1("_gw_node_upstreams_v1")
-            table.insert(_upstream_str, _str_tmpl1)
-            for _k2, _v2 in pairs(_v1) do
-                local _backup2 = ";"
-                if #_nodes1[_k1][_k2] > 0 then
-                    _backup2 = " backup;"
-                end
-                local _tmpl2 =
-                    _get_tmpl(
-                    rules,
-                    {
-                        node_type = _k1 .. "-" .. _k2,
-                        nodes = _nodes1[_k1][_k2],
-                        _domain_name = _job_data._domain_name,
-                        upstream_backup = "server unix:/tmp/" ..
-                            _k1 .. ".node.mbr." .. _job_data._domain_name .. _backup2
-                    }
+            table.insert(
+                _upstream_str,
+                _gen_upstream_block(
+                    "",
+                    _k1,
+                    _nodes[_k1],
+                    _job_data,
+                    "server " .. rules["_gw_upstream_backup_name_" .. _k1] .. _backup,
+                    rules["_gw_upstream_backup_" .. _k1]
                 )
+            )
+            -- local _backup = ";"
+            -- if #_nodes[_k1] > 0 then
+            --     _backup = " backup;"
+            -- end
 
-                local _str_tmpl2 = _tmpl2("_gw_node_upstreams_v1")
-                table.insert(_upstream_str, _str_tmpl2)
+            -- local _tmpl1 =
+            --     _get_tmpl(
+            --     rules,
+            --     {
+            --         node_type = _k1,
+            --         nodes = _nodes[_k1],
+            --         _domain_name = _job_data._domain_name,
+            --         upstream_backup = "server " .. rules["_gw_upstream_backup_name_" .. _k1] .. _backup,
+            --         upstream_extra = rules["_gw_upstream_backup_" .. _k1]
+            --     }
+            -- )
+
+            -- local _str_tmpl1 = _tmpl1("_gw_node_upstreams_v1")
+            -- table.insert(_upstream_str, _str_tmpl1)
+            for _k2, _v2 in pairs(_v1) do
+                table.insert(_upstream_str, _gen_upstream_block(_k1 .. "-", _k2, _nodes1[_k1][_k2], _job_data))
+                -- local _backup2 = ";"
+                -- if #_nodes1[_k1][_k2] > 0 then
+                --     _backup2 = " backup;"
+                -- end
+                -- local _tmpl2 =
+                --     _get_tmpl(
+                --     rules,
+                --     {
+                --         node_type = _k1 .. "-" .. _k2,
+                --         nodes = _nodes1[_k1][_k2],
+                --         _domain_name = _job_data._domain_name,
+                --         upstream_backup = "server unix:/tmp/" ..
+                --             _k1 .. ".node.mbr." .. _job_data._domain_name .. _backup2
+                --     }
+                -- )
+
+                -- local _str_tmpl2 = _tmpl2("_gw_node_upstreams_v1")
+                -- table.insert(_upstream_str, _str_tmpl2)
 
                 for _k3, _v3 in pairs(_v2) do
-                    local _backup3 = ";"
-                    if #_v3 > 0 then
-                        _backup3 = " backup;"
+                    local _ids_country = {}
+                    for _, _vi in ipairs(_v3) do
+                        _ids_country[_vi.id] = 1
                     end
-                    local _tmpl3 =
-                        _get_tmpl(
-                        rules,
-                        {
-                            node_type = _k1 .. "-" .. _k2 .. "-" .. _k3,
-                            nodes = _v3,
-                            _domain_name = _job_data._domain_name,
-                            upstream_backup = "server unix:/tmp/" ..
-                                _k1 .. "-" .. _k2 .. ".node.mbr." .. _job_data._domain_name .. ".sock " .. _backup3
-                        }
-                    )
 
-                    local _str_tmpl3 = _tmpl3("_gw_node_upstreams_v1")
-                    table.insert(_upstream_str, _str_tmpl3)
+                    local _ids_continent = {}
+                    local _nodes_continent = {}
+                    for _, _vi in ipairs(_nodes1[_k1][_k2]) do
+                        _ids_continent[_vi.id] = 1
+                        if not _ids_country[_vi.id] then
+                            _nodes_continent[#_nodes_continent + 1] = _vi
+                        end
+                    end
+
+                    local _nodes_global = {}
+                    for _, _vi in ipairs(_nodes[_k1]) do
+                        if not _ids_continent[_vi.id] then
+                            _nodes_global[#_nodes_global + 1] = _vi
+                        end
+                    end
+
+                    _print("nodes_continent:" .. inspect(_nodes_continent))
+                    _print("nodes_global:" .. inspect(_nodes_global))
+
+                    table.insert(_upstream_str, _gen_upstream_block(_k1 .. "-" .. _k2 .. "-", _k3, _v3, _job_data))
                 end
             end
         end
