@@ -303,6 +303,7 @@ _update_dapi_list() {
 	_dir=$portal_dir/public/deploy/$_type
 	if [ ! -d "$_dir" ]; then return 1; fi
 	info_dir=$portal_dir/public/deploy/info/$_type
+	if [ ! -d "$info_dir" ]; then return; fi
 	mkdir -p $info_dir /tmp/info/$_type
 	rm /tmp/info/$_type/*
 	find $_dir -type f | while read f; do
@@ -325,6 +326,7 @@ _update_dapi_list() {
 _update_user_list() {
 	_type=user
 	_dir=$portal_dir/public/deploy/$_type
+	if [ ! -d "$info_dir" ]; then return; fi
 	if [ ! -d "$_dir" ]; then return 1; fi
 	info_dir=$portal_dir/public/deploy/info/$_type
 	mkdir -p $info_dir
@@ -344,6 +346,7 @@ _update_user_list() {
 _update_gateway_list() {
 	_type=gateway
 	info_dir=$portal_dir/public/deploy/info/$_type
+	if [ ! -d "$info_dir" ]; then return; fi
 	tmp=$(mktemp)
 	find $info_dir -type f -iname 'listid-*' | while read f; do
 		cat $f >>$tmp
@@ -355,6 +358,7 @@ _update_gateway_list() {
 _update_node_list() {
 	_type=node
 	info_dir=$portal_dir/public/deploy/info/$_type
+	if [ ! -d "$info_dir" ]; then return; fi
 	tmp=$(mktemp)
 	find $info_dir -type f -iname 'listid-*' | while read f; do
 		cat $f >>$tmp
