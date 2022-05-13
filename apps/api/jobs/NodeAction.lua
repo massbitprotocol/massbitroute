@@ -276,9 +276,9 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
             end
         end
     end
-    -- _print("nodes:" .. inspect(_nodes))
-    -- _print("nodes1:" .. inspect(_nodes1))
-    -- _print("nodes2:" .. inspect(_nodes2))
+    _print("nodes:" .. inspect(_nodes))
+    _print("nodes1:" .. inspect(_nodes1))
+    _print("nodes2:" .. inspect(_nodes2))
     -- do
     --     local _tmpl =
     --         _get_tmpl(
