@@ -84,7 +84,7 @@ ${datacenters/_datacenter(); separator=',\n'}
 ]
 }
 ]],
-    _gw_zone = [[${id}.gw.mbr 60 A ${ip}]],
+    _gw_zone = [[${id}.gw.mbr 3600 A ${ip}]],
     _gw_zones = [[${nodes/_gw_zone(); separator='\n'}]],
     _gw_stat_target = [[          - ${id}.gw.mbr.${_domain_name}]],
     _gw_stat_v1 = [[${nodes/_gw_stat_target(); separator='\n'}]],
@@ -299,7 +299,7 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
 
         local _file_dapi = gwman_dir .. "/zones/dapi/" .. _blocknet_id .. ".zone"
         print(_file_dapi)
-        _write_file(_file_dapi, "*." .. _blocknet_id .. " 60/60 DYNA	geoip!mbr-map-" .. _blocknet_id .. "\n")
+        _write_file(_file_dapi, "*." .. _blocknet_id .. " 10/10 DYNA	geoip!mbr-map-" .. _blocknet_id .. "\n")
     end
 
     if _approved and #_approved > 0 then

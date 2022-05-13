@@ -43,7 +43,7 @@ local _stat_dir = _service_dir .. "/stat/etc/conf"
 local rules = {
     _listid = [[${id} ${user_id} ${blockchain} ${network} ${ip} ${geo.continent_code} ${geo.country_code} ${token} ${status} ${approved}]],
     _listids = [[${nodes/_listid(); separator='\n'}]],
-    _node_zone = [[${id}.node.mbr 60 A ${ip}]],
+    _node_zone = [[${id}.node.mbr 3600 A ${ip}]],
     _node_zones = [[${nodes/_node_zone(); separator='\n'}]],
     _node_stat_target = [[          - ${id}.node.mbr.${_domain_name}]],
     _node_stat_v1 = [[${nodes/_node_stat_target(); separator='\n'}]],
