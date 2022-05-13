@@ -392,8 +392,10 @@ _update_listid() {
 		>$portal_dir/public/deploy/info/hosts
 	fi
 	info_dir=$portal_dir/public/deploy/info/node
+	mkdir -p $info_dir
 	awk -v domain="$DOMAIN" '{print $5,$1".node.mbr."domain}' $info_dir/listid >>$portal_dir/public/deploy/info/hosts
 	info_dir=$portal_dir/public/deploy/info/gateway
+	mkdir -p $info_dir
 	awk -v domain="$DOMAIN" '{print $5,$1".gw.mbr."domain}' $info_dir/listid >>$portal_dir/public/deploy/info/hosts
 }
 _update_repos() {
