@@ -368,6 +368,10 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
         table.insert(_upstream_str, _str_tmpl1)
     else
         for _k1, _v1 in pairs(_nodes2) do
+            local _backup = ";"
+            if #_nodes[_k1] > 0 then
+                _backup = " backup;"
+            end
             table.insert(
                 _upstream_str,
                 _gen_upstream_block(
