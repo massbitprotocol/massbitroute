@@ -383,6 +383,7 @@ _update_listid() {
 	_update_gateway_list
 	_update_dapi_list
 	_update_node_list
+	mkdir -p $portal_dir/public/deploy/info
 	# _update_user_list
 	if [ -f "$portal_dir/public/deploy/hosts" ]; then
 		cat $portal_dir/public/deploy/hosts >$portal_dir/public/deploy/info/hosts
