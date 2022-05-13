@@ -13,25 +13,25 @@ mbr_root=/massbit/massbitroute/app
 service_dir=$mbr_root/src/sites/services
 
 export MBR_ENV=${MBR_ENV:-dev}
-export BRANCH=${BRANCH:-dev}
-export MBRAPP_BRANCH=${MBRAPP_BRANCH:-dev}
-export ASDF_BRANCH=${ASDF_BRANCH:-dev}
-export GBC_BRANCH=${GBC_BRANCH:-dev}
-export SSL_BRANCH=${SSL_BRANCH:-dev}
-export GWMAN_BRANCH=${GWMAN_BRANCH:-dev}
-export GWMANDEPLOY_BRANCH=${GWMANDEPLOY_BRANCH:-dev}
-export NODE_BRANCH=${NODE_BRANCH:-dev}
-export GATEWAY_BRANCH=${GATEWAY_BRANCH:-dev}
-export STAT_BRANCH=${STAT_BRANCH:-dev}
-export STATDEPLOY_BRANCH=${STATDEPLOY_BRANCH:-dev}
-export MONITOR_BRANCH=${MONITOR_BRANCH:-dev}
-export API_BRANCH=${API_BRANCH:-dev}
-export APIDEPLOY_BRANCH=${APIDEPLOY_BRANCH:-dev}
-export SESSION_BRANCH=${SESSION_BRANCH:-dev}
-export GIT_BRANCH=${GIT_BRANCH:-dev}
-export MKAGENT_BRANCH=${MKAGENT_BRANCH:-dev}
-export MONITOR_BRANCH=${MONITOR_BRANCH:-dev}
-export SESSION_BRANCH=${SESSION_BRANCH:-dev}
+export BRANCH=${BRANCH:-$MBR_ENV}
+export MBRAPP_BRANCH=${MBRAPP_BRANCH:-$MBR_ENV}
+export ASDF_BRANCH=${ASDF_BRANCH:-$MBR_ENV}
+export GBC_BRANCH=${GBC_BRANCH:-$MBR_ENV}
+export SSL_BRANCH=${SSL_BRANCH:-$MBR_ENV}
+export GWMAN_BRANCH=${GWMAN_BRANCH:-$MBR_ENV}
+export GWMANDEPLOY_BRANCH=${GWMANDEPLOY_BRANCH:-$MBR_ENV}
+export NODE_BRANCH=${NODE_BRANCH:-$MBR_ENV}
+export GATEWAY_BRANCH=${GATEWAY_BRANCH:-$MBR_ENV}
+export STAT_BRANCH=${STAT_BRANCH:-$MBR_ENV}
+export STATDEPLOY_BRANCH=${STATDEPLOY_BRANCH:-$MBR_ENV}
+export MONITOR_BRANCH=${MONITOR_BRANCH:-$MBR_ENV}
+export API_BRANCH=${API_BRANCH:-$MBR_ENV}
+export APIDEPLOY_BRANCH=${APIDEPLOY_BRANCH:-$MBR_ENV}
+export SESSION_BRANCH=${SESSION_BRANCH:-$MBR_ENV}
+export GIT_BRANCH=${GIT_BRANCH:-$MBR_ENV}
+export MKAGENT_BRANCH=${MKAGENT_BRANCH:-$MBR_ENV}
+export MONITOR_BRANCH=${MONITOR_BRANCH:-$MBR_ENV}
+export SESSION_BRANCH=${SESSION_BRANCH:-$MBR_ENV}
 
 monitor_dir=/massbit/massbitroute/app/src/sites/services/monitor
 portal_dir=/massbit/massbitroute/app/src/sites/services/api
@@ -52,18 +52,20 @@ $SITE_ROOT/env|$GIT_PRIVATE_READ_URL/massbitroute/env.git|$MBR_ENV \
   $service_dir/gwman/data|https://$GIT_GWMANDEPLOY_WRITE@$GIT_PRIVATE_DOMAIN/massbitroute/gwmandeploy.git|$GWMANDEPLOY_BRANCH \
   $service_dir/api|$GIT_PUBLIC_URL/massbitprotocol/massbitroute.git|$API_BRANCH \
   $service_dir/api/public/deploy|https://$GIT_APIDEPLOY_WRITE@$GIT_PRIVATE_DOMAIN/massbitroute/apideploy.git|$APIDEPLOY_BRANCH \
-  $service_dir/api/public/mbr-app-prod|$GIT_PUBLIC_URL/massbitprotocol/mbr-app.git|$MBRAPP_BRANCH \
+
   $service_dir/stat|$GIT_PUBLIC_URL/massbitprotocol/massbitroute_stat.git|$STAT_BRANCH \
   $service_dir/stat/etc/conf|https://$GIT_STATDEPLOY_WRITE@$GIT_PRIVATE_DOMAIN/massbitroute/statdeploy.git|$STATDEPLOY_BRANCH \
   $service_dir/mkagent|$GIT_PUBLIC_URL/massbitprotocol/massbitroute_mkagent.git|$MKAGENT_BRANCH \
   $service_dir/node|$GIT_PUBLIC_URL/massbitprotocol/massbitroute_node.git|$NODE_BRANCH \
   $service_dir/gateway|$GIT_PUBLIC_URL/massbitprotocol/massbitroute_gateway.git|$GATEWAY_BRANCH \
-  $service_dir/monitor|$GIT_PUBLIC_URL/massbitprotocol/massbitroute_monitor.git|$MONITOR_BRANCH \
-  $service_dir/session|$GIT_PUBLIC_URL/massbitprotocol/massbitroute_session.git|$SESSION_BRANCH \
+
+
 
 "
 }
-
+#  $service_dir/api/public/mbr-app-prod|$GIT_PUBLIC_URL/massbitprotocol/mbr-app.git|$MBRAPP_BRANCH \
+#  $service_dir/monitor|$GIT_PUBLIC_URL/massbitprotocol/massbitroute_monitor.git|$MONITOR_BRANCH \
+#  $service_dir/session|$GIT_PUBLIC_URL/massbitprotocol/massbitroute_session.git|$SESSION_BRANCH \
 _repo
 
 # _tune_os() {
