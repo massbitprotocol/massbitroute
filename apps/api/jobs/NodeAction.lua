@@ -461,8 +461,9 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
                             _block_name .. "-v1",
                             _nodes_global,
                             _job_data,
-                            "server " .. rules["_gw_upstream_backup_name_" .. _k1] .. _backup_global,
-                            rules["_gw_upstream_backup_" .. _k1]
+                            "server " .. rules["_gw_upstream_backup_name_" .. _k1] .. _backup_global
+                             -- ,
+                            -- rules["_gw_upstream_backup_" .. _k1]
                         )
                     )
 
