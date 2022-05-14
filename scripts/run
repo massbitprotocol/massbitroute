@@ -417,8 +417,8 @@ _cleanupmeforsure() {
 			find $SITE_ROOT/public/deploy/$d -type f -delete
 
 		done
-		find $SITE_ROOT/../gwman/data/conf.d/geolocation.d -type f -delete
-		find $SITE_ROOT/../gwman/data/zones -not -name "$DOMAIN" -type f -delete
+		find $SITE_ROOT/../gwman/data/conf.d/geolocation.d -type f -not -iname "_*" -delete
+		find $SITE_ROOT/../gwman/data/zones -not -name "$DOMAIN" -not -name ".gitkeep" -type f -delete
 		# $SITE_ROOT/../gwman/scripts/run _prepare
 		$SITE_ROOT/../gwman/scripts/run _rebuild_conf
 
