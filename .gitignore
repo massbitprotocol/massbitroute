@@ -13,6 +13,7 @@
 .gitconfig
 
 
+.env*
 
 scripts/project-key.json
 scripts/test-nodes.tf
