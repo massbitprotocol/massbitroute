@@ -135,7 +135,7 @@ _supervisor() {
 	ln -sf /massbit/massbitroute/app/gbc/bin/openresty /usr/local/openresty
 	apt-get update
 	apt-get install -y git apache2-utils supervisor jq python-is-python2 libssl-dev \
-		liburcu-dev libev-dev libsodium-dev libtool libunwind-dev libmaxminddb-dev cron
+		liburcu-dev libev-dev libsodium-dev libtool libunwind-dev libmaxminddb-dev cron rsync
 
 	systemctl enable supervisor
 	systemctl start supervisor
