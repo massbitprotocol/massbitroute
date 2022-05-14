@@ -39,6 +39,9 @@ _gitclone() {
 		exit 1
 	fi
 	git -C $dest remote set-url origin $repo
+	git -C $dest checkout origin/$repo
+	git -C $dest reset --hard
+	git -C $dest pull origin $repo
 }
 if [ -f /etc/os-release ]; then
 	# freedesktop.org and systemd
