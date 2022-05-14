@@ -453,6 +453,7 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
                     if #_nodes_global > 0 then
                         _backup_global = " backup;"
                     end
+
                     table.insert(
                         _upstream_str,
                         _gen_upstream_block(
@@ -470,7 +471,23 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
                         _gen_upstream_block(_block_name .. "-v1", "-v2", _nodes_continent, _job_data)
                     )
 
-                    table.insert(_upstream_str, _gen_upstream_block(_k1 .. "-" .. _k2, "-" .. _k3, _v3, _job_data))
+                    local _backup_country = ";"
+                    if #_v3 > 0 then
+                        _backup_country = " backup;"
+                    end
+                    table.insert(
+                        _upstream_str,
+                        _gen_upstream_block(
+                            _k1 .. "-" .. _k2,
+                            "-" .. _k3,
+                            _v3,
+                            _job_data,
+                            "server unix:/tmp/" ..
+                                _block_name ..
+                                    "-v1-v2.node.mbr." .. _job_data._domain_name .. ".sock " .. _backup_country
+                        )
+                    )
+                    -- table.insert(_upstream_str, _gen_upstream_block(_k1 .. "-" .. _k2, "-" .. _k3, _v3, _job_data))
                 end
             end
         end
