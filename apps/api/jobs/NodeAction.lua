@@ -445,8 +445,25 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
                         end
                     end
 
-                    _print("nodes_continent:" .. inspect(_nodes_continent))
-                    _print("nodes_global:" .. inspect(_nodes_global))
+                    -- local _block_name = _k1 .. "-" .. _k2 .. "-" .. _k3
+                    -- _print("nodes_continent:" .. inspect(_nodes_continent))
+                    -- _print("nodes_global:" .. inspect(_nodes_global))
+
+                    -- local _backup_global = ";"
+                    -- if #_nodes_global > 0 then
+                    --     _backup_global = " backup;"
+                    -- end
+                    -- table.insert(
+                    --     _upstream_str,
+                    --     _gen_upstream_block(
+                    --         "",
+                    --         _k1,
+                    --         _nodes[_k1],
+                    --         _job_data,
+                    --         "server " .. rules["_gw_upstream_backup_name_" .. _k1] .. _backup_global,
+                    --         rules["_gw_upstream_backup_" .. _k1]
+                    --     )
+                    -- )
 
                     table.insert(_upstream_str, _gen_upstream_block(_k1 .. "-" .. _k2 .. "-", _k3, _v3, _job_data))
                 end
