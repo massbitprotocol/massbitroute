@@ -205,9 +205,9 @@ local function _norm(_v)
 end
 
 local function _gen_upstream_block(_prefix, _name, _nodes, _job_data, _upstream_backup, _upstream_extra)
-    local _backup3 = ";"
+    local _backup = ";"
     if #_nodes > 0 then
-        _backup3 = " backup;"
+        _backup = " backup;"
     end
 
     if not _upstream_extra then
@@ -216,9 +216,9 @@ local function _gen_upstream_block(_prefix, _name, _nodes, _job_data, _upstream_
 
     if not _upstream_backup then
         _upstream_backup =
-            "server unix:/tmp/" .. _prefix .. ".node.mbr." .. _job_data._domain_name .. ".sock " .. _backup3
+            "server unix:/tmp/" .. _prefix .. ".node.mbr." .. _job_data._domain_name .. ".sock " .. _backup
     end
-    local _tmpl3 =
+    local _tmpl =
         _get_tmpl(
         rules,
         {
@@ -230,7 +230,7 @@ local function _gen_upstream_block(_prefix, _name, _nodes, _job_data, _upstream_
         }
     )
 
-    return _tmpl3("_gw_node_upstreams_v1")
+    return _tmpl("_gw_node_upstreams_v1")
 end
 
 local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
@@ -403,7 +403,7 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
             -- local _str_tmpl1 = _tmpl1("_gw_node_upstreams_v1")
             -- table.insert(_upstream_str, _str_tmpl1)
             for _k2, _v2 in pairs(_v1) do
-                table.insert(_upstream_str, _gen_upstream_block(_k1 .. "-", _k2, _nodes1[_k1][_k2], _job_data))
+                table.insert(_upstream_str, _gen_upstream_block(_k1, "-" .. _k2, _nodes1[_k1][_k2], _job_data))
                 -- local _backup2 = ";"
                 -- if #_nodes1[_k1][_k2] > 0 then
                 --     _backup2 = " backup;"
@@ -445,27 +445,49 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
                         end
                     end
 
-                    -- local _block_name = _k1 .. "-" .. _k2 .. "-" .. _k3
-                    -- _print("nodes_continent:" .. inspect(_nodes_continent))
-                    -- _print("nodes_global:" .. inspect(_nodes_global))
+                    local _block_name = _k1 .. "-" .. _k2 .. "-" .. _k3
+                    _print("nodes_continent:" .. inspect(_nodes_continent))
+                    _print("nodes_global:" .. inspect(_nodes_global))
 
-                    -- local _backup_global = ";"
-                    -- if #_nodes_global > 0 then
-                    --     _backup_global = " backup;"
-                    -- end
-                    -- table.insert(
-                    --     _upstream_str,
-                    --     _gen_upstream_block(
-                    --         "",
-                    --         _k1,
-                    --         _nodes[_k1],
-                    --         _job_data,
-                    --         "server " .. rules["_gw_upstream_backup_name_" .. _k1] .. _backup_global,
-                    --         rules["_gw_upstream_backup_" .. _k1]
-                    --     )
-                    -- )
+                    local _backup_global = ";"
+                    if #_nodes_global > 0 then
+                        _backup_global = " backup;"
+                    end
 
-                    table.insert(_upstream_str, _gen_upstream_block(_k1 .. "-" .. _k2 .. "-", _k3, _v3, _job_data))
+                    table.insert(
+                        _upstream_str,
+                        _gen_upstream_block(
+                            "",
+                            _block_name .. "-v1",
+                            _nodes_global,
+                            _job_data,
+                            "server " .. rules["_gw_upstream_backup_name_" .. _k1] .. _backup_global,
+                            rules["_gw_upstream_backup_" .. _k1]
+                        )
+                    )
+
+                    table.insert(
+                        _upstream_str,
+                        _gen_upstream_block(_block_name .. "-v1", "-v2", _nodes_continent, _job_data)
+                    )
+
+                    local _backup_country = ";"
+                    if #_v3 > 0 then
+                        _backup_country = " backup;"
+                    end
+                    table.insert(
+                        _upstream_str,
+                        _gen_upstream_block(
+                            _k1 .. "-" .. _k2,
+                            "-" .. _k3,
+                            _v3,
+                            _job_data,
+                            "server unix:/tmp/" ..
+                                _block_name ..
+                                    "-v1-v2.node.mbr." .. _job_data._domain_name .. ".sock " .. _backup_country
+                        )
+                    )
+                    -- table.insert(_upstream_str, _gen_upstream_block(_k1 .. "-" .. _k2, "-" .. _k3, _v3, _job_data))
                 end
             end
         end
