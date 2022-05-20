@@ -42,6 +42,7 @@ local _print = mbrutil.print
 local rules = {
     _listid = [[${id} ${user_id} ${blockchain} ${network} ${ip} ${geo.continent_code} ${geo.country_code} ${token} ${status} ${approved}]],
     _listids = [[${nodes/_listid(); separator='\n'}]],
+    _listids_not_actives = [[${not_actives/_listid(); separator='\n'}]],
     _dcmap_map = [[${id} =>  [ ${ip} , 10 ],]],
     _dcmap_v1 = [[
 ${geo_id} => {
@@ -127,6 +128,7 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
 
     local _datacenters = {}
     local _actives = {}
+    local _not_actives = {}
     local _approved = {}
 
     local _blocknet_id = _blockchain .. "-" .. _network
@@ -162,6 +164,7 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
                             --_blocknet_id .. "-" .. _item.geo.continent_code .. "-" .. _item.geo.country_code
                         }
                         _print({id = _item.id, status = _item.status}, true)
+                        _not_actives[#_not_actives + 1] = _item
                         if _item.status and tonumber(_item.status) == 1 then
                             _item._is_enabled = true
                             _actives[#_actives + 1] = _item
@@ -314,7 +317,8 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
 
     if _actives and #_actives > 0 then
         -- _print(_actives, true)
-        local _tmpl = _get_tmpl(rules, {nodes = _actives, _domain_name = _job_data._domain_name})
+        local _tmpl =
+            _get_tmpl(rules, {not_actives = _not_actives, nodes = _actives, _domain_name = _job_data._domain_name})
         local _str = _tmpl("_gw_zones")
         _print(_str)
         local _file = gwman_dir .. "/zones/" .. mytype .. "/" .. _blocknet_id .. ".zone"
@@ -327,6 +331,11 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
         _print(_str_listid)
         _print(_file_listid)
         _write_file(_file_listid, _str_listid)
+        local _str_listid_not_actives = _tmpl("_listids_not_actives")
+        local _file_listid_not_actives = _info_dir .. "/" .. mytype .. "/listid-not-active-" .. _blocknet_id
+        _print(_str_listid_not_actives)
+        _print(_file_listid_not_actives)
+        _write_file(_file_listid_not_actives, _str_listid_not_actives)
     end
 end
 
