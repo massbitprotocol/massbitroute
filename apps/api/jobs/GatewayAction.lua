@@ -164,7 +164,10 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
                             --_blocknet_id .. "-" .. _item.geo.continent_code .. "-" .. _item.geo.country_code
                         }
                         _print({id = _item.id, status = _item.status}, true)
-                        _not_actives[#_not_actives + 1] = _item
+                        if _item.status and tonumber(_item.status) == 0 then
+                            _not_actives[#_not_actives + 1] = _item
+                        end
+
                         if _item.status and tonumber(_item.status) == 1 then
                             _item._is_enabled = true
                             _actives[#_actives + 1] = _item
