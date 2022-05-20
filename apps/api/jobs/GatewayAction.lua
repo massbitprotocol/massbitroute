@@ -334,6 +334,7 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
         _print(_str_listid)
         _print(_file_listid)
         _write_file(_file_listid, _str_listid)
+
         local _str_listid_not_actives = _tmpl("_listids_not_actives")
         local _file_listid_not_actives = _info_dir .. "/" .. mytype .. "/listid-not-active-" .. _blocknet_id
         _print(_str_listid_not_actives)

@@ -43,6 +43,7 @@ local _stat_dir = _service_dir .. "/stat/etc/conf"
 local rules = {
     _listid = [[${id} ${user_id} ${blockchain} ${network} ${ip} ${geo.continent_code} ${geo.country_code} ${token} ${status} ${approved}]],
     _listids = [[${nodes/_listid(); separator='\n'}]],
+    _listids_not_actives = [[${not_actives/_listid(); separator='\n'}]],
     _node_zone = [[${id}.node.mbr 3600 A ${ip}]],
     _node_zones = [[${nodes/_node_zone(); separator='\n'}]],
     _node_stat_target = [[          - ${id}.node.mbr.${_domain_name}]],
@@ -241,6 +242,7 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
     local _nodes2 = {}
     local _datacenters = {}
     local _actives = {}
+    local _not_actives = {}
     local _approved = {}
     local _blocknet_id = _blockchain .. "-" .. _network
     local _network_dir = _deploy_dir .. "/" .. _blockchain .. "/" .. _network
@@ -265,7 +267,11 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
                                             _item = json.decode(_item)
                                         end
                                         _item._domain_name = _job_data._domain_name
-                                        if tonumber(_item.status) == 1 then
+                                        if _item.status and tonumber(_item.status) == 0 then
+                                            _not_actives[#_not_actives + 1] = _item
+                                        end
+
+                                        if _item.status and tonumber(_item.status) == 1 then
                                             _item._is_enabled = true
                                             _actives[#_actives + 1] = _item
                                             if _item.approved and tonumber(_item.approved) == 1 then
@@ -462,7 +468,7 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
                             _nodes_global,
                             _job_data,
                             "server " .. rules["_gw_upstream_backup_name_" .. _k1] .. _backup_global
-                             -- ,
+                            -- ,
                             -- rules["_gw_upstream_backup_" .. _k1]
                         )
                     )
@@ -512,7 +518,8 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
     end
 
     if _actives and #_actives > 0 then
-        local _tmpl = _get_tmpl(rules, {nodes = _actives, _domain_name = _job_data._domain_name})
+        local _tmpl =
+            _get_tmpl(rules, {not_actives = _not_actives, nodes = _actives, _domain_name = _job_data._domain_name})
         local _str = _tmpl("_node_zones")
         local _file = _gwman_dir .. "/zones/" .. mytype .. "/" .. _blocknet_id .. ".zone"
         _print(_str)
@@ -525,6 +532,12 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
         _print(_str_listid)
         _print(_file_listid)
         _write_file(_file_listid, _str_listid)
+
+        local _str_listid_not_actives = _tmpl("_listids_not_actives")
+        local _file_listid_not_actives = _info_dir .. "/" .. mytype .. "/listid-not-active-" .. _blocknet_id
+        _print(_str_listid_not_actives)
+        _print(_file_listid_not_actives)
+        _write_file(_file_listid_not_actives, _str_listid_not_actives)
     end
 end
 
