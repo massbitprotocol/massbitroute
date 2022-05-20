@@ -151,18 +151,20 @@ $SITE_ROOT/cmd_server _update
 
 $SITE_ROOT/cmd_server status
 
-status=$(_nodeverify)
-fields=($status)
-while [ "${fields[0]}" != "verified" ]; do
-	if [ "${fields[1]}" != "null" ]; then
-    echo "Verifying with message: ${fields[1]}"
+res=$($SITE_ROOT/mbr node nodeverify)
+status=$(echo $res | jq ".status" | sed -z "s/\"//g;")
+while [ "$status" != "verified" ]; do
+  message=$(echo $res | jq ".message")
+	if [ "$message" != "null" ]; then
+    echo "Verifying with message: $message"
   fi
 	sleep 10
 	$SCRIPTS_RUN _load_config
 	$SITE_ROOT/cmd_server _update
-	status=$(_nodeverify)
-	fields=($status)
+	res=$($SITE_ROOT/mbr node nodeverify)
+  status=$(echo $res | jq ".status" | sed -z "s/\"//g;")
 done
-if [ "${fields[0]}" = "verified" ]; then
-	echo "Gateway installed successfully !"
+
+if [ "$status" = "verified" ]; then
+	echo "Node installed successfully !"
 fi
