@@ -16,7 +16,7 @@ _centos() {
 }
 
 _nodeverify() {
-	res=$($SITE_ROOT/mbr node nodeverify | tail -1 | jq .status | sed s/\"//g)
+	res=$($SITE_ROOT/mbr node nodeverify | tail -1 | jq ".status,.message" | sed -z "s/\"//g;")
 	echo $res
 }
 _gitclone() {
@@ -183,14 +183,18 @@ $SITE_ROOT/cmd_server _update
 $SITE_ROOT/cmd_server status
 
 status=$(_nodeverify)
-while [ "$status" != "verified" ]; do
-	echo "Verifying firewall ... Please make sure your firewall is open and try run again."
+fields=($status)
+while [ "${fields[0]}" != "verified" ]; do
+	if [ "${fields[1]}" != "null" ]; then
+    echo "Verifying with message: ${fields[1]}"
+  fi
 	sleep 10
 	$SCRIPTS_RUN _load_config
 	$SITE_ROOT/cmd_server _update
 	status=$(_nodeverify)
+	fields=($status)
 done
 
-if [ "$status" = "verified" ]; then
-	echo "Installed node successfully !"
+if [ "${fields[0]}" = "verified" ]; then
+	echo "Node installed successfully !"
 fi
