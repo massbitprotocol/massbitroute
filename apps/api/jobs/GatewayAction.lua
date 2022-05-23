@@ -242,7 +242,9 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
         _print(_dc_info, true)
         _print(_dc_all, true)
         for _continent_code, _continents in pairs(_dc_info) do
+            _print("_continent_code:" .. _continent_code)
             for _country_code, _countries in pairs(_continents) do
+                _print("_country_code:" .. _country_code)
                 local _dcs = table.keys(_countries)
                 for _k, _ in pairs(_dc_all) do
                     if not _countries[_k] then
