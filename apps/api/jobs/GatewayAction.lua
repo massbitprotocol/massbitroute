@@ -282,6 +282,7 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
         end
         _print("_v_maps:")
         _print(_v_maps, true)
+        _print(table_concat(_v_maps, "\n"))
     end
     if _datacenters["blocknet"] and next(_datacenters["blocknet"]) ~= nil then
         local _geo_val = _datacenters["blocknet"]
