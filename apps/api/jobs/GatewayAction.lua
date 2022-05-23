@@ -202,6 +202,7 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
                                 _dc_block[_continent] = _dc_block[_continent] or {}
                                 _dc_block1[_continent] = _dc_block1[_continent] or {}
                                 _dc_block[_continent][_country] = _dc_block[_continent][_country] or {}
+                                _dc_block1[_continent][_country] = _dc_block1[_continent][_country] or {}
                                 _dc_block[_continent]["default"] = _dc_block[_continent]["default"] or {}
                                 _dc_block1[_continent]["default"] = _dc_block1[_continent]["default"] or {}
                                 _dc_block["default"] = _dc_block["default"] or {}
