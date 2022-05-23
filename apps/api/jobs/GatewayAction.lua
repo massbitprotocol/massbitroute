@@ -209,6 +209,7 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
                                 _dc_block1["default"] = _dc_block1["default"] or {}
 
                                 _dc_block[_continent][_country] = _geo_id
+                                _dc_block1[_continent][_country][_geo_id] = 1
                                 table.insert(_dc_block[_continent]["default"], _geo_id)
                                 table.insert(_dc_block["default"], _geo_id)
                                 _dc_block1["default"][_geo_id] = 1
