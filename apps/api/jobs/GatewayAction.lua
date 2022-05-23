@@ -353,6 +353,9 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
         _print(_file_listid_not_actives)
         _write_file(_file_listid_not_actives, _str_listid_not_actives)
     end
+    _print("nodes:")
+    _print(_nodes, true)
+
     if _nodes and #_nodes > 0 then
         for _t, _v in pairs(_nodes) do
             local _tmpl = _get_tmpl(rules, {nodes = _v, _domain_name = _job_data._domain_name})
