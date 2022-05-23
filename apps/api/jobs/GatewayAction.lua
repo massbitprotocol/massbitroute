@@ -268,8 +268,8 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
         end
 
         table_insert(_v_maps, "}")
-        -- _print("v_maps:" .. inspect(_v_maps))
-        -- _print("v_datacenters:" .. inspect(_v_datacenters))
+        _print("v_maps:" .. inspect(_v_maps))
+        _print("v_datacenters:" .. inspect(_v_datacenters))
         local _tmpl_map =
             _get_tmpl(
             rules,
