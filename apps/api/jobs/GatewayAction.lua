@@ -169,8 +169,15 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
                             local _t =
                                 _blocknet_id ..
                                 "-" .. _continent .. "-" .. _country .. "-" .. _item.status .. "-" .. _item.approved
+                            local _t1 =
+                                _blocknet_id .. "-" .. _continent .. "-" .. _item.status .. "-" .. _item.approved
+                            local _t2 = _blocknet_id .. "-" .. _item.status .. "-" .. _item.approved
                             _nodes[_t] = _nodes[_t] or {}
+                            _nodes[_t1] = _nodes[_t1] or {}
+                            _nodes[_t2] = _nodes[_t2] or {}
                             table.insert(_nodes[_t], _item)
+                            table.insert(_nodes[_t1], _item)
+                            table.insert(_nodes[_t2], _item)
                         end
 
                         if _item.status and tonumber(_item.status) == 0 then
