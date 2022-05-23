@@ -165,10 +165,7 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
                             --_blocknet_id .. "-" .. _item.geo.continent_code .. "-" .. _item.geo.country_code
                         }
                         _print({id = _item.id, status = _item.status}, true)
-                        if
-                            _continent and _country and _item.status and tonumber(_item.status) == 0 and _item.approved and
-                                tonumber(_item.approved) == 0
-                         then
+                        if _continent and _country and _item.status and _item.approved then
                             local _t =
                                 _blocknet_id ..
                                 "-" .. _continent .. "-" .. _country .. "-" .. _item.status .. "-" .. _item.approved
