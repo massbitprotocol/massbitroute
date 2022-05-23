@@ -258,6 +258,7 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
                 for _k, _ in pairs(_dc_continent[_continent_code]) do
                     if not _countries[_k] then
                         table.insert(_dcs, _k)
+                        _countries[_k] = 1
                     end
                 end
                 for _k, _ in pairs(_dc_global) do
