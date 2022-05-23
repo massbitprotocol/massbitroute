@@ -242,7 +242,7 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
                         table_insert(_v_maps, _k4 .. " => [ ")
                         for _, _v5 in ipairs(_v4) do
                             if _v5 and not _cache[_v5] then
-                                table_insert(_v_maps, _v5 .. ",")
+                                table_insert(_v_maps, "  " .. _v5 .. ",")
                                 _cache[_v5] = 1
                                 _v_datacenters[_v5] = 1
                             end
@@ -257,7 +257,7 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
                 local _cache = {}
                 for _, _v4 in ipairs(_v3) do
                     if _v4 and not _cache[_v4] then
-                        table_insert(_v_maps, _v4 .. ",")
+                        table_insert(_v_maps, "  " .. _v4 .. ",")
                         _v_datacenters[_v4] = 1
                         _cache[_v4] = 1
                     end
