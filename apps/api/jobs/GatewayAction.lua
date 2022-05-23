@@ -244,6 +244,11 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
     if _dc_country and next(_dc_country) then
         _print("dc_country:")
         _print(_dc_country, true)
+        _print("dc_continent:")
+        _print(_dc_continent, true)
+
+        _print("dc_global:")
+        _print(_dc_global, true)
 
         for _continent_code, _continents in pairs(_dc_country) do
             _print("_continent_code:" .. _continent_code)
