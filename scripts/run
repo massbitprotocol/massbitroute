@@ -450,7 +450,7 @@ _update() {
 
 _reload() {
 
-	_update_listid
+	#	_update_listid
 	$cmd_server _update
 	# $cmd_server update
 	tmp=$(mktemp)
