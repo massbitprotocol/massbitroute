@@ -193,6 +193,7 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
 
                                 _datacenters["geo"] = _datacenters["geo"] or {}
                                 _datacenters["blocknet"] = _datacenters["blocknet"] or {}
+                                _datacenters["blocknet1"] = _datacenters["blocknet1"] or {}
                                 local _dc_geo = _datacenters["geo"]
                                 local _dc_block = _datacenters["blocknet"]
                                 local _dc_block1 = _datacenters["blocknet1"]
