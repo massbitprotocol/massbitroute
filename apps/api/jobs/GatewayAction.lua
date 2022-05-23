@@ -356,7 +356,7 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
     _print("nodes:")
     _print(_nodes, true)
 
-    if _nodes and #_nodes > 0 then
+    if _nodes and next(_nodes) then
         for _t, _v in pairs(_nodes) do
             local _tmpl = _get_tmpl(rules, {nodes = _v, _domain_name = _job_data._domain_name})
             local _str_listid = _tmpl("_listids")
