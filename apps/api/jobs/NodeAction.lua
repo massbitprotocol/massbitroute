@@ -386,8 +386,10 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
                 node_type = _k1,
                 nodes = {},
                 _domain_name = _job_data._domain_name,
-                upstream_backup = "server " .. rules["_gw_upstream_backup_name_" .. _k1] .. _backup,
-                upstream_extra = rules["_gw_upstream_backup_" .. _k1]
+                upstream_backup = rules["_gw_upstream_backup_name_" .. _k1] and
+                    "server " .. rules["_gw_upstream_backup_name_" .. _k1] .. _backup or
+                    "",
+                upstream_extra = rules["_gw_upstream_backup_" .. _k1] and rules["_gw_upstream_backup_" .. _k1] or ""
             }
         )
 
@@ -406,7 +408,9 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
                     _k1,
                     _nodes[_k1],
                     _job_data,
-                    "server " .. rules["_gw_upstream_backup_name_" .. _k1] .. _backup,
+                    rules["_gw_upstream_backup_name_" .. _k1] and
+                        "server " .. rules["_gw_upstream_backup_name_" .. _k1] .. _backup or
+                        "",
                     rules["_gw_upstream_backup_" .. _k1]
                 )
             )
@@ -488,7 +492,9 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
                             _block_name .. "-v1",
                             _nodes_global,
                             _job_data,
-                            "server " .. rules["_gw_upstream_backup_name_" .. _k1] .. _backup_global
+                            rules["_gw_upstream_backup_name_" .. _k1] and
+                                "server " .. rules["_gw_upstream_backup_name_" .. _k1] .. _backup_global or
+                                ""
                             -- ,
                             -- rules["_gw_upstream_backup_" .. _k1]
                         )
