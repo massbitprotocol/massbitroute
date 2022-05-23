@@ -713,7 +713,7 @@ function JobsAction:removeconfAction(job)
     _print("removeconf:" .. inspect(job))
 
     local instance = self:getInstance()
-    local _config = self:getInstanceConfig()
+    -- local _config = self:getInstanceConfig()
     local job_data = job.data or {}
     job_data._domain_name = _domain_name
     _remove_item(instance, job_data)

@@ -7,17 +7,17 @@ local JobsAction = cc.class(mytype .. "JobsAction", gbc.ActionBase)
 
 local mbrutil = require "mbutil" --cc.import("#mbrutil")
 local env = require("env")
-local read_dir = mbrutil.read_dir
+-- local read_dir = mbrutil.read_dir
 local read_file = mbrutil.read_file
 local show_folder = mbrutil.show_folder
 local inspect = mbrutil.inspect
 
 -- local table_map = table.map
 -- local table_walk = table.walk
-local table_filter = table.filter
+-- local table_filter = table.filter
 local table_insert = table.insert
 local table_concat = table.concat
-local table_keys = table.keys
+-- local table_keys = table.keys
 local table_merge = table.merge
 
 local _write_file = mbrutil.write_file
@@ -65,24 +65,24 @@ ${dcmaps/_dcmap(); separator='\n'}
 ]],
     _dns_geo_resource_v1 = [[
 mbr-map-${blocknet_id} =>{
-map => mbr-map-${blocknet_id},
-service_types => gateway_check,
-plugin => weighted,
-dcmap => {
-${dcmaps/_dcmap_v1(); separator='\n'}
+  map => mbr-map-${blocknet_id},
+  service_types => gateway_check,
+  plugin => weighted,
+  dcmap => {
+    ${dcmaps/_dcmap_v1(); separator='\n'}
 }
 }
 ]],
     _datacenter = [[${it}]],
     _dns_geo_map = [[
 mbr-map-${id} =>{
-geoip2_db => GeoIP2-City.mmdb
-map => {
-${map}
-},
-datacenters => [
-${datacenters/_datacenter(); separator=',\n'}
-]
+  geoip2_db => GeoIP2-City.mmdb
+  map => {
+    ${map}
+  },
+  datacenters => [
+    ${datacenters/_datacenter(); separator=',\n'}
+  ]
 }
 ]],
     _gw_zone = [[${id}.gw.mbr 3600 A ${ip}]],
