@@ -134,8 +134,7 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
 
     local _blocknet_id = _blockchain .. "-" .. _network
     local _dc_all = {}
-    local _dc_geo = _datacenters["geo"]
-    local _dc_block = _datacenters["blocknet"]
+
     local _dc_info = {}
 
     local _network_dir = _deploy_dir .. "/" .. _blockchain .. "/" .. _network
@@ -197,6 +196,8 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
 
                                 _datacenters["geo"] = _datacenters["geo"] or {}
                                 _datacenters["blocknet"] = _datacenters["blocknet"] or {}
+                                local _dc_geo = _datacenters["geo"]
+                                local _dc_block = _datacenters["blocknet"]
                                 -- _datacenters["blocknet1"] = _datacenters["blocknet1"] or {}
 
                                 _dc_info[_continent] = _dc_info[_continent] or {}
