@@ -197,25 +197,31 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
 
                                 _datacenters["geo"] = _datacenters["geo"] or {}
                                 _datacenters["blocknet"] = _datacenters["blocknet"] or {}
-                                _datacenters["blocknet1"] = _datacenters["blocknet1"] or {}
+                                -- _datacenters["blocknet1"] = _datacenters["blocknet1"] or {}
+
+                                _dc_info[_continent] = _dc_info[_continent] or {}
+                                _dc_info[_continent][_country] = _dc_info[_continent][_country] or {}
+                                _dc_info[_continent][_country][_geo_id] = 1
+
+                                _dc_info[_continent]["default"] = _dc_info[_continent]["default"] or {}
+                                _dc_info[_continent]["default"][_geo_id] = 1
+                                _dc_all[_geo_id] = 1
 
                                 -- _dc_geo[_blocknet_id] = _dc_geo[_blocknet_id] or {}
                                 -- _dc_block[_blocknet_id] = _dc_block[_blocknet_id] or {}
                                 _dc_block[_continent] = _dc_block[_continent] or {}
-                                _dc_info[_continent] = _dc_info[_continent] or {}
+
                                 _dc_block[_continent][_country] = _dc_block[_continent][_country] or {}
-                                _dc_info[_continent][_country] = _dc_info[_continent][_country] or {}
+
                                 _dc_block[_continent]["default"] = _dc_block[_continent]["default"] or {}
-                                _dc_info[_continent]["default"] = _dc_info[_continent]["default"] or {}
+
                                 _dc_block["default"] = _dc_block["default"] or {}
                                 -- _dc_block1["default"] = _dc_block1["default"] or {}
 
                                 _dc_block[_continent][_country] = _geo_id
-                                _dc_info[_continent][_country][_geo_id] = 1
+
                                 table.insert(_dc_block[_continent]["default"], _geo_id)
                                 table.insert(_dc_block["default"], _geo_id)
-                                _dc_all[_geo_id] = 1
-                                _dc_info[_continent]["default"][_geo_id] = 1
 
                                 _dc_geo[_geo_id] = _dc_geo[_geo_id] or {}
                                 _dc_geo[_geo_country_default] = _dc_geo[_geo_country_default] or {}
