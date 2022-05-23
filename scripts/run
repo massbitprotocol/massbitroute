@@ -212,7 +212,7 @@ _git_cmd() {
 	shift
 	list_push="apideploy gwmandeploy statdeploy"
 	list_pull="api gwman stat $list_push"
-	list_all="$list_pull gateway node mkagent monitor"
+	list_all="$list_pull gateway node mkagent"
 	if [ -z "$cmd" ]; then cmd=push; fi
 
 	list=""
