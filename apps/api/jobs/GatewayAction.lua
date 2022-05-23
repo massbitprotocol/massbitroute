@@ -200,11 +200,15 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
                                 _dc_block[_continent] = _dc_block[_continent] or {}
                                 _dc_block[_continent][_country] = _dc_block[_continent][_country] or {}
                                 _dc_block[_continent]["default"] = _dc_block[_continent]["default"] or {}
+                                _dc_block[_continent]["default1"] = _dc_block[_continent]["default1"] or {}
                                 _dc_block["default"] = _dc_block["default"] or {}
+                                _dc_block["default1"] = _dc_block["default1"] or {}
 
                                 _dc_block[_continent][_country] = _geo_id
                                 table.insert(_dc_block[_continent]["default"], _geo_id)
                                 table.insert(_dc_block["default"], _geo_id)
+                                _dc_block["default1"][_geo_id] = 1
+                                _dc_block[_continent]["default1"][_geo_id] = 1
 
                                 _dc_geo[_geo_id] = _dc_geo[_geo_id] or {}
                                 _dc_geo[_geo_country_default] = _dc_geo[_geo_country_default] or {}
@@ -227,6 +231,7 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
         local _v_maps = {}
         local _v_datacenters = {}
         table_insert(_v_maps, _blocknet_id .. " => { ")
+
         for _k3, _v3 in pairs(_geo_val) do
             if _k3 ~= "default" then
                 table_insert(_v_maps, _k3 .. " => { ")
