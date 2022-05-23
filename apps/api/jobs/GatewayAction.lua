@@ -228,10 +228,14 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
             end
         end
     end
-    local _blocknet1 = _datacenters["blocknet1"]
-    _print("blocknet1:")
-    _print(_blocknet1, true)
-
+    if _datacenters["blocknet1"] and next(_datacenters["blocknet1"]) then
+        local _blocknet1 = _datacenters["blocknet1"]
+        _print("blocknet1:")
+        _print(_blocknet1, true)
+        local _all_dc = _blocknet1["_default"] and _blocknet1["_default"] or {}
+        _print("_all_dc")
+        _print(_all_dc, true)
+    end
     if _datacenters["blocknet"] and next(_datacenters["blocknet"]) ~= nil then
         local _geo_val = _datacenters["blocknet"]
         _print("blocknet:")
