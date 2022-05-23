@@ -231,7 +231,7 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
                 table_insert(_v_maps, _k3 .. " => { ")
                 for _k4, _v4 in pairs(_v3) do
                     if _k4 and _k4 ~= "default" then
-                        table_insert(_v_maps, _k4 .. " => [ " .. _v4 .. "],")
+                        table_insert(_v_maps, "  " .. _k4 .. " => [ " .. _v4 .. "],")
                         _v_datacenters[_v4] = 1
                     else
                         _v_datacenters[_blocknet_id .. "-" .. _k3 .. "-" .. _k4] = 1
@@ -239,10 +239,10 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
                         --     table.insert(_v_datacenters, _v4)
                         -- end
                         local _cache = {}
-                        table_insert(_v_maps, _k4 .. " => [ ")
+                        table_insert(_v_maps, "  " .. _k4 .. " => [ ")
                         for _, _v5 in ipairs(_v4) do
                             if _v5 and not _cache[_v5] then
-                                table_insert(_v_maps, "  " .. _v5 .. ",")
+                                table_insert(_v_maps, "    " .. _v5 .. ",")
                                 _cache[_v5] = 1
                                 _v_datacenters[_v5] = 1
                             end
@@ -253,11 +253,11 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
                 table_insert(_v_maps, "},")
             else
                 _v_datacenters[_blocknet_id .. "-" .. _k3 .. "-" .. _k3] = 1
-                table_insert(_v_maps, _k3 .. " => [ ")
+                table_insert(_v_maps, "  " .. _k3 .. " => [ ")
                 local _cache = {}
                 for _, _v4 in ipairs(_v3) do
                     if _v4 and not _cache[_v4] then
-                        table_insert(_v_maps, "  " .. _v4 .. ",")
+                        table_insert(_v_maps, "    " .. _v4 .. ",")
                         _v_datacenters[_v4] = 1
                         _cache[_v4] = 1
                     end
