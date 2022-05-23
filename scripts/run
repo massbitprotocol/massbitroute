@@ -443,8 +443,6 @@ _update() {
 	_update_repos
 	_st_update=$?
 	#_update_listid
-	$0 _git_cmd all
-	$0 _git_cmd commit
 
 	return $_st_update
 }
@@ -468,6 +466,9 @@ _monitor() {
 	if [ $is_reload -ne 0 ]; then
 		$0 _reload
 	fi
+	$0 _git_cmd all
+	$0 _git_cmd commit
+
 }
 
 _run() {
