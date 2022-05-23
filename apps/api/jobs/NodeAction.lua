@@ -236,23 +236,23 @@ end
 
 local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
     _print("rescanconf_blockchain_network:" .. _blockchain .. ":" .. _network)
-    _print(inspect(_job_data))
+    -- _print(inspect(_job_data))
     local _allnodes = {}
     local _nodes = {}
     local _nodes1 = {}
     local _nodes2 = {}
     local _datacenters = {}
     local _actives = {}
-    local _not_actives = {}
+    -- local _not_actives = {}
     local _approved = {}
     local _blocknet_id = _blockchain .. "-" .. _network
     local _network_dir = _deploy_dir .. "/" .. _blockchain .. "/" .. _network
     for _, _continent in ipairs(show_folder(_network_dir)) do
-        _print("continent:" .. _continent)
+        -- _print("continent:" .. _continent)
         local _continent_dir = _network_dir .. "/" .. _continent
         if is_dir(_continent_dir) then
             for _, _country in ipairs(show_folder(_continent_dir)) do
-                _print("country:" .. _country)
+                -- _print("country:" .. _country)
                 local _country_dir = _continent_dir .. "/" .. _country
                 if is_dir(_country_dir) then
                     for _, _user_id in ipairs(show_folder(_country_dir)) do
@@ -263,16 +263,16 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
                                 if _id ~= ".gitkeep" then
                                     local _item = read_file(_user_dir .. "/" .. _id)
 
-                                    _print("path:" .. _user_dir .. "/" .. _id)
+                                    -- _print("path:" .. _user_dir .. "/" .. _id)
                                     -- _print("item:" .. _item)
                                     if _item then
                                         if type(_item) == "string" then
                                             _item = json.decode(_item)
                                         end
                                         _item._domain_name = _job_data._domain_name
-                                        if _item.status and tonumber(_item.status) == 0 then
-                                            _not_actives[#_not_actives + 1] = _item
-                                        end
+                                        -- if _item.status and tonumber(_item.status) == 0 then
+                                        --     _not_actives[#_not_actives + 1] = _item
+                                        -- end
 
                                         if _continent and _country and _item.status and _item.approved then
                                             local _t =
@@ -332,9 +332,9 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
             end
         end
     end
-    _print("nodes:" .. inspect(_nodes))
-    _print("nodes1:" .. inspect(_nodes1))
-    _print("nodes2:" .. inspect(_nodes2))
+    -- _print("nodes:" .. inspect(_nodes))
+    -- _print("nodes1:" .. inspect(_nodes1))
+    -- _print("nodes2:" .. inspect(_nodes2))
     -- do
     --     local _tmpl =
     --         _get_tmpl(
@@ -365,9 +365,9 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
         )
 
         local _str_tmpl = _tmpl("_gw_nodes")
-        _print(_str_tmpl)
+        -- _print(_str_tmpl)
         local _file_gw = _deploy_gatewayconfdir .. "/" .. _blocknet_id .. "-nodes.conf"
-        _print(_file_gw)
+        -- _print(_file_gw)
         _write_file(_file_gw, _str_tmpl)
     end
 
@@ -477,8 +477,8 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
                     end
 
                     local _block_name = _k1 .. "-" .. _k2 .. "-" .. _k3
-                    _print("nodes_continent:" .. inspect(_nodes_continent))
-                    _print("nodes_global:" .. inspect(_nodes_global))
+                    -- _print("nodes_continent:" .. inspect(_nodes_continent))
+                    -- _print("nodes_global:" .. inspect(_nodes_global))
 
                     local _backup_global = ";"
                     if #_nodes_global > 0 then
@@ -526,11 +526,11 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
             end
         end
     end
-    _print("upstream_str:" .. table.concat(_upstream_str, "\n"))
+    -- _print("upstream_str:" .. table.concat(_upstream_str, "\n"))
 
     local _file_gw = _deploy_gatewayconfdir .. "/" .. _blocknet_id .. "-upstreams.conf"
     local _str_tmpl = table.concat(_upstream_str, "\n")
-    _print(_file_gw)
+    -- _print(_file_gw)
     _write_file(_file_gw, _str_tmpl)
 
     if _approved and #_approved > 0 then
@@ -539,8 +539,8 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
 
         mkdirp(_stat_dir .. "/stat_node")
         local _file_stat = _stat_dir .. "/stat_node/" .. _blocknet_id .. ".yml"
-        _print(_str_stat)
-        _print(_file_stat)
+        -- _print(_str_stat)
+        -- _print(_file_stat)
         _write_file(_file_stat, _str_stat)
     end
 
@@ -550,33 +550,32 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
             local _str_listid = _tmpl("_listids")
             mkdirp(_info_dir .. "/" .. mytype)
             local _file_listid = _info_dir .. "/" .. mytype .. "/listid-" .. _t
-            _print(_str_listid)
-            _print(_file_listid)
+            -- _print(_str_listid)
+            -- _print(_file_listid)
             _write_file(_file_listid, _str_listid)
         end
     end
 
     if _actives and #_actives > 0 then
-        local _tmpl =
-            _get_tmpl(rules, {not_actives = _not_actives, nodes = _actives, _domain_name = _job_data._domain_name})
+        local _tmpl = _get_tmpl(rules, {nodes = _actives, _domain_name = _job_data._domain_name})
         local _str = _tmpl("_node_zones")
         local _file = _gwman_dir .. "/zones/" .. mytype .. "/" .. _blocknet_id .. ".zone"
-        _print(_str)
-        _print(_file)
+        -- _print(_str)
+        -- _print(_file)
         _write_file(_file, _str)
         -- local _tmpl = _get_tmpl(rules, {nodes = _actives})
         local _str_listid = _tmpl("_listids")
         mkdirp(_info_dir .. "/" .. mytype)
         local _file_listid = _info_dir .. "/" .. mytype .. "/listid-" .. _blocknet_id
-        _print(_str_listid)
-        _print(_file_listid)
+        -- _print(_str_listid)
+        -- _print(_file_listid)
         _write_file(_file_listid, _str_listid)
 
-        local _str_listid_not_actives = _tmpl("_listids_not_actives")
-        local _file_listid_not_actives = _info_dir .. "/" .. mytype .. "/listid-not-active-" .. _blocknet_id
-        _print(_str_listid_not_actives)
-        _print(_file_listid_not_actives)
-        _write_file(_file_listid_not_actives, _str_listid_not_actives)
+    -- local _str_listid_not_actives = _tmpl("_listids_not_actives")
+    -- local _file_listid_not_actives = _info_dir .. "/" .. mytype .. "/listid-not-active-" .. _blocknet_id
+    -- _print(_str_listid_not_actives)
+    -- _print(_file_listid_not_actives)
+    -- _write_file(_file_listid_not_actives, _str_listid_not_actives)
     end
 end
 
@@ -684,7 +683,7 @@ local function _generate_item(instance, args)
     local _str_tmpl = _tmpl("_local")
 
     local _file_main = _deploy_nodeconfdir .. "/" .. _item.id .. ".conf"
-    _print(_file_main)
+    -- _print(_file_main)
     _write_file(_file_main, _str_tmpl)
 
     _rescanconf_blockchain_network(_item.blockchain, _item.network, args)

@@ -42,7 +42,7 @@ local _print = mbrutil.print
 local rules = {
     _listid = [[${id} ${user_id} ${blockchain} ${network} ${ip} ${geo.continent_code} ${geo.country_code} ${token} ${status} ${approved}]],
     _listids = [[${nodes/_listid(); separator='\n'}]],
-    _listids_not_actives = [[${not_actives/_listid(); separator='\n'}]],
+    -- _listids_not_actives = [[${not_actives/_listid(); separator='\n'}]],
     _dcmap_map = [[${id} =>  [ ${ip} , 10 ],]],
     _dcmap_v1 = [[
 ${geo_id} => {
@@ -124,18 +124,18 @@ end
 --
 local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
     _print("rescanconf_blockchain_network:" .. _blockchain .. ":" .. _network)
-    _print(inspect(_job_data))
+    -- _print(inspect(_job_data))
 
     local _datacenters = {}
     local _allnodes = {}
     local _actives = {}
-    local _not_actives = {}
+    -- local _not_actives = {}
     local _approved = {}
 
     local _blocknet_id = _blockchain .. "-" .. _network
 
     local _network_dir = _deploy_dir .. "/" .. _blockchain .. "/" .. _network
-    _print("dir:" .. _network_dir)
+    -- _print("dir:" .. _network_dir)
     for _, _continent in ipairs(show_folder(_network_dir)) do
         local _continent_dir = _network_dir .. "/" .. _continent
         for _, _country in ipairs(show_folder(_continent_dir)) do
@@ -148,7 +148,7 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
                 local _user_dir = _country_dir .. "/" .. _user_id
                 for _, _id in ipairs(show_folder(_user_dir)) do
                     local _file = _user_dir .. "/" .. _id
-                    _print("file:" .. _file)
+                    -- _print("file:" .. _file)
                     local _item = read_file(_file)
                     if _item then
                         if type(_item) == "string" then
@@ -164,7 +164,7 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
                             geo_id = _geo_id
                             --_blocknet_id .. "-" .. _item.geo.continent_code .. "-" .. _item.geo.country_code
                         }
-                        _print({id = _item.id, status = _item.status}, true)
+                        -- _print({id = _item.id, status = _item.status}, true)
                         if _continent and _country and _item.status and _item.approved then
                             local _t =
                                 _blocknet_id ..
@@ -180,9 +180,9 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
                             table.insert(_allnodes[_t2], _item)
                         end
 
-                        if _item.status and tonumber(_item.status) == 0 then
-                            _not_actives[#_not_actives + 1] = _item
-                        end
+                        -- if _item.status and tonumber(_item.status) == 0 then
+                        --     _not_actives[#_not_actives + 1] = _item
+                        -- end
 
                         if _item.status and tonumber(_item.status) == 1 then
                             _item._is_enabled = true
@@ -219,8 +219,8 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
             end
         end
     end
-    _print("datacenters:")
-    _print(_datacenters, true)
+    -- _print("datacenters:")
+    -- _print(_datacenters, true)
     if _datacenters["blocknet"] and next(_datacenters["blocknet"]) ~= nil then
         local _geo_val = _datacenters["blocknet"]
         local _v_maps = {}
@@ -267,8 +267,8 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
         end
 
         table_insert(_v_maps, "}")
-        _print("v_maps:" .. inspect(_v_maps))
-        _print("v_datacenters:" .. inspect(_v_datacenters))
+        -- _print("v_maps:" .. inspect(_v_maps))
+        -- _print("v_datacenters:" .. inspect(_v_datacenters))
         local _tmpl_map =
             _get_tmpl(
             rules,
@@ -314,9 +314,9 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
             }
         )
         local _geo_res = _tmpl_res("_dns_geo_resource_v1")
-        _print(_geo_res)
+        -- _print(_geo_res)
         local _file_res = gwman_dir .. "/conf.d/geolocation.d/resources.d/mbr-map-" .. _blocknet_id
-        _print(_file_res)
+        -- _print(_file_res)
         _write_file(_file_res, _geo_res)
 
         local _file_dapi = gwman_dir .. "/zones/dapi/" .. _blocknet_id .. ".zone"
@@ -329,33 +329,32 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
         local _str_stat = _tmpl("_gw_stat_v1")
         mkdirp(stat_dir .. "/stat_gw")
         local _file_stat = stat_dir .. "/stat_gw/" .. _blocknet_id .. ".yml"
-        _print(_str_stat)
-        _print(_file_stat)
+        -- _print(_str_stat)
+        -- _print(_file_stat)
         _write_file(_file_stat, _str_stat)
     end
 
     if _actives and #_actives > 0 then
         -- _print(_actives, true)
-        local _tmpl =
-            _get_tmpl(rules, {not_actives = _not_actives, nodes = _actives, _domain_name = _job_data._domain_name})
+        local _tmpl = _get_tmpl(rules, {nodes = _actives, _domain_name = _job_data._domain_name})
         local _str = _tmpl("_gw_zones")
-        _print(_str)
+        -- _print(_str)
         local _file = gwman_dir .. "/zones/" .. mytype .. "/" .. _blocknet_id .. ".zone"
-        _print(_file)
+        -- _print(_file)
         _write_file(_file, _str)
 
         local _str_listid = _tmpl("_listids")
         mkdirp(_info_dir .. "/" .. mytype)
         local _file_listid = _info_dir .. "/" .. mytype .. "/listid-" .. _blocknet_id
-        _print(_str_listid)
-        _print(_file_listid)
+        -- _print(_str_listid)
+        -- _print(_file_listid)
         _write_file(_file_listid, _str_listid)
 
-        local _str_listid_not_actives = _tmpl("_listids_not_actives")
-        local _file_listid_not_actives = _info_dir .. "/" .. mytype .. "/listid-not-active-" .. _blocknet_id
-        _print(_str_listid_not_actives)
-        _print(_file_listid_not_actives)
-        _write_file(_file_listid_not_actives, _str_listid_not_actives)
+    -- local _str_listid_not_actives = _tmpl("_listids_not_actives")
+    -- local _file_listid_not_actives = _info_dir .. "/" .. mytype .. "/listid-not-active-" .. _blocknet_id
+    -- _print(_str_listid_not_actives)
+    -- _print(_file_listid_not_actives)
+    -- _write_file(_file_listid_not_actives, _str_listid_not_actives)
     end
     if _allnodes and next(_allnodes) then
         for _t, _v in pairs(_allnodes) do
@@ -363,8 +362,8 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
             local _str_listid = _tmpl("_listids")
             mkdirp(_info_dir .. "/" .. mytype)
             local _file_listid = _info_dir .. "/" .. mytype .. "/listid-" .. _t
-            _print(_str_listid)
-            _print(_file_listid)
+            -- _print(_str_listid)
+            -- _print(_file_listid)
             _write_file(_file_listid, _str_listid)
         end
     end
@@ -385,7 +384,7 @@ local function _remove_item(instance, args)
     _print("remove_item:" .. inspect(args))
     local model = Model:new(instance)
     local _item = _norm(model:get(args))
-    _print("stored_item:" .. inspect(_item))
+    -- _print("stored_item:" .. inspect(_item))
     if args._is_delete then
         model:delete({id = args.id, user_id = args.user_id})
     end
