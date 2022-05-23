@@ -241,6 +241,18 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
         _print("dc_info:")
         _print(_dc_info, true)
         _print(_dc_all, true)
+        for _continent_code, _continents in pairs(_dc_info) do
+            for _country_code, _countries in pairs(_continents) do
+                local _dcs = table.keys(_countries)
+                for _k, _ in pairs(_dc_all) do
+                    if not _countries[_k] then
+                        table.insert(_dcs, _k)
+                    end
+                end
+                _print("dcs")
+                _print(_dcs, true)
+            end
+        end
     end
     if _datacenters["blocknet"] and next(_datacenters["blocknet"]) ~= nil then
         local _geo_val = _datacenters["blocknet"]
