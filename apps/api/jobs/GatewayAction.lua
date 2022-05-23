@@ -219,10 +219,11 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
             end
         end
     end
-    -- _print("datacenters:")
-    -- _print(_datacenters, true)
     if _datacenters["blocknet"] and next(_datacenters["blocknet"]) ~= nil then
         local _geo_val = _datacenters["blocknet"]
+        _print("blocknet:")
+        _print(_geo_val, true)
+
         local _v_maps = {}
         local _v_datacenters = {}
         table_insert(_v_maps, _blocknet_id .. " => { ")
@@ -288,6 +289,9 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
 
     if _datacenters["geo"] and next(_datacenters["geo"]) ~= nil then
         local _geo_val = _datacenters["geo"]
+        _print("geo:")
+        _print(_geo_val, true)
+
         -- _print("_geo_val:" .. inspect(_geo_val))
         local _dc_maps_new = {}
         for _geo_id, _geo_svrs in pairs(_geo_val) do
