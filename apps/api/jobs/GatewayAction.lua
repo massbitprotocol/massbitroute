@@ -232,7 +232,7 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
         local _blocknet1 = _datacenters["blocknet1"]
         _print("blocknet1:")
         _print(_blocknet1, true)
-        local _all_dc = _blocknet1["default"] and _blocknet1["default"] or {}
+        local _all_dc = _blocknet1["default"] and table.keys(_blocknet1["default"]) or {}
         _print("_all_dc")
         _print(_all_dc, true)
     end
