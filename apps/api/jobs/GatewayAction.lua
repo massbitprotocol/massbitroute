@@ -127,7 +127,7 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
     _print(inspect(_job_data))
 
     local _datacenters = {}
-    local _nodes = {}
+    local _allnodes = {}
     local _actives = {}
     local _not_actives = {}
     local _approved = {}
@@ -172,12 +172,12 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
                             local _t1 =
                                 _blocknet_id .. "-" .. _continent .. "-" .. _item.status .. "-" .. _item.approved
                             local _t2 = _blocknet_id .. "-" .. _item.status .. "-" .. _item.approved
-                            _nodes[_t] = _nodes[_t] or {}
-                            _nodes[_t1] = _nodes[_t1] or {}
-                            _nodes[_t2] = _nodes[_t2] or {}
-                            table.insert(_nodes[_t], _item)
-                            table.insert(_nodes[_t1], _item)
-                            table.insert(_nodes[_t2], _item)
+                            _allnodes[_t] = _allnodes[_t] or {}
+                            _allnodes[_t1] = _allnodes[_t1] or {}
+                            _allnodes[_t2] = _allnodes[_t2] or {}
+                            table.insert(_allnodes[_t], _item)
+                            table.insert(_allnodes[_t1], _item)
+                            table.insert(_allnodes[_t2], _item)
                         end
 
                         if _item.status and tonumber(_item.status) == 0 then
@@ -357,11 +357,11 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
         _print(_file_listid_not_actives)
         _write_file(_file_listid_not_actives, _str_listid_not_actives)
     end
-    _print("nodes:")
-    _print(_nodes, true)
+    -- _print("nodes:")
+    -- _print(_allnodes, true)
 
-    if _nodes and next(_nodes) then
-        for _t, _v in pairs(_nodes) do
+    if _allnodes and next(_allnodes) then
+        for _t, _v in pairs(_allnodes) do
             local _tmpl = _get_tmpl(rules, {nodes = _v, _domain_name = _job_data._domain_name})
             local _str_listid = _tmpl("_listids")
             mkdirp(_info_dir .. "/" .. mytype)
