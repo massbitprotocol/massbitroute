@@ -133,9 +133,10 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
     local _approved = {}
 
     local _blocknet_id = _blockchain .. "-" .. _network
-    local _dc_all = {}
+    local _dc_global = {}
 
-    local _dc_info = {}
+    local _dc_country = {}
+    local _dc_continent = {}
 
     local _network_dir = _deploy_dir .. "/" .. _blockchain .. "/" .. _network
     -- _print("dir:" .. _network_dir)
@@ -200,13 +201,16 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
                                 local _dc_block = _datacenters["blocknet"]
                                 -- _datacenters["blocknet1"] = _datacenters["blocknet1"] or {}
 
-                                _dc_info[_continent] = _dc_info[_continent] or {}
-                                _dc_info[_continent][_country] = _dc_info[_continent][_country] or {}
-                                _dc_info[_continent][_country][_geo_id] = 1
+                                _dc_global[_geo_id] = 1
 
-                                _dc_info[_continent]["default"] = _dc_info[_continent]["default"] or {}
-                                _dc_info[_continent]["default"][_geo_id] = 1
-                                _dc_all[_geo_id] = 1
+                                _dc_continent[_continent] = _dc_continent[_continent] or {}
+                                _dc_continent[_continent][_geo_id] = 1
+
+                                _dc_country[_continent] = _dc_country[_continent] or {}
+
+                                _dc_country[_continent][_country] = _dc_country[_continent][_country] or {}
+
+                                _dc_country[_continent][_country][_geo_id] = 1
 
                                 -- _dc_geo[_blocknet_id] = _dc_geo[_blocknet_id] or {}
                                 -- _dc_block[_blocknet_id] = _dc_block[_blocknet_id] or {}
@@ -237,16 +241,21 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
             end
         end
     end
-    if _dc_info and next(_dc_info) then
-        _print("dc_info:")
-        _print(_dc_info, true)
-        _print(_dc_all, true)
-        for _continent_code, _continents in pairs(_dc_info) do
+    if _dc_country and next(_dc_country) then
+        _print("dc_country:")
+        _print(_dc_country, true)
+
+        for _continent_code, _continents in pairs(_dc_country) do
             _print("_continent_code:" .. _continent_code)
             for _country_code, _countries in pairs(_continents) do
                 _print("_country_code:" .. _country_code)
                 local _dcs = table.keys(_countries)
-                for _k, _ in pairs(_dc_all) do
+                for _k, _ in pairs(_dc_continent) do
+                    if not _countries[_k] then
+                        table.insert(_dcs, _k)
+                    end
+                end
+                for _k, _ in pairs(_dc_global) do
                     if not _countries[_k] then
                         table.insert(_dcs, _k)
                     end
