@@ -46,21 +46,21 @@ local rules = {
     _dcmap_map = [[${id} =>  [ ${ip} , 10 ],]],
     _dcmap_v1 = [[
 ${geo_id} => {
-${datacenters/_dcmap_map(); separator='\n'}
+  ${datacenters/_dcmap_map(); separator='\n'}
 },
 ]],
     _dcmap = [[
 ${id} => {
-${str}
+  ${str}
 },
 ]],
     _dns_geo_resource = [[
 mbr-map-${id} =>{
-map => mbr-map-${id},
-plugin => weighted,
-dcmap => {
-${dcmaps/_dcmap(); separator='\n'}
-}
+  map => mbr-map-${id},
+  plugin => weighted,
+  dcmap => {
+    ${dcmaps/_dcmap(); separator='\n'}
+  }
 }
 ]],
     _dns_geo_resource_v1 = [[
