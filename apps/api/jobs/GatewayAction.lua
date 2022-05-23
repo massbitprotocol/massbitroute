@@ -195,20 +195,21 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
                                 _datacenters["blocknet"] = _datacenters["blocknet"] or {}
                                 local _dc_geo = _datacenters["geo"]
                                 local _dc_block = _datacenters["blocknet"]
+                                local _dc_block1 = _datacenters["blocknet1"]
                                 -- _dc_geo[_blocknet_id] = _dc_geo[_blocknet_id] or {}
                                 -- _dc_block[_blocknet_id] = _dc_block[_blocknet_id] or {}
                                 _dc_block[_continent] = _dc_block[_continent] or {}
                                 _dc_block[_continent][_country] = _dc_block[_continent][_country] or {}
                                 _dc_block[_continent]["default"] = _dc_block[_continent]["default"] or {}
-                                _dc_block[_continent]["default1"] = _dc_block[_continent]["default1"] or {}
+                                _dc_block1[_continent]["default"] = _dc_block1[_continent]["default"] or {}
                                 _dc_block["default"] = _dc_block["default"] or {}
-                                _dc_block["default1"] = _dc_block["default1"] or {}
+                                _dc_block1["default"] = _dc_block1["default"] or {}
 
                                 _dc_block[_continent][_country] = _geo_id
                                 table.insert(_dc_block[_continent]["default"], _geo_id)
                                 table.insert(_dc_block["default"], _geo_id)
-                                _dc_block["default1"][_geo_id] = 1
-                                _dc_block[_continent]["default1"][_geo_id] = 1
+                                _dc_block1["default"][_geo_id] = 1
+                                _dc_block1[_continent]["default"][_geo_id] = 1
 
                                 _dc_geo[_geo_id] = _dc_geo[_geo_id] or {}
                                 _dc_geo[_geo_country_default] = _dc_geo[_geo_country_default] or {}
@@ -223,6 +224,10 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
             end
         end
     end
+    local _blocknet1 = _datacenters["blocknet1"]
+    _print("blocknet1:")
+    _print(_blocknet1, true)
+
     if _datacenters["blocknet"] and next(_datacenters["blocknet"]) ~= nil then
         local _geo_val = _datacenters["blocknet"]
         _print("blocknet:")
