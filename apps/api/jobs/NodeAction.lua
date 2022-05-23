@@ -248,9 +248,11 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
     local _blocknet_id = _blockchain .. "-" .. _network
     local _network_dir = _deploy_dir .. "/" .. _blockchain .. "/" .. _network
     for _, _continent in ipairs(show_folder(_network_dir)) do
+        _print("continent:" .. _continent)
         local _continent_dir = _network_dir .. "/" .. _continent
         if is_dir(_continent_dir) then
             for _, _country in ipairs(show_folder(_continent_dir)) do
+                _print("country:" .. _country)
                 local _country_dir = _continent_dir .. "/" .. _country
                 if is_dir(_country_dir) then
                     for _, _user_id in ipairs(show_folder(_country_dir)) do
