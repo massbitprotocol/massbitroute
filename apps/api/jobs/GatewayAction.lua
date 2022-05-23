@@ -247,7 +247,7 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
                                 _v_datacenters[_v5] = 1
                             end
                         end
-                        table_insert(_v_maps, "],")
+                        table_insert(_v_maps, "  ],")
                     end
                 end
                 table_insert(_v_maps, "},")
@@ -262,7 +262,7 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
                         _cache[_v4] = 1
                     end
                 end
-                table_insert(_v_maps, "],")
+                table_insert(_v_maps, "  ],")
             end
         end
 
