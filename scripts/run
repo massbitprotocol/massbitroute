@@ -438,13 +438,14 @@ _cleanupmeforsure() {
 _update() {
 	echo "Update"
 	_st_update=0
-	$0 _git_cmd all
-	$0 _git_cmd commit
 	# $0 _git_cmd push
 
 	_update_repos
 	_st_update=$?
 	#_update_listid
+	$0 _git_cmd all
+	$0 _git_cmd commit
+
 	return $_st_update
 }
 
