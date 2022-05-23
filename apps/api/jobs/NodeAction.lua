@@ -237,6 +237,7 @@ end
 local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
     _print("rescanconf_blockchain_network:" .. _blockchain .. ":" .. _network)
     _print(inspect(_job_data))
+    local _allnodes = {}
     local _nodes = {}
     local _nodes1 = {}
     local _nodes2 = {}
@@ -269,6 +270,24 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
                                         _item._domain_name = _job_data._domain_name
                                         if _item.status and tonumber(_item.status) == 0 then
                                             _not_actives[#_not_actives + 1] = _item
+                                        end
+
+                                        if _continent and _country and _item.status and _item.approved then
+                                            local _t =
+                                                _blocknet_id ..
+                                                "-" ..
+                                                    _continent ..
+                                                        "-" .. _country .. "-" .. _item.status .. "-" .. _item.approved
+                                            local _t1 =
+                                                _blocknet_id ..
+                                                "-" .. _continent .. "-" .. _item.status .. "-" .. _item.approved
+                                            local _t2 = _blocknet_id .. "-" .. _item.status .. "-" .. _item.approved
+                                            _allnodes[_t] = _allnodes[_t] or {}
+                                            _allnodes[_t1] = _allnodes[_t1] or {}
+                                            _allnodes[_t2] = _allnodes[_t2] or {}
+                                            table.insert(_allnodes[_t], _item)
+                                            table.insert(_allnodes[_t1], _item)
+                                            table.insert(_allnodes[_t2], _item)
                                         end
 
                                         if _item.status and tonumber(_item.status) == 1 then
@@ -515,6 +534,18 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
         _print(_str_stat)
         _print(_file_stat)
         _write_file(_file_stat, _str_stat)
+    end
+
+    if _allnodes and next(_allnodes) then
+        for _t, _v in pairs(_allnodes) do
+            local _tmpl = _get_tmpl(rules, {nodes = _v, _domain_name = _job_data._domain_name})
+            local _str_listid = _tmpl("_listids")
+            mkdirp(_info_dir .. "/" .. mytype)
+            local _file_listid = _info_dir .. "/" .. mytype .. "/listid-" .. _t
+            _print(_str_listid)
+            _print(_file_listid)
+            _write_file(_file_listid, _str_listid)
+        end
     end
 
     if _actives and #_actives > 0 then
