@@ -127,6 +127,7 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
     _print(inspect(_job_data))
 
     local _datacenters = {}
+    local _nodes = {}
     local _actives = {}
     local _not_actives = {}
     local _approved = {}
@@ -164,6 +165,17 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
                             --_blocknet_id .. "-" .. _item.geo.continent_code .. "-" .. _item.geo.country_code
                         }
                         _print({id = _item.id, status = _item.status}, true)
+                        if
+                            _continent and _country and _item.status and tonumber(_item.status) == 0 and _item.approved and
+                                tonumber(_item.approved) == 0
+                         then
+                            local _t =
+                                _blocknet_id ..
+                                "-" .. _continent .. "-" .. _country .. "-" .. _item.status .. "-" .. _item.approved
+                            _nodes[_t] = _nodes[_t] or {}
+                            table.insert(_nodes[_t], _item)
+                        end
+
                         if _item.status and tonumber(_item.status) == 0 then
                             _not_actives[#_not_actives + 1] = _item
                         end
@@ -340,6 +352,17 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
         _print(_str_listid_not_actives)
         _print(_file_listid_not_actives)
         _write_file(_file_listid_not_actives, _str_listid_not_actives)
+    end
+    if _nodes and #_nodes > 0 then
+        for _t, _v in pairs(_nodes) do
+            local _tmpl = _get_tmpl(rules, {nodes = _v, _domain_name = _job_data._domain_name})
+            local _str_listid = _tmpl("_listids")
+            mkdirp(_info_dir .. "/" .. mytype)
+            local _file_listid = _info_dir .. "/" .. mytype .. "/listid-" .. _t
+            _print(_str_listid)
+            _print(_file_listid)
+            _write_file(_file_listid, _str_listid)
+        end
     end
 end
 
