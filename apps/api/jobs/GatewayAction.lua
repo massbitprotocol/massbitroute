@@ -199,7 +199,7 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
                                 _datacenters["geo"] = _datacenters["geo"] or {}
                                 _datacenters["blocknet"] = _datacenters["blocknet"] or {}
                                 local _dc_geo = _datacenters["geo"]
-                                -- local _dc_block = _datacenters["blocknet"]
+                                local _dc_block = _datacenters["blocknet"]
                                 -- _datacenters["blocknet1"] = _datacenters["blocknet1"] or {}
 
                                 _dc_global[_geo_id] = 1
@@ -213,21 +213,21 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
 
                                 _dc_country[_continent][_country][_geo_id] = 1
 
-                                -- _dc_geo[_blocknet_id] = _dc_geo[_blocknet_id] or {}
-                                -- _dc_block[_blocknet_id] = _dc_block[_blocknet_id] or {}
-                                -- _dc_block[_continent] = _dc_block[_continent] or {}
+                                _dc_geo[_blocknet_id] = _dc_geo[_blocknet_id] or {}
+                                _dc_block[_blocknet_id] = _dc_block[_blocknet_id] or {}
+                                _dc_block[_continent] = _dc_block[_continent] or {}
 
-                                -- _dc_block[_continent][_country] = _dc_block[_continent][_country] or {}
+                                _dc_block[_continent][_country] = _dc_block[_continent][_country] or {}
 
-                                -- _dc_block[_continent]["default"] = _dc_block[_continent]["default"] or {}
+                                _dc_block[_continent]["default"] = _dc_block[_continent]["default"] or {}
 
-                                -- _dc_block["default"] = _dc_block["default"] or {}
-                                -- -- _dc_block1["default"] = _dc_block1["default"] or {}
+                                _dc_block["default"] = _dc_block["default"] or {}
+                                -- _dc_block1["default"] = _dc_block1["default"] or {}
 
-                                -- _dc_block[_continent][_country] = _geo_id
+                                _dc_block[_continent][_country] = _geo_id
 
-                                -- table.insert(_dc_block[_continent]["default"], _geo_id)
-                                -- table.insert(_dc_block["default"], _geo_id)
+                                table.insert(_dc_block[_continent]["default"], _geo_id)
+                                table.insert(_dc_block["default"], _geo_id)
 
                                 _dc_geo[_geo_id] = _dc_geo[_geo_id] or {}
                                 _dc_geo[_geo_country_default] = _dc_geo[_geo_country_default] or {}
@@ -322,76 +322,76 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
         print(_geo_map)
         local _file_map = gwman_dir .. "/conf.d/geolocation.d/maps.d/mbr-map-" .. _blocknet_id
         print(_file_map)
+    -- _write_file(_file_map, _geo_map)
+    end
+    if _datacenters["blocknet"] and next(_datacenters["blocknet"]) ~= nil then
+        local _geo_val = _datacenters["blocknet"]
+        _print("blocknet:")
+        _print(_geo_val, true)
+
+        local _v_maps = {}
+        local _v_datacenters = {}
+        table_insert(_v_maps, _blocknet_id .. " => { ")
+
+        for _k3, _v3 in pairs(_geo_val) do
+            if _k3 ~= "default" then
+                table_insert(_v_maps, _k3 .. " => { ")
+                for _k4, _v4 in pairs(_v3) do
+                    if _k4 and _k4 ~= "default" then
+                        table_insert(_v_maps, "  " .. _k4 .. " => [ " .. _v4 .. "],")
+                        _v_datacenters[_v4] = 1
+                    else
+                        _v_datacenters[_blocknet_id .. "-" .. _k3 .. "-" .. _k4] = 1
+                        -- if _v4 then
+                        --     table.insert(_v_datacenters, _v4)
+                        -- end
+                        local _cache = {}
+                        table_insert(_v_maps, "  " .. _k4 .. " => [ ")
+                        for _, _v5 in ipairs(_v4) do
+                            if _v5 and not _cache[_v5] then
+                                table_insert(_v_maps, "    " .. _v5 .. ",")
+                                _cache[_v5] = 1
+                                _v_datacenters[_v5] = 1
+                            end
+                        end
+                        table_insert(_v_maps, "  ],")
+                    end
+                end
+                table_insert(_v_maps, "},")
+            else
+                _v_datacenters[_blocknet_id .. "-" .. _k3 .. "-" .. _k3] = 1
+                table_insert(_v_maps, "  " .. _k3 .. " => [ ")
+                local _cache = {}
+                for _, _v4 in ipairs(_v3) do
+                    if _v4 and not _cache[_v4] then
+                        table_insert(_v_maps, "    " .. _v4 .. ",")
+                        _v_datacenters[_v4] = 1
+                        _cache[_v4] = 1
+                    end
+                end
+                table_insert(_v_maps, "  ],")
+            end
+        end
+
+        table_insert(_v_maps, "}")
+        _print("v_maps:" .. inspect(_v_maps))
+        _print("v_datacenters:" .. inspect(_v_datacenters))
+        local _tmpl_map =
+            _get_tmpl(
+            rules,
+            {
+                id = _blocknet_id,
+                datacenters = table_keys(_v_datacenters),
+                map = table_concat(_v_maps, "\n"),
+                _domain_name = _job_data._domain_name
+            }
+        )
+        local _geo_map = _tmpl_map("_dns_geo_map")
+        print(_geo_map)
+        local _file_map = gwman_dir .. "/conf.d/geolocation.d/maps.d/mbr-map-" .. _blocknet_id
+        print(_file_map)
         _write_file(_file_map, _geo_map)
     end
-    -- if _datacenters["blocknet"] and next(_datacenters["blocknet"]) ~= nil then
-    --     local _geo_val = _datacenters["blocknet"]
-    --     _print("blocknet:")
-    --     _print(_geo_val, true)
-
-    --     local _v_maps = {}
-    --     local _v_datacenters = {}
-    --     table_insert(_v_maps, _blocknet_id .. " => { ")
-
-    --     for _k3, _v3 in pairs(_geo_val) do
-    --         if _k3 ~= "default" then
-    --             table_insert(_v_maps, _k3 .. " => { ")
-    --             for _k4, _v4 in pairs(_v3) do
-    --                 if _k4 and _k4 ~= "default" then
-    --                     table_insert(_v_maps, "  " .. _k4 .. " => [ " .. _v4 .. "],")
-    --                     _v_datacenters[_v4] = 1
-    --                 else
-    --                     _v_datacenters[_blocknet_id .. "-" .. _k3 .. "-" .. _k4] = 1
-    --                     -- if _v4 then
-    --                     --     table.insert(_v_datacenters, _v4)
-    --                     -- end
-    --                     local _cache = {}
-    --                     table_insert(_v_maps, "  " .. _k4 .. " => [ ")
-    --                     for _, _v5 in ipairs(_v4) do
-    --                         if _v5 and not _cache[_v5] then
-    --                             table_insert(_v_maps, "    " .. _v5 .. ",")
-    --                             _cache[_v5] = 1
-    --                             _v_datacenters[_v5] = 1
-    --                         end
-    --                     end
-    --                     table_insert(_v_maps, "  ],")
-    --                 end
-    --             end
-    --             table_insert(_v_maps, "},")
-    --         else
-    --             _v_datacenters[_blocknet_id .. "-" .. _k3 .. "-" .. _k3] = 1
-    --             table_insert(_v_maps, "  " .. _k3 .. " => [ ")
-    --             local _cache = {}
-    --             for _, _v4 in ipairs(_v3) do
-    --                 if _v4 and not _cache[_v4] then
-    --                     table_insert(_v_maps, "    " .. _v4 .. ",")
-    --                     _v_datacenters[_v4] = 1
-    --                     _cache[_v4] = 1
-    --                 end
-    --             end
-    --             table_insert(_v_maps, "  ],")
-    --         end
-    --     end
-
-    --     table_insert(_v_maps, "}")
-    --     _print("v_maps:" .. inspect(_v_maps))
-    --     _print("v_datacenters:" .. inspect(_v_datacenters))
-    --     local _tmpl_map =
-    --         _get_tmpl(
-    --         rules,
-    --         {
-    --             id = _blocknet_id,
-    --             datacenters = table.keys(_v_datacenters),
-    --             map = table_concat(_v_maps, "\n"),
-    --             _domain_name = _job_data._domain_name
-    --         }
-    --     )
-    --     local _geo_map = _tmpl_map("_dns_geo_map")
-    --     print(_geo_map)
-    --     local _file_map = gwman_dir .. "/conf.d/geolocation.d/maps.d/mbr-map-" .. _blocknet_id
-    --     print(_file_map)
-    --     _write_file(_file_map, _geo_map)
-    -- end
 
     if _datacenters["geo"] and next(_datacenters["geo"]) ~= nil then
         local _geo_val = _datacenters["geo"]
