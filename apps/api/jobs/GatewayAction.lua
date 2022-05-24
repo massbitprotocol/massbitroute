@@ -395,6 +395,8 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
     -- end
 
     -- if _datacenters["geo"] and next(_datacenters["geo"]) ~= nil then
+    _print("dc_geo")
+    _print(_dc_geo, true)
     if _dc_geo and next(_dc_geo) then
         -- local _geo_val = _datacenters["geo"]
         -- _print("geo:")
@@ -426,7 +428,7 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
             }
         )
         local _geo_res = _tmpl_res("_dns_geo_resource_v1")
-        -- _print(_geo_res)
+        _print(_geo_res)
         local _file_res = gwman_dir .. "/conf.d/geolocation.d/resources.d/mbr-map-" .. _blocknet_id
         -- _print(_file_res)
         _write_file(_file_res, _geo_res)
