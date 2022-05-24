@@ -257,7 +257,7 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
             table_insert(_v_maps, "  " .. _continent_code .. " => { ")
             for _country_code, _countries in pairs(_continents) do
                 _print("_country_code:" .. _country_code)
-                table_insert(_v_maps, "    " .. _country_code .. " => [ ")
+
                 local _dcs = table.keys(_countries)
                 for _k, _ in pairs(_dc_continent[_continent_code]) do
                     if not _countries[_k] then
@@ -273,13 +273,29 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
                 _print("dcs")
                 _print(_dcs, true)
 
+                table_insert(_v_maps, "    " .. _country_code .. " => [ ")
                 for _, _dc in ipairs(_dcs) do
                     table_insert(_v_maps, "        " .. _dc .. ",")
                 end
                 table_insert(_v_maps, "    ],")
             end
+            local _country_code = "default"
+            local _countries = _dc_continent[_continent_code]
+            local _dcs = table.keys(_countries)
+            for _k, _ in pairs(_dc_global) do
+                if not _countries[_k] then
+                    table.insert(_dcs, _k)
+                end
+            end
+            table_insert(_v_maps, "    " .. _country_code .. " => [ ")
+            for _, _dc in ipairs(_dcs) do
+                table_insert(_v_maps, "        " .. _dc .. ",")
+            end
+            table_insert(_v_maps, "    ],")
+
             table_insert(_v_maps, "  },")
         end
+
         _print("_v_maps:")
         _print(_v_maps, true)
         _print(table_concat(_v_maps, "\n"))
