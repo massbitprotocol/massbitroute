@@ -304,7 +304,6 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
         end
         table_insert(_v_maps, "  ],")
         table_insert(_v_maps, "}")
-        table_insert(_v_maps, "}")
 
         _print("_v_maps:")
         _print(_v_maps, true)
