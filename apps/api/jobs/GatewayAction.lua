@@ -138,6 +138,7 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
 
     local _dc_country = {}
     local _dc_continent = {}
+    local _dc_geo = {}
 
     local _network_dir = _deploy_dir .. "/" .. _blockchain .. "/" .. _network
     -- _print("dir:" .. _network_dir)
@@ -198,7 +199,7 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
 
                                 _datacenters["geo"] = _datacenters["geo"] or {}
                                 _datacenters["blocknet"] = _datacenters["blocknet"] or {}
-                                local _dc_geo = _datacenters["geo"]
+                                -- local _dc_geo = _datacenters["geo"]
                                 -- local _dc_block = _datacenters["blocknet"]
                                 -- _datacenters["blocknet1"] = _datacenters["blocknet1"] or {}
 
@@ -213,7 +214,7 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
 
                                 _dc_country[_continent][_country][_geo_id] = 1
 
-                                _dc_geo[_blocknet_id] = _dc_geo[_blocknet_id] or {}
+                                -- _dc_geo[_blocknet_id] = _dc_geo[_blocknet_id] or {}
                                 -- _dc_block[_blocknet_id] = _dc_block[_blocknet_id] or {}
                                 -- _dc_block[_continent] = _dc_block[_continent] or {}
 
@@ -229,12 +230,10 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
                                 -- table.insert(_dc_block[_continent]["default"], _geo_id)
                                 -- table.insert(_dc_block["default"], _geo_id)
 
-                                local _dc_geo1 = _dc_geo[_geo_id]
-                                _dc_geo1 = _dc_geo1 or {}
-                                _dc_geo1[#_dc_geo1 + 1] = _obj
-                            -- _dc_geo[_geo_country_default] = _dc_geo[_geo_country_default] or {}
-                            -- _dc_geo[_geo_continent_default] = _dc_geo[_geo_continent_default] or {}
-                            -- table_insert(_dc_geo[_geo_id], _obj)
+                                _dc_geo[_geo_id] = _dc_geo[_geo_id] or {}
+                                -- _dc_geo[_geo_country_default] = _dc_geo[_geo_country_default] or {}
+                                -- _dc_geo[_geo_continent_default] = _dc_geo[_geo_continent_default] or {}
+                                table_insert(_dc_geo[_geo_id], _obj)
                             -- table_insert(_dc_geo[_geo_country_default], _obj)
                             -- table_insert(_dc_geo[_geo_continent_default], _obj)
                             end
@@ -395,14 +394,15 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
     --     _write_file(_file_map, _geo_map)
     -- end
 
-    if _datacenters["geo"] and next(_datacenters["geo"]) ~= nil then
-        local _geo_val = _datacenters["geo"]
-        _print("geo:")
-        _print(_geo_val, true)
+    -- if _datacenters["geo"] and next(_datacenters["geo"]) ~= nil then
+    if _dc_geo and next(_dc_geo) then
+        -- local _geo_val = _datacenters["geo"]
+        -- _print("geo:")
+        -- _print(_geo_val, true)
 
-        _print("_geo_val:" .. inspect(_geo_val))
+        -- _print("_geo_val:" .. inspect(_geo_val))
         local _dc_maps_new = {}
-        for _geo_id, _geo_svrs in pairs(_geo_val) do
+        for _geo_id, _geo_svrs in pairs(_dc_geo) do
             -- _print("_geo_id:" .. inspect(_geo_id))
             -- _print("_geo_svrs:" .. inspect(_geo_svrs))
             table.insert(
