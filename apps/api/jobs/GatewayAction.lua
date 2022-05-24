@@ -296,14 +296,27 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
             table_insert(_v_maps, "  },")
         end
 
+        local _dc_global_keys = table.keys(_dc_global)
         table_insert(_v_maps, "  default => [ ")
-        for _, _dc in ipairs(table.keys(_dc_global)) do
+        for _, _dc in ipairs(_dc_global_keys) do
             table_insert(_v_maps, "        " .. _dc .. ",")
         end
         table_insert(_v_maps, "  ],")
         _print("_v_maps:")
         _print(_v_maps, true)
-        _print(table_concat(_v_maps, "\n"))
+        -- _print(table_concat(_v_maps, "\n"))
+        local _tmpl_map =
+            _get_tmpl(
+            rules,
+            {
+                id = _blocknet_id,
+                datacenters = _dc_global_keys,
+                map = table_concat(_v_maps, "\n"),
+                _domain_name = _job_data._domain_name
+            }
+        )
+        local _geo_map = _tmpl_map("_dns_geo_map")
+        print(_geo_map)
     end
     if _datacenters["blocknet"] and next(_datacenters["blocknet"]) ~= nil then
         local _geo_val = _datacenters["blocknet"]
