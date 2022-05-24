@@ -17,6 +17,7 @@ local inspect = mbrutil.inspect
 -- local table_filter = table.filter
 local table_insert = table.insert
 local table_concat = table.concat
+local table_keys = table.keys
 -- local table_keys = table.keys
 local table_merge = table.merge
 
@@ -198,7 +199,7 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
                                 _datacenters["geo"] = _datacenters["geo"] or {}
                                 _datacenters["blocknet"] = _datacenters["blocknet"] or {}
                                 local _dc_geo = _datacenters["geo"]
-                                local _dc_block = _datacenters["blocknet"]
+                                -- local _dc_block = _datacenters["blocknet"]
                                 -- _datacenters["blocknet1"] = _datacenters["blocknet1"] or {}
 
                                 _dc_global[_geo_id] = 1
@@ -214,19 +215,19 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
 
                                 -- _dc_geo[_blocknet_id] = _dc_geo[_blocknet_id] or {}
                                 -- _dc_block[_blocknet_id] = _dc_block[_blocknet_id] or {}
-                                _dc_block[_continent] = _dc_block[_continent] or {}
+                                -- _dc_block[_continent] = _dc_block[_continent] or {}
 
-                                _dc_block[_continent][_country] = _dc_block[_continent][_country] or {}
+                                -- _dc_block[_continent][_country] = _dc_block[_continent][_country] or {}
 
-                                _dc_block[_continent]["default"] = _dc_block[_continent]["default"] or {}
+                                -- _dc_block[_continent]["default"] = _dc_block[_continent]["default"] or {}
 
-                                _dc_block["default"] = _dc_block["default"] or {}
-                                -- _dc_block1["default"] = _dc_block1["default"] or {}
+                                -- _dc_block["default"] = _dc_block["default"] or {}
+                                -- -- _dc_block1["default"] = _dc_block1["default"] or {}
 
-                                _dc_block[_continent][_country] = _geo_id
+                                -- _dc_block[_continent][_country] = _geo_id
 
-                                table.insert(_dc_block[_continent]["default"], _geo_id)
-                                table.insert(_dc_block["default"], _geo_id)
+                                -- table.insert(_dc_block[_continent]["default"], _geo_id)
+                                -- table.insert(_dc_block["default"], _geo_id)
 
                                 _dc_geo[_geo_id] = _dc_geo[_geo_id] or {}
                                 _dc_geo[_geo_country_default] = _dc_geo[_geo_country_default] or {}
@@ -258,7 +259,7 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
             for _country_code, _countries in pairs(_continents) do
                 _print("_country_code:" .. _country_code)
 
-                local _dcs = table.keys(_countries)
+                local _dcs = table_keys(_countries)
                 for _k, _ in pairs(_dc_continent[_continent_code]) do
                     if not _countries[_k] then
                         table.insert(_dcs, _k)
@@ -281,7 +282,7 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
             end
             local _country_code = "default"
             local _countries = _dc_continent[_continent_code]
-            local _dcs = table.keys(_countries)
+            local _dcs = table_keys(_countries)
             for _k, _ in pairs(_dc_global) do
                 if not _countries[_k] then
                     table.insert(_dcs, _k)
@@ -296,7 +297,7 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
             table_insert(_v_maps, "  },")
         end
 
-        local _dc_global_keys = table.keys(_dc_global)
+        local _dc_global_keys = table_keys(_dc_global)
         table_insert(_v_maps, "  default => [ ")
         for _, _dc in ipairs(_dc_global_keys) do
             table_insert(_v_maps, "        " .. _dc .. ",")
