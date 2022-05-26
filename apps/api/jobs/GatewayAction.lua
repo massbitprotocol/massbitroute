@@ -253,7 +253,7 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
         _print(_dc_global, true)
 
         local _v_maps = {}
-        table_insert(_v_maps, _blocknet_id .. " => { ")
+        -- table_insert(_v_maps, _blocknet_id .. " => { ")
         for _continent_code, _continents in pairs(_dc_country) do
             _print("_continent_code:" .. _continent_code)
             table_insert(_v_maps, "  " .. _continent_code .. " => { ")
@@ -304,7 +304,7 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
             table_insert(_v_maps, "        " .. _dc .. ",")
         end
         table_insert(_v_maps, "  ],")
-        table_insert(_v_maps, "}")
+        -- table_insert(_v_maps, "}")
 
         _print("_v_maps:")
         _print(_v_maps, true)
@@ -430,7 +430,7 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
         local _geo_res = _tmpl_res("_dns_geo_resource_v1")
         _print(_geo_res)
         local _file_res = gwman_dir .. "/conf.d/geolocation.d/resources.d/mbr-map-" .. _blocknet_id
-        -- _print(_file_res)
+        _print(_file_res)
         _write_file(_file_res, _geo_res)
 
         local _file_dapi = gwman_dir .. "/zones/dapi/" .. _blocknet_id .. ".zone"
