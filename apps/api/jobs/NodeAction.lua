@@ -68,6 +68,9 @@ scrape_configs:
       - targets:
 ${nodes/_node_stat_target(); separator='\n'}
 ]],
+    _gw_node_upstream_ws = [[
+server unix:/tmp/${id}-ws.sock max_fails=1 fail_timeout=3s;
+]],
     _gw_node_upstream = [[
 server unix:/tmp/${id}.sock max_fails=1 fail_timeout=3s;
 ]],
@@ -95,8 +98,23 @@ server {
   include /massbit/massbitroute/app/src/sites/services/gateway/etc/_provider_server.conf;
     }
 }
+ ${upstream_extra_ws}
+upstream ${node_type}-ws.node.mbr.${_domain_name} {
+  ${nodes/_gw_node_upstream_ws()}
+  ${upstream_backup_ws}
+ keepalive 100;
+}
+server {
+    listen unix:/tmp/${node_type}-ws.node.mbr.${_domain_name}.sock;
+    location / {
+        proxy_pass http://${node_type}-ws.node.mbr.${_domain_name};
+
+  include /massbit/massbitroute/app/src/sites/services/gateway/etc/_provider_server_ws.conf;
+    }
+}
 ]],
     ["_gw_upstream_backup_name_dot-mainnet"] = [[ unix:/tmp/dot-mainnet-getblock-1.sock ]],
+    ["_gw_upstream_backup_name_ws_dot-mainnet"] = [[ unix:/tmp/dot-mainnet-getblock-1.sock ]],
     ["_gw_upstream_backup_dot-mainnet"] = [[
 server {
     listen unix:/tmp/dot-mainnet-getblock-1.sock;
@@ -109,7 +127,20 @@ server {
     }
 }
  ]],
+    ["_gw_upstream_backup_ws_dot-mainnet"] = [[
+server {
+    listen unix:/tmp/dot-mainnet-getblock-1.sock;
+    location / {
+        add_header X-Mbr-Node-Id dot-mainnet-getblock-1;
+        proxy_set_header X-Api-Key 6c4ddad0-7646-403e-9c10-744f91d37ccf;
+        proxy_pass https://dot.getblock.io/mainnet/;
+
+  include /massbit/massbitroute/app/src/sites/services/gateway/etc/_provider_server_ws.conf;
+    }
+}
+ ]],
     ["_gw_upstream_backup_name_eth-mainnet"] = [[ unix:/tmp/eth-mainnet-getblock-1.sock ]],
+    ["_gw_upstream_backup_name_ws_eth-mainnet"] = [[ unix:/tmp/eth-mainnet-getblock-1.sock ]],
     ["_gw_upstream_backup_eth-mainnet"] = [[
 server {
     listen unix:/tmp/eth-mainnet-getblock-1.sock;
@@ -118,6 +149,17 @@ server {
         proxy_set_header X-Api-Key 6c4ddad0-7646-403e-9c10-744f91d37ccf;
         proxy_pass https://eth.getblock.io/mainnet/;
   include /massbit/massbitroute/app/src/sites/services/gateway/etc/_provider_server.conf;
+    }
+}
+]],
+    ["_gw_upstream_backup_ws_eth-mainnet"] = [[
+server {
+    listen unix:/tmp/eth-mainnet-getblock-1.sock;
+    location / {
+        add_header X-Mbr-Node-Id eth-mainnet-getblock-1;
+        proxy_set_header X-Api-Key 6c4ddad0-7646-403e-9c10-744f91d37ccf;
+        proxy_pass https://eth.getblock.io/mainnet/;
+  include /massbit/massbitroute/app/src/sites/services/gateway/etc/_provider_server_ws.conf;
     }
 }
 ]],
@@ -131,11 +173,20 @@ upstream ${node_type}.node.mbr.${_domain_name} {
 ]],
     _gw_node = [[
 server {
+    listen unix:/tmp/${id}-ws.sock;
+    location / {
+        proxy_set_header X-Api-Key ${token};
+        proxy_set_header Host ${id}-ws.node.mbr.${_domain_name};
+        proxy_pass https://${ip};
+
+  include /massbit/massbitroute/app/src/sites/services/gateway/etc/_provider_server_ws.conf;
+    }
+}
+server {
     listen unix:/tmp/${id}.sock;
     location / {
         proxy_set_header X-Api-Key ${token};
         proxy_set_header Host ${id}.node.mbr.${_domain_name};
-        #add_header X-Mbr-GNode-Id ${id};
         proxy_pass https://${ip};
 
   include /massbit/massbitroute/app/src/sites/services/gateway/etc/_provider_server.conf;
@@ -222,7 +273,15 @@ local function _norm(_v)
     return _v
 end
 
-local function _gen_upstream_block(_prefix, _name, _nodes, _job_data, _upstream_backup, _upstream_extra)
+local function _gen_upstream_block(
+    _prefix,
+    _name,
+    _nodes,
+    _job_data,
+    _upstream_backup,
+    _upstream_backup_ws,
+    _upstream_extra,
+    _upstream_extra_ws)
     local _backup = ";"
     if #_nodes > 0 then
         _backup = " backup;"
@@ -232,9 +291,17 @@ local function _gen_upstream_block(_prefix, _name, _nodes, _job_data, _upstream_
         _upstream_extra = ""
     end
 
+    if not _upstream_extra_ws then
+        _upstream_extra_ws = ""
+    end
+
     if not _upstream_backup then
         _upstream_backup =
             "server unix:/tmp/" .. _prefix .. ".node.mbr." .. _job_data._domain_name .. ".sock " .. _backup
+    end
+    if not _upstream_backup_ws then
+        _upstream_backup_ws =
+            "server unix:/tmp/" .. _prefix .. ".node.mbr." .. _job_data._domain_name .. "-ws.sock " .. _backup
     end
     local _tmpl =
         _get_tmpl(
@@ -244,7 +311,9 @@ local function _gen_upstream_block(_prefix, _name, _nodes, _job_data, _upstream_
             nodes = _nodes,
             _domain_name = _job_data._domain_name,
             upstream_backup = _upstream_backup,
-            upstream_extra = _upstream_extra
+            upstream_backup_ws = _upstream_backup_ws,
+            upstream_extra = _upstream_extra,
+            upstream_extra_ws = _upstream_extra_ws
         }
     )
 
@@ -406,7 +475,12 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
                 upstream_backup = rules["_gw_upstream_backup_name_" .. _k1] and
                     "server " .. rules["_gw_upstream_backup_name_" .. _k1] .. _backup or
                     "",
-                upstream_extra = rules["_gw_upstream_backup_" .. _k1] and rules["_gw_upstream_backup_" .. _k1] or ""
+                upstream_backup_ws = rules["_gw_upstream_backup_name_ws_" .. _k1] and
+                    "server " .. rules["_gw_upstream_backup_name_ws_" .. _k1] .. _backup or
+                    "",
+                upstream_extra = rules["_gw_upstream_backup_" .. _k1] and rules["_gw_upstream_backup_" .. _k1] or "",
+                upstream_extra_ws = rules["_gw_upstream_backup_ws_" .. _k1] and rules["_gw_upstream_backup_ws_" .. _k1] or
+                    ""
             }
         )
 
@@ -428,7 +502,11 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
                     rules["_gw_upstream_backup_name_" .. _k1] and
                         "server " .. rules["_gw_upstream_backup_name_" .. _k1] .. _backup or
                         "",
-                    rules["_gw_upstream_backup_" .. _k1]
+                    rules["_gw_upstream_backup_name_ws_" .. _k1] and
+                        "server " .. rules["_gw_upstream_backup_name_ws_" .. _k1] .. _backup or
+                        "",
+                    rules["_gw_upstream_backup_" .. _k1],
+                    rules["_gw_upstream_backup_ws_" .. _k1]
                 )
             )
             -- local _backup = ";"
@@ -511,6 +589,9 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
                             _job_data,
                             rules["_gw_upstream_backup_name_" .. _k1] and
                                 "server " .. rules["_gw_upstream_backup_name_" .. _k1] .. _backup_global or
+                                "",
+                            rules["_gw_upstream_backup_name_ws_" .. _k1] and
+                                "server " .. rules["_gw_upstream_backup_name_ws_" .. _k1] .. _backup_global or
                                 ""
                             -- ,
                             -- rules["_gw_upstream_backup_" .. _k1]
@@ -535,7 +616,10 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
                             _job_data,
                             "server unix:/tmp/" ..
                                 _block_name ..
-                                    "-v1-v2.node.mbr." .. _job_data._domain_name .. ".sock " .. _backup_country
+                                    "-v1-v2.node.mbr." .. _job_data._domain_name .. ".sock " .. _backup_country,
+                            "server unix:/tmp/" ..
+                                _block_name ..
+                                    "-v1-v2-ws.node.mbr." .. _job_data._domain_name .. ".sock " .. _backup_country
                         )
                     )
                     -- table.insert(_upstream_str, _gen_upstream_block(_k1 .. "-" .. _k2, "-" .. _k3, _v3, _job_data))
