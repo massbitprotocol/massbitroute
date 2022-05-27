@@ -114,7 +114,7 @@ server {
 }
 ]],
     ["_gw_upstream_backup_name_dot-mainnet"] = [[ unix:/tmp/dot-mainnet-getblock-1.sock ]],
-    ["_gw_upstream_backup_name_ws_dot-mainnet"] = [[ unix:/tmp/dot-mainnet-getblock-1.sock ]],
+    ["_gw_upstream_backup_name_ws_dot-mainnet"] = [[ unix:/tmp/dot-mainnet-getblock-ws-1.sock ]],
     ["_gw_upstream_backup_dot-mainnet"] = [[
 server {
     listen unix:/tmp/dot-mainnet-getblock-1.sock;
@@ -129,7 +129,7 @@ server {
  ]],
     ["_gw_upstream_backup_ws_dot-mainnet"] = [[
 server {
-    listen unix:/tmp/dot-mainnet-getblock-1.sock;
+    listen unix:/tmp/dot-mainnet-getblock-ws-1.sock;
     location / {
         add_header X-Mbr-Node-Id dot-mainnet-getblock-1;
         proxy_set_header X-Api-Key 6c4ddad0-7646-403e-9c10-744f91d37ccf;
@@ -140,7 +140,7 @@ server {
 }
  ]],
     ["_gw_upstream_backup_name_eth-mainnet"] = [[ unix:/tmp/eth-mainnet-getblock-1.sock ]],
-    ["_gw_upstream_backup_name_ws_eth-mainnet"] = [[ unix:/tmp/eth-mainnet-getblock-1.sock ]],
+    ["_gw_upstream_backup_name_ws_eth-mainnet"] = [[ unix:/tmp/eth-mainnet-getblock-ws-1.sock ]],
     ["_gw_upstream_backup_eth-mainnet"] = [[
 server {
     listen unix:/tmp/eth-mainnet-getblock-1.sock;
@@ -154,7 +154,7 @@ server {
 ]],
     ["_gw_upstream_backup_ws_eth-mainnet"] = [[
 server {
-    listen unix:/tmp/eth-mainnet-getblock-1.sock;
+    listen unix:/tmp/eth-mainnet-getblock-ws-1.sock;
     location / {
         add_header X-Mbr-Node-Id eth-mainnet-getblock-1;
         proxy_set_header X-Api-Key 6c4ddad0-7646-403e-9c10-744f91d37ccf;
