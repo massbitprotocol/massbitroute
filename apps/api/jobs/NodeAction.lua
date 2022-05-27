@@ -745,6 +745,9 @@ local function _generate_item(instance, args)
     local _item1 = model:get(args)
     _print("stored item: " .. inspect(_item1))
     local _item = _norm(_item1)
+    if not _item.data_ws then
+        _item.data_ws = _item.data_url
+    end
 
     if
         not _item or not _item.id or not _item.ip or not _item.blockchain or not _item.network or not _item.geo or
@@ -781,6 +784,7 @@ local function _generate_item(instance, args)
     _write_file(_deploy_file1, "")
     _item._domain_name = args._domain_name
     local _tmpl = _get_tmpl(rules, _item)
+
     local _str_tmpl = _tmpl("_local")
 
     local _file_main = _deploy_nodeconfdir .. "/" .. _item.id .. ".conf"
