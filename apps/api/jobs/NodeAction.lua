@@ -156,6 +156,22 @@ map $http_x_api_key $api_realm {
 }
 
 server {
+    include /massbit/massbitroute/app/src/sites/services/node/etc/_pre_server_ws.conf;
+    include /massbit/massbitroute/app/src/sites/services/node/etc/_ssl_node.mbr.${_domain_name}.conf;
+    server_name ${id}-ws.node.mbr.${_domain_name};
+    location / {
+        add_header X-Mbr-Node-Id ${id};
+        vhost_traffic_status_filter_by_set_key $api_method user::${user_id}::node::${id}::v1::api_method;
+        proxy_pass ${data_ws};
+        include /massbit/massbitroute/app/src/sites/services/node/etc/_node_server_ws.conf;
+    }
+    location /__internal_status_vhost/ {
+        include /massbit/massbitroute/app/src/sites/services/node/etc/_vts_server_ws.conf;
+    }
+    include /massbit/massbitroute/app/src/sites/services/node/etc/_location_server_ws.conf;
+}
+
+server {
     include /massbit/massbitroute/app/src/sites/services/node/etc/_pre_server.conf;
     include /massbit/massbitroute/app/src/sites/services/node/etc/_ssl_node.mbr.${_domain_name}.conf;
     server_name ${id}.node.mbr.${_domain_name};
