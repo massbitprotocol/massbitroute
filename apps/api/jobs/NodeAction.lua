@@ -700,7 +700,7 @@ local function _generate_item(instance, args)
         },
         "/"
     )
-    local _cmd = "/usr/bin/rm" .. _old_file
+    local _cmd = "/usr/bin/rm " .. _old_file
 
     local handle = io.popen(_cmd)
     local _res = handle:read("*a")
