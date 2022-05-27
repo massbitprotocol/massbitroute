@@ -12,6 +12,8 @@ local read_file = mbrutil.read_file
 local show_folder = mbrutil.show_folder
 local inspect = mbrutil.inspect
 
+local shell = require "shell-games"
+
 -- local table_map = table.map
 -- local table_walk = table.walk
 -- local table_filter = table.filter
@@ -578,6 +580,25 @@ local function _generate_item(instance, args)
     -- dump detail
     _write_file(_deploy_file, json.encode(_item))
 
+    local _old_file =
+        table.concat(
+        {
+            _deploy_dir,
+            "*",
+            "*",
+            "*",
+            "*",
+            "*",
+            _item.id
+        },
+        "/"
+    )
+    local _cmd = {
+        "/usr/bin/rm",
+        _old_file
+    }
+    local _res = shell.run(_cmd)
+    _print("rm old:" .. _old_file .. ":" .. inspect(_res))
     _rescanconf_blockchain_network(_item.blockchain, _item.network, args)
     return true
 end

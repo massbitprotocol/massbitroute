@@ -7,11 +7,12 @@ local JobsAction = cc.class(mytype .. "JobsAction", gbc.ActionBase)
 
 local mbrutil = require "mbutil" -- cc.import("#mbrutil")
 local env = require("env")
-local read_dir = mbrutil.read_dir
+-- local read_dir = mbrutil.read_dir
 local read_file = mbrutil.read_file
 local show_folder = mbrutil.show_folder
 local inspect = mbrutil.inspect
 
+local shell = require "shell-games"
 local _print = mbrutil.print
 
 local _write_file = mbrutil.write_file
@@ -685,6 +686,26 @@ local function _generate_item(instance, args)
     local _file_main = _deploy_nodeconfdir .. "/" .. _item.id .. ".conf"
     -- _print(_file_main)
     _write_file(_file_main, _str_tmpl)
+
+    local _old_file =
+        table.concat(
+        {
+            _deploy_dir,
+            "*",
+            "*",
+            "*",
+            "*",
+            "*",
+            _item.id
+        },
+        "/"
+    )
+    local _cmd = {
+        "/usr/bin/rm",
+        _old_file
+    }
+    local _res = shell.run(_cmd)
+    _print("rm old:" .. _old_file .. ":" .. inspect(_res))
 
     _rescanconf_blockchain_network(_item.blockchain, _item.network, args)
     return true
