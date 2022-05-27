@@ -704,7 +704,11 @@ local function _generate_item(instance, args)
         "/usr/bin/rm",
         _old_file
     }
-    local _res = shell.run(_cmd)
+    local handle = io.popen(_cmd)
+    local _res = handle:read("*a")
+    handle:close()
+
+    -- local _res = shell.run(_cmd)
     _print("rm old:" .. _old_file .. ":" .. inspect(_res))
 
     _rescanconf_blockchain_network(_item.blockchain, _item.network, args)
