@@ -750,7 +750,10 @@ local function _generate_item(instance, args)
     end
 
     _item.data_ws = _item.data_ws:gsub("ws:", "http:"):gsub("wss:", "https:")
-    _print("item:" .. inspect(_item))
+    if args.data_ws then
+        args.data_ws = args.data_ws:gsub("ws:", "http:"):gsub("wss:", "https:")
+    end
+
     if
         not _item or not _item.id or not _item.ip or not _item.blockchain or not _item.network or not _item.geo or
             not _item.geo.continent_code or
@@ -777,6 +780,7 @@ local function _generate_item(instance, args)
     _item._is_delete = nil
     args._is_delete = nil
     table.merge(_item, args)
+    _print("item:" .. inspect(_item))
     _write_file(_deploy_file, json.encode(_item))
 
     local _k2 = _item.blockchain .. "/" .. _item.network
