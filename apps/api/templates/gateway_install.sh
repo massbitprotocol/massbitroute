@@ -103,7 +103,14 @@ if [ "$zone" != "{{zone}}" ]; then
 
 fi
 
-SITE_ROOT=/massbit/massbitroute/app/src/sites/services/gateway
+SERVICE_DIR=/massbit/massbitroute/app/src/sites/services
+SITE_ROOT=$SERVICE_DIR/gateway
+
+if [ \( -f "/etc/supervisor/conf.d/mbr_node.conf" \) -o \( -d "$SERVICE_DIR/node" \) ]; then
+	echo "Detect conflict folder $SERVICE_DIR/node or /etc/supervisor/conf.d/mbr_node.conf. Please remove it before install"
+	exit 0
+fi
+
 SCRIPTS_RUN="$SITE_ROOT/scripts/run"
 mkdir -p $(dirname $SITE_ROOT)
 
@@ -154,15 +161,15 @@ $SITE_ROOT/cmd_server status
 res=$($SITE_ROOT/mbr node nodeverify)
 status=$(echo $res | jq ".status" | sed -z "s/\"//g;")
 while [ "$status" != "verified" ]; do
-  message=$(echo $res | jq ".message")
+	message=$(echo $res | jq ".message")
 	if [ "$message" != "null" ]; then
-    echo "Verifying with message: $message"
-  fi
+		echo "Verifying with message: $message"
+	fi
 	sleep 10
 	$SCRIPTS_RUN _load_config
 	$SITE_ROOT/cmd_server _update
 	res=$($SITE_ROOT/mbr node nodeverify)
-  status=$(echo $res | jq ".status" | sed -z "s/\"//g;")
+	status=$(echo $res | jq ".status" | sed -z "s/\"//g;")
 done
 
 if [ "$status" = "verified" ]; then
