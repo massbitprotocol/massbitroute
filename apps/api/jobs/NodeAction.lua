@@ -749,7 +749,7 @@ local function _generate_item(instance, args)
         _item.data_ws = _item.data_url
     end
 
-    _item.data_ws = _item.data_ws:gsub("%^ws", "http")
+    _item.data_ws = _item.data_ws:gsub("ws:", "http:"):gsub("wss:", "https:")
     _print("item:" .. inspect(_item))
     if
         not _item or not _item.id or not _item.ip or not _item.blockchain or not _item.network or not _item.geo or
