@@ -336,19 +336,19 @@ local function _generate_item(instance, args)
         return false
     end
 
-    local _cmd = {
-        _portal_dir .. "/scripts/run",
-        "_test_node",
-        _item.id,
-        _blocknet,
-        _deploy_file
-    }
-    local _res = shell.run(_cmd)
+    -- local _cmd = {
+    --     _portal_dir .. "/scripts/run",
+    --     "_test_node",
+    --     _item.id,
+    --     _blocknet,
+    --     _deploy_file
+    -- }
+    -- local _res = shell.run(_cmd)
 
-    if _res.status ~= 0 then
-        os.remove(_deploy_file)
-        return false
-    end
+    -- if _res.status ~= 0 then
+    --     os.remove(_deploy_file)
+    --     return false
+    -- end
     -- read all file in blocknet dir
     local _content_all = _read_dir(_blocknet_dir)
     local _combine_file = _deploy_confdir .. "/" .. _blocknet .. ".conf"
