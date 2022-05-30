@@ -247,7 +247,7 @@ function Action:registerAction(args)
     local jobs = instance:getJobs()
     local job = {
         action = "/jobs/" .. mytype .. ".generateconf",
-        delay = 1,
+        delay = 0,
         data = {
             id = id,
             user_id = user_id
@@ -297,7 +297,7 @@ function Action:nodeverifyAction(args)
         local jobs = instance:getJobs()
         local job = {
             action = "/jobs/" .. mytype .. ".generateconf",
-            delay = 1,
+            delay = 0,
             data = {
                 id = _id,
                 user_id = _user_id
@@ -345,7 +345,7 @@ function Action:unregisterAction(args)
     local jobs = instance:getJobs()
     local job = {
         action = "/jobs/" .. mytype .. ".removeconf",
-        delay = 1,
+        delay = 0,
         data = {
             _is_delete = true,
             id = id,
@@ -474,13 +474,13 @@ function Action:adminupdateAction(args)
             args._is_delete = false
             job = {
                 action = "/jobs/" .. mytype .. ".removeconf",
-                delay = 1,
+                delay = 0,
                 data = args
             }
         else
             job = {
                 action = "/jobs/" .. mytype .. ".generateconf",
-                delay = 1,
+                delay = 0,
                 data = args
             }
         end
@@ -578,7 +578,7 @@ function Action:deleteAction(args)
     local jobs = instance:getJobs()
     local job = {
         action = "/jobs/" .. mytype .. ".removeconf",
-        delay = 1,
+        delay = 0,
         data = {
             _is_delete = true,
             id = args.id,
