@@ -745,14 +745,14 @@ local function _generate_item(instance, args)
     local _item1 = model:get(args)
     _print("stored item: " .. inspect(_item1))
     local _item = _norm(_item1)
-    if not _item.data_ws or type(_item.data_ws) ~= "string" or _item.data_ws == "null" then
+    if _item and not _item.data_ws or type(_item.data_ws) ~= "string" or _item.data_ws == "null" then
         _item.data_ws = _item.data_url
     end
 
-    if _item.data_ws and type(_item.data_ws) == "string" then
+    if _item and _item.data_ws and type(_item.data_ws) == "string" then
         _item.data_ws = _item.data_ws:gsub("ws:", "http:"):gsub("wss:", "https:")
     end
-    if args.data_ws and type(args.data_ws) == "string" then
+    if args and args.data_ws and type(args.data_ws) == "string" then
         args.data_ws = args.data_ws:gsub("ws:", "http:"):gsub("wss:", "https:")
     end
 
