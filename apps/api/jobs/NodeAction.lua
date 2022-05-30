@@ -12,7 +12,7 @@ local read_file = mbrutil.read_file
 local show_folder = mbrutil.show_folder
 local inspect = mbrutil.inspect
 
-local shell = require "shell-games"
+-- local shell = require "shell-games"
 local _print = mbrutil.print
 
 local _write_file = mbrutil.write_file
@@ -418,26 +418,6 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
             end
         end
     end
-    -- _print("nodes:" .. inspect(_nodes))
-    -- _print("nodes1:" .. inspect(_nodes1))
-    -- _print("nodes2:" .. inspect(_nodes2))
-    -- do
-    --     local _tmpl =
-    --         _get_tmpl(
-    --         rules,
-    --         {
-    --             node_type = _blocknet_id,
-    --             nodes = _nodes[_blocknet_id],
-    --             _domain_name = _job_data._domain_name
-    --         }
-    --     )
-
-    --     local _str_tmpl = _tmpl("_gw_conf")
-    --     _print(_str_tmpl)
-    --     local _file_gw = _deploy_gatewayconfdir .. "/" .. _blocknet_id .. ".conf"
-    --     _print(_file_gw)
-    --     _write_file(_file_gw, _str_tmpl)
-    -- end
 
     do
         local _tmpl =

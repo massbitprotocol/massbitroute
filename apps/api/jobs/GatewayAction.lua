@@ -209,21 +209,21 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
         end
     end
     if _dc_country and next(_dc_country) then
-        _print("dc_country:")
-        _print(_dc_country, true)
-        _print("dc_continent:")
-        _print(_dc_continent, true)
+        -- _print("dc_country:")
+        -- _print(_dc_country, true)
+        -- _print("dc_continent:")
+        -- _print(_dc_continent, true)
 
-        _print("dc_global:")
-        _print(_dc_global, true)
+        -- _print("dc_global:")
+        -- _print(_dc_global, true)
 
         local _v_maps = {}
         -- table_insert(_v_maps, _blocknet_id .. " => { ")
         for _continent_code, _continents in pairs(_dc_country) do
-            _print("_continent_code:" .. _continent_code)
+            -- _print("_continent_code:" .. _continent_code)
             table_insert(_v_maps, "  " .. _continent_code .. " => { ")
             for _country_code, _countries in pairs(_continents) do
-                _print("_country_code:" .. _country_code)
+                -- _print("_country_code:" .. _country_code)
 
                 local _dcs = table_keys(_countries)
                 for _k, _ in pairs(_dc_continent[_continent_code]) do
@@ -237,8 +237,8 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
                         table.insert(_dcs, _k)
                     end
                 end
-                _print("dcs")
-                _print(_dcs, true)
+                -- _print("dcs")
+                -- _print(_dcs, true)
 
                 table_insert(_v_maps, "    " .. _country_code .. " => [ ")
                 for _, _dc in ipairs(_dcs) do
@@ -271,8 +271,8 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
         table_insert(_v_maps, "  ],")
         -- table_insert(_v_maps, "}")
 
-        _print("_v_maps:")
-        _print(_v_maps, true)
+        -- _print("_v_maps:")
+        -- _print(_v_maps, true)
         -- _print(table_concat(_v_maps, "\n"))
         local _tmpl_map =
             _get_tmpl(
@@ -285,14 +285,14 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
             }
         )
         local _geo_map = _tmpl_map("_dns_geo_map")
-        print(_geo_map)
+        -- print(_geo_map)
         local _file_map = gwman_dir .. "/conf.d/geolocation.d/maps.d/mbr-map-" .. _blocknet_id
         print(_file_map)
         _write_file(_file_map, _geo_map)
     end
 
-    _print("dc_geo")
-    _print(_dc_geo, true)
+    -- _print("dc_geo")
+    -- _print(_dc_geo, true)
     if _dc_geo and next(_dc_geo) then
         local _dc_maps_new = {}
         for _geo_id, _geo_svrs in pairs(_dc_geo) do
@@ -315,7 +315,7 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
             }
         )
         local _geo_res = _tmpl_res("_dns_geo_resource_v1")
-        _print(_geo_res)
+        -- _print(_geo_res)
         local _file_res = gwman_dir .. "/conf.d/geolocation.d/resources.d/mbr-map-" .. _blocknet_id
         _print(_file_res)
         _write_file(_file_res, _geo_res)
