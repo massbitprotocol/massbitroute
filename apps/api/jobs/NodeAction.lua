@@ -749,7 +749,9 @@ local function _generate_item(instance, args)
         _item.data_ws = _item.data_url
     end
 
-    _item.data_ws = _item.data_ws:gsub("ws:", "http:"):gsub("wss:", "https:")
+    if _item.data_ws then
+        _item.data_ws = _item.data_ws:gsub("ws:", "http:"):gsub("wss:", "https:")
+    end
     if args.data_ws then
         args.data_ws = args.data_ws:gsub("ws:", "http:"):gsub("wss:", "https:")
     end
