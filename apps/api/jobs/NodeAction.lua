@@ -744,6 +744,28 @@ local function _generate_item(instance, args)
         return nil, "invalid data"
     end
 
+    local _old_file =
+        table.concat(
+        {
+            _deploy_dir,
+            "*",
+            "*",
+            "*",
+            "*",
+            "*",
+            _item.id
+        },
+        "/"
+    )
+    local _cmd = "/usr/bin/rm " .. _old_file
+
+    local handle = io.popen(_cmd)
+    local _res = handle:read("*a")
+    handle:close()
+
+    -- local _res = shell.run(_cmd)
+    _print("rm old:" .. _old_file .. ":" .. inspect(_res))
+
     local _item_path =
         table.concat(
         {
@@ -776,28 +798,6 @@ local function _generate_item(instance, args)
     local _str_tmpl = _tmpl("_local")
 
     local _file_main = _deploy_nodeconfdir .. "/" .. _item.id .. ".conf"
-
-    local _old_file =
-        table.concat(
-        {
-            _deploy_dir,
-            "*",
-            "*",
-            "*",
-            "*",
-            "*",
-            _item.id
-        },
-        "/"
-    )
-    local _cmd = "/usr/bin/rm " .. _old_file
-
-    local handle = io.popen(_cmd)
-    local _res = handle:read("*a")
-    handle:close()
-
-    -- local _res = shell.run(_cmd)
-    _print("rm old:" .. _old_file .. ":" .. inspect(_res))
 
     -- _print(_file_main)
     _write_file(_file_main, _str_tmpl)
