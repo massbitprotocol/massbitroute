@@ -443,7 +443,7 @@ _sync_redis_conf() {
 	echo 'keys *:'$_type | $_redis | while read _k; do
 		_user_id=$(echo $_k | cut -d':' -f1)
 		echo "hkeys $_k" | $_redis | while read _id; do
-			echo bash $SITE_ROOT/scripts/mbr _call ${_type}.adminupdate $_id $_user_id
+			bash $SITE_ROOT/scripts/mbr _call ${_type}.adminupdate $_id $_user_id
 		done
 
 	done
