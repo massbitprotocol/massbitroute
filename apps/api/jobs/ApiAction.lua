@@ -106,7 +106,7 @@ server {
     include /massbit/massbitroute/app/src/sites/services/gateway/etc/_ssl_${blockchain}-${network}.]] ..
                 _domain_name ..
                     [[.conf;
-    server_name ${gateway_domain_ws};
+    server_name ws-${gateway_domain};
     include /massbit/massbitroute/app/src/sites/services/gateway/etc/_session_ws.conf;
     include /massbit/massbitroute/app/src/sites/services/gateway/etc/_location_server.conf;
 
