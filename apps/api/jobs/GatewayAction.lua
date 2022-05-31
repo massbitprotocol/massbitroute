@@ -420,7 +420,7 @@ local function _generate_item(instance, args)
 
     -- query db for detail
     local _item = _norm(model:get(args))
-
+    _print("item:" .. inspect(_item))
     if
         not _item or not _item.id or not _item.ip or not _item.blockchain or not _item.network or not _item.geo or
             not _item.geo.continent_code or
