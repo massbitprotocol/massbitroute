@@ -218,6 +218,44 @@ function Action:getAction(args)
     return _result
 end
 
+function Action:adminupdateAction(args)
+    _print(inspect(args))
+    args.action = nil
+    local instance = self:getInstance()
+    local model = Model:new(instance)
+    local _ok, _err = model:update(args)
+    _print(
+        {
+            ok = _ok,
+            err = _err
+        },
+        true
+    )
+    if _ok then
+        local jobs = instance:getJobs()
+        local job
+        if tonumber(args.status) == 0 then
+            args._is_delete = false
+            job = {
+                action = "/jobs/" .. mytype .. ".removeconf",
+                delay = 0,
+                data = args
+            }
+        else
+            job = {
+                action = "/jobs/" .. mytype .. ".generateconf",
+                delay = 0,
+                data = args
+            }
+        end
+        jobs:add(job)
+    end
+    return {
+        ok = _ok,
+        err = _err
+    }
+end
+
 function Action:updateAction(args)
     _print(inspect(args))
     if not args.id then
