@@ -349,6 +349,8 @@ local function _generate_item(instance, args)
             _content[#_content + 1] = _tmpl_upstream
 
             _item.gateway_domain_ws = _item.gateway_domain:gsub(_item.id, _item.id .. "-ws")
+            _print("_item.gateway_domain:" .. _item.gateway_domain)
+            _print("_item.gateway_domain_ws:" .. _item.gateway_domain_ws)
             _print("item:" .. inspect(_item))
             -- generate servers conf link with upstreams
             local _tmpl_server = _get_tmpl(rules, _item)
