@@ -102,7 +102,7 @@ server {
 upstream ${node_type}-ws.node.mbr.${_domain_name} {
   ${nodes/_gw_node_upstream_ws()}
   ${upstream_backup_ws}
-    include /massbit/massbitroute/app/src/sites/services/gateway/etc/_upstream_server.conf;
+    include /massbit/massbitroute/app/src/sites/services/gateway/etc/_upstream_server_ws.conf;
 
 }
 server {
