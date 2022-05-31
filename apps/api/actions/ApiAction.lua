@@ -261,7 +261,7 @@ function Action:updateAction(args)
         local jobs = instance:getJobs()
         local job = {
             action = "/jobs/" .. mytype .. ".removeconf",
-            delay = 1,
+            delay = 0,
             data = {
                 _is_delete = false,
                 id = args.id,
@@ -273,7 +273,7 @@ function Action:updateAction(args)
         local jobs = instance:getJobs()
         local job = {
             action = "/jobs/" .. mytype .. ".generateconf",
-            delay = 1,
+            delay = 0,
             data = {
                 id = args.id,
                 user_id = user_id
@@ -345,7 +345,7 @@ function Action:updatemultiAction(args)
         local jobs = instance:getJobs()
         local job = {
             action = "/jobs/" .. mytype .. ".removemulticonf",
-            delay = 1,
+            delay = 0,
             data = {
                 _is_delete = false,
                 ids = _ids,
@@ -357,7 +357,7 @@ function Action:updatemultiAction(args)
         local jobs = instance:getJobs()
         local job = {
             action = "/jobs/" .. mytype .. ".generatemulticonf",
-            delay = 1,
+            delay = 0,
             data = {
                 ids = _ids,
                 user_id = user_id
@@ -399,7 +399,7 @@ function Action:deleteAction(args)
     local jobs = instance:getJobs()
     local job = {
         action = "/jobs/" .. mytype .. ".removeconf",
-        delay = 1,
+        delay = 0,
         data = {
             _is_delete = true,
             id = args.id,

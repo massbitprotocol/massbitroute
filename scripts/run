@@ -13,25 +13,25 @@ mbr_root=/massbit/massbitroute/app
 service_dir=$mbr_root/src/sites/services
 
 export MBR_ENV=${MBR_ENV:-dev}
-export BRANCH=${BRANCH:-dev}
-export MBRAPP_BRANCH=${MBRAPP_BRANCH:-dev}
-export ASDF_BRANCH=${ASDF_BRANCH:-dev}
-export GBC_BRANCH=${GBC_BRANCH:-dev}
-export SSL_BRANCH=${SSL_BRANCH:-dev}
-export GWMAN_BRANCH=${GWMAN_BRANCH:-dev}
-export GWMANDEPLOY_BRANCH=${GWMANDEPLOY_BRANCH:-dev}
-export NODE_BRANCH=${NODE_BRANCH:-dev}
-export GATEWAY_BRANCH=${GATEWAY_BRANCH:-dev}
-export STAT_BRANCH=${STAT_BRANCH:-dev}
-export STATDEPLOY_BRANCH=${STATDEPLOY_BRANCH:-dev}
-export MONITOR_BRANCH=${MONITOR_BRANCH:-dev}
-export API_BRANCH=${API_BRANCH:-dev}
-export APIDEPLOY_BRANCH=${APIDEPLOY_BRANCH:-dev}
-export SESSION_BRANCH=${SESSION_BRANCH:-dev}
-export GIT_BRANCH=${GIT_BRANCH:-dev}
-export MKAGENT_BRANCH=${MKAGENT_BRANCH:-dev}
-export MONITOR_BRANCH=${MONITOR_BRANCH:-dev}
-export SESSION_BRANCH=${SESSION_BRANCH:-dev}
+export BRANCH=${BRANCH:-$MBR_ENV}
+export MBRAPP_BRANCH=${MBRAPP_BRANCH:-$MBR_ENV}
+export ASDF_BRANCH=${ASDF_BRANCH:-$MBR_ENV}
+export GBC_BRANCH=${GBC_BRANCH:-$MBR_ENV}
+export SSL_BRANCH=${SSL_BRANCH:-$MBR_ENV}
+export GWMAN_BRANCH=${GWMAN_BRANCH:-$MBR_ENV}
+export GWMANDEPLOY_BRANCH=${GWMANDEPLOY_BRANCH:-$MBR_ENV}
+export NODE_BRANCH=${NODE_BRANCH:-$MBR_ENV}
+export GATEWAY_BRANCH=${GATEWAY_BRANCH:-$MBR_ENV}
+export STAT_BRANCH=${STAT_BRANCH:-$MBR_ENV}
+export STATDEPLOY_BRANCH=${STATDEPLOY_BRANCH:-$MBR_ENV}
+export MONITOR_BRANCH=${MONITOR_BRANCH:-$MBR_ENV}
+export API_BRANCH=${API_BRANCH:-$MBR_ENV}
+export APIDEPLOY_BRANCH=${APIDEPLOY_BRANCH:-$MBR_ENV}
+export SESSION_BRANCH=${SESSION_BRANCH:-$MBR_ENV}
+export GIT_BRANCH=${GIT_BRANCH:-$MBR_ENV}
+export MKAGENT_BRANCH=${MKAGENT_BRANCH:-$MBR_ENV}
+export MONITOR_BRANCH=${MONITOR_BRANCH:-$MBR_ENV}
+export SESSION_BRANCH=${SESSION_BRANCH:-$MBR_ENV}
 
 monitor_dir=/massbit/massbitroute/app/src/sites/services/monitor
 portal_dir=/massbit/massbitroute/app/src/sites/services/api
@@ -49,21 +49,23 @@ $SITE_ROOT/env|$GIT_PRIVATE_READ_URL/massbitroute/env.git|$MBR_ENV \
  $mbr_root/gbc|https://github.com/massbitprotocol/massbitroute_gbc|$GBC_BRANCH \
  $mbr_root/gbc/bin/.asdf|https://github.com/massbitprotocol/massbitroute_asdf|$ASDF_BRANCH \
   $service_dir/gwman|$GIT_PUBLIC_URL/massbitprotocol/massbitroute_gwman.git|$GWMAN_BRANCH \
-  $service_dir/gwman/data|https://$GIT_GWMANDEPLOY_WRITE@$GIT_PRIVATE_DOMAIN/massbitroute/gwmandeploy.git|$GWMANDEPLOY_BRANCH \
+  $service_dir/gwman/data|http://$GIT_GWMANDEPLOY_WRITE@$GIT_PRIVATE_DOMAIN/massbitroute/gwmandeploy.git|$GWMANDEPLOY_BRANCH \
   $service_dir/api|$GIT_PUBLIC_URL/massbitprotocol/massbitroute.git|$API_BRANCH \
-  $service_dir/api/public/deploy|https://$GIT_APIDEPLOY_WRITE@$GIT_PRIVATE_DOMAIN/massbitroute/apideploy.git|$APIDEPLOY_BRANCH \
-  $service_dir/api/public/mbr-app-prod|$GIT_PUBLIC_URL/massbitprotocol/mbr-app.git|$MBRAPP_BRANCH \
+  $service_dir/api/public/deploy|http://$GIT_APIDEPLOY_WRITE@$GIT_PRIVATE_DOMAIN/massbitroute/apideploy.git|$APIDEPLOY_BRANCH \
+
   $service_dir/stat|$GIT_PUBLIC_URL/massbitprotocol/massbitroute_stat.git|$STAT_BRANCH \
-  $service_dir/stat/etc/conf|https://$GIT_STATDEPLOY_WRITE@$GIT_PRIVATE_DOMAIN/massbitroute/statdeploy.git|$STATDEPLOY_BRANCH \
+  $service_dir/stat/etc/conf|http://$GIT_STATDEPLOY_WRITE@$GIT_PRIVATE_DOMAIN/massbitroute/statdeploy.git|$STATDEPLOY_BRANCH \
   $service_dir/mkagent|$GIT_PUBLIC_URL/massbitprotocol/massbitroute_mkagent.git|$MKAGENT_BRANCH \
   $service_dir/node|$GIT_PUBLIC_URL/massbitprotocol/massbitroute_node.git|$NODE_BRANCH \
   $service_dir/gateway|$GIT_PUBLIC_URL/massbitprotocol/massbitroute_gateway.git|$GATEWAY_BRANCH \
-  $service_dir/monitor|$GIT_PUBLIC_URL/massbitprotocol/massbitroute_monitor.git|$MONITOR_BRANCH \
-  $service_dir/session|$GIT_PUBLIC_URL/massbitprotocol/massbitroute_session.git|$SESSION_BRANCH \
+
+
 
 "
 }
-
+#  $service_dir/api/public/mbr-app-prod|$GIT_PUBLIC_URL/massbitprotocol/mbr-app.git|$MBRAPP_BRANCH \
+#  $service_dir/monitor|$GIT_PUBLIC_URL/massbitprotocol/massbitroute_monitor.git|$MONITOR_BRANCH \
+#  $service_dir/session|$GIT_PUBLIC_URL/massbitprotocol/massbitroute_session.git|$SESSION_BRANCH \
 _repo
 
 # _tune_os() {
@@ -132,7 +134,8 @@ _supervisor() {
 	ln -sf /massbit/massbitroute/app/gbc /massbit/massbitroute/app/src/gbc
 	ln -sf /massbit/massbitroute/app/gbc/bin/openresty /usr/local/openresty
 	apt-get update
-	apt-get install -y git apache2-utils supervisor jq python-is-python2 libssl-dev
+	apt-get install -y git apache2-utils supervisor jq python-is-python2 libssl-dev \
+		liburcu-dev libev-dev libsodium-dev libtool libunwind-dev libmaxminddb-dev cron rsync
 
 	systemctl enable supervisor
 	systemctl start supervisor
@@ -209,7 +212,7 @@ _git_cmd() {
 	shift
 	list_push="apideploy gwmandeploy statdeploy"
 	list_pull="api gwman stat $list_push"
-	list_all="$list_pull gateway node mkagent monitor"
+	list_all="$list_pull gateway node mkagent"
 	if [ -z "$cmd" ]; then cmd=push; fi
 
 	list=""
@@ -300,6 +303,7 @@ _update_dapi_list() {
 	_dir=$portal_dir/public/deploy/$_type
 	if [ ! -d "$_dir" ]; then return 1; fi
 	info_dir=$portal_dir/public/deploy/info/$_type
+	if [ ! -d "$info_dir" ]; then return; fi
 	mkdir -p $info_dir /tmp/info/$_type
 	rm /tmp/info/$_type/*
 	find $_dir -type f | while read f; do
@@ -322,6 +326,7 @@ _update_dapi_list() {
 _update_user_list() {
 	_type=user
 	_dir=$portal_dir/public/deploy/$_type
+	if [ ! -d "$info_dir" ]; then return; fi
 	if [ ! -d "$_dir" ]; then return 1; fi
 	info_dir=$portal_dir/public/deploy/info/$_type
 	mkdir -p $info_dir
@@ -341,6 +346,7 @@ _update_user_list() {
 _update_gateway_list() {
 	_type=gateway
 	info_dir=$portal_dir/public/deploy/info/$_type
+	if [ ! -d "$info_dir" ]; then return; fi
 	tmp=$(mktemp)
 	find $info_dir -type f -iname 'listid-*' | while read f; do
 		cat $f >>$tmp
@@ -352,6 +358,7 @@ _update_gateway_list() {
 _update_node_list() {
 	_type=node
 	info_dir=$portal_dir/public/deploy/info/$_type
+	if [ ! -d "$info_dir" ]; then return; fi
 	tmp=$(mktemp)
 	find $info_dir -type f -iname 'listid-*' | while read f; do
 		cat $f >>$tmp
@@ -376,6 +383,7 @@ _update_listid() {
 	_update_gateway_list
 	_update_dapi_list
 	_update_node_list
+	mkdir -p $portal_dir/public/deploy/info
 	# _update_user_list
 	if [ -f "$portal_dir/public/deploy/hosts" ]; then
 		cat $portal_dir/public/deploy/hosts >$portal_dir/public/deploy/info/hosts
@@ -384,8 +392,10 @@ _update_listid() {
 		>$portal_dir/public/deploy/info/hosts
 	fi
 	info_dir=$portal_dir/public/deploy/info/node
+	mkdir -p $info_dir
 	awk -v domain="$DOMAIN" '{print $5,$1".node.mbr."domain}' $info_dir/listid >>$portal_dir/public/deploy/info/hosts
 	info_dir=$portal_dir/public/deploy/info/gateway
+	mkdir -p $info_dir
 	awk -v domain="$DOMAIN" '{print $5,$1".gw.mbr."domain}' $info_dir/listid >>$portal_dir/public/deploy/info/hosts
 }
 _update_repos() {
@@ -407,8 +417,8 @@ _cleanupmeforsure() {
 			find $SITE_ROOT/public/deploy/$d -type f -delete
 
 		done
-		find $SITE_ROOT/../gwman/data/conf.d/geolocation.d -type f -delete
-		find $SITE_ROOT/../gwman/data/zones -not -name "$DOMAIN" -type f -delete
+		find $SITE_ROOT/../gwman/data/conf.d/geolocation.d -type f -not -iname "_*" -delete
+		find $SITE_ROOT/../gwman/data/zones -not -name "$DOMAIN" -not -name ".gitkeep" -type f -delete
 		# $SITE_ROOT/../gwman/scripts/run _prepare
 		$SITE_ROOT/../gwman/scripts/run _rebuild_conf
 
@@ -428,19 +438,16 @@ _cleanupmeforsure() {
 _update() {
 	echo "Update"
 	_st_update=0
-	$0 _git_cmd all
-	$0 _git_cmd commit
 	# $0 _git_cmd push
 
 	_update_repos
 	_st_update=$?
-	_update_listid
+	#_update_listid
+
 	return $_st_update
 }
 
 _reload() {
-
-	_update_listid
 	$cmd_server _update
 	# $cmd_server update
 	tmp=$(mktemp)
@@ -454,11 +461,14 @@ _reload() {
 }
 
 _monitor() {
-	timeout 300 $0 _update
+	_update
 	is_reload=$?
 	if [ $is_reload -ne 0 ]; then
 		$0 _reload
 	fi
+	$0 _git_cmd all
+	$0 _git_cmd commit
+
 }
 
 _run() {

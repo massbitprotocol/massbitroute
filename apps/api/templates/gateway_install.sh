@@ -16,7 +16,7 @@ _centos() {
 	yum install -y git httpd-tools supervisor jq python2
 }
 _nodeverify() {
-	res=$($SITE_ROOT/mbr node nodeverify | tail -1 | jq .status | sed s/\"//g)
+	res=$($SITE_ROOT/mbr node nodeverify | tail -1 | jq ".status,.message" | sed -z "s/\"//g;")
 	echo $res
 }
 _gitclone() {
@@ -39,6 +39,9 @@ _gitclone() {
 		exit 1
 	fi
 	git -C $dest remote set-url origin $repo
+	git -C $dest checkout origin/$repo
+	git -C $dest reset --hard
+	git -C $dest pull origin $repo
 }
 if [ -f /etc/os-release ]; then
 	# freedesktop.org and systemd
@@ -100,7 +103,14 @@ if [ "$zone" != "{{zone}}" ]; then
 
 fi
 
-SITE_ROOT=/massbit/massbitroute/app/src/sites/services/gateway
+SERVICE_DIR=/massbit/massbitroute/app/src/sites/services
+SITE_ROOT=$SERVICE_DIR/gateway
+
+if [ \( -f "/etc/supervisor/conf.d/mbr_node.conf" \) -o \( -d "$SERVICE_DIR/node" \) ]; then
+	echo "Detect conflict folder $SERVICE_DIR/node or /etc/supervisor/conf.d/mbr_node.conf. Please remove it before install"
+	exit 0
+fi
+
 SCRIPTS_RUN="$SITE_ROOT/scripts/run"
 mkdir -p $(dirname $SITE_ROOT)
 
@@ -148,14 +158,20 @@ $SITE_ROOT/cmd_server _update
 
 $SITE_ROOT/cmd_server status
 
-status=$(_nodeverify)
+res=$($SITE_ROOT/mbr node nodeverify)
+status=$(echo $res | jq ".status" | sed -z "s/\"//g;")
 while [ "$status" != "verified" ]; do
-	echo "Verifying firewall ... Please make sure your firewall is open and try run again."
+	message=$(echo $res | jq ".message")
+	if [ "$message" != "null" ]; then
+		echo "Verifying with message: $message"
+	fi
 	sleep 10
 	$SCRIPTS_RUN _load_config
 	$SITE_ROOT/cmd_server _update
-	status=$(_nodeverify)
+	res=$($SITE_ROOT/mbr node nodeverify)
+	status=$(echo $res | jq ".status" | sed -z "s/\"//g;")
 done
+
 if [ "$status" = "verified" ]; then
-	echo "Installed gateway successfully !"
+	echo "Node installed successfully !"
 fi

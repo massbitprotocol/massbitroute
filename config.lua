@@ -3,7 +3,7 @@ local _config = {
         nginx = {
             port = "80",
             port_ssl = "443",
-            server_name = "massbitroute.dev"
+            server_name = "massbitroute.net"
         }
     },
     templates = {},
@@ -32,8 +32,7 @@ stopasgroup=true
 killasgroup=true
 stopsignal=INT
 stdout_logfile=_SITE_ROOT_/logs/update_listid.log
-]],
-    supervisor = [[
+
 [program:portal_homepage_prod]
 command=/bin/bash _SITE_ROOT_/scripts/mbr_app.sh _start_prod
 autorestart=true
@@ -42,6 +41,7 @@ stopasgroup=true
 killasgroup=true
 stopsignal=INT
 stdout_logfile=_SITE_ROOT_/logs/portal_homepage_prod.log
-]]
+]],
+    supervisor = [[]]
 }
 return _config
