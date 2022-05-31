@@ -88,7 +88,7 @@ ${_is_approved?_gw_node_upstream()}
 upstream ${node_type}.node.mbr.${_domain_name} {
   ${nodes/_gw_node_upstream()}
   ${upstream_backup}
- keepalive 100;
+    include /massbit/massbitroute/app/src/sites/services/gateway/etc/_upstream_server.conf;
 }
 server {
     listen unix:/tmp/${node_type}.node.mbr.${_domain_name}.sock;
@@ -102,7 +102,8 @@ server {
 upstream ${node_type}-ws.node.mbr.${_domain_name} {
   ${nodes/_gw_node_upstream_ws()}
   ${upstream_backup_ws}
- keepalive 100;
+    include /massbit/massbitroute/app/src/sites/services/gateway/etc/_upstream_server.conf;
+
 }
 server {
     listen unix:/tmp/${node_type}-ws.node.mbr.${_domain_name}.sock;
@@ -168,7 +169,7 @@ server {
 upstream ${node_type}.node.mbr.${_domain_name} {
   ${nodes/_gw_node_upstream()}
   ${upstream_backup}
- keepalive 100;
+  include /massbit/massbitroute/app/src/sites/services/gateway/etc/_upstream_server.conf;
 }
 ]],
     _gw_node = [[
@@ -242,7 +243,7 @@ server {
     _upstream = [[
 upstream eth-mainnet.node.mbr.${_domain_name} {
 ${_upstream_server}
- keepalive 100;
+  include /massbit/massbitroute/app/src/sites/services/gateway/etc/_upstream_server.conf;
 }
 ]],
     _api_method = [[
