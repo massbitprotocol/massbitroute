@@ -451,9 +451,6 @@ local function _generate_item(instance, args)
     -- remove unused props
     _item._is_delete = nil
 
-    -- dump detail
-    _write_file(_deploy_file, json.encode(_item))
-
     local _old_file =
         table.concat(
         {
@@ -474,6 +471,9 @@ local function _generate_item(instance, args)
 
     -- local _res = shell.run(_cmd)
     _print("rm old:" .. _old_file .. ":" .. inspect(_res))
+
+    -- dump detail
+    _write_file(_deploy_file, json.encode(_item))
     _rescanconf_blockchain_network(_item.blockchain, _item.network, args)
     return true
 end

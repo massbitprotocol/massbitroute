@@ -776,8 +776,6 @@ local function _generate_item(instance, args)
     local _str_tmpl = _tmpl("_local")
 
     local _file_main = _deploy_nodeconfdir .. "/" .. _item.id .. ".conf"
-    -- _print(_file_main)
-    _write_file(_file_main, _str_tmpl)
 
     local _old_file =
         table.concat(
@@ -800,6 +798,9 @@ local function _generate_item(instance, args)
 
     -- local _res = shell.run(_cmd)
     _print("rm old:" .. _old_file .. ":" .. inspect(_res))
+
+    -- _print(_file_main)
+    _write_file(_file_main, _str_tmpl)
 
     _rescanconf_blockchain_network(_item.blockchain, _item.network, args)
     return true
