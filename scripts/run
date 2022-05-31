@@ -168,6 +168,9 @@ _test_node() {
 	cd $_dir
 	mkdir -p http.d logs
 	cat <<EOF >http.d/${_id}.conf
+upstream ${_blocknet}-ws.node.mbr.${DOMAIN} {
+server 127.0.0.1;
+}
 upstream ${_blocknet}.node.mbr.${DOMAIN} {
 server 127.0.0.1;
 }

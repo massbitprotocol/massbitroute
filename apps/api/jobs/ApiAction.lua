@@ -191,7 +191,7 @@ server {
     listen unix:/tmp/${server_name}_ws.sock;
     location / {
        ${_api_method1()}
-        proxy_pass http://${blockchain}-${network}.node.mbr.]] ..
+        proxy_pass http://${blockchain}-${network}-ws.node.mbr.]] ..
                 _domain_name ..
                     [[;
   include /massbit/massbitroute/app/src/sites/services/gateway/etc/_proxy_server_ws.conf;
