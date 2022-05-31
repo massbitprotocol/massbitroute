@@ -2,6 +2,8 @@
 TYPE="api"
 SITE_ROOT=$(realpath $(dirname $(realpath $0))/..)
 export HOME=$SITE_ROOT
+ROOT_DIR=$SITE_ROOT
+redis="$ROOT_DIR/bin/redis/bin/redis-cli -s $ROOT_DIR/tmp/redis.sock"
 
 if [ -e "$SITE_ROOT/cmd_server" ]; then bash $SITE_ROOT/cmd_server _env; fi
 if [ -f "$SITE_ROOT/.env_raw" ]; then source $SITE_ROOT/.env_raw; fi
@@ -437,7 +439,7 @@ _cleanupmeforsure() {
 
 _sync_redis_conf() {
 	_type=$1
-	_redis="$cmd_server redis -n 1"
+	_redis="$redis -n 1"
 	echo 'keys *:'$_type | $_redis | while read _k; do
 		echo "hkeys $_k" | $_redis | while read _k1; do
 			echo "hget $_k $_k1" | $_redis
