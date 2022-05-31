@@ -162,6 +162,8 @@ _test_node() {
 	_conf=$3
 	_dir=$(mktemp -d)
 	cd $service_dir/gateway
+	touch .env
+	touch .env_raw
 	rsync -avz * $_dir/ >/dev/null
 	cd $_dir
 	mkdir -p http.d logs

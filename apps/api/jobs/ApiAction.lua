@@ -56,7 +56,7 @@ local rules = {
     _upstreams = [[
 upstream upstream_${api_key} {
     ${entrypoints/_upstream()}
- keepalive 100;
+    include /massbit/massbitroute/app/src/sites/services/gateway/etc/_upstream_server.conf;
 }
 ]],
     _api_method1 = "",
