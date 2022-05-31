@@ -52,11 +52,16 @@ local rules = {
     _backup1 = [[backup]],
     _backup = [[]],
     _priority = [[weight=${priority}]],
+    _upstream_ws = [[server unix:/tmp/${server_name}_ws.sock max_fails=1 fail_timeout=3s ${_is_backup?_backup()!_priority()};]],
     _upstream = [[server unix:/tmp/${server_name}.sock max_fails=1 fail_timeout=3s ${_is_backup?_backup()!_priority()};]],
     _upstreams = [[
 upstream upstream_${api_key} {
     ${entrypoints/_upstream()}
     include /massbit/massbitroute/app/src/sites/services/gateway/etc/_upstream_server.conf;
+}
+upstream upstream_ws_${api_key} {
+    ${entrypoints/_upstream_ws()}
+    include /massbit/massbitroute/app/src/sites/services/gateway/etc/_upstream_server_ws.conf;
 }
 ]],
     _api_method1 = "",
@@ -93,6 +98,32 @@ server {
         add_header X-Mbr-Gateway-Id __GATEWAY_ID__;
         proxy_pass http://upstream_${api_key}/;
         include /massbit/massbitroute/app/src/sites/services/gateway/etc/_node_server.conf;
+    }
+
+}
+server {
+    include /massbit/massbitroute/app/src/sites/services/gateway/etc/_pre_server_ws.conf;
+    include /massbit/massbitroute/app/src/sites/services/gateway/etc/_ssl_${blockchain}-${network}.]] ..
+                _domain_name ..
+                    [[.conf;
+    server_name ${gateway_domain_ws};
+    include /massbit/massbitroute/app/src/sites/services/gateway/etc/_session_ws.conf;
+    include /massbit/massbitroute/app/src/sites/services/gateway/etc/_location_server.conf;
+
+    location /${api_key} {
+        set $mbr_token ${api_key};
+
+        ${security._is_limit_rate_per_sec?_limit_rate_per_sec2()}
+        ${_allow_methods1()}
+
+        vhost_traffic_status_filter_by_set_key $api_method user::${user_id}::project::${project_id}::api::${id}::gateway::__GATEWAY_ID__::v1::api_method;
+
+        add_header X-Mbr-User-Id ${user_id};
+        add_header X-Mbr-Api-Id ${id};
+        add_header X-Mbr-Project-Id ${project_id};
+        add_header X-Mbr-Gateway-Id __GATEWAY_ID__;
+        proxy_pass http://upstream_ws_${api_key}/;
+        include /massbit/massbitroute/app/src/sites/services/gateway/etc/_node_server_ws.conf;
     }
 
 }
@@ -154,6 +185,17 @@ server {
             [[;
   include /massbit/massbitroute/app/src/sites/services/gateway/etc/_proxy_server.conf;
   include /massbit/massbitroute/app/src/sites/services/gateway/etc/_provider_server.conf;
+    }
+}
+server {
+    listen unix:/tmp/${server_name}_ws.sock;
+    location / {
+       ${_api_method1()}
+        proxy_pass http://${blockchain}-${network}-ws.node.mbr.]] ..
+                _domain_name ..
+                    [[;
+  include /massbit/massbitroute/app/src/sites/services/gateway/etc/_proxy_server_ws.conf;
+  include /massbit/massbitroute/app/src/sites/services/gateway/etc/_provider_server_ws.conf;
     }
 }
 ]]
@@ -306,6 +348,9 @@ local function _generate_item(instance, args)
 
             _content[#_content + 1] = _tmpl_upstream
 
+            _item.gateway_domain_ws = _item.gateway_domain
+            _item.gateway_domain_ws = _item.gateway_domain_ws:gsub(_item.id, _item.id .. "-ws")
+            _print("item:" .. inspect(_item))
             -- generate servers conf link with upstreams
             local _tmpl_server = _get_tmpl(rules, _item)
             _content[#_content + 1] = _tmpl_server("_server_main")
