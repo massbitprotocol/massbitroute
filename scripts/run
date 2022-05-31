@@ -441,10 +441,11 @@ _sync_redis_conf() {
 	_type=$1
 	_redis="$redis -n 1"
 	echo 'keys *:'$_type | $_redis | while read _k; do
-		echo "hkeys $_k" | $_redis | while read _k1; do
-			echo "hget $_k $_k1" | $_redis
+		_user_id=$(echo $_k | cut -d':' -f1)
+		echo "hkeys $_k" | $_redis | while read _id; do
+			echo bash $SITE_ROOT/scripts/mbr _call ${_type}.adminupdate $_id $_user_id
 		done
-		#	echo bash $SITE_ROOT/scripts/mbr _call ${_type}.adminupdate 139db2cf-b019-46ef-a827-dcbf33a794f3 11d76b1e-e6e8-424b-9f7f-15642a585a8a
+
 	done
 }
 _update() {
