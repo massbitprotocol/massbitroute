@@ -435,6 +435,16 @@ _cleanupmeforsure() {
 
 }
 
+_sync_redis_conf() {
+	_type=$1
+	_redis="$cmd_server redis -n 1"
+	echo 'keys *:'$_type | $_redis | while read _k; do
+		echo "hkeys $_k" | $_redis | while read _k1; do
+			echo "hget $_k $_k1" | $_redis
+		done
+		#	echo bash $SITE_ROOT/scripts/mbr _call ${_type}.adminupdate 139db2cf-b019-46ef-a827-dcbf33a794f3 11d76b1e-e6e8-424b-9f7f-15642a585a8a
+	done
+}
 _update() {
 	echo "Update"
 	_st_update=0
