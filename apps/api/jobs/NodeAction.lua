@@ -113,20 +113,7 @@ server {
   include /massbit/massbitroute/app/src/sites/services/gateway/etc/_provider_server_ws.conf;
     }
 }
-upstream ${node_type}-ws.node.mbr.${_domain_name} {
-  ${nodes/_gw_node_upstream_ws()}
-  ${upstream_backup_ws}
-    include /massbit/massbitroute/app/src/sites/services/gateway/etc/_upstream_server_ws.conf;
 
-}
-server {
-    listen unix:/tmp/${node_type}-ws.node.mbr.${_domain_name}.sock;
-    location / {
-        proxy_pass http://${node_type}-ws.node.mbr.${_domain_name};
-
-  include /massbit/massbitroute/app/src/sites/services/gateway/etc/_provider_server_ws.conf;
-    }
-}
 ]],
     ["_gw_upstream_backup_name_dot-mainnet"] = [[ unix:/tmp/dot-mainnet-getblock-1.sock ]],
     ["_gw_upstream_backup_name_ws_dot-mainnet"] = [[ unix:/tmp/dot-mainnet-getblock-ws-1.sock ]],
@@ -225,22 +212,6 @@ server {
     include /massbit/massbitroute/app/src/sites/services/node/etc/_pre_server_ws.conf;
     include /massbit/massbitroute/app/src/sites/services/node/etc/_ssl_node.mbr.${_domain_name}.conf;
     server_name ws-${id}.node.mbr.${_domain_name};
-    location / {
-        add_header X-Mbr-Node-Id ${id};
-        vhost_traffic_status_filter_by_set_key $api_method user::${user_id}::node::${id}::v1::api_method;
-        proxy_pass ${data_ws};
-        include /massbit/massbitroute/app/src/sites/services/node/etc/_node_server_ws.conf;
-    }
-    location /__internal_status_vhost/ {
-        include /massbit/massbitroute/app/src/sites/services/node/etc/_vts_server_ws.conf;
-    }
-    include /massbit/massbitroute/app/src/sites/services/node/etc/_location_server_ws.conf;
-}
-
-server {
-    include /massbit/massbitroute/app/src/sites/services/node/etc/_pre_server_ws.conf;
-    include /massbit/massbitroute/app/src/sites/services/node/etc/_ssl_node.mbr.${_domain_name}.conf;
-    server_name ${id}-ws.node.mbr.${_domain_name};
     location / {
         add_header X-Mbr-Node-Id ${id};
         vhost_traffic_status_filter_by_set_key $api_method user::${user_id}::node::${id}::v1::api_method;
