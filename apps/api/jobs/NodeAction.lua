@@ -106,7 +106,7 @@ upstream ws-${node_type}.node.mbr.${_domain_name} {
 
 }
 server {
-    listen unix:/tmp/ws-${node_type}-ws.node.mbr.${_domain_name}.sock;
+    listen unix:/tmp/ws-${node_type}.node.mbr.${_domain_name}.sock;
     location / {
         proxy_pass http://ws-${node_type}.node.mbr.${_domain_name};
 
