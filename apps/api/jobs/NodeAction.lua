@@ -191,7 +191,7 @@ server {
     listen unix:/tmp/${id}-ws.sock;
     location / {
         proxy_set_header X-Api-Key ${token};
-        proxy_set_header Host ${id}-ws.node.mbr.${_domain_name};
+        proxy_set_header Host ws-${id}.node.mbr.${_domain_name};
         proxy_pass https://${ip};
 
   include /massbit/massbitroute/app/src/sites/services/gateway/etc/_provider_server_ws.conf;
