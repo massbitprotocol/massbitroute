@@ -303,7 +303,7 @@ local function _gen_upstream_block(
     end
     if not _upstream_backup_ws then
         _upstream_backup_ws =
-            "server unix:/tmp/" .. _prefix .. ".node.mbr." .. _job_data._domain_name .. "-ws.sock " .. _backup
+            "server unix:/tmp/ws-" .. _prefix .. ".node.mbr." .. _job_data._domain_name .. ".sock " .. _backup
     end
     local _tmpl =
         _get_tmpl(
