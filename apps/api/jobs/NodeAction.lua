@@ -99,6 +99,20 @@ server {
     }
 }
  ${upstream_extra_ws}
+upstream ws-${node_type}.node.mbr.${_domain_name} {
+  ${nodes/_gw_node_upstream_ws()}
+  ${upstream_backup_ws}
+    include /massbit/massbitroute/app/src/sites/services/gateway/etc/_upstream_server_ws.conf;
+
+}
+server {
+    listen unix:/tmp/ws-${node_type}-ws.node.mbr.${_domain_name}.sock;
+    location / {
+        proxy_pass http://ws-${node_type}.node.mbr.${_domain_name};
+
+  include /massbit/massbitroute/app/src/sites/services/gateway/etc/_provider_server_ws.conf;
+    }
+}
 upstream ${node_type}-ws.node.mbr.${_domain_name} {
   ${nodes/_gw_node_upstream_ws()}
   ${upstream_backup_ws}
