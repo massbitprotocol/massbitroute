@@ -37,7 +37,7 @@ local stat_dir = _service_dir .. "/stat/etc/conf"
 
 local _print = mbrutil.print
 local rules = {
-    _listid = [[${id} ${user_id} ${blockchain} ${network} ${ip} ${geo.continent_code} ${geo.country_code} ${token} ${status} ${approved}]],
+    _listid = [[${id} ${user_id} ${blockchain} ${network} ${ip} ${geo.continent_code} ${geo.country_code} ${token} ${status} ${approved} ${updated_at}]],
     _listids = [[${nodes/_listid(); separator='\n'}]],
     -- _listids_not_actives = [[${not_actives/_listid(); separator='\n'}]],
     _dcmap_map = [[${id} =>  [ ${ip} , 10 ],]],
