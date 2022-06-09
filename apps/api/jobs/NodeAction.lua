@@ -331,7 +331,7 @@ local function _gen_upstream_block(
     local _file = _deploy_gatewayconfdir .. "/" .. _node_type .. "-upstreams.conf"
     _write_file(_file, _str_blocks)
     local _str_ws_blocks = _tmpl("_gw_node_upstreams_ws_block_v1")
-    local _file_ws = _deploy_gatewayconfdir .. "/" .. _node_type .. "-upstreams.conf"
+    local _file_ws = _deploy_gatewayconfdir .. "/ws-" .. _node_type .. "-upstreams.conf"
     _write_file(_file_ws, _str_ws_blocks)
     return _str
 end
