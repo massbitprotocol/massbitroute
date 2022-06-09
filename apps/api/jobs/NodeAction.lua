@@ -83,6 +83,12 @@ ${_is_enabled?_gw_node()}
     _gw_node_upstream_approved = [[
 ${_is_approved?_gw_node_upstream()}
 ]],
+    _gw_node_upstreams_ws_block_v1 = [[
+${nodes/_gw_node_upstream_ws()}
+]],
+    _gw_node_upstreams_block_v1 = [[
+${nodes/_gw_node_upstream()}
+]],
     _gw_node_upstreams_v1 = [[
  ${upstream_extra}
 upstream ${node_type}.node.mbr.${_domain_name} {
@@ -319,9 +325,14 @@ local function _gen_upstream_block(
             upstream_extra_ws = _upstream_extra_ws
         }
     )
-    local _file = _deploy_gatewayconfdir .. "/" .. _node_type .. "-upstreams.conf"
+
     local _str = _tmpl("_gw_node_upstreams_v1")
-    _write_file(_file, _str)
+    local _str_blocks = _tmpl("_gw_node_upstreams_block_v1")
+    local _file = _deploy_gatewayconfdir .. "/" .. _node_type .. "-upstreams.conf"
+    _write_file(_file, _str_blocks)
+    local _str_ws_blocks = _tmpl("_gw_node_upstreams_ws_block_v1")
+    local _file_ws = _deploy_gatewayconfdir .. "/" .. _node_type .. "-upstreams.conf"
+    _write_file(_file_ws, _str_ws_blocks)
     return _str
 end
 
