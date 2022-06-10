@@ -327,7 +327,7 @@ local function _gen_upstream_block(
     )
 
     local _str = _tmpl("_gw_node_upstreams_v1")
-    local _file_block = _deploy_gatewayconfdir .. "/upstreams." .. _node_type .. ".conf1"
+    local _file_block = _deploy_gatewayconfdir .. "/upstreams-" .. _node_type .. ".conf1"
     _write_file(_file_block, _str)
 
     local _str_blocks = _tmpl("_gw_node_upstreams_block_v1")
