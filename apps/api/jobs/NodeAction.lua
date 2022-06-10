@@ -89,6 +89,39 @@ ${nodes/_gw_node_upstream_ws()}
     _gw_node_upstreams_block_v1 = [[
 ${nodes/_gw_node_upstream()}
 ]],
+    _gw_node_upstreams_v2 = [[
+ ${upstream_extra}
+upstream ${node_type}.node.mbr.${_domain_name} {
+  ${nodes/_gw_node_upstream()}
+include  /massbit/massbitroute/app/src/sites/services/gateway/http.d/${node_type}.upstream;
+  ${upstream_backup}
+    include /massbit/massbitroute/app/src/sites/services/gateway/etc/_upstream_server.conf;
+}
+server {
+    listen unix:/tmp/${node_type}.node.mbr.${_domain_name}.sock;
+    location / {
+        proxy_pass http://${node_type}.node.mbr.${_domain_name};
+
+  include /massbit/massbitroute/app/src/sites/services/gateway/etc/_provider_server.conf;
+    }
+}
+ ${upstream_extra_ws}
+upstream ws-${node_type}.node.mbr.${_domain_name} {
+include  /massbit/massbitroute/app/src/sites/services/gateway/http.d/ws-${node_type}.upstream;
+  ${upstream_backup_ws}
+    include /massbit/massbitroute/app/src/sites/services/gateway/etc/_upstream_server_ws.conf;
+
+}
+server {
+    listen unix:/tmp/ws-${node_type}.node.mbr.${_domain_name}.sock;
+    location / {
+        proxy_pass http://ws-${node_type}.node.mbr.${_domain_name};
+
+  include /massbit/massbitroute/app/src/sites/services/gateway/etc/_provider_server_ws.conf;
+    }
+}
+
+]],
     _gw_node_upstreams_v1 = [[
  ${upstream_extra}
 upstream ${node_type}.node.mbr.${_domain_name} {
@@ -327,8 +360,9 @@ local function _gen_upstream_block(
     )
 
     local _str = _tmpl("_gw_node_upstreams_v1")
+    local _str2 = _tmpl("_gw_node_upstreams_v2")
     local _file_block = _deploy_gatewayconfdir .. "/upstreams-" .. _node_type .. ".conf1"
-    _write_file(_file_block, _str)
+    _write_file(_file_block, _str2)
 
     local _str_blocks = _tmpl("_gw_node_upstreams_block_v1")
     local _file = _deploy_gatewayconfdir .. "/" .. _node_type .. ".upstream"
