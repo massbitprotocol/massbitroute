@@ -203,10 +203,10 @@ _git_cmd_commit() {
 		$_git pull
 		$_git commit -m "${ip}: ${mid}: ${HOSTNAME}: $_fdir at $_time"
 		$_git push
-		commit_id=$($_git rev-parse origin/$($_git rev-parse --abbrev-ref HEAD))
-		mkdir -p $SITE_ROOT/public/deploy/version
-		repo_name=$(basename $($_git remote get-url origin) .git)
-		echo $commit_id >$SITE_ROOT/public/deploy/version/${repo_name}.version
+		# commit_id=$($_git rev-parse origin/$($_git rev-parse --abbrev-ref HEAD))
+		# mkdir -p $SITE_ROOT/public/deploy/version
+		# repo_name=$(basename $($_git remote get-url origin) .git)
+		# echo $commit_id >$SITE_ROOT/public/deploy/version/${repo_name}.version
 		# 		mkdir -p $SITE_ROOT/public/deploy/version/${repo_name}
 		# 		cat >$SITE_ROOT/public/deploy/version/${repo_name}/${commit_id}.sh <<EOF
 		# #!/bin/bash
