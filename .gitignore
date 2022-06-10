@@ -12,7 +12,7 @@
 /env/
 .gitconfig
 
-
+.env
 .env*
 
 scripts/project-key.json
