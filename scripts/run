@@ -196,7 +196,7 @@ _git_cmd_commit() {
 		_time=$(date -u)
 		_git_config $_cdir
 		for _fdir in $@; do
-			$_git add -f $_fdir
+			$_git add $_fdir
 		done
 		mid=$(cat /etc/machine-id)
 		ip=$(curl ipv4.icanhazip.com)
