@@ -92,7 +92,6 @@ ${nodes/_gw_node_upstream()}
     _gw_node_upstreams_v2 = [[
  ${upstream_extra}
 upstream ${node_type}.node.mbr.${_domain_name} {
-  ${nodes/_gw_node_upstream()}
 include  /massbit/massbitroute/app/src/sites/services/gateway/http.d/${node_type}.upstream;
   ${upstream_backup}
     include /massbit/massbitroute/app/src/sites/services/gateway/etc/_upstream_server.conf;
