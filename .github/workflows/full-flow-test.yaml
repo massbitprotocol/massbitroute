@@ -6,7 +6,7 @@ name: Test main flow ETH/DOT Node/GW
 on:
   pull_request:
     types: [opened, reopened]
-    branches: [dev]
+    branches: [testing]
 
 jobs:
   set-up-test-env:
