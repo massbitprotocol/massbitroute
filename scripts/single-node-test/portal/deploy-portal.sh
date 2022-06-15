@@ -41,7 +41,7 @@ cat massbitroute-portal-template-single | \
     sed "s/\[\[PRIVATE_GIT_SSL_PASSWORD\]\]/$PRIVATE_GIT_SSL_PASSWORD/g"  | \
     sed "s/\[\[PRIVATE_GIT_SSH_USERNAME\]\]/$PRIVATE_GIT_SSH_USERNAME/g" | \
     sed "s/\[\[PRIVATE_GIT_SSH_PASSWORD\]\]/$PRIVATE_GIT_SSH_PASSWORD/g" | \
-    sed "s/\[\[GIT_API_TOKEN\]\]/$GIT_API_TOKEN/g" \
+    sed "s/\[\[GIT_API_TOKEN\]\]/$GIT_API_TOKEN/g" | \
     sed "s/\[\[MASSBITROUTE_CORE_IP\]\]/$MASSBITROUTE_CORE_IP/g" >> test-nodes.tf
 
 cat test-nodes.tf
