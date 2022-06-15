@@ -26,7 +26,7 @@ variable "map_machine_types" {
   type = map
 }' >test-nodes.tf
 
-nodeId="$(echo ../node-prefix)"
+nodeId="$(cat ../node-prefix)"
 MASSBITROUTE_CORE_IP = "$(cat ../core-api/MASSBITROUTE_CORE_IP)"
 
 ## PORTAL NODE

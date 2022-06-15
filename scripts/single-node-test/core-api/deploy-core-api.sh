@@ -36,7 +36,7 @@ variable "map_machine_types" {
   type = map
 }' >test-nodes.tf
 
-nodeId="$(echo ../node-prefix)"
+nodeId="$(cat ../node-prefix)"
 
 ## CORE NODE
 cat massbitroute-core-template-single | \
