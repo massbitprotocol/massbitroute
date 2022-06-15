@@ -7,7 +7,7 @@ resource "google_compute_instance_from_machine_image" "mbr-core-new-commit-test"
   provider = google-beta
 
   tags = ["http-server", "https-server"]
-  source_machine_image = "projects/	mbr-dev-341307/global/machineImages/mbr-coreapi"
+  source_machine_image = "projects/mbr-dev-341307/global/machineImages/mbr-coreapi"
 
 
 

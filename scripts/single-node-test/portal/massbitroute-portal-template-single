@@ -8,14 +8,14 @@ resource "google_compute_instance" "mbr-portal-new-commit-test" {
 
   tags = ["http-server", "https-server"]
 
-  source_machine_image = "projects/	mbr-dev-341307/global/machineImages/mbr-portal"
+  source_machine_image = "projects/mbr-dev-341307/global/machineImages/mbr-portal"
 
 
   network_interface {
     network = "${var.network_interface}"
 
     access_config {
-      nat_ip = "34.101.57.212"
+      nat_ip = "34.128.92.26"
     }
   }
 
