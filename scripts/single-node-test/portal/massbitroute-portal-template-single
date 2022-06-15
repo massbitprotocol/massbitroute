@@ -21,7 +21,6 @@ resource "google_compute_instance" "mbr-portal-new-commit-test" {
 
   metadata_startup_script =  <<EOH
   #!/bin/bash
-
   #-------------------------------------------
   #  Install PORTAL API
   #-------------------------------------------

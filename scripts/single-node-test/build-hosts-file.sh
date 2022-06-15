@@ -4,8 +4,7 @@ MASSBITROUTE_RUST_IP=$(cat MASSBITROUTE_RUST_IP)
 whoami
 sudo cat hosts-template | \
     sed "s/\[\[MASSBITROUTE_CORE_IP\]\]/$MASSBITROUTE_CORE_IP/g" | \
-    sed "s/\[\[MASSBITROUTE_PORTAL_IP\]\]/$MASSBITROUTE_PORTAL_IP/g" | \
-    sed "s/\[\[MASSBITROUTE_RUST_IP\]\]/$MASSBITROUTE_RUST_IP/g" > test-hosts-file
+    sed "s/\[\[MASSBITROUTE_PORTAL_IP\]\]/$MASSBITROUTE_PORTAL_IP/g" |  > test-hosts-file
 
 # sudo ssh-keyscan -H $MASSBITROUTE_CORE_IP >> /root/.ssh/known_hosts
 # sudo ssh-keyscan -H $MASSBITROUTE_PORTAL_IP >> /root/.ssh/known_hosts

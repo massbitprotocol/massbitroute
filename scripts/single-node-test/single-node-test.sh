@@ -35,7 +35,7 @@ sleep 420
 #-------------------------------------------
 echo "-----------------------------------------"
 while [[ "$core_ready_response" != "200" ]] || [[ "$portal_ready_response" != "200" ]] || [[ "$rust_ready_response" != "200" ]] || [[ "$staking_ready_response" != "200" ]]; do
-  core_ready_response=$(curl -o /dev/null -s -w "%{http_code}\n" --location https://dapi.massbitroute.dev/deploy/build.txt)
+  core_ready_response=$(curl -o /dev/null -s -w "%{http_code}\n" --location https://api.massbitroute.dev/deploy/build.txt)
   echo "CORE response: $core_ready_response"
   
   rust_ready_response=$(curl -o /dev/null -s -w "%{http_code}\n" --location 'http://verify-as.massbitroute.dev/ping' )
