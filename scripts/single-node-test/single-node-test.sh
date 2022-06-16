@@ -150,9 +150,8 @@ variable "map_machine_types" {
 
 ' >test-nodes.tf
 
-MASSBITROUTE_CORE_IP=$(cat MASSBITROUTE_CORE_IP)
-MASSBITROUTE_PORTAL_IP=$(cat MASSBITROUTE_PORTAL_IP)
-MASSBITROUTE_RUST_IP=$(cat MASSBITROUTE_RUST_IP)
+MASSBITROUTE_CORE_IP=$(cat persistent-artifact/MASSBITROUTE_CORE_IP)
+MASSBITROUTE_PORTAL_IP=$(cat persistent-artifact/MASSBITROUTE_PORTAL_IP)
 
 while IFS="," read -r nodeId appId zone; do
   cat gateway-template-single | sed "s/\[\[GATEWAY_ID\]\]/$nodeId/g" | \
