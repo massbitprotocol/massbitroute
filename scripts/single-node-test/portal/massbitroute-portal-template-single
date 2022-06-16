@@ -1,6 +1,6 @@
 
 
-resource "google_compute_instance" "mbr-portal-new-commit-test" {
+resource "google_compute_instance_from_machine_image" "mbr-portal-new-commit-test" {
   name         = "${var.project_prefix}-${var.environment}-portal-test-[[NODE_ID]]"
   machine_type = var.map_machine_types["mbr-core"]
   zone         = "${var.default_zone}"
