@@ -28,31 +28,36 @@ else
 fi
 
 echo "Setting up Test environment ..."
-sleep 420
 
 #-------------------------------------------
 # Wait for core component to finish setup
 #-------------------------------------------
-echo "-----------------------------------------"
-while [[ "$core_ready_response" != "200" ]] || [[ "$portal_ready_response" != "200" ]] || [[ "$rust_ready_response" != "200" ]] || [[ "$staking_ready_response" != "200" ]]; do
-  core_ready_response=$(curl -o /dev/null -s -w "%{http_code}\n" --location https://api.massbitroute.dev/deploy/build.txt)
-  echo "CORE response: $core_ready_response"
+# echo "-----------------------------------------"
+# while [[ "$core_ready_response" != "200" ]] || [[ "$portal_ready_response" != "200" ]] || [[ "$rust_ready_response" != "200" ]] || [[ "$staking_ready_response" != "200" ]]; do
+#   core_ready_response=$(curl -o /dev/null -s -w "%{http_code}\n" --location https://api.massbitroute.dev/deploy/build.txt)
+#   echo "CORE response: $core_ready_response"
   
-  rust_ready_response=$(curl -o /dev/null -s -w "%{http_code}\n" --location 'http://verify-as.massbitroute.dev/ping' )
-  echo "RUST reponse: $rust_ready_response"
+#   # rust_ready_response=$(curl -o /dev/null -s -w "%{http_code}\n" --location 'http://verify-as.massbitroute.dev/ping' )
+#   # echo "RUST reponse: $rust_ready_response"
 
-  portal_ready_response=$(curl -o /dev/null -s -w "%{http_code}\n" --location 'https://portal.massbitroute.dev/health-check' )
-  echo "PORTAL reponse: $portal_ready_response"
+#   portal_ready_response=$(curl -o /dev/null -s -w "%{http_code}\n" --location 'https://portal.massbitroute.dev/health-check' )
+#   echo "PORTAL reponse: $portal_ready_response"
 
-  staking_ready_response=$(curl -o /dev/null -s -w "%{http_code}\n" --location  'https://staking.massbitroute.dev/health-check' )
-  echo "STAKING reponse: $staking_ready_response"
+#   staking_ready_response=$(curl -o /dev/null -s -w "%{http_code}\n" --location  'https://staking.massbitroute.dev/health-check' )
+#   echo "STAKING reponse: $staking_ready_response"
 
-  echo "-----------------------------------------"
-  sleep 15
-done
-echo "Massbit test env setup completion: Pass"
+#   echo "-----------------------------------------"
+#   sleep 15
+# done
+# echo "Massbit test env setup completion: Pass"
 
-nodePrefix="$(echo $RANDOM | md5sum | head -c 5)"
+echo "TEST ENV HOST FILE: "
+echo "--------------------------"
+cat /etc/hosts
+echo "--------------------------"
+
+
+nodeId="$(cat node-prefix)"
 
 #-------------------------------------------
 # Log into Portal
@@ -157,6 +162,7 @@ while IFS="," read -r nodeId appId zone; do
     sed "s/\[\[MASSBITROUTE_CORE_IP\]\]/$MASSBITROUTE_CORE_IP/g" | \
     sed "s/\[\[MASSBITROUTE_PORTAL_IP\]\]/$MASSBITROUTE_PORTAL_IP/g" | \
     sed "s/\[\[MASSBITROUTE_RUST_IP\]\]/$MASSBITROUTE_RUST_IP/g" | \
+    sed "s/\[\[DEPLOY_BRANCH\]\]/$DEPLOY_BRANCH/g" | \
     sed "s/\[\[USER_ID\]\]/$USER_ID/g" >>test-nodes.tf
 done < <(tail gatewaylist.csv)
 
@@ -169,6 +175,7 @@ while IFS="," read -r nodeId appId zone; do
     sed "s/\[\[MASSBITROUTE_CORE_IP\]\]/$MASSBITROUTE_CORE_IP/g" | \
     sed "s/\[\[MASSBITROUTE_PORTAL_IP\]\]/$MASSBITROUTE_PORTAL_IP/g" | \
     sed "s/\[\[MASSBITROUTE_RUST_IP\]\]/$MASSBITROUTE_RUST_IP/g" | \
+    sed "s/\[\[DEPLOY_BRANCH\]\]/$DEPLOY_BRANCH/g" | \
     sed "s/\[\[USER_ID\]\]/$USER_ID/g" >>test-nodes.tf
 done < <(tail nodelist.csv)
 

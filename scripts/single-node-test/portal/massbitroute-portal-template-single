@@ -22,21 +22,27 @@ resource "google_compute_instance_from_machine_image" "mbr-portal-new-commit-tes
   metadata_startup_script =  <<EOH
   #!/bin/bash
   #-------------------------------------------
+  #  Update host file
+  #-------------------------------------------
+  echo "[[MASSBITROUTE_CORE_IP]] api.massbitroute.dev" >> /etc/hosts
+
+  #-------------------------------------------
   #  Install PORTAL API
   #-------------------------------------------
   cd /opt/user-management
-  git pull 
-  sudo yarn
-  sudo yarn build
-  sudo pm2 restart
+  # git pull 
+  # sudo yarn
+  # sudo yarn build
+  sudo pm2 start
 
   #-------------------------------------------
   #  Install STAKING API
   #-------------------------------------------
   cd /opt/test-massbit-staking
-  sudo yarn
-  sudo yarn build
-  sudo pm2 restart
+  # git pull
+  # sudo yarn
+  # sudo yarn build
+  sudo pm2 start
   EOH
 
 

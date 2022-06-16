@@ -93,6 +93,7 @@ jobs:
           export WALLET_ADDRESS=$WALLET_ADDRESS
           export ETH_PROJECT=$ETH_PROJECT
           export DOT_PROJECT=$DOT_PROJECT" > .env 
+          export DEPLOY_BRANCH=$GITHUB_HEAD_REF
           sudo bash -x ./single-node-test.sh eth
   test-nodes-dot:
     needs: set-up-test-env
@@ -133,7 +134,8 @@ jobs:
           export USER_ID=$USER_ID
           export WALLET_ADDRESS=$WALLET_ADDRESS
           export ETH_PROJECT=$ETH_PROJECT
-          export DOT_PROJECT=$DOT_PROJECT" > .env 
+          export DOT_PROJECT=$DOT_PROJECT
+          export DEPLOY_BRANCH=$GITHUB_HEAD_REF" > .env 
           sudo bash -x ./single-node-test.sh dot
 
   clean-up-core:
