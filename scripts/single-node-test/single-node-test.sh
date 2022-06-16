@@ -73,7 +73,6 @@ if [[ "$bearer" == "null" ]]; then
   exit 1
 fi
 
-
 #-------------------------------------------
 # create  node/gw in Portal
 #-------------------------------------------
@@ -82,7 +81,7 @@ sudo curl -s --location --request POST 'https://portal.massbitroute.dev/mbr/node
   --header "Authorization: Bearer  $bearer" \
   --header 'Content-Type: application/json' \
   --data-raw "{
-      \"name\": \"mb-dev-node-$nodePrefix\",
+      \"name\": \"mb-dev-node-$nodeId\",
       \"blockchain\": \"$blockchain\",
       \"zone\": \"AS\",
       \"dataSource\": \"$dataSource\",
@@ -182,7 +181,7 @@ while IFS="," read -r nodeId appId zone; do
     sed "s/\[\[USER_ID\]\]/$USER_ID/g" >>test-nodes.tf
 done < <(tail nodelist.csv)
 
-
+cat test-nodes.tf
 #-------------------------------------------
 #  Spin up nodes VM on GCE
 #-------------------------------------------
