@@ -38,13 +38,6 @@ jobs:
           PRIVATE_GIT_SSH_USERNAME: ${{ secrets.PRIVATE_GIT_SSH_USERNAME }}
           PRIVATE_GIT_SSH_PASSWORD: ${{ secrets.PRIVATE_GIT_SSH_PASSWORD }}
         run: |
-          sudo mkdir -p /root/.ssh          
-          sudo git clone http://$PRIVATE_GIT_SSH_USERNAME:$PRIVATE_GIT_SSH_PASSWORD@$PRIVATE_GIT_DOMAIN/massbitroute/ssh.git -b main /opt/ssh-key
-          sudo cp /opt/ssh-key/id_rsa*  /root/.ssh/
-          sudo chmod og-rwx /root/.ssh/id_rsa
-          ls -l /root/.ssh
-          cd scripts/single-node-test
-          ssh-keyscan -t rsa github.com >> /root/.ssh/known_hosts
           sudo bash build-hosts-file.sh          
           mkdir persistent-artifact
           cp MASSBITROUTE_CORE_IP persistent-artifact

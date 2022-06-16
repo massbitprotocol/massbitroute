@@ -32,9 +32,9 @@ cat test-hosts-file
 git config --global user.email "hoang@codelight.co"
 git config --global user.name "hoanito"
 
-rm -rf hosts
-sudo git clone git@github.com:hoanito/hosts.git -b main hosts
-sudo cp test-hosts-file hosts/test-hosts-file
-cd hosts
-git config --global --add safe.directory /__w/masbitroute/massbitroute
-sudo git add . && sudo git commit -m "Update host file" && sudo git push origin main
+# rm -rf hosts
+# sudo git clone git@github.com:hoanito/hosts.git -b main hosts
+# sudo cp test-hosts-file hosts/test-hosts-file
+# cd hosts
+# git config --global --add safe.directory /__w/masbitroute/massbitroute
+# sudo git add . && sudo git commit -m "Update host file" && sudo git push origin main
