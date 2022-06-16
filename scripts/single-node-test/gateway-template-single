@@ -40,8 +40,8 @@ resource "google_compute_instance" "mbr-gw-new-commit-test" {
   #-------------------------------------------
   #  Install script for GATEWAY
   #-------------------------------------------
-  sudo bash -c "$(curl -sSfL 'https://dapi.massbitroute.dev/api/v1/gateway_install?id=[[GATEWAY_ID]]&user_id=[[USER_ID]]&blockchain=[[BLOCKCHAIN]]&network=mainnet&zone=[[ZONE]]&app_key=[[APP_KEY]]&portal_url=https://portal.massbitroute.dev&env=testing')"  >> /home/verification.log
-  curl -sSfL 'https://dapi.massbitroute.dev/api/v1/gateway_install?id=[[GATEWAY_ID]]&user_id=[[USER_ID]]&blockchain=[[BLOCKCHAIN]]&network=mainnet&zone=[[ZONE]]&app_key=[[APP_KEY]]&portal_url=https://portal.massbitroute.dev&env=testing' > /home/install.sh
+  sudo bash -c "$(curl -sSfL 'https://portal.massbitroute.dev/api/v1/gateway_install?id=[[GATEWAY_ID]]&user_id=[[USER_ID]]&blockchain=[[BLOCKCHAIN]]&network=mainnet&zone=[[ZONE]]&app_key=[[APP_KEY]]&portal_url=https://portal.massbitroute.dev&env=testing')"  >> /home/verification.log
+  curl -sSfL 'https://portal.massbitroute.dev/api/v1/gateway_install?id=[[GATEWAY_ID]]&user_id=[[USER_ID]]&blockchain=[[BLOCKCHAIN]]&network=mainnet&zone=[[ZONE]]&app_key=[[APP_KEY]]&portal_url=https://portal.massbitroute.dev&env=testing' > /home/install.sh
   EOH
 
   service_account {
