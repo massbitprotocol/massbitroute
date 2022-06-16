@@ -25,6 +25,9 @@ resource "google_compute_instance_from_machine_image" "mbr-portal-new-commit-tes
   #  Update host file
   #-------------------------------------------
   echo "[[MASSBITROUTE_CORE_IP]] api.massbitroute.dev" >> /etc/hosts
+  rm /etc/resolv.conf
+  touch /etc/resolv.conf
+  echo "nameserver 8.8.8.8" > /etc/resolv.conf
 
   #-------------------------------------------
   #  Install PORTAL API

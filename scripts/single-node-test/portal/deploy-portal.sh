@@ -28,7 +28,7 @@ variable "map_machine_types" {
 
 echo "Current working directory: $(pwd)"
 nodeId="$(cat ../node-prefix)"
-MASSBITROUTE_CORE_IP = "$(cat ../core-api/MASSBITROUTE_CORE_IP)"
+MASSBITROUTE_CORE_IP="$(cat ../core-api/MASSBITROUTE_CORE_IP)"
 
 ## PORTAL NODE
 cat massbitroute-portal-template-single | \
