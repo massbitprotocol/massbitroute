@@ -72,6 +72,9 @@ jobs:
         run: |
           cd scripts/single-node-test/persistent-artifact 
           ls -l
+          cat test-hosts-file
+          cat MASSBITROUTE_CORE_IP
+          cat MASSBITROUTE_PORTAL_IP
           cat test-hosts-file >> /etc/hosts
           cp * .. 
       - name: Run full flow check for ETH nodes
@@ -92,8 +95,9 @@ jobs:
           export USER_ID=$USER_ID
           export WALLET_ADDRESS=$WALLET_ADDRESS
           export ETH_PROJECT=$ETH_PROJECT
-          export DOT_PROJECT=$DOT_PROJECT" > .env 
-          export DEPLOY_BRANCH=$GITHUB_HEAD_REF
+          export DOT_PROJECT=$DOT_PROJECT
+          export DEPLOY_BRANCH=$GITHUB_HEAD_REF" > .env 
+          
           sudo bash -x ./single-node-test.sh eth
   test-nodes-dot:
     needs: set-up-test-env
