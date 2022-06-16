@@ -164,7 +164,7 @@ while IFS="," read -r nodeId appId zone; do
     sed "s/\[\[MASSBITROUTE_CORE_IP\]\]/$MASSBITROUTE_CORE_IP/g" | \
     sed "s/\[\[MASSBITROUTE_PORTAL_IP\]\]/$MASSBITROUTE_PORTAL_IP/g" | \
     sed "s/\[\[MASSBITROUTE_RUST_IP\]\]/$MASSBITROUTE_RUST_IP/g" | \
-    sed "s/\[\[DEPLOY_BRANCH\]\]/$DEPLOY_BRANCH/g" | \
+    sed "s|\[\[DEPLOY_BRANCH\]\]|$DEPLOY_BRANCH|g" | \
     sed "s/\[\[USER_ID\]\]/$USER_ID/g" >>test-nodes.tf
 done < <(tail gatewaylist.csv)
 
@@ -177,7 +177,7 @@ while IFS="," read -r nodeId appId zone; do
     sed "s/\[\[MASSBITROUTE_CORE_IP\]\]/$MASSBITROUTE_CORE_IP/g" | \
     sed "s/\[\[MASSBITROUTE_PORTAL_IP\]\]/$MASSBITROUTE_PORTAL_IP/g" | \
     sed "s/\[\[MASSBITROUTE_RUST_IP\]\]/$MASSBITROUTE_RUST_IP/g" | \
-    sed "s/\[\[DEPLOY_BRANCH\]\]/$DEPLOY_BRANCH/g" | \
+    sed "s|\[\[DEPLOY_BRANCH\]\]|$DEPLOY_BRANCH|g" | \
     sed "s/\[\[USER_ID\]\]/$USER_ID/g" >>test-nodes.tf
 done < <(tail nodelist.csv)
 
