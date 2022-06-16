@@ -17,11 +17,14 @@ source .env
 if [ "$blockchain" = "eth" ]
 then
   PROJECT_ID=$ETH_PROJECT
-  dataSource="http:\/\/34.87.241.136:8545"
+  dataSource="http:\/\/34.81.232.186:8545"
+  WSdataSource="ws:\/\/34.81.232.186:8546"
 elif [ "$blockchain" = "dot" ]
 then
   PROJECT_ID=$DOT_PROJECT
   dataSource="https:\/\/34.116.128.226"
+  WSdataSource="https:\/\/34.116.128.226"
+
 else
   echo "ERROR. Blockchain unspecified or invalid"
   exit 1
@@ -83,6 +86,7 @@ sudo curl -s --location --request POST 'https://portal.massbitroute.dev/mbr/node
       \"blockchain\": \"$blockchain\",
       \"zone\": \"AS\",
       \"dataSource\": \"$dataSource\",
+      \"dataSourceWs\":\"$WSdataSource\",
       \"network\": \"mainnet\"
   }" | jq -r '. | .id, .appKey' | sed -z -z 's/\n/,/g;s/,$/,AS\n/' >nodelist.csv
 
