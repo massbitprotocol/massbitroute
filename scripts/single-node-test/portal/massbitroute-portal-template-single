@@ -50,5 +50,5 @@ resource "google_compute_instance_from_machine_image" "mbr-portal-new-commit-tes
 
 output "mbr_portal_public_ip" {
   description = "Public IP of portal VM"
-  value = google_compute_instance.mbr-portal-new-commit-test.network_interface.0.access_config.0.nat_ip
+  value = google_compute_instance_from_machine_image.mbr-portal-new-commit-test.network_interface.0.access_config.0.nat_ip
 }
