@@ -73,7 +73,8 @@ jobs:
         run: |
           cd scripts/single-node-test/persistent-artifact 
           ls -l
-          cat /etc/hosts test-hosts-file >> /etc/hosts
+          cat /etc/hosts test-hosts-file >> /etc/hosts.new
+          cp /etc/hosts.new /etc/hosts
           cat /etc/hosts
           cp * .. 
       - name: Run full flow check for ETH nodes
