@@ -42,7 +42,8 @@ jobs:
           sudo bash build-hosts-file.sh          
           mkdir persistent-artifact
           cp core-api/MASSBITROUTE_CORE_IP persistent-artifact
-          cp portal/MASSBITROUTE_PORTAL_IP persistent-artifact
+          cp portal/MASSBITROUTE_PORTAL_IP persistent-artifact 
+          cp node-prefix persistent-artifact
           cp test-hosts-file persistent-artifact
       - uses: actions/upload-artifact@master
         with:
@@ -72,10 +73,8 @@ jobs:
         run: |
           cd scripts/single-node-test/persistent-artifact 
           ls -l
-          cat test-hosts-file
-          cat MASSBITROUTE_CORE_IP
-          cat MASSBITROUTE_PORTAL_IP
-          cat test-hosts-file >> /etc/hosts
+          cat /etc/hosts test-hosts-file >> /etc/hosts
+          cat /etc/hosts
           cp * .. 
       - name: Run full flow check for ETH nodes
         env:

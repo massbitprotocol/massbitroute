@@ -43,6 +43,7 @@ resource "google_compute_instance_from_machine_image" "mbr-portal-new-commit-tes
   # sudo yarn
   # sudo yarn build
   sudo pm2 start
+  service nginx restart
   EOH
 
 
