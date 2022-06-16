@@ -2,7 +2,7 @@
 
 resource "google_compute_instance" "node-[[GATEWAY_ID]]" {
   name         = "${var.project_prefix}-${var.environment}-node-[[BLOCKCHAIN]]-[[GATEWAY_ID]]"
-  machine_type = var.map_machine_types["gateway"]
+  machine_type = var.map_machine_types["node"]
   zone         = "${var.default_zone}"
   provider = google-beta
 
