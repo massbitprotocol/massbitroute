@@ -309,8 +309,18 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
     -- _print("dc_geo")
     -- _print(_dc_geo, true)
     if _dc_geo and next(_dc_geo) then
+        local _dapi_domains = {}
         local _dc_maps_new = {}
         for _geo_id, _geo_svrs in pairs(_dc_geo) do
+            local _suffix_len = string.len(_geo_id) - string.len(_blocknet_id)
+            if _suffix_len <= 6 then
+                table.insert(
+                    _dapi_domains,
+                    "*." .. _geo_id .. " 10/10 DYNA	geoip!mbr-map-" .. _blocknet_id .. "/" .. _geo_id
+                )
+            else
+                table.insert(_dapi_domains, _geo_id .. " 10/10 DYNA	geoip!mbr-map-" .. _blocknet_id .. "/" .. _geo_id)
+            end
             table.insert(
                 _dc_maps_new,
                 {
@@ -336,8 +346,11 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
         _write_file(_file_res, _geo_res)
 
         local _file_dapi = gwman_dir .. "/zones/dapi/" .. _blocknet_id .. ".zone"
-        print(_file_dapi)
-        _write_file(_file_dapi, "*." .. _blocknet_id .. " 10/10 DYNA	geoip!mbr-map-" .. _blocknet_id .. "\n")
+        -- print(_file_dapi)
+        table.insert(_dapi_domains, "*." .. _blocknet_id .. " 10/10 DYNA	geoip!mbr-map-" .. _blocknet_id)
+
+        _write_file(_file_dapi, table.concat(_dapi_domains, "\n"))
+    -- _write_file(_file_dapi, "*." .. _blocknet_id .. " 10/10 DYNA	geoip!mbr-map-" .. _blocknet_id .. "\n")
     end
 
     if _approved and #_approved > 0 then
