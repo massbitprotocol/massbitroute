@@ -80,7 +80,7 @@ server {
     include /massbit/massbitroute/app/src/sites/services/gateway/etc/_ssl_${blockchain}-${network}.]] ..
         _domain_name ..
             [[.conf;
-    server_name ${gateway_domain};
+    server_name ${gateway_domain_list};
     include /massbit/massbitroute/app/src/sites/services/gateway/etc/_session.conf;
     include /massbit/massbitroute/app/src/sites/services/gateway/etc/_location_server.conf;
 
@@ -106,7 +106,7 @@ server {
     include /massbit/massbitroute/app/src/sites/services/gateway/etc/_ssl_${blockchain}-${network}.]] ..
                 _domain_name ..
                     [[.conf;
-    server_name ws-${gateway_domain};
+    server_name ws-${gateway_domain_list};
     include /massbit/massbitroute/app/src/sites/services/gateway/etc/_session_ws.conf;
     include /massbit/massbitroute/app/src/sites/services/gateway/etc/_location_server.conf;
 
@@ -352,13 +352,13 @@ local function _generate_item(instance, args)
             -- _item.gateway_domain_ws = string.gsub(_item.gateway_domain, _item.id, _item.id .. "-ws")
             -- _print("_item.gateway_domain:" .. _item.gateway_domain)
             -- _print("_item.gateway_domain_ws:" .. _item.gateway_domain_ws)
-
+            -- _print("item:" .. inspect(_item))
             if _item.gateway_domain and _item.server_name then
                 _item.gateway_domain_list =
                     _item.gateway_domain ..
                     " " .. _item.gateway_domain:gsub("." .. _item.server_name, "*." .. _item.server_name)
             end
-            _print("item:" .. inspect(_item))
+
             -- generate servers conf link with upstreams
             local _tmpl_server = _get_tmpl(rules, _item)
             _content[#_content + 1] = _tmpl_server("_server_main")
