@@ -190,8 +190,6 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
                                 _datacenters["geo"] = _datacenters["geo"] or {}
                                 _datacenters["blocknet"] = _datacenters["blocknet"] or {}
 
-                                _dc_global[_geo_id] = 1
-
                                 _dc_continent[_continent] = _dc_continent[_continent] or {}
                                 _dc_continent[_continent][_geo_id] = 1
 
@@ -203,11 +201,16 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
 
                                 _dc_geo[_geo_id] = _dc_geo[_geo_id] or {}
                                 _dc_geo[_geo_continent] = _dc_geo[_geo_continent] or {}
+
                                 local _geo_myid = _blocknet_id .. "-" .. _item.id
                                 _dc_geo[_geo_myid] = _dc_geo[_geo_myid] or {}
                                 table_insert(_dc_geo[_geo_myid], _obj)
                                 table_insert(_dc_geo[_geo_id], _obj)
                                 table_insert(_dc_geo[_geo_continent], _obj)
+
+                                _dc_global[_geo_myid] = 1
+                                _dc_global[_geo_id] = 1
+                                _dc_global[_geo_continent] = 1
                             end
                         end
                     end
