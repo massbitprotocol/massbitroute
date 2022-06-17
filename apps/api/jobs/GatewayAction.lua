@@ -131,6 +131,7 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
 
     local _blocknet_id = _blockchain .. "-" .. _network
     local _dc_global = {}
+    local _dc_global1 = {}
 
     local _dc_country = {}
     local _dc_continent = {}
@@ -208,9 +209,9 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
                                 table_insert(_dc_geo[_geo_id], _obj)
                                 table_insert(_dc_geo[_geo_continent], _obj)
 
-                                _dc_global[_geo_myid] = 1
+                                _dc_global1[_geo_myid] = 1
                                 _dc_global[_geo_id] = 1
-                                _dc_global[_geo_continent] = 1
+                                _dc_global1[_geo_continent] = 1
                             end
                         end
                     end
@@ -273,7 +274,10 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
             table_insert(_v_maps, "  },")
         end
 
-        local _dc_global_keys = table_keys(_dc_global)
+        local _dc_global2 = table.merge({}, _dc_global)
+        table.merge(_dc_global2, _dc_global1)
+        local _dc_global_keys = table_keys(_dc_global2)
+
         table_insert(_v_maps, "  default => [ ")
         for _, _dc in ipairs(_dc_global_keys) do
             table_insert(_v_maps, "        " .. _dc .. ",")
