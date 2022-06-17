@@ -1,6 +1,6 @@
 project_prefix = "mbr"
 environment = "test"
-default_zone = "asia-southeast2-a"
+default_zone = "asia-east1-b"
 network_interface = "default"
 email = "mbr-dev@mbr-dev-341307.iam.gserviceaccount.com"
 map_machine_types={"git":"e2-micro","mbr-core":"e2-medium","mbr-core-micro":"e2-micro","api":"e2-custom-4-4096","dns":"e2-micro","gateway":"e2-micro","node":"e2-micro"}
