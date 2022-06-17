@@ -81,7 +81,7 @@ sudo curl -s --location --request POST 'https://portal.massbitroute.dev/mbr/node
   --header "Authorization: Bearer  $bearer" \
   --header 'Content-Type: application/json' \
   --data-raw "{
-      \"name\": \"mb-dev-node-$nodeId\",
+      \"name\": \"mb-test-node-$nodeId\",
       \"blockchain\": \"$blockchain\",
       \"zone\": \"AS\",
       \"dataSource\": \"$dataSource\",
@@ -93,7 +93,7 @@ sudo curl -s --location --request POST 'https://portal.massbitroute.dev/mbr/gate
   --header "Authorization: Bearer  $bearer" \
   --header 'Content-Type: application/json' \
   --data-raw "{
-    \"name\":\"MB-dev-gateway-$nodePrefix\",
+    \"name\":\"mb-test-gateway-$nodeId\",
     \"blockchain\":\"$blockchain\",
     \"zone\":\"AS\",
     \"network\":\"mainnet\"}" | jq -r '. | .id, .appKey' | sed -z -z 's/\n/,/g;s/,$/,AS\n/' >gatewaylist.csv
