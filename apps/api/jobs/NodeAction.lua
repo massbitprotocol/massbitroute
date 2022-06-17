@@ -402,6 +402,8 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
                                         if type(_item) == "string" then
                                             _item = json.decode(_item)
                                         end
+                                    end
+                                    if _item then
                                         _item._domain_name = _job_data._domain_name
 
                                         if _continent and _country and _item.status and _item.approved then
