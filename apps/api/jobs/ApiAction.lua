@@ -352,6 +352,12 @@ local function _generate_item(instance, args)
             -- _item.gateway_domain_ws = string.gsub(_item.gateway_domain, _item.id, _item.id .. "-ws")
             -- _print("_item.gateway_domain:" .. _item.gateway_domain)
             -- _print("_item.gateway_domain_ws:" .. _item.gateway_domain_ws)
+
+            if _item.gateway_domain and _item.server_name then
+                _item.gateway_domain_list =
+                    _item.gateway_domain ..
+                    " " .. _item.gateway_domain:gsub("." .. _item.server_name, "*." .. _item.server_name)
+            end
             _print("item:" .. inspect(_item))
             -- generate servers conf link with upstreams
             local _tmpl_server = _get_tmpl(rules, _item)
