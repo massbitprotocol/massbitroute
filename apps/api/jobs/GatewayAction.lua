@@ -347,7 +347,7 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
 
         local _file_dapi = gwman_dir .. "/zones/dapi/" .. _blocknet_id .. ".zone"
         -- print(_file_dapi)
-        table.insert(_dapi_domains, "*." .. _blocknet_id .. " 10/10 DYNA	geoip!mbr-map-" .. _blocknet_id)
+        table.insert(_dapi_domains, "*." .. _blocknet_id .. " 10/10 DYNA	geoip!mbr-map-" .. _blocknet_id .. "\n")
 
         _write_file(_file_dapi, table.concat(_dapi_domains, "\n"))
     -- _write_file(_file_dapi, "*." .. _blocknet_id .. " 10/10 DYNA	geoip!mbr-map-" .. _blocknet_id .. "\n")
