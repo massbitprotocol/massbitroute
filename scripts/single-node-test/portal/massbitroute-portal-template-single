@@ -15,7 +15,7 @@ resource "google_compute_instance_from_machine_image" "mbr-portal-new-commit-tes
     network = "${var.network_interface}"
 
     access_config {
-      nat_ip = "34.128.92.26"
+      nat_ip = "104.199.187.38"
     }
   }
 
