@@ -354,7 +354,8 @@ local function _generate_item(instance, args)
             -- _print("_item.gateway_domain_ws:" .. _item.gateway_domain_ws)
             -- _print("item:" .. inspect(_item))
             if _item.gateway_domain and _item.server_name then
-                _item.gateway_domain_list = _item.gateway_domain:gsub(_item.server_name, "*")
+                _item.gateway_domain_list =
+                    _item.gateway_domain:gsub(_item.blockchain .. "-" .. _item.network .. "." .. _item.server_name, "*")
             end
 
             -- generate servers conf link with upstreams
