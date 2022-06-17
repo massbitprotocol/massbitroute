@@ -274,7 +274,8 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
             table_insert(_v_maps, "  },")
         end
 
-        local _dc_global2 = table.merge({}, _dc_global)
+        local _dc_global2 = {}
+        table.merge(_dc_global2, _dc_global)
         table.merge(_dc_global2, _dc_global1)
         local _dc_global_keys = table_keys(_dc_global2)
 
