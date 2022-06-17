@@ -22,7 +22,7 @@ jobs:
       - name: Building test environment
         run: |
           cd scripts/single-node-test
-          echo $RANDOM | md5sum | head -c 5 > node-prefix
+          date | md5sum | head -c 5 > node-prefix
           cd core-api
           sudo bash -x deploy-core-api.sh $GITHUB_HEAD_REF
           cd ../portal
@@ -99,48 +99,48 @@ jobs:
           export DEPLOY_BRANCH=$GITHUB_HEAD_REF" > .env 
           
           sudo bash -x ./single-node-test.sh eth
-  test-nodes-dot:
-    needs: set-up-test-env
-    runs-on: ubuntu-latest
-    container: hoanito/mbr-ubuntu:1.2
-    steps:
-      - uses: actions/checkout@v3
-      - name: Obtain GCE key
-        env: 
-          PROJECT_KEY: ${{ secrets.PROJECT_KEY }}
-        run: |
-          echo $PROJECT_KEY  > scripts/single-node-test/project_key.json 
-      - uses: actions/download-artifact@v3
-        with:
-          name: persistent-artifact
-          path: scripts/single-node-test/persistent-artifact
-      - name: Update hosts file
-        run: |
-          cd scripts/single-node-test/persistent-artifact 
-          ls -l
-          cat test-hosts-file >> /etc/hosts
-          cp * ..           
-      - name: Run full flow check for DOT nodes
-        env:
-          MEMONIC: ${{ secrets.MEMONIC }}
-          TEST_PASSWORD: ${{ secrets.TEST_PASSWORD }}
-          TEST_USERNAME: ${{ secrets.TEST_USERNAME }}
-          USER_ID: ${{ secrets.USER_ID }}
-          WALLET_ADDRESS: ${{ secrets.WALLET_ADDRESS }}
-          ETH_PROJECT: ${{ secrets.ETH_PROJECT }}
-          DOT_PROJECT: ${{ secrets.DOT_PROJECT }}
-        run: |
-          cd scripts/single-node-test
-          echo "
-          export MEMONIC=\"$MEMONIC\"
-          export TEST_USERNAME=$TEST_USERNAME
-          export TEST_PASSWORD=$TEST_PASSWORD
-          export USER_ID=$USER_ID
-          export WALLET_ADDRESS=$WALLET_ADDRESS
-          export ETH_PROJECT=$ETH_PROJECT
-          export DOT_PROJECT=$DOT_PROJECT
-          export DEPLOY_BRANCH=$GITHUB_HEAD_REF" > .env 
-          sudo bash -x ./single-node-test.sh dot
+  # test-nodes-dot:
+  #   needs: set-up-test-env
+  #   runs-on: ubuntu-latest
+  #   container: hoanito/mbr-ubuntu:1.2
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     - name: Obtain GCE key
+  #       env: 
+  #         PROJECT_KEY: ${{ secrets.PROJECT_KEY }}
+  #       run: |
+  #         echo $PROJECT_KEY  > scripts/single-node-test/project_key.json 
+  #     - uses: actions/download-artifact@v3
+  #       with:
+  #         name: persistent-artifact
+  #         path: scripts/single-node-test/persistent-artifact
+  #     - name: Update hosts file
+  #       run: |
+  #         cd scripts/single-node-test/persistent-artifact 
+  #         ls -l
+  #         cat test-hosts-file >> /etc/hosts
+  #         cp * ..           
+  #     - name: Run full flow check for DOT nodes
+  #       env:
+  #         MEMONIC: ${{ secrets.MEMONIC }}
+  #         TEST_PASSWORD: ${{ secrets.TEST_PASSWORD }}
+  #         TEST_USERNAME: ${{ secrets.TEST_USERNAME }}
+  #         USER_ID: ${{ secrets.USER_ID }}
+  #         WALLET_ADDRESS: ${{ secrets.WALLET_ADDRESS }}
+  #         ETH_PROJECT: ${{ secrets.ETH_PROJECT }}
+  #         DOT_PROJECT: ${{ secrets.DOT_PROJECT }}
+  #       run: |
+  #         cd scripts/single-node-test
+  #         echo "
+  #         export MEMONIC=\"$MEMONIC\"
+  #         export TEST_USERNAME=$TEST_USERNAME
+  #         export TEST_PASSWORD=$TEST_PASSWORD
+  #         export USER_ID=$USER_ID
+  #         export WALLET_ADDRESS=$WALLET_ADDRESS
+  #         export ETH_PROJECT=$ETH_PROJECT
+  #         export DOT_PROJECT=$DOT_PROJECT
+  #         export DEPLOY_BRANCH=$GITHUB_HEAD_REF" > .env 
+  #         sudo bash -x ./single-node-test.sh dot
 
   clean-up-core:
     needs: [test-nodes-eth, test-nodes-dot]
