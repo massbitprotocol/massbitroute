@@ -142,6 +142,7 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
         local _continent_dir = _network_dir .. "/" .. _continent
         for _, _country in ipairs(show_folder(_continent_dir)) do
             local _geo_id = _blocknet_id .. "-" .. _continent .. "-" .. _country
+            local _geo_continent = _blocknet_id .. "-" .. _continent
 
             local _country_dir = _continent_dir .. "/" .. _country
             for _, _user_id in ipairs(show_folder(_country_dir)) do
@@ -199,8 +200,12 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
                                 _dc_country[_continent][_country][_geo_id] = 1
 
                                 _dc_geo[_geo_id] = _dc_geo[_geo_id] or {}
-
+                                _dc_geo[_geo_continent] = _dc_geo[_geo_continent] or {}
+                                local _geo_myid = _blocknet_id .. "-" .. _item.id
+                                _dc_geo[_geo_myid] = _dc_geo[_geo_myid] or {}
+                                table_insert(_dc_geo[_geo_myid], _obj)
                                 table_insert(_dc_geo[_geo_id], _obj)
+                                table_insert(_dc_geo[_geo_continent], _obj)
                             end
                         end
                     end
