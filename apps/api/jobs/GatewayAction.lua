@@ -312,15 +312,10 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
         local _dapi_domains = {}
         local _dc_maps_new = {}
         for _geo_id, _geo_svrs in pairs(_dc_geo) do
-            local _suffix_len = string.len(_geo_id) - string.len(_blocknet_id)
-            if _suffix_len <= 6 then
-                table.insert(
-                    _dapi_domains,
-                    "*." .. _geo_id .. " 10/10 DYNA	geoip!mbr-map-" .. _blocknet_id .. "/" .. _geo_id
-                )
-            else
-                table.insert(_dapi_domains, _geo_id .. " 10/10 DYNA	geoip!mbr-map-" .. _blocknet_id .. "/" .. _geo_id)
-            end
+            table.insert(
+                _dapi_domains,
+                "*." .. _geo_id .. " 10/10 DYNA	geoip!mbr-map-" .. _blocknet_id .. "/" .. _geo_id
+            )
             table.insert(
                 _dc_maps_new,
                 {
