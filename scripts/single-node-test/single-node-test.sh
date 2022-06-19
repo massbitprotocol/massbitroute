@@ -413,6 +413,32 @@ dapi_response_code=$(curl -o /dev/null -s -w "%{http_code}\n" --location --reque
   --header 'Content-Type: application/json' \
   --data-raw "$http_data")
 if [[ "$dapi_response_code" != "200" ]]; then
+  if [[ "$dapi_response_code" == "504" ]]; then
+      retries=0
+      while [[ "$gw_response_code" != "200" ]] && [[ retries < 5 ]]; do
+        gw_response_code=$(curl -o /dev/null -s -w "%{http_code}\n" --location --request POST "https://$GW_IP" \
+          --header "x-api-key: $appkey" \
+          --header Host: "$apiId.gw.mbr.massbitroute.dev" \
+          --header 'Content-Type: application/json' \
+          --data-raw '{
+              "jsonrpc": "2.0",
+              "method": "eth_blockNumber",
+              "params": [],
+              "id": 1
+          }')
+
+        retries=retries+1
+      done
+
+      if [[ "$gw_response_code" != "200" ]]; then
+        echo "Calling dAPI (directly from GW): Failed"
+        exit 1
+      fi
+  elif
+    echo "Calling dAPI: Failed"
+    exit 1
+  fi
+fi
   echo "Calling dAPI: Failed"
   exit 1
 fi
