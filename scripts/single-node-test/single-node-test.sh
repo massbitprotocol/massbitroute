@@ -434,7 +434,7 @@ if [[ "$dapi_response_code" != "200" ]]; then
         echo "Calling dAPI (directly from GW): Failed"
         exit 1
       fi
-  elif
+  else
     echo "Calling dAPI: Failed"
     exit 1
   fi
