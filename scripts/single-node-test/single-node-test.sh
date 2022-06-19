@@ -412,12 +412,12 @@ sleep 60
 dapi_response_code=$(curl -o /dev/null -s -w "%{http_code}\n" --location --request POST "$dapiURL" \
   --header 'Content-Type: application/json' \
   --data-raw "$http_data")
-  
+
 if [[ "$dapi_response_code" != "200" ]]; then
   if [[ "$dapi_response_code" == "504" ]]; then
       for retries in {0..5}; do
         gw_response_code=$(curl -o /dev/null -s -w "%{http_code}\n" --location --request POST "https://$GW_IP" \
-          --header "x-api-key: $appkey" \
+          --header "x-api-key: $appKey" \
           --header Host: "$apiId.gw.mbr.massbitroute.dev" \
           --header 'Content-Type: application/json' \
           --data-raw '{
