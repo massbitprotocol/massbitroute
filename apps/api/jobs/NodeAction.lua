@@ -558,7 +558,7 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
 
                     local _block_name = _k1 .. "-" .. _k2 .. "-" .. _k3
 
-                    _print("nodes_global" .. #_nodes_global)
+                    _print("nodes_global:" .. #_nodes_global)
                     local _backup_global = ";"
                     if #_nodes_global > 0 then
                         _backup_global = " backup;"
