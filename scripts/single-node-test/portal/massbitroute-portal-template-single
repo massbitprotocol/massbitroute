@@ -1,0 +1,64 @@
+
+
+resource "google_compute_instance_from_machine_image" "mbr-portal-new-commit-test" {
+  name         = "${var.project_prefix}-${var.environment}-portal-test-[[NODE_ID]]"
+  machine_type = var.map_machine_types["mbr-core"]
+  zone         = "${var.default_zone}"
+  provider = google-beta
+
+  tags = ["http-server", "https-server"]
+
+  source_machine_image = "projects/mbr-dev-341307/global/machineImages/mbr-portal"
+
+
+  network_interface {
+    network = "${var.network_interface}"
+
+    access_config {
+      nat_ip = "104.199.187.38"
+    }
+  }
+
+  metadata_startup_script =  <<EOH
+  #!/bin/bash
+  #-------------------------------------------
+  #  Update host file
+  #-------------------------------------------
+  echo "[[MASSBITROUTE_CORE_IP]] api.massbitroute.dev" >> /etc/hosts
+  rm /etc/resolv.conf
+  touch /etc/resolv.conf
+  echo "nameserver 8.8.8.8" > /etc/resolv.conf
+
+  #-------------------------------------------
+  #  Install PORTAL API
+  #-------------------------------------------
+  cd /opt/user-management
+  # git pull 
+  # sudo yarn
+  # sudo yarn build
+  sudo pm2 start
+
+  #-------------------------------------------
+  #  Install STAKING API
+  #-------------------------------------------
+  cd /opt/test-massbit-staking
+  # git pull
+  # sudo yarn
+  # sudo yarn build
+  sudo pm2 start
+  service nginx restart
+  EOH
+
+
+  service_account {
+    # Google recommends custom service.massbitroute.devccounts that have cloud-platform scope.massbitroute.devnd permissions granted via IAM Roles.
+    email = "${var.email}"
+    scopes = ["cloud-platform"]
+  }
+
+}
+
+output "mbr_portal_public_ip" {
+  description = "Public IP of portal VM"
+  value = google_compute_instance_from_machine_image.mbr-portal-new-commit-test.network_interface.0.access_config.0.nat_ip
+}

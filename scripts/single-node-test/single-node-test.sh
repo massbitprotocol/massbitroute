@@ -17,42 +17,50 @@ source .env
 if [ "$blockchain" = "eth" ]
 then
   PROJECT_ID=$ETH_PROJECT
-  dataSource="http:\/\/34.87.241.136:8545"
+  dataSource="http:\/\/34.81.232.186:8545"
+  WSdataSource="ws:\/\/34.81.232.186:8546"
 elif [ "$blockchain" = "dot" ]
 then
   PROJECT_ID=$DOT_PROJECT
   dataSource="https:\/\/34.116.128.226"
+  WSdataSource="https:\/\/34.116.128.226"
+
 else
   echo "ERROR. Blockchain unspecified or invalid"
   exit 1
 fi
 
 echo "Setting up Test environment ..."
-sleep 420
 
 #-------------------------------------------
 # Wait for core component to finish setup
 #-------------------------------------------
-echo "-----------------------------------------"
-while [[ "$core_ready_response" != "200" ]] || [[ "$portal_ready_response" != "200" ]] || [[ "$rust_ready_response" != "200" ]] || [[ "$staking_ready_response" != "200" ]]; do
-  core_ready_response=$(curl -o /dev/null -s -w "%{http_code}\n" --location https://dapi.massbitroute.dev/deploy/build.txt)
-  echo "CORE response: $core_ready_response"
+# echo "-----------------------------------------"
+# while [[ "$core_ready_response" != "200" ]] || [[ "$portal_ready_response" != "200" ]] || [[ "$rust_ready_response" != "200" ]] || [[ "$staking_ready_response" != "200" ]]; do
+#   core_ready_response=$(curl -o /dev/null -s -w "%{http_code}\n" --location https://api.massbitroute.dev/deploy/build.txt)
+#   echo "CORE response: $core_ready_response"
   
-  rust_ready_response=$(curl -o /dev/null -s -w "%{http_code}\n" --location 'http://verify-as.massbitroute.dev/ping' )
-  echo "RUST reponse: $rust_ready_response"
+#   # rust_ready_response=$(curl -o /dev/null -s -w "%{http_code}\n" --location 'http://verify-as.massbitroute.dev/ping' )
+#   # echo "RUST reponse: $rust_ready_response"
 
-  portal_ready_response=$(curl -o /dev/null -s -w "%{http_code}\n" --location 'https://portal.massbitroute.dev/health-check' )
-  echo "PORTAL reponse: $portal_ready_response"
+#   portal_ready_response=$(curl -o /dev/null -s -w "%{http_code}\n" --location 'https://portal.massbitroute.dev/health-check' )
+#   echo "PORTAL reponse: $portal_ready_response"
 
-  staking_ready_response=$(curl -o /dev/null -s -w "%{http_code}\n" --location  'https://staking.massbitroute.dev/health-check' )
-  echo "STAKING reponse: $staking_ready_response"
+#   staking_ready_response=$(curl -o /dev/null -s -w "%{http_code}\n" --location  'https://staking.massbitroute.dev/health-check' )
+#   echo "STAKING reponse: $staking_ready_response"
 
-  echo "-----------------------------------------"
-  sleep 15
-done
-echo "Massbit test env setup completion: Pass"
+#   echo "-----------------------------------------"
+#   sleep 15
+# done
+# echo "Massbit test env setup completion: Pass"
 
-nodePrefix="$(echo $RANDOM | md5sum | head -c 5)"
+echo "TEST ENV HOST FILE: "
+echo "--------------------------"
+cat /etc/hosts
+echo "--------------------------"
+
+
+nodeId="$(cat node-prefix)"
 
 #-------------------------------------------
 # Log into Portal
@@ -65,7 +73,6 @@ if [[ "$bearer" == "null" ]]; then
   exit 1
 fi
 
-
 #-------------------------------------------
 # create  node/gw in Portal
 #-------------------------------------------
@@ -74,10 +81,11 @@ sudo curl -s --location --request POST 'https://portal.massbitroute.dev/mbr/node
   --header "Authorization: Bearer  $bearer" \
   --header 'Content-Type: application/json' \
   --data-raw "{
-      \"name\": \"mb-dev-node-$nodePrefix\",
+      \"name\": \"mb-test-node-$nodeId\",
       \"blockchain\": \"$blockchain\",
       \"zone\": \"AS\",
       \"dataSource\": \"$dataSource\",
+      \"dataSourceWs\":\"$WSdataSource\",
       \"network\": \"mainnet\"
   }" | jq -r '. | .id, .appKey' | sed -z -z 's/\n/,/g;s/,$/,AS\n/' >nodelist.csv
 
@@ -85,7 +93,7 @@ sudo curl -s --location --request POST 'https://portal.massbitroute.dev/mbr/gate
   --header "Authorization: Bearer  $bearer" \
   --header 'Content-Type: application/json' \
   --data-raw "{
-    \"name\":\"MB-dev-gateway-$nodePrefix\",
+    \"name\":\"mb-test-gateway-$nodeId\",
     \"blockchain\":\"$blockchain\",
     \"zone\":\"AS\",
     \"network\":\"mainnet\"}" | jq -r '. | .id, .appKey' | sed -z -z 's/\n/,/g;s/,$/,AS\n/' >gatewaylist.csv
@@ -145,9 +153,8 @@ variable "map_machine_types" {
 
 ' >test-nodes.tf
 
-MASSBITROUTE_CORE_IP=$(cat MASSBITROUTE_CORE_IP)
-MASSBITROUTE_PORTAL_IP=$(cat MASSBITROUTE_PORTAL_IP)
-MASSBITROUTE_RUST_IP=$(cat MASSBITROUTE_RUST_IP)
+MASSBITROUTE_CORE_IP=$(cat persistent-artifact/MASSBITROUTE_CORE_IP)
+MASSBITROUTE_PORTAL_IP=$(cat persistent-artifact/MASSBITROUTE_PORTAL_IP)
 
 while IFS="," read -r nodeId appId zone; do
   cat gateway-template-single | sed "s/\[\[GATEWAY_ID\]\]/$nodeId/g" | \
@@ -157,6 +164,7 @@ while IFS="," read -r nodeId appId zone; do
     sed "s/\[\[MASSBITROUTE_CORE_IP\]\]/$MASSBITROUTE_CORE_IP/g" | \
     sed "s/\[\[MASSBITROUTE_PORTAL_IP\]\]/$MASSBITROUTE_PORTAL_IP/g" | \
     sed "s/\[\[MASSBITROUTE_RUST_IP\]\]/$MASSBITROUTE_RUST_IP/g" | \
+    sed "s|\[\[DEPLOY_BRANCH\]\]|$DEPLOY_BRANCH|g" | \
     sed "s/\[\[USER_ID\]\]/$USER_ID/g" >>test-nodes.tf
 done < <(tail gatewaylist.csv)
 
@@ -169,10 +177,11 @@ while IFS="," read -r nodeId appId zone; do
     sed "s/\[\[MASSBITROUTE_CORE_IP\]\]/$MASSBITROUTE_CORE_IP/g" | \
     sed "s/\[\[MASSBITROUTE_PORTAL_IP\]\]/$MASSBITROUTE_PORTAL_IP/g" | \
     sed "s/\[\[MASSBITROUTE_RUST_IP\]\]/$MASSBITROUTE_RUST_IP/g" | \
+    sed "s|\[\[DEPLOY_BRANCH\]\]|$DEPLOY_BRANCH|g" | \
     sed "s/\[\[USER_ID\]\]/$USER_ID/g" >>test-nodes.tf
 done < <(tail nodelist.csv)
 
-
+cat test-nodes.tf
 #-------------------------------------------
 #  Spin up nodes VM on GCE
 #-------------------------------------------
@@ -403,10 +412,36 @@ sleep 60
 dapi_response_code=$(curl -o /dev/null -s -w "%{http_code}\n" --location --request POST "$dapiURL" \
   --header 'Content-Type: application/json' \
   --data-raw "$http_data")
+
 if [[ "$dapi_response_code" != "200" ]]; then
-  echo "Calling dAPI: Failed"
-  exit 1
+  if [[ "$dapi_response_code" == "504" ]]; then
+      for retries in {0..5}; do
+        gw_response_code=$(curl -k -o /dev/null -s -w "%{http_code}\n" --location --request POST "https://$GW_IP" \
+          --header "x-api-key: $appKey" \
+          --header "Host: $apiId.gw.mbr.massbitroute.dev" \
+          --header 'Content-Type: application/json' \
+          --data-raw '{
+              "jsonrpc": "2.0",
+              "method": "eth_blockNumber",
+              "params": [],
+              "id": 1
+          }')
+
+        if [[ "$gw_response_code" == "200" ]]; then
+          break
+        fi
+      done
+
+      if [[ "$gw_response_code" != "200" ]]; then
+        echo "Calling dAPI (directly from GW): Failed"
+        exit 1
+      fi
+  else 
+    echo "Calling dAPI: Failed"
+    exit 1
+  fi
 fi
+
 echo "Calling dAPI: Pass"
 
 

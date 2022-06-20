@@ -6,7 +6,7 @@ name: Test main flow ETH/DOT Node/GW
 on:
   pull_request:
     types: [opened, reopened]
-    branches: [dev]
+    branches: [testing]
 
 jobs:
   set-up-test-env:
@@ -20,27 +20,13 @@ jobs:
         run: |
           echo $PROJECT_KEY  > scripts/single-node-test/project_key.json 
       - name: Building test environment
-        env:
-          PRIVATE_GIT_DOMAIN: ${{ secrets.PRIVATE_GIT_DOMAIN }}
-          PRIVATE_GIT_READ_PASSWORD: ${{ secrets.PRIVATE_GIT_READ_PASSWORD }}
-          PRIVATE_GIT_READ_USERNAME: ${{ secrets.PRIVATE_GIT_READ_USERNAME }}
-          PRIVATE_GIT_SSL_USERNAME: ${{ secrets.PRIVATE_GIT_SSL_USERNAME }}
-          PRIVATE_GIT_SSL_PASSWORD: ${{ secrets.PRIVATE_GIT_SSL_PASSWORD }}
-          PRIVATE_GIT_SSH_USERNAME: ${{ secrets.PRIVATE_GIT_SSH_USERNAME }}
-          PRIVATE_GIT_SSH_PASSWORD: ${{ secrets.PRIVATE_GIT_SSH_PASSWORD }}
-          GIT_API_TOKEN: ${{ secrets.GIT_API_TOKEN }}
         run: |
           cd scripts/single-node-test
-          echo "
-          export PRIVATE_GIT_DOMAIN=$PRIVATE_GIT_DOMAIN
-          export PRIVATE_GIT_READ_PASSWORD=$PRIVATE_GIT_READ_PASSWORD
-          export PRIVATE_GIT_READ_USERNAME=$PRIVATE_GIT_READ_USERNAME
-          export PRIVATE_GIT_SSL_USERNAME=$PRIVATE_GIT_SSL_USERNAME
-          export PRIVATE_GIT_SSL_PASSWORD=$PRIVATE_GIT_SSL_PASSWORD
-          export PRIVATE_GIT_SSH_USERNAME=$PRIVATE_GIT_SSH_USERNAME
-          export PRIVATE_GIT_SSH_PASSWORD=$PRIVATE_GIT_SSH_PASSWORD
-          export GIT_API_TOKEN=$GIT_API_TOKEN" > .env
-          sudo bash -x deploy-mb-core.sh $GITHUB_HEAD_REF
+          date | md5sum | head -c 5 > node-prefix
+          cd core-api
+          sudo bash -x deploy-core-api.sh $GITHUB_HEAD_REF
+          cd ../portal
+          sudo bash -x deploy-portal.sh
           sleep 15
       - name: Updating hosts file for test environment
         env:
@@ -52,18 +38,12 @@ jobs:
           PRIVATE_GIT_SSH_USERNAME: ${{ secrets.PRIVATE_GIT_SSH_USERNAME }}
           PRIVATE_GIT_SSH_PASSWORD: ${{ secrets.PRIVATE_GIT_SSH_PASSWORD }}
         run: |
-          sudo mkdir -p /root/.ssh          
-          sudo git clone http://$PRIVATE_GIT_SSH_USERNAME:$PRIVATE_GIT_SSH_PASSWORD@$PRIVATE_GIT_DOMAIN/massbitroute/ssh.git -b main /opt/ssh-key
-          sudo cp /opt/ssh-key/id_rsa*  /root/.ssh/
-          sudo chmod og-rwx /root/.ssh/id_rsa
-          ls -l /root/.ssh
           cd scripts/single-node-test
-          ssh-keyscan -t rsa github.com >> /root/.ssh/known_hosts
           sudo bash build-hosts-file.sh          
           mkdir persistent-artifact
-          cp MASSBITROUTE_CORE_IP persistent-artifact
-          cp MASSBITROUTE_PORTAL_IP persistent-artifact
-          cp MASSBITROUTE_RUST_IP persistent-artifact
+          cp core-api/MASSBITROUTE_CORE_IP persistent-artifact
+          cp portal/MASSBITROUTE_PORTAL_IP persistent-artifact 
+          cp node-prefix persistent-artifact
           cp test-hosts-file persistent-artifact
       - uses: actions/upload-artifact@master
         with:
@@ -73,6 +53,7 @@ jobs:
         with:
           name: persistent-core-docker-state
           path: scripts/single-node-test
+          
   test-nodes-eth:
     needs: set-up-test-env
     runs-on: ubuntu-latest
@@ -92,7 +73,9 @@ jobs:
         run: |
           cd scripts/single-node-test/persistent-artifact 
           ls -l
-          cat test-hosts-file >> /etc/hosts
+          cat /etc/hosts test-hosts-file >> /etc/hosts.new
+          cp /etc/hosts.new /etc/hosts
+          cat /etc/hosts
           cp * .. 
       - name: Run full flow check for ETH nodes
         env:
@@ -112,52 +95,55 @@ jobs:
           export USER_ID=$USER_ID
           export WALLET_ADDRESS=$WALLET_ADDRESS
           export ETH_PROJECT=$ETH_PROJECT
-          export DOT_PROJECT=$DOT_PROJECT" > .env 
+          export DOT_PROJECT=$DOT_PROJECT
+          export DEPLOY_BRANCH=$GITHUB_HEAD_REF" > .env 
+          
           sudo bash -x ./single-node-test.sh eth
-  test-nodes-dot:
-    needs: set-up-test-env
-    runs-on: ubuntu-latest
-    container: hoanito/mbr-ubuntu:1.2
-    steps:
-      - uses: actions/checkout@v3
-      - name: Obtain GCE key
-        env: 
-          PROJECT_KEY: ${{ secrets.PROJECT_KEY }}
-        run: |
-          echo $PROJECT_KEY  > scripts/single-node-test/project_key.json 
-      - uses: actions/download-artifact@v3
-        with:
-          name: persistent-artifact
-          path: scripts/single-node-test/persistent-artifact
-      - name: Update hosts file
-        run: |
-          cd scripts/single-node-test/persistent-artifact 
-          ls -l
-          cat test-hosts-file >> /etc/hosts
-          cp * ..           
-      - name: Run full flow check for DOT nodes
-        env:
-          MEMONIC: ${{ secrets.MEMONIC }}
-          TEST_PASSWORD: ${{ secrets.TEST_PASSWORD }}
-          TEST_USERNAME: ${{ secrets.TEST_USERNAME }}
-          USER_ID: ${{ secrets.USER_ID }}
-          WALLET_ADDRESS: ${{ secrets.WALLET_ADDRESS }}
-          ETH_PROJECT: ${{ secrets.ETH_PROJECT }}
-          DOT_PROJECT: ${{ secrets.DOT_PROJECT }}
-        run: |
-          cd scripts/single-node-test
-          echo "
-          export MEMONIC=\"$MEMONIC\"
-          export TEST_USERNAME=$TEST_USERNAME
-          export TEST_PASSWORD=$TEST_PASSWORD
-          export USER_ID=$USER_ID
-          export WALLET_ADDRESS=$WALLET_ADDRESS
-          export ETH_PROJECT=$ETH_PROJECT
-          export DOT_PROJECT=$DOT_PROJECT" > .env 
-          sudo bash -x ./single-node-test.sh dot
+  # test-nodes-dot:
+  #   needs: set-up-test-env
+  #   runs-on: ubuntu-latest
+  #   container: hoanito/mbr-ubuntu:1.2
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     - name: Obtain GCE key
+  #       env: 
+  #         PROJECT_KEY: ${{ secrets.PROJECT_KEY }}
+  #       run: |
+  #         echo $PROJECT_KEY  > scripts/single-node-test/project_key.json 
+  #     - uses: actions/download-artifact@v3
+  #       with:
+  #         name: persistent-artifact
+  #         path: scripts/single-node-test/persistent-artifact
+  #     - name: Update hosts file
+  #       run: |
+  #         cd scripts/single-node-test/persistent-artifact 
+  #         ls -l
+  #         cat test-hosts-file >> /etc/hosts
+  #         cp * ..           
+  #     - name: Run full flow check for DOT nodes
+  #       env:
+  #         MEMONIC: ${{ secrets.MEMONIC }}
+  #         TEST_PASSWORD: ${{ secrets.TEST_PASSWORD }}
+  #         TEST_USERNAME: ${{ secrets.TEST_USERNAME }}
+  #         USER_ID: ${{ secrets.USER_ID }}
+  #         WALLET_ADDRESS: ${{ secrets.WALLET_ADDRESS }}
+  #         ETH_PROJECT: ${{ secrets.ETH_PROJECT }}
+  #         DOT_PROJECT: ${{ secrets.DOT_PROJECT }}
+  #       run: |
+  #         cd scripts/single-node-test
+  #         echo "
+  #         export MEMONIC=\"$MEMONIC\"
+  #         export TEST_USERNAME=$TEST_USERNAME
+  #         export TEST_PASSWORD=$TEST_PASSWORD
+  #         export USER_ID=$USER_ID
+  #         export WALLET_ADDRESS=$WALLET_ADDRESS
+  #         export ETH_PROJECT=$ETH_PROJECT
+  #         export DOT_PROJECT=$DOT_PROJECT
+  #         export DEPLOY_BRANCH=$GITHUB_HEAD_REF" > .env 
+  #         sudo bash -x ./single-node-test.sh dot
 
   clean-up-core:
-    needs: [test-nodes-eth, test-nodes-dot]
+    needs: [test-nodes-eth]
     runs-on: ubuntu-latest
     container: hoanito/mbr-ubuntu:1.2
     steps:
@@ -167,7 +153,14 @@ jobs:
           path: scripts/single-node-test
       - name: Terminate core VMs
         run: |
-          cd scripts/single-node-test 
+          cd scripts/single-node-test/core-api
+          chown -Rf root:root *
+          rm -rf .terraform
+          ls -l
+          terraform init
+          terraform destroy -auto-approve
+          
+          cd ../portal
           chown -Rf root:root *
           rm -rf .terraform
           ls -l
