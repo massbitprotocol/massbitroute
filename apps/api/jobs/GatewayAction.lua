@@ -356,20 +356,20 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
         _write_file(_file_stat, _str_stat)
     end
 
-    if _actives and #_actives > 0 then
-        -- _print(_actives, true)
-        local _tmpl = _get_tmpl(rules, {nodes = _actives, _domain_name = _job_data._domain_name})
-        local _str = _tmpl("_gw_zones")
-        -- _print(_str)
-        local _file = gwman_dir .. "/zones/" .. mytype .. "/" .. _blocknet_id .. ".zone"
-        -- _print(_file)
-        _write_file(_file, _str)
+    -- if _actives and #_actives > 0 then
+    --     -- _print(_actives, true)
+    --     local _tmpl = _get_tmpl(rules, {nodes = _actives, _domain_name = _job_data._domain_name})
+    --     local _str = _tmpl("_gw_zones")
+    --     -- _print(_str)
+    --     local _file = gwman_dir .. "/zones/" .. mytype .. "/" .. _blocknet_id .. ".zone"
+    --     -- _print(_file)
+    --     _write_file(_file, _str)
 
-        local _str_listid = _tmpl("_listids")
-        mkdirp(_info_dir .. "/" .. mytype)
-        local _file_listid = _info_dir .. "/" .. mytype .. "/listid-" .. _blocknet_id
-        _write_file(_file_listid, _str_listid)
-    end
+    --     local _str_listid = _tmpl("_listids")
+    --     mkdirp(_info_dir .. "/" .. mytype)
+    --     local _file_listid = _info_dir .. "/" .. mytype .. "/listid-" .. _blocknet_id
+    --     _write_file(_file_listid, _str_listid)
+    -- end
     if _allnodes and next(_allnodes) then
         for _t, _v in pairs(_allnodes) do
             local _tmpl = _get_tmpl(rules, {nodes = _v, _domain_name = _job_data._domain_name})
