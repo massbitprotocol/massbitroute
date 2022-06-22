@@ -203,6 +203,78 @@ server {
     }
 }
 ]],
+    ["_gw_upstream_backup_name_eth-rinkeby"] = [[ unix:/tmp/eth-rinkeby-getblock-1.sock ]],
+    ["_gw_upstream_backup_name_ws_eth-rinkeby"] = [[ unix:/tmp/eth-rinkeby-getblock-ws-1.sock ]],
+    ["_gw_upstream_backup_eth-rinkeby"] = [[
+server {
+    listen unix:/tmp/eth-rinkeby-getblock-1.sock;
+    location / {
+        add_header X-Mbr-Node-Id eth-rinkeby-getblock-1;
+        proxy_set_header X-Api-Key 6c4ddad0-7646-403e-9c10-744f91d37ccf;
+        proxy_pass https://eth.getblock.io/rinkeby/;
+  include /massbit/massbitroute/app/src/sites/services/gateway/etc/_provider_server.conf;
+    }
+}
+]],
+    ["_gw_upstream_backup_ws_eth-rinkeby"] = [[
+server {
+    listen unix:/tmp/eth-rinkeby-getblock-ws-1.sock;
+    location / {
+        add_header X-Mbr-Node-Id eth-rinkeby-getblock-1;
+        proxy_set_header X-Api-Key 6c4ddad0-7646-403e-9c10-744f91d37ccf;
+        proxy_pass https://eth.getblock.io/rinkeby/;
+  include /massbit/massbitroute/app/src/sites/services/gateway/etc/_provider_server_ws.conf;
+    }
+}
+]],
+    ["_gw_upstream_backup_name_matic-mainnet"] = [[ unix:/tmp/matic-mainnet-getblock-1.sock ]],
+    ["_gw_upstream_backup_name_ws_matic-mainnet"] = [[ unix:/tmp/matic-mainnet-getblock-ws-1.sock ]],
+    ["_gw_upstream_backup_matic-mainnet"] = [[
+server {
+    listen unix:/tmp/matic-mainnet-getblock-1.sock;
+    location / {
+        add_header X-Mbr-Node-Id matic-mainnet-getblock-1;
+        proxy_set_header X-Api-Key 6c4ddad0-7646-403e-9c10-744f91d37ccf;
+        proxy_pass https://matic.getblock.io/mainnet/;
+  include /massbit/massbitroute/app/src/sites/services/gateway/etc/_provider_server.conf;
+    }
+}
+]],
+    ["_gw_upstream_backup_ws_matic-mainnet"] = [[
+server {
+    listen unix:/tmp/matic-mainnet-getblock-ws-1.sock;
+    location / {
+        add_header X-Mbr-Node-Id matic-mainnet-getblock-1;
+        proxy_set_header X-Api-Key 6c4ddad0-7646-403e-9c10-744f91d37ccf;
+        proxy_pass https://matic.getblock.io/mainnet/;
+  include /massbit/massbitroute/app/src/sites/services/gateway/etc/_provider_server_ws.conf;
+    }
+}
+]],
+    ["_gw_upstream_backup_name_matic-testnet"] = [[ unix:/tmp/matic-testnet-getblock-1.sock ]],
+    ["_gw_upstream_backup_name_ws_matic-testnet"] = [[ unix:/tmp/matic-testnet-getblock-ws-1.sock ]],
+    ["_gw_upstream_backup_matic-testnet"] = [[
+server {
+    listen unix:/tmp/matic-testnet-getblock-1.sock;
+    location / {
+        add_header X-Mbr-Node-Id matic-testnet-getblock-1;
+        proxy_set_header X-Api-Key 6c4ddad0-7646-403e-9c10-744f91d37ccf;
+        proxy_pass https://matic.getblock.io/testnet/;
+  include /massbit/massbitroute/app/src/sites/services/gateway/etc/_provider_server.conf;
+    }
+}
+]],
+    ["_gw_upstream_backup_ws_matic-testnet"] = [[
+server {
+    listen unix:/tmp/matic-testnet-getblock-ws-1.sock;
+    location / {
+        add_header X-Mbr-Node-Id matic-testnet-getblock-1;
+        proxy_set_header X-Api-Key 6c4ddad0-7646-403e-9c10-744f91d37ccf;
+        proxy_pass https://matic.getblock.io/testnet/;
+  include /massbit/massbitroute/app/src/sites/services/gateway/etc/_provider_server_ws.conf;
+    }
+}
+]],
     _gw_node_upstreams = [[
 
 upstream ${node_type}.node.mbr.${_domain_name} {
