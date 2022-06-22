@@ -324,10 +324,12 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
             if _geo_continent then
                 local _tmp = {}
                 for _, _v in ipairs(_geo_svrs) do
-                    _tmp[_v] = 1
+                    if _v.id then
+                        _tmp[_v.id] = 1
+                    end
                 end
                 for _, _v1 in ipairs(_dc_geo[_geo_continent]) do
-                    if not _tmp[_v1] then
+                    if _v1.id and not _tmp[_v1.id] then
                         table.insert(_geo_svrs, _v1)
                     end
                 end
