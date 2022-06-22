@@ -136,7 +136,7 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
     local _dc_country = {}
     local _dc_continent = {}
     local _dc_geo = {}
-    local _dc_geo1 = {}
+    -- local _dc_geo1 = {}
 
     local _network_dir = _deploy_dir .. "/" .. _blockchain .. "/" .. _network
 
@@ -203,7 +203,7 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
 
                                 _dc_geo[_geo_id] = _dc_geo[_geo_id] or {}
                                 _dc_geo[_geo_continent] = _dc_geo[_geo_continent] or {}
-                                _dc_geo1[_geo_id] = _geo_continent
+                                -- _dc_geo1[_geo_id] = _geo_continent
 
                                 local _geo_myid = _blocknet_id .. "-" .. _item.id
                                 _dc_geo[_geo_myid] = _dc_geo[_geo_myid] or {}
@@ -319,21 +319,22 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
                 _dapi_domains,
                 "*." .. _geo_id .. " 10/10 DYNA	geoip!mbr-map-" .. _blocknet_id .. "/" .. _geo_id
             )
-            local _geo_continent = _dc_geo1[_geo_id]
+            -- local _geo_continent = _dc_geo1[_geo_id]
 
-            if _geo_continent then
-                local _tmp = {}
-                for _, _v in ipairs(_geo_svrs) do
-                    if _v.id then
-                        _tmp[_v.id] = 1
-                    end
-                end
-                for _, _v1 in ipairs(_dc_geo[_geo_continent]) do
-                    if _v1.id and not _tmp[_v1.id] then
-                        table.insert(_geo_svrs, _v1)
-                    end
-                end
-            end
+            -- if _geo_continent then
+            --     local _tmp = {}
+            --     for _, _v in ipairs(_geo_svrs) do
+            --         if _v.id then
+            --             _tmp[_v.id] = 1
+            --         end
+            --     end
+            --     for _, _v1 in ipairs(_dc_geo[_geo_continent]) do
+            -- 	   if _v1.id and not _tmp[_v1.id] then
+            -- 	      _v1.weight = 100
+            --             table.insert(_geo_svrs, _v1)
+            --         end
+            --     end
+            -- end
 
             table.insert(
                 _dc_maps_new,
