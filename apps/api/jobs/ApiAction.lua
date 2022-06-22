@@ -90,7 +90,7 @@ server {
         ${security._is_limit_rate_per_sec?_limit_rate_per_sec2()}
         ${_allow_methods1()}
 
-        vhost_traffic_status_filter_by_set_key $api_method user::${user_id}::project::${project_id}::api::${id}::gateway::__GATEWAY_ID__::v1::api_method;
+        vhost_traffic_status_filter_by_set_key $api_method user::${user_id}::project::${project_id}::api::${id}::user_gateway::__GATEWAY_USER_ID__::gateway::__GATEWAY_ID__::v1::api_method;
 
         add_header X-Mbr-User-Id ${user_id};
         add_header X-Mbr-Api-Id ${id};
@@ -116,7 +116,7 @@ server {
         ${security._is_limit_rate_per_sec?_limit_rate_per_sec2()}
         ${_allow_methods1()}
 
-        vhost_traffic_status_filter_by_set_key $api_method user::${user_id}::project::${project_id}::api::${id}::gateway::__GATEWAY_ID__::v1::api_method;
+        vhost_traffic_status_filter_by_set_key $api_method user::${user_id}::project::${project_id}::api::${id}::user_gateway::__GATEWAY_USER_ID__::gateway::__GATEWAY_ID__::v1::api_method;
 
         add_header X-Mbr-User-Id ${user_id};
         add_header X-Mbr-Api-Id ${id};
