@@ -614,15 +614,15 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
 
     _write_file(_file_gw, _str_tmpl)
 
-    if _approved and #_approved > 0 then
-        local _tmpl = _get_tmpl(rules, {nodes = _approved, _domain_name = _job_data._domain_name})
-        local _str_stat = _tmpl("_node_stat_v1")
+    -- if _approved and #_approved > 0 then
+    --     local _tmpl = _get_tmpl(rules, {nodes = _approved, _domain_name = _job_data._domain_name})
+    --     local _str_stat = _tmpl("_node_stat_v1")
 
-        mkdirp(_stat_dir .. "/stat_node")
-        local _file_stat = _stat_dir .. "/stat_node/" .. _blocknet_id .. ".yml"
+    --     mkdirp(_stat_dir .. "/stat_node")
+    --     local _file_stat = _stat_dir .. "/stat_node/" .. _blocknet_id .. ".yml"
 
-        _write_file(_file_stat, _str_stat)
-    end
+    --     _write_file(_file_stat, _str_stat)
+    -- end
 
     if _allnodes and next(_allnodes) then
         for _t, _v in pairs(_allnodes) do
