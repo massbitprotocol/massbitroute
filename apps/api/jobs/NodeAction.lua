@@ -635,19 +635,19 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
         end
     end
 
-    if _actives and #_actives > 0 then
-        local _tmpl = _get_tmpl(rules, {nodes = _actives, _domain_name = _job_data._domain_name})
-        local _str = _tmpl("_node_zones")
-        local _file = _gwman_dir .. "/zones/" .. mytype .. "/" .. _blocknet_id .. ".zone"
+    -- if _actives and #_actives > 0 then
+    --     local _tmpl = _get_tmpl(rules, {nodes = _actives, _domain_name = _job_data._domain_name})
+    --     local _str = _tmpl("_node_zones")
+    --     local _file = _gwman_dir .. "/zones/" .. mytype .. "/" .. _blocknet_id .. ".zone"
 
-        _write_file(_file, _str)
+    --     _write_file(_file, _str)
 
-        local _str_listid = _tmpl("_listids")
-        mkdirp(_info_dir .. "/" .. mytype)
-        local _file_listid = _info_dir .. "/" .. mytype .. "/listid-" .. _blocknet_id
+    --     local _str_listid = _tmpl("_listids")
+    --     mkdirp(_info_dir .. "/" .. mytype)
+    --     local _file_listid = _info_dir .. "/" .. mytype .. "/listid-" .. _blocknet_id
 
-        _write_file(_file_listid, _str_listid)
-    end
+    --     _write_file(_file_listid, _str_listid)
+    -- end
 end
 
 local function _rescanconf(_job_data)
