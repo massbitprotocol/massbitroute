@@ -380,9 +380,9 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
     local _nodes1 = {}
     local _nodes2 = {}
     local _datacenters = {}
-    local _actives = {}
+    -- local _actives = {}
 
-    local _approved = {}
+    -- local _approved = {}
     local _blocknet_id = _blockchain .. "-" .. _network
     local _network_dir = _deploy_dir .. "/" .. _blockchain .. "/" .. _network
     for _, _continent in ipairs(show_folder(_network_dir)) do
@@ -426,9 +426,9 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
 
                                         if _item.status and tonumber(_item.status) == 1 then
                                             _item._is_enabled = true
-                                            _actives[#_actives + 1] = _item
+                                            -- _actives[#_actives + 1] = _item
                                             if _item.approved and tonumber(_item.approved) == 1 then
-                                                _approved[#_approved + 1] = _item
+                                                -- _approved[#_approved + 1] = _item
                                                 _item._is_approved = true
                                                 table.insert(_datacenters, _item)
                                                 local _blocknet_continent = _item.geo.continent_code
