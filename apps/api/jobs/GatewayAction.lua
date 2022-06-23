@@ -331,7 +331,7 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
             local _geo_global = _dc_geo2[_geo_id]
 
             local _geo_svrs1 = _geo_svrs
-            _print("geo_svrs1:" .. inspect(_geo_svrs1))
+
             if _geo_continent and _geo_global then
                 local _tmp = {}
                 for _, _v in ipairs(_geo_svrs1) do
@@ -358,7 +358,7 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
                     end
                 end
             end
-
+            _print("geo_svrs1:" .. inspect(_geo_svrs1))
             table.insert(
                 _dc_maps_new,
                 {
