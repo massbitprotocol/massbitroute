@@ -209,6 +209,7 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
                                 _dc_geo[_geo_continent] = _dc_geo[_geo_continent] or {}
                                 _dc_geo1[_geo_id] = _geo_continent
                                 _dc_geo2[_geo_id] = _blocknet_id
+                                _dc_geo2[_geo_continent] = _blocknet_id
 
                                 _dc_geo_domain[_geo_id] = "-" .. _continent .. "-" .. _country .. "." .. _blocknet_id
                                 _dc_geo_domain[_geo_continent] = "-" .. _continent .. "." .. _blocknet_id
