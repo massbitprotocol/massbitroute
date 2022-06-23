@@ -211,9 +211,12 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
                                 _dc_geo2[_geo_id] = _blocknet_id
                                 _dc_geo2[_geo_continent] = _blocknet_id
 
+                                local _geo_myid = _blocknet_id .. "-" .. _item.id
+
                                 _dc_geo_domain[_geo_id] = "-" .. _continent .. "-" .. _country .. "." .. _blocknet_id
                                 _dc_geo_domain[_geo_continent] = "-" .. _continent .. "." .. _blocknet_id
-                                local _geo_myid = _blocknet_id .. "-" .. _item.id
+
+                                _dc_geo_domain[_geo_myid] = "-" .. _item.id .. "." .. _blocknet_id
                                 _dc_geo[_geo_myid] = _dc_geo[_geo_myid] or {}
 
                                 table_insert(_dc_geo[_blocknet_id], _obj)
