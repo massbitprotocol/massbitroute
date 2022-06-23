@@ -33,7 +33,7 @@ local _deploy_dir = _portal_dir .. "/public/deploy/gateway"
 local _info_dir = _portal_dir .. "/public/deploy/info"
 
 local gwman_dir = _service_dir .. "/gwman/data"
-local stat_dir = _service_dir .. "/stat/etc/conf"
+-- local stat_dir = _service_dir .. "/stat/etc/conf"
 
 local _print = mbrutil.print
 local rules = {
@@ -136,7 +136,9 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
     local _dc_country = {}
     local _dc_continent = {}
     local _dc_geo = {}
-    -- local _dc_geo1 = {}
+    local _dc_geo1 = {}
+    local _dc_geo2 = {}
+    local _dc_geo_domain = {}
 
     local _network_dir = _deploy_dir .. "/" .. _blockchain .. "/" .. _network
 
@@ -164,7 +166,8 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
                         local _obj = {
                             ip = _item.ip,
                             id = _item.id,
-                            geo_id = _geo_id
+                            geo_id = _geo_id,
+                            weighted = 1000000
                         }
 
                         if _continent and _country and _item.status and _item.approved then
@@ -201,13 +204,18 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
 
                                 _dc_country[_continent][_country][_geo_id] = 1
 
+                                _dc_geo[_blocknet_id] = _dc_geo[_blocknet_id] or {}
                                 _dc_geo[_geo_id] = _dc_geo[_geo_id] or {}
                                 _dc_geo[_geo_continent] = _dc_geo[_geo_continent] or {}
-                                -- _dc_geo1[_geo_id] = _geo_continent
+                                _dc_geo1[_geo_id] = _geo_continent
+                                _dc_geo2[_geo_id] = _blocknet_id
 
+                                _dc_geo_domain[_geo_id] = "-" .. _continent .. "-" .. _country .. "." .. _blocknet_id
+                                _dc_geo_domain[_geo_continent] = "-" .. _continent .. "." .. _blocknet_id
                                 local _geo_myid = _blocknet_id .. "-" .. _item.id
                                 _dc_geo[_geo_myid] = _dc_geo[_geo_myid] or {}
 
+                                table_insert(_dc_geo[_blocknet_id], _obj)
                                 table_insert(_dc_geo[_geo_myid], _obj)
                                 table_insert(_dc_geo[_geo_id], _obj)
                                 table_insert(_dc_geo[_geo_continent], _obj)
@@ -319,28 +327,40 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
                 _dapi_domains,
                 "*." .. _geo_id .. " 10/10 DYNA	geoip!mbr-map-" .. _blocknet_id .. "/" .. _geo_id
             )
-            -- local _geo_continent = _dc_geo1[_geo_id]
+            local _geo_continent = _dc_geo1[_geo_id]
+            local _geo_global = _dc_geo2[_geo_id]
 
-            -- if _geo_continent then
-            --     local _tmp = {}
-            --     for _, _v in ipairs(_geo_svrs) do
-            --         if _v.id then
-            --             _tmp[_v.id] = 1
-            --         end
-            --     end
-            --     for _, _v1 in ipairs(_dc_geo[_geo_continent]) do
-            -- 	   if _v1.id and not _tmp[_v1.id] then
-            -- 	      _v1.weight = 100
-            --             table.insert(_geo_svrs, _v1)
-            --         end
-            --     end
-            -- end
+            local _geo_svrs1 = _geo_svrs
+            if _geo_continent and _geo_global then
+                local _tmp = {}
+                for _, _v in ipairs(_geo_svrs1) do
+                    if _v.id then
+                        _tmp[_v.id] = 1
+                    end
+                end
+                if _dc_geo[_geo_continent] then
+                    for _, _v1 in ipairs(_dc_geo[_geo_continent]) do
+                        if _v1.id and not _tmp[_v1.id] then
+                            _v1.weight = 1000
+                            table.insert(_geo_svrs1, _v1)
+                        end
+                    end
+                end
+                if _dc_geo[_geo_global] then
+                    for _, _v1 in ipairs(_dc_geo[_geo_global]) do
+                        if _v1.id and not _tmp[_v1.id] then
+                            _v1.weight = 1
+                            table.insert(_geo_svrs1, _v1)
+                        end
+                    end
+                end
+            end
 
             table.insert(
                 _dc_maps_new,
                 {
                     geo_id = _geo_id,
-                    datacenters = _geo_svrs
+                    datacenters = _geo_svrs1
                 }
             )
         end
