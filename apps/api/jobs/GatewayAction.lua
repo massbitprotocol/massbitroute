@@ -335,7 +335,7 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
             local _geo_svrs1 = table.copy(_geo_svrs)
             _print("step 0: geo_svrs1:" .. inspect(_geo_svrs1))
 
-            if _geo_continent and _geo_global then
+            if _geo_global then
                 local _tmp = {}
                 for _, _v in ipairs(_geo_svrs1) do
                     if _v.id then
@@ -343,7 +343,8 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
                     end
                 end
                 _print("step 0: geo_svrs1:" .. inspect(_geo_svrs1))
-                if _dc_geo[_geo_continent] then
+
+                if _geo_continent and _dc_geo[_geo_continent] then
                     for _, _v11 in ipairs(_dc_geo[_geo_continent]) do
                         local _v1 = table.copy(_v11)
                         if _v1.id and not _tmp[_v1.id] then
@@ -354,7 +355,7 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
                     end
                 end
                 _print("step 1: geo_svrs1:" .. inspect(_geo_svrs1))
-                if _dc_geo[_geo_global] then
+                if _geo_global and _dc_geo[_geo_global] then
                     for _, _v11 in ipairs(_dc_geo[_geo_global]) do
                         local _v1 = table.copy(_v11)
                         if _v1.id and not _tmp[_v1.id] then
