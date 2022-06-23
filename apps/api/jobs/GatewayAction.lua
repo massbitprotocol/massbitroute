@@ -334,7 +334,7 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
             local _geo_svrs1 = table.copy(_geo_svrs)
             _print("step 0: geo_svrs1:" .. inspect(_geo_svrs1))
 
-            if false and _geo_continent and _geo_global then
+            if _geo_continent and _geo_global then
                 local _tmp = {}
                 for _, _v in ipairs(_geo_svrs1) do
                     if _v.id then
