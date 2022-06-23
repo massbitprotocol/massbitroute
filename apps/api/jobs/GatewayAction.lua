@@ -341,7 +341,7 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
                 if _dc_geo[_geo_continent] then
                     for _, _v1 in ipairs(_dc_geo[_geo_continent]) do
                         if _v1.id and not _tmp[_v1.id] then
-                            _v1.weight = 1000
+                            _v1.weighted = 1000
                             table.insert(_geo_svrs1, _v1)
                         end
                     end
@@ -349,7 +349,7 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
                 if _dc_geo[_geo_global] then
                     for _, _v1 in ipairs(_dc_geo[_geo_global]) do
                         if _v1.id and not _tmp[_v1.id] then
-                            _v1.weight = 1
+                            _v1.weighted = 1
                             table.insert(_geo_svrs1, _v1)
                         end
                     end
