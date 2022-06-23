@@ -331,6 +331,11 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
                     _dapi_domains,
                     "*" .. _record_name .. " 10/10 DYNA	geoip!mbr-map-" .. _blocknet_id .. "/" .. _geo_id
                 )
+            else
+                table.insert(
+                    _dapi_domains,
+                    "*." .. _geo_id .. " 10/10 DYNA	geoip!mbr-map-" .. _blocknet_id .. "/" .. _geo_id
+                )
             end
 
             local _geo_continent = _dc_geo1[_geo_id]
