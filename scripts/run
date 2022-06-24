@@ -469,6 +469,8 @@ _update() {
 }
 
 _reload() {
+	truncate -s 0 $SITE_ROOT/logs/nginx/*
+	truncate -s 0 $SITE_ROOT/logs/*
 	$cmd_server _update
 	# $cmd_server update
 	tmp=$(mktemp)
