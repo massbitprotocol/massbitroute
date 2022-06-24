@@ -790,7 +790,15 @@ local function _generate_item(instance, args)
     if not _item then
         return false
     end
-    if _item and (not _item.data_ws or type(_item.data_ws) ~= "string" or _item.data_ws == "null") then
+    if _item and _item.data_ws then
+        _item.data_ws = string.trim(_item.data_ws)
+    end
+
+    if
+        _item and
+            (not _item.data_ws or type(_item.data_ws) ~= "string" or string.len(_item.data_ws) == 0 or
+                _item.data_ws == "null")
+     then
         _item.data_ws = _item.data_url
     end
 
