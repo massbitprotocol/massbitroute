@@ -787,7 +787,10 @@ local function _generate_item(instance, args)
     local _item1 = model:get(args)
     _print("stored item: " .. inspect(_item1))
     local _item = _norm(_item1)
-    if _item and not _item.data_ws or type(_item.data_ws) ~= "string" or _item.data_ws == "null" then
+    if not _item then
+        return false
+    end
+    if _item and (not _item.data_ws or type(_item.data_ws) ~= "string" or _item.data_ws == "null") then
         _item.data_ws = _item.data_url
     end
 
