@@ -84,6 +84,12 @@ server {
     include /massbit/massbitroute/app/src/sites/services/gateway/etc/_session.conf;
     include /massbit/massbitroute/app/src/sites/services/gateway/etc/_location_server.conf;
 
+    location /${api_key}/_redirect {
+         return 308 $scheme://$myid-$continent_code-$country_code$mydomain/${api_key}$is_args$args;
+        }
+    location /${api_key}/_getlink {
+         return 200 $scheme://$myid-$continent_code-$country_code$mydomain/${api_key}$is_args$args;
+        }
     location /${api_key} {
         set $mbr_token ${api_key};
 
@@ -354,7 +360,8 @@ local function _generate_item(instance, args)
             -- _print("_item.gateway_domain_ws:" .. _item.gateway_domain_ws)
             -- _print("item:" .. inspect(_item))
             -- if _item.gateway_domain and _item.server_name then
-            _item.gateway_domain_list = "~^" .. _item.id .. ".+$"
+            _item.gateway_domain_list = "~^(?<myid>" .. _item.id .. ")(?<mydomain>.+)$"
+
             -- _item.gateway_domain:gsub(_item.blockchain .. "-" .. _item.network .. "." .. _item.server_name, "*")
             -- end
 
