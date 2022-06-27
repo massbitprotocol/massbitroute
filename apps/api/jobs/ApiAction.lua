@@ -84,12 +84,7 @@ server {
     include /massbit/massbitroute/app/src/sites/services/gateway/etc/_session.conf;
     include /massbit/massbitroute/app/src/sites/services/gateway/etc/_location_server.conf;
 
-    location /${api_key}/_redirect {
-         return 308 $scheme://$myid-$continent_code-$country_code$mydomain/${api_key}$is_args$args;
-        }
-    location /${api_key}/_getlink {
-         return 200 $scheme://$myid-$continent_code-$country_code$mydomain/${api_key}$is_args$args;
-        }
+   
     location /${api_key} {
         set $mbr_token ${api_key};
 
@@ -105,7 +100,12 @@ server {
         proxy_pass http://upstream_${api_key}/;
         include /massbit/massbitroute/app/src/sites/services/gateway/etc/_node_server.conf;
     }
-
+        location /${api_key}/_redirect {
+         return 308 $scheme://$myid-$continent_code-$country_code$mydomain/${api_key}$is_args$args;
+        }
+        location /${api_key}/_getlink {
+         return 200 $scheme://$myid-$continent_code-$country_code$mydomain/${api_key}$is_args$args;
+        }
 }
 server {
     include /massbit/massbitroute/app/src/sites/services/gateway/etc/_pre_server_ws.conf;
