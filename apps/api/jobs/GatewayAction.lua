@@ -213,10 +213,10 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
 
                                 local _geo_myid = _blocknet_id .. "-" .. _item.id
 
-                                _dc_geo_domain[_geo_id] = "-" .. _continent .. "-" .. _country .. "." .. _blocknet_id
-                                _dc_geo_domain[_geo_continent] = "-" .. _continent .. "." .. _blocknet_id
+                                _dc_geo_domain[_geo_id] = "*-" .. _continent .. "-" .. _country .. "." .. _blocknet_id
+                                _dc_geo_domain[_geo_continent] = "*-" .. _continent .. "." .. _blocknet_id
 
-                                _dc_geo_domain[_geo_myid] = "-" .. _item.id .. "." .. _blocknet_id
+                                _dc_geo_domain[_geo_myid] = _item.id .. "." .. _blocknet_id
                                 _dc_geo[_geo_myid] = _dc_geo[_geo_myid] or {}
 
                                 table_insert(_dc_geo[_blocknet_id], _obj)
@@ -327,12 +327,12 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
         local _dapi_domains = {}
         local _dc_maps_new = {}
         for _geo_id, _geo_svrs in pairs(_dc_geo) do
-            _print("==> geo_svrs:" .. inspect(_geo_svrs))
+            -- _print("==> geo_svrs:" .. inspect(_geo_svrs))
             local _record_name = _dc_geo_domain[_geo_id]
             if _record_name then
                 table.insert(
                     _dapi_domains,
-                    "*" .. _record_name .. " 10/10 DYNA	geoip!mbr-map-" .. _blocknet_id .. "/" .. _geo_id
+                    _record_name .. " 10/10 DYNA	geoip!mbr-map-" .. _blocknet_id .. "/" .. _geo_id
                 )
             else
                 table.insert(
@@ -345,7 +345,7 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
             local _geo_global = _dc_geo2[_geo_id]
 
             local _geo_svrs1 = table.copy(_geo_svrs)
-            _print("step 0: geo_svrs1:" .. inspect(_geo_svrs1))
+            -- _print("step 0: geo_svrs1:" .. inspect(_geo_svrs1))
 
             if _geo_global then
                 local _tmp = {}
@@ -354,7 +354,7 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
                         _tmp[_v.id] = 1
                     end
                 end
-                _print("step 0: geo_svrs1:" .. inspect(_geo_svrs1))
+                -- _print("step 0: geo_svrs1:" .. inspect(_geo_svrs1))
 
                 if _geo_continent and _dc_geo[_geo_continent] then
                     for _, _v11 in ipairs(_dc_geo[_geo_continent]) do
@@ -366,7 +366,7 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
                         end
                     end
                 end
-                _print("step 1: geo_svrs1:" .. inspect(_geo_svrs1))
+                -- _print("step 1: geo_svrs1:" .. inspect(_geo_svrs1))
                 if _geo_global and _dc_geo[_geo_global] then
                     for _, _v11 in ipairs(_dc_geo[_geo_global]) do
                         local _v1 = table.copy(_v11)
@@ -377,7 +377,7 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
                     end
                 end
             end
-            _print("step 2: geo_svrs1:" .. inspect(_geo_svrs1))
+            -- _print("step 2: geo_svrs1:" .. inspect(_geo_svrs1))
             table.insert(
                 _dc_maps_new,
                 {
