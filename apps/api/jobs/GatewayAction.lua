@@ -41,6 +41,10 @@ local rules = {
     _listids = [[${nodes/_listid(); separator='\n'}]],
     -- _listids_not_actives = [[${not_actives/_listid(); separator='\n'}]],
     _dcmap_map = [[${id} =>  [ ${ip} , ${weighted} ],]],
+    _dcmap_maps = [[
+  ${datacenters/_dcmap_map(); separator='\n'}
+},
+]],
     _dcmap_v1 = [[
 ${geo_id} => {
   ${datacenters/_dcmap_map(); separator='\n'}
@@ -385,6 +389,20 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
                     datacenters = _geo_svrs1
                 }
             )
+
+            local _tmpl_res =
+                _get_tmpl(
+                rules,
+                {
+                    datacenters = _geo_svrs1,
+                    _domain_name = _job_data._domain_name
+                }
+            )
+            local _geo_dcmaps = _tmpl_res("_dcmap_maps")
+            -- _print(_geo_res)
+            local _file_dc_maps = gwman_dir .. "/conf.d/geolocation.d/resources.d/dcmap/" .. _geo_id
+            _print(_file_dc_maps)
+            _write_file(_file_dc_maps, _geo_dcmaps)
         end
 
         local _tmpl_res =
