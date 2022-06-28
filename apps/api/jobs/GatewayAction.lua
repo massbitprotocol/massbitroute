@@ -44,6 +44,9 @@ local rules = {
     _dcmap_maps = [[
   ${datacenters/_dcmap_map(); separator='\n'}
 ]],
+    _dcmap_v2 = [[
+${geo_id} => {$include{../dcmap/${geo_id}}},
+]],
     _dcmap_v1 = [[
 ${geo_id} => {
   ${datacenters/_dcmap_map(); separator='\n'}
@@ -69,7 +72,7 @@ mbr-map-${blocknet_id} =>{
   service_types => gateway_check,
   plugin => weighted,
   dcmap => {
-    ${dcmaps/_dcmap_v1(); separator='\n'}
+    ${dcmaps/_dcmap_v2(); separator='\n'}
 }
 }
 ]],
@@ -400,7 +403,7 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
                 )
                 local _geo_dcmaps = _tmpl_res("_dcmap_maps")
                 -- _print(_geo_res)
-                local _file_dc_maps = gwman_dir .. "/conf.d/geolocation.d/dcmap/" .. _blocknet_id .. "/" .. _geo_id
+                local _file_dc_maps = gwman_dir .. "/conf.d/geolocation.d/" .. _geo_id
                 _print(_file_dc_maps)
                 _write_file(_file_dc_maps, _geo_dcmaps)
             end
