@@ -399,8 +399,7 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
             )
             local _geo_dcmaps = _tmpl_res("_dcmap_maps")
             -- _print(_geo_res)
-            local _file_dc_maps =
-                gwman_dir .. "/conf.d/geolocation.d/resources.d/dcmap/" .. _blocknet_id .. "/" .. _geo_id
+            local _file_dc_maps = gwman_dir .. "/conf.d/geolocation.d/dcmap/" .. _blocknet_id .. "/" .. _geo_id
             _print(_file_dc_maps)
             _write_file(_file_dc_maps, _geo_dcmaps)
         end
