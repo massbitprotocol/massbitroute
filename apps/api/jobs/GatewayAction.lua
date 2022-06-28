@@ -43,7 +43,6 @@ local rules = {
     _dcmap_map = [[${id} =>  [ ${ip} , ${weighted} ],]],
     _dcmap_maps = [[
   ${datacenters/_dcmap_map(); separator='\n'}
-},
 ]],
     _dcmap_v1 = [[
 ${geo_id} => {
