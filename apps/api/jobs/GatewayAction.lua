@@ -330,78 +330,80 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
         local _dapi_domains = {}
         local _dc_maps_new = {}
         for _geo_id, _geo_svrs in pairs(_dc_geo) do
-            -- _print("==> geo_svrs:" .. inspect(_geo_svrs))
-            local _record_name = _dc_geo_domain[_geo_id]
-            if _record_name then
-                table.insert(
-                    _dapi_domains,
-                    _record_name .. " 10/10 DYNA	geoip!mbr-map-" .. _blocknet_id .. "/" .. _geo_id
-                )
-            else
-                table.insert(
-                    _dapi_domains,
-                    "*." .. _geo_id .. " 10/10 DYNA	geoip!mbr-map-" .. _blocknet_id .. "/" .. _geo_id
-                )
-            end
-
-            local _geo_continent = _dc_geo1[_geo_id]
-            local _geo_global = _dc_geo2[_geo_id]
-
-            local _geo_svrs1 = table.copy(_geo_svrs)
-            -- _print("step 0: geo_svrs1:" .. inspect(_geo_svrs1))
-
-            if _geo_global then
-                local _tmp = {}
-                for _, _v in ipairs(_geo_svrs1) do
-                    if _v.id then
-                        _tmp[_v.id] = 1
-                    end
+            if _geo_id ~= _blocknet_id then
+                -- _print("==> geo_svrs:" .. inspect(_geo_svrs))
+                local _record_name = _dc_geo_domain[_geo_id]
+                if _record_name then
+                    table.insert(
+                        _dapi_domains,
+                        _record_name .. " 10/10 DYNA	geoip!mbr-map-" .. _blocknet_id .. "/" .. _geo_id
+                    )
+                else
+                    table.insert(
+                        _dapi_domains,
+                        "*." .. _geo_id .. " 10/10 DYNA	geoip!mbr-map-" .. _blocknet_id .. "/" .. _geo_id
+                    )
                 end
+
+                local _geo_continent = _dc_geo1[_geo_id]
+                local _geo_global = _dc_geo2[_geo_id]
+
+                local _geo_svrs1 = table.copy(_geo_svrs)
                 -- _print("step 0: geo_svrs1:" .. inspect(_geo_svrs1))
 
-                if _geo_continent and _dc_geo[_geo_continent] then
-                    for _, _v11 in ipairs(_dc_geo[_geo_continent]) do
-                        local _v1 = table.copy(_v11)
-                        if _v1.id and not _tmp[_v1.id] then
-                            _v1.weighted = 1000
-                            table.insert(_geo_svrs1, _v1)
-                            _tmp[_v1.id] = 1
+                if _geo_global then
+                    local _tmp = {}
+                    for _, _v in ipairs(_geo_svrs1) do
+                        if _v.id then
+                            _tmp[_v.id] = 1
                         end
                     end
-                end
-                -- _print("step 1: geo_svrs1:" .. inspect(_geo_svrs1))
-                if _geo_global and _dc_geo[_geo_global] then
-                    for _, _v11 in ipairs(_dc_geo[_geo_global]) do
-                        local _v1 = table.copy(_v11)
-                        if _v1.id and not _tmp[_v1.id] then
-                            _v1.weighted = 1
-                            table.insert(_geo_svrs1, _v1)
-                        end
-                    end
-                end
-            end
-            -- _print("step 2: geo_svrs1:" .. inspect(_geo_svrs1))
-            table.insert(
-                _dc_maps_new,
-                {
-                    geo_id = _geo_id,
-                    datacenters = _geo_svrs1
-                }
-            )
+                    -- _print("step 0: geo_svrs1:" .. inspect(_geo_svrs1))
 
-            local _tmpl_res =
-                _get_tmpl(
-                rules,
-                {
-                    datacenters = _geo_svrs1,
-                    _domain_name = _job_data._domain_name
-                }
-            )
-            local _geo_dcmaps = _tmpl_res("_dcmap_maps")
-            -- _print(_geo_res)
-            local _file_dc_maps = gwman_dir .. "/conf.d/geolocation.d/dcmap/" .. _blocknet_id .. "/" .. _geo_id
-            _print(_file_dc_maps)
-            _write_file(_file_dc_maps, _geo_dcmaps)
+                    if _geo_continent and _dc_geo[_geo_continent] then
+                        for _, _v11 in ipairs(_dc_geo[_geo_continent]) do
+                            local _v1 = table.copy(_v11)
+                            if _v1.id and not _tmp[_v1.id] then
+                                _v1.weighted = 1000
+                                table.insert(_geo_svrs1, _v1)
+                                _tmp[_v1.id] = 1
+                            end
+                        end
+                    end
+                    -- _print("step 1: geo_svrs1:" .. inspect(_geo_svrs1))
+                    if _geo_global and _dc_geo[_geo_global] then
+                        for _, _v11 in ipairs(_dc_geo[_geo_global]) do
+                            local _v1 = table.copy(_v11)
+                            if _v1.id and not _tmp[_v1.id] then
+                                _v1.weighted = 1
+                                table.insert(_geo_svrs1, _v1)
+                            end
+                        end
+                    end
+                end
+                -- _print("step 2: geo_svrs1:" .. inspect(_geo_svrs1))
+                table.insert(
+                    _dc_maps_new,
+                    {
+                        geo_id = _geo_id,
+                        datacenters = _geo_svrs1
+                    }
+                )
+
+                local _tmpl_res =
+                    _get_tmpl(
+                    rules,
+                    {
+                        datacenters = _geo_svrs1,
+                        _domain_name = _job_data._domain_name
+                    }
+                )
+                local _geo_dcmaps = _tmpl_res("_dcmap_maps")
+                -- _print(_geo_res)
+                local _file_dc_maps = gwman_dir .. "/conf.d/geolocation.d/dcmap/" .. _blocknet_id .. "/" .. _geo_id
+                _print(_file_dc_maps)
+                _write_file(_file_dc_maps, _geo_dcmaps)
+            end
         end
 
         local _tmpl_res =
