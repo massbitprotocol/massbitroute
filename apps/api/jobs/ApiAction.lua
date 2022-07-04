@@ -84,7 +84,7 @@ server {
     include /massbit/massbitroute/app/src/sites/services/gateway/etc/_session.conf;
     include /massbit/massbitroute/app/src/sites/services/gateway/etc/_location_server.conf;
 
-   
+   set $api_key ${api_key};
     location /${api_key} {
         set $mbr_token ${api_key};
 
