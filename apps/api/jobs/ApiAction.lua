@@ -104,7 +104,7 @@ server {
          return 308 $scheme://$myid-$continent_code-$country_code$mydomain/${api_key}$is_args$args;
         }
         location /${api_key}/_getlink {
-         return 200 $scheme://$myid-$continent_code-$country_code$mydomain/${api_key}$is_args$args;
+         return 200 '{"url":"$scheme://$myid-$continent_code-$country_code$mydomain/${api_key}$is_args$args"}';
         }
 }
 server {
