@@ -101,10 +101,10 @@ server {
         include /massbit/massbitroute/app/src/sites/services/gateway/etc/_node_server.conf;
     }
         location /${api_key}/_redirect {
-         return 308 $scheme://$myid-$continent_code-$country_code$mydomain/${api_key}$is_args$args;
+    include /massbit/massbitroute/app/src/sites/services/gateway/etc/_api_redirect.conf;
         }
         location /${api_key}/_getlink {
-         return 200 '{"url":"$scheme://$myid-$continent_code-$country_code$mydomain/${api_key}$is_args$args"}';
+    include /massbit/massbitroute/app/src/sites/services/gateway/etc/_api_getlink.conf;
         }
 }
 server {
