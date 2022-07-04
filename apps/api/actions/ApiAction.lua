@@ -256,6 +256,25 @@ function Action:adminupdateAction(args)
     }
 end
 
+function Action:calljobAction(args)
+    _print(inspect(args))
+    args.action = nil
+    local job_method = args.job
+    args.job = nil
+    local instance = self:getInstance()
+    local jobs = instance:getJobs()
+    local job = {
+        action = "/jobs/" .. job_method,
+        delay = 0,
+        data = args
+    }
+    local _ok, _err = jobs:add(job)
+    return {
+        ok = _ok,
+        err = _err
+    }
+end
+
 function Action:updateAction(args)
     _print(inspect(args))
     if not args.id then
