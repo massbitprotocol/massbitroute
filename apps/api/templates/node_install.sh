@@ -1,5 +1,6 @@
 #!/bin/bash
 GITHUB_TRIES=10
+
 _debian() {
 	apt-get update
 	apt-get install -y git apache2-utils supervisor jq python2
@@ -61,15 +62,7 @@ elif [ -f /etc/debian_version ]; then
 	# Older Debian/Ubuntu/etc.
 	OS=Debian
 	VER=$(cat /etc/debian_version)
-# elif [ -f /etc/SuSe-release ]; then
-# 	# Older SuSE/etc.
 
-# elif [ -f /etc/redhat-release ]; then
-# 	# Older Red Hat, CentOS, etc.
-# else
-# 	# Fall back to uname, e.g. "Linux <version>", also works for BSD, etc.
-# 	OS=$(uname -s)
-# 	VER=$(uname -r)
 fi
 
 if [ \( "$OS" = "Ubuntu" \) -a \( "$VER" = "20.04" \) ]; then
@@ -78,22 +71,6 @@ else
 	echo "Sorry. Current we only support Ubuntu 20.04. "
 	exit 1
 fi
-
-# case "$OS" in
-# "Debian GNU/Linux")
-# 	_debian
-# 	;;
-# "Ubuntu")
-# 	_ubuntu
-# 	;;
-# "CentOS Linux")
-# 	_centos
-# 	;;
-# *)
-# 	echo "Your OS not support"
-# 	exit 0
-# 	;;
-# esac
 
 IP="$(curl -ssSfL http://ipv4.icanhazip.com)"
 n=$(grep -o "\." <<<"$IP" | wc -l)
@@ -111,17 +88,12 @@ zone=$(curl -ssSfL "{*portal_url*}/mbr/node/{{id}}/geo?ip=$IP" --header 'Authori
 zone=$(echo $zone | sed 's/\"//g')
 if [ -z "$zone" ]; then
 	echo "Cannot detect zone from IP $IP"
-	#exit 1
+	sleep 3
 fi
 
 if [ "$zone" != "{{zone}}" ]; then
 	echo "WARNING: Your IP $IP not in zone {{zone}}"
-	# read -p "Are you sure ? (y/n) " -n 1 -r
-	# echo # (optional) move to a new line
-	# if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-	# 	echo "Please install in correct Zone"
-	# 	exit 1
-	# fi
+	sleep 3
 fi
 
 SERVICE_DIR=/massbit/massbitroute/app/src/sites/services
@@ -175,33 +147,6 @@ rm -f $SITE_ROOT/vars/*
 ./mbr node set APP_KEY {{app_key}}
 ./mbr node set SITE_ROOT "$SITE_ROOT"
 
-bash -x $SCRIPTS_RUN _install
-
-rm -f $SITE_ROOT/http.d/*
-
-./mbr node register
-
-supervisorctl status
-
-$SCRIPTS_RUN _load_config
-$SITE_ROOT/cmd_server _update
-
-$SITE_ROOT/cmd_server status
-
-res=$($SITE_ROOT/mbr node nodeverify)
-status=$(echo $res | jq ".status" | sed -z "s/\"//g;")
-while [ "$status" != "verified" ]; do
-	message=$(echo $res | jq ".message")
-	if [ "$message" != "null" ]; then
-		echo "Verifying with message: $message"
-	fi
-	sleep 10
-	$SCRIPTS_RUN _load_config
-	$SITE_ROOT/cmd_server _update
-	res=$($SITE_ROOT/mbr node nodeverify)
-	status=$(echo $res | jq ".status" | sed -z "s/\"//g;")
-done
-
-if [ "$status" = "verified" ]; then
-	echo "Node installed successfully !"
-fi
+log_install=$SITE_ROOT/logs/install.log
+bash $SCRIPTS_RUN _install >>$log_install
+bash $SCRIPTS_RUN _register_node >>$log_install
