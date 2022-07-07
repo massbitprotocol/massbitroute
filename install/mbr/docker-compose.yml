@@ -1,0 +1,54 @@
+# version: "2"
+services:
+  api_dev:
+    privileged: true
+    restart: unless-stopped
+    # image: ubuntu:20.04
+    image: massbit/massbitroute_api_dev
+
+    # command: 'sleep infinity'
+    command: ""
+    build:
+      context: /massbit/massbitroute/app/src/sites/services/api
+      dockerfile: install/mbr/build/Dockerfile.dev
+      args:
+        BRANCH: keiko
+    network_mode: "host"
+    volumes:
+      - ./logs:/massbit/massbitroute/app/src/sites/services/api/logs:rw
+      - ./vars:/massbit/massbitroute/app/src/sites/services/api/vars:rw
+    environment:
+      - MBR_ENV=keiko
+      - ID=
+      - USER_ID=
+      - BLOCKCHAIN=
+      - NETWORK
+      - ZONE=
+      - APP_KEY=
+      - INSTALL_CMD=
+  api:
+    privileged: true
+    restart: unless-stopped
+    # image: ubuntu:20.04
+    image: massbit/massbitroute_api
+
+    # command: 'sleep infinity'
+    command: ""
+    build:
+      context: /massbit/massbitroute/app/src/sites/services/api
+      dockerfile: install/mbr/build/Dockerfile
+      args:
+        BRANCH: keiko
+    network_mode: "host"
+    volumes:
+      - ./logs:/massbit/massbitroute/app/src/sites/services/api/logs:rw
+      - ./vars:/massbit/massbitroute/app/src/sites/services/api/vars:rw
+    environment:
+      - MBR_ENV=keiko
+      - ID=
+      - USER_ID=
+      - BLOCKCHAIN=
+      - NETWORK
+      - ZONE=
+      - APP_KEY=
+      - INSTALL_CMD=

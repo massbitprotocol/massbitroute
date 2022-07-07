@@ -38,13 +38,13 @@ $SITE_ROOT/env|$GIT_PRIVATE_READ_URL/massbitroute/env.git|$MBR_ENV \
   $service_dir/gwman/data|http://$GIT_GWMANDEPLOY_WRITE@$GIT_PRIVATE_DOMAIN/massbitroute/gwmandeploy.git|$GWMANDEPLOY_BRANCH \
   $service_dir/api|$GIT_PUBLIC_URL/massbitprotocol/massbitroute.git|$API_BRANCH \
   $service_dir/api/public/deploy|http://$GIT_APIDEPLOY_WRITE@$GIT_PRIVATE_DOMAIN/massbitroute/apideploy.git|$APIDEPLOY_BRANCH \
-
-  $service_dir/stat|$GIT_PUBLIC_URL/massbitprotocol/massbitroute_stat.git|$STAT_BRANCH \
-  $service_dir/stat/etc/conf|http://$GIT_STATDEPLOY_WRITE@$GIT_PRIVATE_DOMAIN/massbitroute/statdeploy.git|$STATDEPLOY_BRANCH \
   $service_dir/mkagent|$GIT_PUBLIC_URL/massbitprotocol/massbitroute_mkagent.git|$MKAGENT_BRANCH \
   $service_dir/node|$GIT_PUBLIC_URL/massbitprotocol/massbitroute_node.git|$NODE_BRANCH \
   $service_dir/gateway|$GIT_PUBLIC_URL/massbitprotocol/massbitroute_gateway.git|$GATEWAY_BRANCH \
 "
+	# $service_dir/stat|$GIT_PUBLIC_URL/massbitprotocol/massbitroute_stat.git|$STAT_BRANCH \
+	# $service_dir/stat/etc/conf|http://$GIT_STATDEPLOY_WRITE@$GIT_PRIVATE_DOMAIN/massbitroute/statdeploy.git|$STATDEPLOY_BRANCH \
+
 }
 _repo
 source $SITE_ROOT/scripts/base.sh
@@ -79,19 +79,34 @@ cmd_server=$SITE_ROOT/cmd_server
 # 	systemctl disable systemd-resolved
 # }
 
+_docker() {
+	cmd=$1
+	env=$2
+	bran=$3
+	ver=$4
+	shift 4
+	tmp=$(mktemp)
+	sed "s/_BRANCH_/$bran/g" install/mbr/docker-compose-$env.yml >$tmp
+	sed "s/_VER_/$ver/g" -i $tmp
+	sed "s/_ENV_/$env/g" -i $tmp
+	cat $tmp
+	docker-compose -f $tmp $cmd $@
+	rm $tmp
+}
+
 _prepare() {
 	echo "Prepare"
 	mkdir -p $SITE_ROOT/logs/nginx $SITE_ROOT/db $SITE_ROOT/tmp $SITE_ROOT/db
 
 	# rm -rf $SITE_ROOT/tmp/*
 	if [ ! -f "/usr/bin/parallel" ]; then
-		apt update
-		apt install -y parallel
+		sudo apt update
+		sudo apt install -y parallel
 	fi
 
 	if [ ! -f "$SITE_ROOT/data/geoip/GeoIP2-City.mmdb" ]; then
-		apt update
-		apt-get install -y xz-utils
+		sudo apt update
+		sudo apt-get install -y xz-utils
 		tar -xvJf $SITE_ROOT/data/geoip/GeoIP2-City.mmdb.tar.xz -C $SITE_ROOT/data/geoip
 	fi
 	# if [ -n "$DOMAIN" ]; then
@@ -133,8 +148,8 @@ _init() {
 _supervisor() {
 	ln -sf /massbit/massbitroute/app/gbc /massbit/massbitroute/app/src/gbc
 	ln -sf /massbit/massbitroute/app/gbc/bin/openresty /usr/local/openresty
-	apt-get update
-	apt-get install -y git apache2-utils supervisor jq python-is-python2 libssl-dev \
+	sudo apt-get update
+	sudo apt-get install -y git apache2-utils supervisor jq python-is-python2 libssl-dev \
 		liburcu-dev libev-dev libsodium-dev libtool libunwind-dev libmaxminddb-dev cron rsync
 
 	systemctl enable supervisor

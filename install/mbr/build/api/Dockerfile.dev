@@ -1,0 +1,19 @@
+FROM ubuntu:20.04 as base
+MAINTAINER "Vu Tran<baysao@massbit.io>"
+
+ARG BRANCH=testing
+ENV MBR_MODE=docker MBR_ROLE=api MBR_ENV=$BRANCH DEBIAN_FRONTEND=noninteractive
+RUN apt-get update
+RUN apt-get install -y --no-install-recommends ca-certificates curl apt-utils git
+
+
+FROM base as build
+ADD . /massbit/massbitroute/app/src/sites/services/api
+RUN bash -x /massbit/massbitroute/app/src/sites/services/api/scripts/run _install
+
+RUN mkdir -p /var/log/supervisor \
+    ; rm -rf /var/lib/apt/lists/* \
+    ; echo user=root >>  /etc/supervisor/supervisord.conf
+
+CMD ["-n"]
+ENTRYPOINT  ["/usr/bin/supervisord"]
