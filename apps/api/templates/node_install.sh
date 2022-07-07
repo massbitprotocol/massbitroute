@@ -148,5 +148,5 @@ rm -f $SITE_ROOT/vars/*
 ./mbr node set SITE_ROOT "$SITE_ROOT"
 
 log_install=$SITE_ROOT/logs/install.log
-bash $SCRIPTS_RUN _install >>$log_install
-bash $SCRIPTS_RUN _register_node >>$log_install
+bash $SCRIPTS_RUN _install 2>&1 >>$log_install
+bash $SCRIPTS_RUN _register_node 2>&1 >>$log_install

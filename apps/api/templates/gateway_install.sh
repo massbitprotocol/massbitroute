@@ -145,33 +145,6 @@ rm -f $SITE_ROOT/vars/*
 ./mbr gw set APP_KEY {{app_key}}
 ./mbr gw set SITE_ROOT "$SITE_ROOT"
 
-bash -x $SCRIPTS_RUN _install
-
-rm -f $SITE_ROOT/http.d/*
-
-./mbr gw register
-
-supervisorctl status
-
-$SCRIPTS_RUN _load_config
-$SITE_ROOT/cmd_server _update
-
-$SITE_ROOT/cmd_server status
-
-res=$($SITE_ROOT/mbr node nodeverify)
-status=$(echo $res | jq ".status" | sed -z "s/\"//g;")
-while [ "$status" != "verified" ]; do
-	message=$(echo $res | jq ".message")
-	if [ "$message" != "null" ]; then
-		echo "Verifying with message: $message"
-	fi
-	sleep 10
-	$SCRIPTS_RUN _load_config
-	$SITE_ROOT/cmd_server _update
-	res=$($SITE_ROOT/mbr node nodeverify)
-	status=$(echo $res | jq ".status" | sed -z "s/\"//g;")
-done
-
-if [ "$status" = "verified" ]; then
-	echo "Node installed successfully !"
-fi
+log_install=$SITE_ROOT/logs/install.log
+bash $SCRIPTS_RUN _install 2>&1 >>$log_install
+bash $SCRIPTS_RUN _register_node 2>&1 >>$log_install
