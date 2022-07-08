@@ -484,6 +484,14 @@ _sync_redis_conf() {
 	done
 }
 _update() {
+	if [ ! -f "$SITE_ROOT/.env" ]; then
+		cat <<EOF >$SITE_ROOT/.env
+export GIT_PUBLIC_URL="https://github.com"
+export MBR_ENV=$MBR_ENV
+export GIT_PRIVATE_READ_URL=$GIT_PRIVATE_READ_URL
+EOF
+	fi
+
 	echo "Update"
 	_st_update=0
 	# $0 _git_cmd push
