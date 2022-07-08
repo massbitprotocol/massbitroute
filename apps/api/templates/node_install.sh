@@ -1,20 +1,22 @@
 #!/bin/bash
 GITHUB_TRIES=10
 
-_debian() {
-	apt-get update
-	apt-get install -y git apache2-utils supervisor jq python2
+# _debian() {
+# 	apt-get update
+# 	apt-get install -y git apache2-utils supervisor jq python2
 
-}
+# }
 _ubuntu() {
 	apt-get update
-	apt-get install -y git apache2-utils supervisor libmaxminddb0 libmaxminddb-dev jq python-is-python2
+	apt-get install -y \
+		supervisor ca-certificates curl rsync apt-utils git python3 python3-pip parallel apache2-utils jq python-is-python2 libssl-dev libmaxminddb-dev fcgiwrap cron xz-utils liburcu-dev libev-dev libsodium-dev libtool libunwind-dev libmaxminddb-dev
+	# git apache2-utils supervisor libmaxminddb0 libmaxminddb-dev jq python-is-python2
 
 }
-_centos() {
-	yum update
-	yum install -y git httpd-tools supervisor jq python2
-}
+# _centos() {
+# 	yum update
+# 	yum install -y git httpd-tools supervisor jq python2
+# }
 
 _nodeverify() {
 	res=$($SITE_ROOT/mbr node nodeverify | tail -1 | jq ".status,.message" | sed -z "s/\"//g;")
