@@ -99,14 +99,14 @@ _prepare() {
 	mkdir -p $SITE_ROOT/logs/nginx $SITE_ROOT/db $SITE_ROOT/tmp $SITE_ROOT/db
 
 	# rm -rf $SITE_ROOT/tmp/*
-	if [ ! -f "/usr/bin/parallel" ]; then
-		apt update
-		apt install -y parallel
-	fi
+	# if [ ! -f "/usr/bin/parallel" ]; then
+	# 	apt update
+	# 	apt install -y parallel
+	# fi
 
 	if [ ! -f "$SITE_ROOT/data/geoip/GeoIP2-City.mmdb" ]; then
-		apt update
-		apt-get install -y xz-utils
+		# apt update
+		# apt-get install -y xz-utils
 		tar -xvJf $SITE_ROOT/data/geoip/GeoIP2-City.mmdb.tar.xz -C $SITE_ROOT/data/geoip
 	fi
 	# if [ -n "$DOMAIN" ]; then
@@ -153,9 +153,9 @@ EOF
 _supervisor() {
 	ln -sf /massbit/massbitroute/app/gbc /massbit/massbitroute/app/src/gbc
 	ln -sf /massbit/massbitroute/app/gbc/bin/openresty /usr/local/openresty
-	apt-get update
-	apt-get install -y git apache2-utils supervisor jq python-is-python2 libssl-dev \
-		liburcu-dev libev-dev libsodium-dev libtool libunwind-dev libmaxminddb-dev cron rsync
+	# apt-get update
+	# apt-get install -y git apache2-utils supervisor jq python-is-python2 libssl-dev \
+	# 	liburcu-dev libev-dev libsodium-dev libtool libunwind-dev libmaxminddb-dev cron rsync
 	if [ -f "/usr/bin/systemctl" ]; then
 		systemctl enable supervisor
 		systemctl start supervisor
