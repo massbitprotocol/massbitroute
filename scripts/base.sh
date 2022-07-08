@@ -21,13 +21,16 @@ _git_clone() {
 	# if [ -d "$_dir" ]; then rm -rf $_dir; fi
 	mkdir -p $_dir
 	if [ ! -d "$_dir/.git" ]; then
-		git remote -v | grep 'git@' >/dev/null
-		if [ $? -ne 0 ]; then
-			git clone $_url $_dir -b $_branch
-			git -C $_dir branch --set-upstream-to=origin/$_branch
-		fi
+		git clone $_url $_dir -b $_branch
+		git -C $_dir fetch --all
+		git -C $_dir branch --set-upstream-to=origin/$_branch
+
 	else
-		git -C $_dir pull origin $_branch
+		git -C $_dir remote -v | grep 'git@' >/dev/null
+		if [ $? -ne 0 ]; then
+			git -C $_dir fetch --all
+			git -C $_dir pull origin $_branch
+		fi
 	fi
 	if [ -f "$_dir/scripts/run" ]; then
 		echo "========================="
