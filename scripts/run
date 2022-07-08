@@ -29,22 +29,22 @@ _repo() {
 	export MONITOR_BRANCH=${MONITOR_BRANCH:-$MBR_ENV}
 	export SESSION_BRANCH=${SESSION_BRANCH:-$MBR_ENV}
 
-	REPOS_PRIVATE="\
+	REPOS="\
 $SITE_ROOT/env|$GIT_PRIVATE_READ_URL/massbitroute/env.git|$MBR_ENV \
 /etc/letsencrypt|$GIT_PRIVATE_READ_URL/massbitroute/ssl.git|$SSL_BRANCH \
-$service_dir/gwman/data|http://$GIT_GWMANDEPLOY_WRITE@$GIT_PRIVATE_DOMAIN/massbitroute/gwmandeploy.git|$GWMANDEPLOY_BRANCH \
-$service_dir/api/public/deploy|http://$GIT_APIDEPLOY_WRITE@$GIT_PRIVATE_DOMAIN/massbitroute/apideploy.git|$APIDEPLOY_BRANCH \
-"
-	REPOS="\
  $mbr_root/gbc|https://github.com/massbitprotocol/massbitroute_gbc|$GBC_BRANCH \
  $mbr_root/gbc/bin/.asdf|https://github.com/massbitprotocol/massbitroute_asdf|$ASDF_BRANCH \
   $service_dir/gwman|$GIT_PUBLIC_URL/massbitprotocol/massbitroute_gwman.git|$GWMAN_BRANCH \
+  $service_dir/gwman/data|http://$GIT_GWMANDEPLOY_WRITE@$GIT_PRIVATE_DOMAIN/massbitroute/gwmandeploy.git|$GWMANDEPLOY_BRANCH \
   $service_dir/api|$GIT_PUBLIC_URL/massbitprotocol/massbitroute.git|$API_BRANCH \
-
+  $service_dir/api/public/deploy|http://$GIT_APIDEPLOY_WRITE@$GIT_PRIVATE_DOMAIN/massbitroute/apideploy.git|$APIDEPLOY_BRANCH \
   $service_dir/mkagent|$GIT_PUBLIC_URL/massbitprotocol/massbitroute_mkagent.git|$MKAGENT_BRANCH \
   $service_dir/node|$GIT_PUBLIC_URL/massbitprotocol/massbitroute_node.git|$NODE_BRANCH \
   $service_dir/gateway|$GIT_PUBLIC_URL/massbitprotocol/massbitroute_gateway.git|$GATEWAY_BRANCH \
 "
+	# $service_dir/stat|$GIT_PUBLIC_URL/massbitprotocol/massbitroute_stat.git|$STAT_BRANCH \
+	# $service_dir/stat/etc/conf|http://$GIT_STATDEPLOY_WRITE@$GIT_PRIVATE_DOMAIN/massbitroute/statdeploy.git|$STATDEPLOY_BRANCH \
+
 }
 _repo
 source $SITE_ROOT/scripts/base.sh
@@ -100,13 +100,13 @@ _prepare() {
 
 	# rm -rf $SITE_ROOT/tmp/*
 	if [ ! -f "/usr/bin/parallel" ]; then
-		sudo apt update
-		sudo apt install -y parallel
+		apt update
+		apt install -y parallel
 	fi
 
 	if [ ! -f "$SITE_ROOT/data/geoip/GeoIP2-City.mmdb" ]; then
-		sudo apt update
-		sudo apt-get install -y xz-utils
+		apt update
+		apt-get install -y xz-utils
 		tar -xvJf $SITE_ROOT/data/geoip/GeoIP2-City.mmdb.tar.xz -C $SITE_ROOT/data/geoip
 	fi
 	# if [ -n "$DOMAIN" ]; then
@@ -131,38 +131,44 @@ _init() {
 		exit 1
 	fi
 	if [ ! -f "$SITE_ROOT/.env" ]; then
-		echo "$MBR_ENV" >$SITE_ROOT/.env
+		cat <<EOF >$SITE_ROOT/.env
+export GIT_PUBLIC_URL="https://github.com"
+export MBR_ENV=$MBR_ENV
+export GIT_PRIVATE_READ_URL=$GIT_PRIVATE_READ_URL
+EOF
 	fi
 
 	source $SITE_ROOT/.env
 
 	_git_clone $GIT_PRIVATE_READ_URL/massbitroute/env.git /massbit/massbitroute/app/src/env $MBR_ENV
 	_git_clone $GIT_PUBLIC_URL/massbitprotocol/massbitroute_gbc.git /massbit/massbitroute/app/gbc
-	_git_clone $GIT_PUBLIC_URL/massbitprotocol/mbr-app.git $SITE_ROOT/public/mbr-app-prod $MBRAPP_BRANCH
+	# _git_clone $GIT_PUBLIC_URL/massbitprotocol/mbr-app.git $SITE_ROOT/public/mbr-app-prod $MBRAPP_BRANCH
 
 	bash $SITE_ROOT/cmd_server _env
 	source $SITE_ROOT/.env_raw
 	_repo
 
 }
+
 _supervisor() {
 	ln -sf /massbit/massbitroute/app/gbc /massbit/massbitroute/app/src/gbc
 	ln -sf /massbit/massbitroute/app/gbc/bin/openresty /usr/local/openresty
-	sudo apt-get update
-	sudo apt-get install -y git apache2-utils supervisor jq python-is-python2 libssl-dev \
+	apt-get update
+	apt-get install -y git apache2-utils supervisor jq python-is-python2 libssl-dev \
 		liburcu-dev libev-dev libsodium-dev libtool libunwind-dev libmaxminddb-dev cron rsync
-
-	systemctl enable supervisor
-	systemctl start supervisor
+	if [ -f "/usr/bin/systemctl" ]; then
+		systemctl enable supervisor
+		systemctl start supervisor
+	fi
 
 	mkdir -p /etc/supervisor/conf.d
 	cp supervisor.conf /etc/supervisor/conf.d/${TYPE}.conf
-	supervisorctl update
+	if [ "$MBR_MODE" != "docker" ]; then
+		supervisorctl update
+	fi
 }
 _install_one() {
-	if [ "$MBR_MODE" != "docker"]; then
-		_init
-	fi
+	_init
 	_prepare
 	_install_repos
 }
