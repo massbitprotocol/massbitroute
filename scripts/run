@@ -120,7 +120,6 @@ _init() {
 	cat <<EOF >$SITE_ROOT/.env
 export GIT_PUBLIC_URL="https://github.com"
 export MBR_ENV=$MBR_ENV
-export GIT_PRIVATE_READ_URL=$GIT_PRIVATE_READ_URL
 EOF
 	# fi
 
@@ -481,7 +480,6 @@ _update() {
 		cat <<EOF >$SITE_ROOT/.env
 export GIT_PUBLIC_URL="https://github.com"
 export MBR_ENV=$MBR_ENV
-export GIT_PRIVATE_READ_URL=$GIT_PRIVATE_READ_URL
 EOF
 	fi
 
