@@ -159,6 +159,14 @@ _supervisor() {
 		supervisorctl update
 	fi
 }
+_install_test() {
+	cpan -i Test::Nginx
+	ls -d /root/.cpan/build/* | while read d; do
+		cd $d
+		make install
+		cd -
+	done
+}
 _install_one() {
 	_init
 	_prepare
