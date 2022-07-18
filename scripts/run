@@ -160,6 +160,7 @@ _supervisor() {
 	fi
 }
 _install_test() {
+	apt install -y make
 	cpan -i Test::Nginx
 	ls -d /root/.cpan/build/* | while read d; do
 		cd $d
