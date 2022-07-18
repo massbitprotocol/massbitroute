@@ -490,7 +490,7 @@ _update() {
 	fi
 
 	# if [ ! -f "$HOME/.gitconfig" ]; then
-	echo <<EOF >$HOME/.gitconfig
+	cat <<EOF >$HOME/.gitconfig
 [http]
         sslverify = false
 [user]
