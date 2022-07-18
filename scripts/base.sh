@@ -20,8 +20,10 @@ _git_clone() {
 	if [ -z "$_branch" ]; then _branch=$MBR_ENV; fi
 	# if [ -d "$_dir" ]; then rm -rf $_dir; fi
 	mkdir -p $_dir
+	git config --global --add safe.directory $_dir
 	if [ ! -d "$_dir/.git" ]; then
 		git clone $_url $_dir -b $_branch
+
 		git -C $_dir fetch --all
 		git -C $_dir branch --set-upstream-to=origin/$_branch
 
