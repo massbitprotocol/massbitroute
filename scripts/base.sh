@@ -49,6 +49,7 @@ _update_sources() {
 	branch=$MBR_ENV
 	for _pathgit in $@; do
 		_path=$(echo $_pathgit | cut -d'|' -f1)
+		git config --global --add safe.directory $_path
 		_url=$(echo $_pathgit | cut -d'|' -f2)
 		_branch=$(echo $_pathgit | cut -d'|' -f3)
 		if [ -z "$_branch" ]; then _branch=$branch; fi
