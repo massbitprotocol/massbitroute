@@ -497,7 +497,7 @@ _update() {
 	directory = /massbit/massbitroute/app/gbc/bin/.asdf
 	directory = /etc/letsencrypt
 	directory = /massbit/massbitroute/app/src/sites/services/api
-	directory = /massbit/massbitroute/app/src/sites/services/public/deploy
+	directory = /massbit/massbitroute/app/src/sites/services/api/public/deploy
 	directory = /massbit/massbitroute/app/src/sites/services/node
 	directory = /massbit/massbitroute/app/src/sites/services/gateway
 	directory = /massbit/massbitroute/app/src/sites/services/mkagent
