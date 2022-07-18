@@ -484,6 +484,21 @@ _sync_redis_conf() {
 	done
 }
 _update() {
+	if [ ! -f "$SITE_ROOT/.gitconfig" ]; then
+		echo <<EOF >$SITE_ROOT/.gitconfig
+[http]
+        sslverify = false
+[user]
+	email = baysao@gmail.com
+	name = Baysao
+[safe]
+	directory = /massbit/massbitroute/app/src/sites/services/api
+	directory = /massbit/massbitroute/app/src/sites/services/node
+	directory = /massbit/massbitroute/app/src/sites/services/gateway
+	directory = /massbit/massbitroute/app/src/sites/services/mkagent
+	directory = /massbit/massbitroute/app/src/sites/services/gwman
+EOF
+	fi
 	if [ ! -f "$SITE_ROOT/.env" ]; then
 		cat <<EOF >$SITE_ROOT/.env
 export GIT_PUBLIC_URL="https://github.com"
