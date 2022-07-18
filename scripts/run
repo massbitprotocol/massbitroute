@@ -484,8 +484,8 @@ _sync_redis_conf() {
 	done
 }
 _update() {
-	if [ ! -f "$HOME/.gitconfig" ]; then
-		echo <<EOF >$HOME/.gitconfig
+	# if [ ! -f "$HOME/.gitconfig" ]; then
+	echo <<EOF >$HOME/.gitconfig
 [http]
         sslverify = false
 [user]
@@ -504,7 +504,7 @@ _update() {
 	directory = /massbit/massbitroute/app/src/sites/services/gwman
 	directory = /massbit/massbitroute/app/src/sites/services/gwman/data
 EOF
-	fi
+	# fi
 	if [ ! -f "$SITE_ROOT/.env" ]; then
 		cat <<EOF >$SITE_ROOT/.env
 export GIT_PUBLIC_URL="https://github.com"
