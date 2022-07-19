@@ -72,8 +72,8 @@ else
 	exit 1
 fi
 
-ENV={{env}}
-MBR_ENV={{env}}
+export ENV={{env}}
+export MBR_ENV={{env}}
 IP="$(curl -ssSfL http://ipv4.icanhazip.com)"
 
 n=$(grep -o "\." <<<"$IP" | wc -l)

@@ -107,8 +107,8 @@ fi
 
 SCRIPTS_RUN="$SITE_ROOT/scripts/run"
 mkdir -p $(dirname $SITE_ROOT)
-ENV={{env}}
-MBR_ENV={{env}}
+export ENV={{env}}
+export MBR_ENV={{env}}
 
 git config --global http.sslVerify false
 if [ ! -d "$SITE_ROOT/.git" ]; then
