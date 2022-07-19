@@ -126,15 +126,14 @@ if [ ! -d "$SITE_ROOT/.git" ]; then
 fi
 
 cd $SITE_ROOT
-cat >.env <<EOF
-export GIT_PUBLIC_URL="https://github.com"
-export MBR_ENV=${ENV}
-EOF
 
 git pull
 git reset --hard
 rm -f $SITE_ROOT/vars/* $SITE_ROOT/.env $SITE_ROOT/.env_raw $SITE_ROOT/src/env.lua
-
+cat >.env <<EOF
+export GIT_PUBLIC_URL="https://github.com"
+export MBR_ENV=${MBR_ENV}
+EOF
 #create environment variables
 ./mbr node set ENV {{env}}
 ./mbr node set MBR_ENV {{env}}
