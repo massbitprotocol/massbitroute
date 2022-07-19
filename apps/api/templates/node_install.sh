@@ -131,6 +131,7 @@ export MBR_ENV=${ENV}
 EOF
 
 git pull
+git reset --hard
 rm -f $SITE_ROOT/vars/*
 
 #create environment variables
