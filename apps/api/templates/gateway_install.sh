@@ -133,7 +133,7 @@ EOF
 
 git pull
 git reset --hard
-rm -f $SITE_ROOT/vars/*
+rm -f $SITE_ROOT/vars/* $SITE_ROOT/.env $SITE_ROOT/.env_raw $SITE_ROOT/src/env.lua
 
 #create environment variables
 ./mbr node set ENV {{env}}
