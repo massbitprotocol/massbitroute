@@ -73,12 +73,12 @@ fi
 git config --global http.sslVerify false
 git clone https://github.com/massbitprotocol/massbitroute_node $SITE_ROOT -b ${MBR_ENV}
 
-cd $SITE_ROOT
+# cd $SITE_ROOT
 
-git pull
-git reset --hard
+# git pull
+# git reset --hard
 
-rm -f $SITE_ROOT/vars/* $SITE_ROOT/.env*
+rm -f $SITE_ROOT/vars/* $SITE_ROOT/.env*-
 
 #create environment variables
 
