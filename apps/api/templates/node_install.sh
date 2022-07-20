@@ -6,6 +6,7 @@ MBR=$SITE_ROOT/mbr
 export MBR_ENV={{env}}
 SCRIPTS_RUN="$SITE_ROOT/scripts/run"
 mkdir -p $(dirname $SITE_ROOT)
+TYPE=node
 
 _ubuntu() {
 	apt-get update
@@ -52,7 +53,7 @@ if [ -z "$IP" ]; then
 fi
 
 tmp=$(mktemp)
-curl -ssSfL "{*portal_url*}/mbr/node/{{id}}/geo?ip=$IP" --header 'Authorization: {{app_key}}' -o $tmp >/dev/null
+curl -ssSfL "{*portal_url*}/mbr/$TYPE/{{id}}/geo?ip=$IP" --header 'Authorization: {{app_key}}' -o $tmp >/dev/null
 if [ $? -eq 0 ]; then
 	zone=$(cat $tmp | jq .continent_code | sed 's/\"//g')
 	if [ "$zone" != "{{zone}}" ]; then
@@ -72,13 +73,9 @@ if [ \( -f "$_c_conf" \) -o \( -d "$_c_dir" \) ]; then
 fi
 
 git config --global http.sslVerify false
-git clone https://github.com/massbitprotocol/massbitroute_node $SITE_ROOT -b ${MBR_ENV}
+git clone https://github.com/massbitprotocol/massbitroute_$TYPE $SITE_ROOT -b ${MBR_ENV}
 sleep 1
-# cd $SITE_ROOT
-
-# git pull
-# git reset --hard
-
+cd $SITE_ROOT
 rm -f $SITE_ROOT/vars/* $SITE_ROOT/.env*-
 
 #create environment variables
@@ -89,9 +86,9 @@ export MBR_ENV=${MBR_ENV}
 EOF
 
 cp $SITE_ROOT/.env $SITE_ROOT/.env_raw
+
 $MBR node set MBR_ENV {{env}}
 
-#bash init.sh
 $MBR node set PORTAL_URL {*portal_url*}
 $MBR node set DATA_URI {*data_url*}
 $MBR node set USER_ID {{user_id}}
