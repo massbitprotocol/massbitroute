@@ -36,6 +36,19 @@ else
 	echo "Sorry. Current we only support Ubuntu 20.04. "
 	exit 1
 fi
+IP="$(curl -ssSfL http://ipv4.icanhazip.com)"
+
+if [ -z "$IP" ]; then
+	echo "Your IP is unknown"
+	exit 1
+# else
+# 	n=$(grep -o "\." <<<"$IP" | wc -l)
+# 	if [ $n -ne 3 ]; then
+# 		echo "Your IP is unknown"
+# 		exit 1
+# 	fi
+fi
+
 tmp=$(mktemp)
 curl -ssSfL "{*portal_url*}/mbr/$TYPE/{{id}}/geo?ip=$IP" --header 'Authorization: {{app_key}}' -o $tmp >/dev/null
 if [ $? -eq 0 ]; then
