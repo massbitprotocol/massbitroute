@@ -1,12 +1,12 @@
 #!/bin/bash
+TYPE=node
 export DEBIAN_FRONTEND=noninteractive
 SERVICE_DIR=/massbit/massbitroute/app/src/sites/services
-SITE_ROOT=$SERVICE_DIR/node
+SITE_ROOT=$SERVICE_DIR/$TYPE
 MBR=$SITE_ROOT/mbr
 export MBR_ENV={{env}}
 SCRIPTS_RUN="$SITE_ROOT/scripts/run"
 mkdir -p $(dirname $SITE_ROOT)
-TYPE=node
 
 _ubuntu() {
 	apt-get update
