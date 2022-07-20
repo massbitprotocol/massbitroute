@@ -2,6 +2,7 @@
 export DEBIAN_FRONTEND=noninteractive
 SERVICE_DIR=/massbit/massbitroute/app/src/sites/services
 SITE_ROOT=$SERVICE_DIR/node
+MBR=$SITE_ROOT/mbr
 export MBR_ENV={{env}}
 SCRIPTS_RUN="$SITE_ROOT/scripts/run"
 mkdir -p $(dirname $SITE_ROOT)
@@ -88,19 +89,19 @@ export MBR_ENV=${MBR_ENV}
 EOF
 
 cp $SITE_ROOT/.env $SITE_ROOT/.env_raw
-./mbr node set MBR_ENV {{env}}
+$MBR node set MBR_ENV {{env}}
 
 #bash init.sh
-./mbr node set PORTAL_URL {*portal_url*}
-./mbr node set DATA_URI {*data_url*}
-./mbr node set USER_ID {{user_id}}
-./mbr node set ID {{id}}
-./mbr node set IP $IP
-./mbr node set TOKEN {{token}}
-./mbr node set BLOCKCHAIN {{blockchain}}
-./mbr node set NETWORK {{network}}
-./mbr node set APP_KEY {{app_key}}
-./mbr node set SITE_ROOT "$SITE_ROOT"
+$MBR node set PORTAL_URL {*portal_url*}
+$MBR node set DATA_URI {*data_url*}
+$MBR node set USER_ID {{user_id}}
+$MBR node set ID {{id}}
+$MBR node set IP $IP
+$MBR node set TOKEN {{token}}
+$MBR node set BLOCKCHAIN {{blockchain}}
+$MBR node set NETWORK {{network}}
+$MBR node set APP_KEY {{app_key}}
+$MBR node set SITE_ROOT "$SITE_ROOT"
 
 log_install=$SITE_ROOT/logs/install.log
 bash -x $SCRIPTS_RUN _install 2>&1 >>$log_install
