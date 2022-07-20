@@ -72,7 +72,7 @@ fi
 
 git config --global http.sslVerify false
 git clone https://github.com/massbitprotocol/massbitroute_node $SITE_ROOT -b ${MBR_ENV}
-
+sleep 1
 # cd $SITE_ROOT
 
 # git pull
