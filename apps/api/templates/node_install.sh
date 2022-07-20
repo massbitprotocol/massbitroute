@@ -82,6 +82,11 @@ rm -f $SITE_ROOT/vars/* $SITE_ROOT/.env*
 
 #create environment variables
 
+cat >$SITE_ROOT/.env_raw <<EOF
+export GIT_PUBLIC_URL="https://github.com"
+export MBR_ENV=${MBR_ENV}
+EOF
+
 ./mbr node set MBR_ENV {{env}}
 
 #bash init.sh
