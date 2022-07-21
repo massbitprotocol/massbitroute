@@ -94,7 +94,7 @@ $MBR node set DATA_URI {*data_url*}
 $MBR node set USER_ID {{user_id}}
 $MBR node set ID {{id}}
 $MBR node set IP $IP
-$MBR node set TOKEN {{token}}
+# $MBR node set TOKEN {{token}}
 $MBR node set BLOCKCHAIN {{blockchain}}
 $MBR node set NETWORK {{network}}
 $MBR node set APP_KEY {{app_key}}

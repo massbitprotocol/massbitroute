@@ -92,7 +92,7 @@ cp $SITE_ROOT/.env $SITE_ROOT/.env_raw
 ./mbr gw set USER_ID {{user_id}}
 ./mbr gw set ID {{id}}
 ./mbr gw set IP $IP
-./mbr gw set TOKEN {{token}}
+# ./mbr gw set TOKEN {{token}}
 ./mbr gw set BLOCKCHAIN {{blockchain}}
 ./mbr gw set NETWORK {{network}}
 ./mbr gw set APP_KEY {{app_key}}
