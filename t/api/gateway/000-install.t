@@ -3,9 +3,11 @@ use Test::Nginx::Socket::Lua 'no_plan';
 repeat_each(1);
 
 no_shuffle();
+
 # plan tests => blocks() * repeat_each() * 2;
 
-$ENV{TEST_NGINX_BINARY} = "/massbit/massbitroute/app/src/sites/services/api/bin/openresty/nginx/sbin/nginx";
+$ENV{TEST_NGINX_BINARY} =
+"/massbit/massbitroute/app/src/sites/services/api/bin/openresty/nginx/sbin/nginx";
 our $main_config = <<'_EOC_';
       load_module /massbit/massbitroute/app/src/sites/services/api/bin/openresty/nginx/modules/ngx_http_geoip2_module.so;
       load_module /massbit/massbitroute/app/src/sites/services/api/bin/openresty/nginx/modules/ngx_stream_geoip2_module.so;
@@ -17,8 +19,7 @@ our $main_config = <<'_EOC_';
 env BIND_ADDRESS;
 _EOC_
 
-
-our $http_config  = <<'_EOC_';
+our $http_config = <<'_EOC_';
 
 log_format main_json escape=json '{' '"msec": "$msec", ' '"connection": "$connection", ' '"connection_requests": "$connection_requests", ' '"pid": "$pid", ' '"request_id": "$request_id", ' '"request_length": "$request_length", ' '"remote_addr": "$remote_addr", ' '"remote_user": "$remote_user", ' '"remote_port": "$remote_port", ' '"time_local": "$time_local", ' '"time_iso8601": "$time_iso8601", ' '"request": "$request", ' '"request_uri": "$request_uri", ' '"args": "$args", ' '"status": "$status", ' '"body_bytes_sent": "$body_bytes_sent", ' '"bytes_sent": "$bytes_sent", ' '"http_referer": "$http_referer", ' '"http_user_agent": "$http_user_agent", ' '"http_x_forwarded_for": "$http_x_forwarded_for", ' '"http_host": "$http_host", ' '"server_name": "$server_name", ' '"request_time": "$request_time", ' '"upstream": "$upstream_addr", ' '"upstream_connect_time": "$upstream_connect_time", ' '"upstream_header_time": "$upstream_header_time", ' '"upstream_response_time": "$upstream_response_time", ' '"upstream_response_length": "$upstream_response_length", ' '"upstream_cache_status": "$upstream_cache_status", ' '"ssl_protocol": "$ssl_protocol", ' '"ssl_cipher": "$ssl_cipher", ' '"scheme": "$scheme", ' '"request_method": "$request_method", ' '"server_protocol": "$server_protocol", ' '"pipe": "$pipe", ' '"gzip_ratio": "$gzip_ratio", ' '"request_body": "$request_body", ' '"http_cf_ray": "$http_cf_ray"' '"real_ip": "$http_x_forwarded_for",' '}';
     lua_package_path '/massbit/massbitroute/app/src/sites/services/api/gbc/src/?.lua;/massbit/massbitroute/app/src/sites/services/api/lib/?.lua;/massbit/massbitroute/app/src/sites/services/api/src/?.lua;/massbit/massbitroute/app/src/sites/services/api/sites/../src/?.lua/massbit/massbitroute/app/src/sites/services/api/sites/../lib/?.lua;/massbit/massbitroute/app/src/sites/services/api/sites/../src/?.lua;/massbit/massbitroute/app/src/sites/services/api/bin/openresty/site/lualib/?.lua;;';
@@ -38,8 +39,7 @@ log_format main_json escape=json '{' '"msec": "$msec", ' '"connection": "$connec
 lua_shared_dict portal_stats 10m;
 _EOC_
 
-
-    run_tests();
+run_tests();
 
 __DATA__
 === TEST 1: api test
@@ -56,40 +56,15 @@ __DATA__
 
     root /massbit/massbitroute/app/src/sites/services/api/sites/../public/admin;
 
-location /_internal_api/v3/ {
 
-    set $app_root /massbit/massbitroute/app/src/sites/services/api/apps/api;
-    default_type application/json;
- 
-    content_by_lua 'nginxBootstrap:runapp("/massbit/massbitroute/app/src/sites/services/api/apps/api")';
+location /api/v1/gateway_install {
+    set $template_root /massbit/massbitroute/app/src/sites/services/api/apps/api/templates;
+    content_by_lua_file /massbit/massbitroute/app/src/sites/services/api/apps/api/handlers/gateway_install.lua;
 }
 
 --- request
-POST /_internal_api/v3/?action=node.create
-{
-  blockchain = "eth",
-  data_url = "http://127.0.0.1:8545",
-  data_ws = "ws://127.0.0.1:8546",
-  geo = {
-    city = "Omaha",
-    continent_code = "NA",
-    continent_name = "North America",
-    country_code = "US",
-    country_name = "United States",
-    ip = "34.68.244.83",
-    latitude = 41.232959747314,
-    longitude = -95.87735748291
-  },
-  id = "e22663c3-9b33-4d8a-864a-b48f8f9ca0d9",
-  name = "baysao-node-1",
-  network = "mainnet",
-  partner_id = "xxx",
-  sid = "yyy",
-  status = 0,
-  token = "zzz",
-  user_id = "eeee",
-  zone = "EU"
-}
+GET /api/v1/gateway_install?id=1af00408-d427-4fd1-b796-ba22296ffbac&user_id=b363ddf4-42cf-4ccf-89c2-8c42c531ac99&blockchain=eth&network=mainnet&zone=EU&app_key=2lh5jo-BWSo49R5ugpnVEg&portal_url=https://portal.massbitroute.net&env=keiko
+
 --- response_body eval
-qr/"result":false/
+qr/_register_node/
 --- no_error_log
