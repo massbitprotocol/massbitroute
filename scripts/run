@@ -159,15 +159,24 @@ _supervisor() {
 		supervisorctl update
 	fi
 }
+
+_run_test() {
+	cd $SITE_ROOT
+	export PATH=$PATH:$SITE_ROOT/bin/openresty/nginx/sbin
+	prove -r t/$@
+
+}
 _install_test() {
+	apt update
 	apt install -y make
 	cpan -i Test::Nginx
-	ls -d /root/.cpan/build/* | while read d; do
+	ls -d .cpan/build/* | while read d; do
 		cd $d
 		make install
 		cd -
 	done
 }
+
 _install_one() {
 	_init
 	_prepare
