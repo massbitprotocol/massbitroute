@@ -63,6 +63,7 @@ geoip2 /massbit/massbitroute/app/src/sites/services/api/sites/../data/geoip/GeoI
     $location_timezone source=$realip location time_zone;
 }
 lua_shared_dict portal_stats 10m;
+variables_hash_max_size 2048;
 _EOC_
 
 our $config = <<'_EOC_';
@@ -124,7 +125,7 @@ POST /_internal_api/v2/?action=gateway.create
   "zone" : "NA"
 }
 --- response_body eval
-qr/"result":true/
+qr/"result":true/ and qr/"status":0/
 --- no_error_log
 
 === TEST 2: gateway get

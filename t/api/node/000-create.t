@@ -63,6 +63,7 @@ geoip2 /massbit/massbitroute/app/src/sites/services/api/sites/../data/geoip/GeoI
     $location_timezone source=$realip location time_zone;
 }
 lua_shared_dict portal_stats 10m;
+variables_hash_max_size 2048;
 _EOC_
 
 our $config = <<'_EOC_';
