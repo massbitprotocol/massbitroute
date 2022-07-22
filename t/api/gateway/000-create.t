@@ -92,7 +92,7 @@ run_tests();
 
 __DATA__
 
-=== TEST 1: gateway create
+=== Gateway create new
 
 --- main_config eval: $::main_config
 --- http_config eval: $::http_config
@@ -128,7 +128,7 @@ POST /_internal_api/v2/?action=gateway.create
 qr/"result":true/ and qr/"status":0/
 --- no_error_log
 
-=== TEST 2: gateway get
+=== Gateway get and check if created or not
 
 
 --- main_config eval: $::main_config
@@ -139,10 +139,48 @@ qr/"result":true/ and qr/"status":0/
 --- request
 GET /_internal_api/v2/?action=gateway.get&id=60173a87-4d2b-469b-b02c-6f212794136c&partner_id=fc78b64c5c33f3f270700b0c4d3e7998188035ab&sid=403716b0f58a7d6ddec769f8ca6008f2c1c0cea6&user_id=89a21b17-1bbe-4a6b-a5b5-9351d3eb8c81
 --- response_body eval
+qr/"result":true/  and qr/"status":0/
+--- no_error_log
+
+
+
+=== Gateway update "status = 1"
+
+--- main_config eval: $::main_config
+--- http_config eval: $::http_config
+--- config eval: $::config
+    
+--- more_headers
+Content-Type: application/json
+--- request
+POST /_internal_api/v2/?action=gateway.update
+{
+  "id" : "60173a87-4d2b-469b-b02c-6f212794136c",
+  "partner_id" : "fc78b64c5c33f3f270700b0c4d3e7998188035ab",
+  "sid" : "403716b0f58a7d6ddec769f8ca6008f2c1c0cea6",
+  "status" : 1,
+  "user_id" : "89a21b17-1bbe-4a6b-a5b5-9351d3eb8c81"
+}
+--- response_body eval
 qr/"result":true/
 --- no_error_log
 
-=== TEST 3: gateway delete
+=== Gateway get and check if status is 1
+
+
+--- main_config eval: $::main_config
+--- http_config eval: $::http_config
+
+--- config eval: $::config
+
+--- request
+GET /_internal_api/v2/?action=gateway.get&id=60173a87-4d2b-469b-b02c-6f212794136c&partner_id=fc78b64c5c33f3f270700b0c4d3e7998188035ab&sid=403716b0f58a7d6ddec769f8ca6008f2c1c0cea6&user_id=89a21b17-1bbe-4a6b-a5b5-9351d3eb8c81
+--- response_body eval
+qr/"result":true/  and qr/"status":1/
+--- no_error_log
+
+
+=== gateway delete
 
 
 --- main_config eval: $::main_config
@@ -157,7 +195,7 @@ qr/"result":true/
 --- no_error_log
 
 
-=== TEST 4: gateway get
+=== Gateway get and check if exists or not
 
 
 --- main_config eval: $::main_config
