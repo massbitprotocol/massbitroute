@@ -92,7 +92,7 @@ run_tests();
 
 __DATA__
 
-=== TEST 1: node create
+=== Node create new
 
 --- main_config eval: $::main_config
 --- http_config eval: $::http_config
@@ -130,7 +130,7 @@ POST /_internal_api/v2/?action=node.create
 qr/"result":true/
 --- no_error_log
 
-=== TEST 2: node get
+=== Node get and check if created
 
 
 --- main_config eval: $::main_config
@@ -141,8 +141,47 @@ qr/"result":true/
 --- request
 GET /_internal_api/v2/?action=node.get&id=fd6d64f8-70fb-4c12-aa8a-bdc2805a38a4&partner_id=fc78b64c5c33f3f270700b0c4d3e7998188035ab&sid=403716b0f58a7d6ddec769f8ca6008f2c1c0cea6&user_id=b363ddf4-42cf-4ccf-89c2-8c42c531ac99
 --- response_body eval
-qr/"result":true/
+qr/"result":true/ and qr/"status":0/
 --- no_error_log
+
+=== Node update status = 1
+
+--- main_config eval: $::main_config
+--- http_config eval: $::http_config
+--- config eval: $::config
+    
+--- more_headers
+Content-Type: application/json
+--- request
+POST /_internal_api/v2/?action=node.update
+{
+  "id" : "fd6d64f8-70fb-4c12-aa8a-bdc2805a38a4",
+  "partner_id" : "fc78b64c5c33f3f270700b0c4d3e7998188035ab",
+  "sid" : "403716b0f58a7d6ddec769f8ca6008f2c1c0cea6",
+  "status" : 1,
+  "user_id" : "b363ddf4-42cf-4ccf-89c2-8c42c531ac99"
+}
+--- response_body eval
+qr/"result":true/ 
+--- no_error_log
+
+
+
+=== Node get and check if status is 1
+
+
+--- main_config eval: $::main_config
+--- http_config eval: $::http_config
+
+--- config eval: $::config
+
+--- request
+GET /_internal_api/v2/?action=node.get&id=fd6d64f8-70fb-4c12-aa8a-bdc2805a38a4&partner_id=fc78b64c5c33f3f270700b0c4d3e7998188035ab&sid=403716b0f58a7d6ddec769f8ca6008f2c1c0cea6&user_id=b363ddf4-42cf-4ccf-89c2-8c42c531ac99
+--- response_body eval
+qr/"result":true/ and qr/"status":1/
+--- no_error_log
+
+
 
 === TEST 3: node delete
 
