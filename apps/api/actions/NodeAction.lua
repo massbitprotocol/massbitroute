@@ -24,6 +24,7 @@ local ERROR = {
 local Model = cc.import("#" .. mytype)
 
 -- local _get_geo = util.get_geo
+local _authorize_whitelist = util.authorize_whitelist
 local _server_name = env.DOMAIN or "massbitroute.com"
 local function _norm_json(_v, _field)
     if _v[_field] and type(_v[_field]) == "string" then
@@ -40,31 +41,31 @@ local function _norm(_v)
     return _v
 end
 
-local function _authorize_whitelist(self, args)
-    local _config = self:getInstanceConfig()
-    local _appconf = _config.app
-    local whitelist_sid = _appconf.whitelist_sid
-    -- _print("whitelist_sid:" .. inspect(whitelist_sid))
-    local sid = ngx.var.cookie__slc_web_sid or args.sid
-    local _info = whitelist_sid and whitelist_sid[sid]
-    -- _print("sid:" .. sid)
-    -- _print("_info:" .. inspect(_info))
-    if sid and _info then
-        local _partner_id = args.partner_id
-        local _user_id = args.user_id
+-- local function _authorize_whitelist(self, args)
+--     local _config = self:getInstanceConfig()
+--     local _appconf = _config.app
+--     local whitelist_sid = _appconf.whitelist_sid
+--     -- _print("whitelist_sid:" .. inspect(whitelist_sid))
+--     local sid = ngx.var.cookie__slc_web_sid or args.sid
+--     local _info = whitelist_sid and whitelist_sid[sid]
+--     -- _print("sid:" .. sid)
+--     -- _print("_info:" .. inspect(_info))
+--     if sid and _info then
+--         local _partner_id = args.partner_id
+--         local _user_id = args.user_id
 
-        local _info_partner_id = _info.partner_id
-        if not _user_id or not _partner_id or not _info_partner_id or _partner_id ~= _info_partner_id then
-            return {
-                result = false,
-                err_msg = "Arguments not valid"
-            }
-        end
-        args.partner_id = nil
-        return true
-    end
-    return false
-end
+--         local _info_partner_id = _info.partner_id
+--         if not _user_id or not _partner_id or not _info_partner_id or _partner_id ~= _info_partner_id then
+--             return {
+--                 result = false,
+--                 err_msg = "Arguments not valid"
+--             }
+--         end
+--         args.partner_id = nil
+--         return true
+--     end
+--     return false
+-- end
 -- local function _get_geo(ip)
 --     local _api_url = "http://api.ipapi.com/api/" .. ip .. "?access_key=" .. _ipapi_token
 --     -- ngx.log(ngx.ERR, inspect(_api_url))
@@ -363,7 +364,8 @@ function Action:createAction(args)
     -- args.id = nil
 
     local instance = self:getInstance()
-    local _res = _authorize_whitelist(self, args)
+    local _config = self:getInstanceConfig()
+    local _res = _authorize_whitelist(_config, args)
     _print("_authorize_whitelist:" .. inspect(_res))
     local user_id
     if _res then
@@ -408,7 +410,8 @@ function Action:getAction(args)
     end
     args.action = nil
     local instance = self:getInstance()
-    local _res = _authorize_whitelist(self, args)
+    local _config = self:getInstanceConfig()
+    local _res = _authorize_whitelist(_config, args)
     _print("_authorize_whitelist:" .. inspect(_res))
     local user_id
     if _res then
@@ -559,7 +562,8 @@ function Action:deleteAction(args)
     args.action = nil
     local instance = self:getInstance()
     local user_id
-    local _res = _authorize_whitelist(self, args)
+    local _config = self:getInstanceConfig()
+    local _res = _authorize_whitelist(_config, args)
     _print("_authorize_whitelist:" .. inspect(_res))
     if _res then
         user_id = args.user_id
@@ -604,7 +608,8 @@ function Action:updateAction(args)
     args.action = nil
     local instance = self:getInstance()
     local user_id
-    local _res = _authorize_whitelist(self, args)
+    local _config = self:getInstanceConfig()
+    local _res = _authorize_whitelist(_config, args)
 
     _print("_authorize_whitelist:" .. inspect(_res))
     if _res then
@@ -662,7 +667,8 @@ function Action:listAction(args)
     args.action = nil
     local instance = self:getInstance()
     local user_id
-    local _res = _authorize_whitelist(self, args)
+    local _config = self:getInstanceConfig()
+    local _res = _authorize_whitelist(_config, args)
     _print("_authorize_whitelist:" .. inspect(_res))
     if _res then
         user_id = args.user_id

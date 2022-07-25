@@ -21,6 +21,7 @@ local Model = cc.import("#" .. mytype)
 
 -- local v = require "validation"
 local _domain_name = env.DOMAIN or "massbitroute.com"
+local _authorize_whitelist = util.authorize_whitelist
 -- local schema_create =
 --     v.is_table {
 --     action = v.optional(v.is_string()),
@@ -77,32 +78,6 @@ local function _norm(_v)
     return _v
 end
 
-local function _authorize_whitelist(self, args)
-    local _config = self:getInstanceConfig()
-    local _appconf = _config.app
-    local whitelist_sid = _appconf.whitelist_sid
-    -- _print("whitelist_sid:" .. inspect(whitelist_sid))
-    local sid = ngx.var.cookie__slc_web_sid or args.sid
-    local _info = whitelist_sid and whitelist_sid[sid]
-    -- _print("sid:" .. sid)
-    -- _print("_info:" .. inspect(_info))
-    if sid and _info then
-        local _partner_id = args.partner_id
-        local _user_id = args.user_id
-
-        local _info_partner_id = _info.partner_id
-        if not _user_id or not _partner_id or not _info_partner_id or _partner_id ~= _info_partner_id then
-            return {
-                result = false,
-                err_msg = "Arguments not valid"
-            }
-        end
-        args.partner_id = nil
-        return true
-    end
-    return false
-end
-
 function Action:createAction(args)
     _print(inspect(args))
     args.action = nil
@@ -123,7 +98,8 @@ function Action:createAction(args)
     local instance = self:getInstance()
 
     local user_id
-    local _res = _authorize_whitelist(self, args)
+    local _config = self:getInstanceConfig()
+    local _res = _authorize_whitelist(_config, args)
     _print("_authorize_whitelist:" .. inspect(_res))
     if _res then
         user_id = args.user_id
@@ -179,7 +155,8 @@ function Action:getAction(args)
     args.action = nil
     local instance = self:getInstance()
     local user_id
-    local _res = _authorize_whitelist(self, args)
+    local _config = self:getInstanceConfig()
+    local _res = _authorize_whitelist(_config, args)
     _print("_authorize_whitelist:" .. inspect(_res))
     if _res then
         user_id = args.user_id
@@ -285,7 +262,8 @@ function Action:updateAction(args)
     end
     args.action = nil
     local instance = self:getInstance()
-    local _res = _authorize_whitelist(self, args)
+    local _config = self:getInstanceConfig()
+    local _res = _authorize_whitelist(_config, args)
     _print("_authorize_whitelist:" .. inspect(_res))
     local user_id
     if _res then
@@ -367,7 +345,8 @@ function Action:updatemultiAction(args)
     args.id = nil
     args.ids = nil
     local instance = self:getInstance()
-    local _res = _authorize_whitelist(self, args)
+    local _config = self:getInstanceConfig()
+    local _res = _authorize_whitelist(_config, args)
     _print("_authorize_whitelist:" .. inspect(_res))
     local user_id
     if _res then
@@ -438,7 +417,8 @@ function Action:deleteAction(args)
     args.action = nil
     local user_id
     local instance = self:getInstance()
-    local _res = _authorize_whitelist(self, args)
+    local _config = self:getInstanceConfig()
+    local _res = _authorize_whitelist(_config, args)
     _print("_authorize_whitelist:" .. inspect(_res))
     if _res then
         user_id = args.user_id
@@ -476,7 +456,8 @@ function Action:listAction(args)
     _print(inspect(args))
     args.action = nil
     local instance = self:getInstance()
-    local _res = _authorize_whitelist(self, args)
+    local _config = self:getInstanceConfig()
+    local _res = _authorize_whitelist(_config, args)
     _print("_authorize_whitelist:" .. inspect(_res))
     local user_id
     if _res then
