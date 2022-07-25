@@ -171,6 +171,26 @@ local function _git_push(_dir, _files, _rfiles)
     -- print(output)
 end
 
+local function _authorize_whitelist(_config, args)
+    local _appconf = _config.app
+    local whitelist_sid = _appconf.whitelist_sid
+    local sid = ngx.var.cookie__slc_web_sid or args.sid
+    local _info = whitelist_sid and whitelist_sid[sid]
+    if sid and _info then
+        local _partner_id = args.partner_id
+        local _user_id = args.user_id
+
+        local _info_partner_id = _info.partner_id
+        if not _user_id or not _partner_id or not _info_partner_id or _partner_id ~= _info_partner_id then
+            return false, "Arguments not valid"
+        end
+        args.partner_id = nil
+        return true
+    end
+    return false
+end
+
+Cls.authorize_whitelist = _authorize_whitelist
 Cls.read_dir = _read_dir
 Cls.read_file = _read_file
 Cls.write_file = _write_file
