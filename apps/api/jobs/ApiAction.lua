@@ -84,6 +84,7 @@ server {
     include /massbit/massbitroute/app/src/sites/services/gateway/etc/_session.conf;
     include /massbit/massbitroute/app/src/sites/services/gateway/etc/_location_server.conf;
 
+   set $api_key ${api_key};
     location /${api_key} {
         set $mbr_token ${api_key};
 
@@ -99,7 +100,12 @@ server {
         proxy_pass http://upstream_${api_key}/;
         include /massbit/massbitroute/app/src/sites/services/gateway/etc/_node_server.conf;
     }
-
+        location /${api_key}/_redirect {
+    include /massbit/massbitroute/app/src/sites/services/gateway/etc/_api_redirect.conf;
+        }
+        location /${api_key}/_getlink {
+    include /massbit/massbitroute/app/src/sites/services/gateway/etc/_api_getlink.conf;
+        }
 }
 server {
     include /massbit/massbitroute/app/src/sites/services/gateway/etc/_pre_server_ws.conf;
@@ -354,7 +360,8 @@ local function _generate_item(instance, args)
             -- _print("_item.gateway_domain_ws:" .. _item.gateway_domain_ws)
             -- _print("item:" .. inspect(_item))
             -- if _item.gateway_domain and _item.server_name then
-            _item.gateway_domain_list = "~^" .. _item.id .. ".+$"
+            _item.gateway_domain_list = "~^(?<myid>" .. _item.id .. ")(?<mydomain>.+)$"
+
             -- _item.gateway_domain:gsub(_item.blockchain .. "-" .. _item.network .. "." .. _item.server_name, "*")
             -- end
 
