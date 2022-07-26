@@ -204,7 +204,6 @@ function Action:adminupdateAction(args)
 end
 
 function Action:calljobAction(args)
-    -- _print(inspect(args))
     args.action = nil
     local job_method = args.job
     args.job = nil
