@@ -44,24 +44,11 @@ local _authorize_whitelist = util.authorize_whitelist
 
 local function _norm_schema(args)
     for _, _v in ipairs({"name", "blockchain", "network"}) do
-        _print(_v)
+        -- _print(_v)
         args[_v] = args[_v]:trim()
     end
     return args
 end
--- local jsonschema = require "jsonschema"
--- local validator = jsonschema.generate_validator
--- local validator_api =
---     validator(
---     {
---         type = "object",
---         properties = {
---             name = {type = "string"},
---             blockchain = {type = "string"},
---             network = {type = "string"}
---         }
---     }
--- )
 
 local function _norm(_v)
     if type(_v) == "string" then
@@ -79,19 +66,8 @@ local function _norm(_v)
 end
 
 function Action:createAction(args)
-    _print(inspect(args))
     args.action = nil
-    --args.id = nil
-    --[[local _valid, _err = schema_create(args)
-    _print("validator:" .. inspect(_valid))
-    _print("err:" .. inspect(_err))
-    if not _valid then
-        return {
-            result = false,
-            err_msg = "Arguments not valid"
-        }
-    end
-    ]]
+
     args.server_name = _domain_name
     args = _norm_schema(args)
 
@@ -99,9 +75,9 @@ function Action:createAction(args)
 
     local user_id
     local _config = self:getInstanceConfig()
-    local _res = _authorize_whitelist(_config, args)
-    _print("_authorize_whitelist:" .. inspect(_res))
-    if _res then
+    local _is_authorized = _authorize_whitelist(_config, args)
+
+    if _is_authorized then
         user_id = args.user_id
     else
         local _session = _opensession(instance, args)
@@ -115,8 +91,6 @@ function Action:createAction(args)
         end
     end
 
-    _print("user_id:" .. user_id)
-    _print("args:" .. inspect(args))
     args.entrypoints = json.empty_array
 
     args.security = {
@@ -127,7 +101,6 @@ function Action:createAction(args)
     local model = Model:new(instance)
     local _detail, _err_msg = model:create(args)
 
-    _print("detail:" .. inspect(_detail))
     local _result
     if _detail then
         _result = {
@@ -145,7 +118,6 @@ function Action:createAction(args)
 end
 
 function Action:getAction(args)
-    _print(inspect(args))
     if not args.id then
         return {
             result = false,
@@ -156,9 +128,8 @@ function Action:getAction(args)
     local instance = self:getInstance()
     local user_id
     local _config = self:getInstanceConfig()
-    local _res = _authorize_whitelist(_config, args)
-    _print("_authorize_whitelist:" .. inspect(_res))
-    if _res then
+    local _is_authorized = _authorize_whitelist(_config, args)
+    if _is_authorized then
         user_id = args.user_id
     else
         local _session = _opensession(instance, args)
@@ -172,7 +143,6 @@ function Action:getAction(args)
         end
     end
 
-    _print("user_id:" .. user_id)
     local model = Model:new(instance)
 
     local _v, _err_msg = model:get(args)
@@ -196,18 +166,18 @@ function Action:getAction(args)
 end
 
 function Action:adminupdateAction(args)
-    _print(inspect(args))
+    -- _print(inspect(args))
     args.action = nil
     local instance = self:getInstance()
     local model = Model:new(instance)
     local _ok, _err = model:update(args)
-    _print(
-        {
-            ok = _ok,
-            err = _err
-        },
-        true
-    )
+    -- _print(
+    --     {
+    --         ok = _ok,
+    --         err = _err
+    --     },
+    --     true
+    -- )
     if _ok then
         local jobs = instance:getJobs()
         local job
@@ -234,7 +204,7 @@ function Action:adminupdateAction(args)
 end
 
 function Action:calljobAction(args)
-    _print(inspect(args))
+    -- _print(inspect(args))
     args.action = nil
     local job_method = args.job
     args.job = nil
@@ -253,7 +223,7 @@ function Action:calljobAction(args)
 end
 
 function Action:updateAction(args)
-    _print(inspect(args))
+    -- _print(inspect(args))
     if not args.id then
         return {
             result = false,
@@ -263,10 +233,10 @@ function Action:updateAction(args)
     args.action = nil
     local instance = self:getInstance()
     local _config = self:getInstanceConfig()
-    local _res = _authorize_whitelist(_config, args)
-    _print("_authorize_whitelist:" .. inspect(_res))
+    local _is_authorized = _authorize_whitelist(_config, args)
+    -- _print("_authorize_whitelist:" .. inspect(_res))
     local user_id
-    if _res then
+    if _is_authorized then
         user_id = args.user_id
     else
         local _session = _opensession(instance, args)
@@ -282,7 +252,7 @@ function Action:updateAction(args)
 
     local model = Model:new(instance)
     local _detail, _err_msg = model:update(args)
-    _print(inspect(_detail))
+    -- _print(inspect(_detail))
 
     local _result = {result = true}
     if not _detail then
@@ -317,13 +287,13 @@ function Action:updateAction(args)
         _ok, _err = jobs:add(job)
     end
 
-    _print({ok = _ok, err = _err}, true)
+    -- _print({ok = _ok, err = _err}, true)
     instance:getRedis():setKeepAlive()
     return _result
 end
 
 function Action:updatemultiAction(args)
-    _print(inspect(args))
+    -- _print(inspect(args))
     local _ids
 
     if not args.ids then
@@ -346,10 +316,10 @@ function Action:updatemultiAction(args)
     args.ids = nil
     local instance = self:getInstance()
     local _config = self:getInstanceConfig()
-    local _res = _authorize_whitelist(_config, args)
-    _print("_authorize_whitelist:" .. inspect(_res))
+    local _is_authorized = _authorize_whitelist(_config, args)
+    -- _print("_authorize_whitelist:" .. inspect(_res))
     local user_id
-    if _res then
+    if _is_authorized then
         user_id = args.user_id
     else
         local _session = _opensession(instance, args)
@@ -402,7 +372,7 @@ function Action:updatemultiAction(args)
         _ok, _err = jobs:add(job)
     end
 
-    _print({ok = _ok, err = _err}, true)
+    -- _print({ok = _ok, err = _err}, true)
     instance:getRedis():setKeepAlive()
     return {result = true}
 end
@@ -418,9 +388,9 @@ function Action:deleteAction(args)
     local user_id
     local instance = self:getInstance()
     local _config = self:getInstanceConfig()
-    local _res = _authorize_whitelist(_config, args)
-    _print("_authorize_whitelist:" .. inspect(_res))
-    if _res then
+    local _is_authorized = _authorize_whitelist(_config, args)
+    -- _print("_authorize_whitelist:" .. inspect(_res))
+    if _is_authorized then
         user_id = args.user_id
     else
         local _session = _opensession(instance, args)
@@ -445,7 +415,7 @@ function Action:deleteAction(args)
     }
     local _ok, _err = jobs:add(job)
 
-    ngx.log(ngx.ERR, inspect({_ok, _err}))
+    -- ngx.log(ngx.ERR, inspect({_ok, _err}))
     instance:getRedis():setKeepAlive()
     return {
         result = true
@@ -453,14 +423,14 @@ function Action:deleteAction(args)
 end
 
 function Action:listAction(args)
-    _print(inspect(args))
+    -- _print(inspect(args))
     args.action = nil
     local instance = self:getInstance()
     local _config = self:getInstanceConfig()
-    local _res = _authorize_whitelist(_config, args)
-    _print("_authorize_whitelist:" .. inspect(_res))
+    local _is_authorized = _authorize_whitelist(_config, args)
+    -- _print("_authorize_whitelist:" .. inspect(_res))
     local user_id
-    if _res then
+    if _is_authorized then
         user_id = args.user_id
     else
         local _session = _opensession(instance, args)
@@ -474,7 +444,7 @@ function Action:listAction(args)
         end
     end
 
-    _print("user_id:" .. user_id)
+    -- _print("user_id:" .. user_id)
     local model = Model:new(instance)
     local _detail = model:list(args)
     local _ret = {}
@@ -507,7 +477,7 @@ _opensession = function(instance, args)
         return nil
     end
 
-    _print("sid:" .. sid)
+    -- _print("sid:" .. sid)
     local session = Session:new(instance:getRedis())
     if not session:start(sid) then
         -- cc.throw("session is expired, or invalid session id")

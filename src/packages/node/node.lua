@@ -61,7 +61,7 @@ function Node:update(args)
 end
 function Node:delete(args)
     args.action = nil
-    _print(inspect(args))
+    -- _print(inspect(args))
     local user_id = args.user_id
     if not user_id then
         return
@@ -80,14 +80,14 @@ function Node:list(args)
     return _res
 end
 function Node:get(args)
-    _print(args, true)
+    -- _print(args, true)
     -- args.action = nil
     local user_id = args.user_id
     if not user_id then
         return
     end
     local _detail = self._model:_get_key(user_id .. ":" .. model_type, args.id)
-    _print(_detail, true)
+    -- _print(_detail, true)
     return _detail
 end
 
