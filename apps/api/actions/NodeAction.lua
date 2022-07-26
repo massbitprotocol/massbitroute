@@ -24,6 +24,7 @@ local ERROR = {
 local Model = cc.import("#" .. mytype)
 
 -- local _get_geo = util.get_geo
+local _authorize_whitelist = util.authorize_whitelist
 local _server_name = env.DOMAIN or "massbitroute.com"
 local function _norm_json(_v, _field)
     if _v[_field] and type(_v[_field]) == "string" then
@@ -40,31 +41,31 @@ local function _norm(_v)
     return _v
 end
 
-local function _authorize_whitelist(self, args)
-    local _config = self:getInstanceConfig()
-    local _appconf = _config.app
-    local whitelist_sid = _appconf.whitelist_sid
-    -- _print("whitelist_sid:" .. inspect(whitelist_sid))
-    local sid = ngx.var.cookie__slc_web_sid or args.sid
-    local _info = whitelist_sid and whitelist_sid[sid]
-    -- _print("sid:" .. sid)
-    -- _print("_info:" .. inspect(_info))
-    if sid and _info then
-        local _partner_id = args.partner_id
-        local _user_id = args.user_id
+-- local function _authorize_whitelist(self, args)
+--     local _config = self:getInstanceConfig()
+--     local _appconf = _config.app
+--     local whitelist_sid = _appconf.whitelist_sid
+--     -- _print("whitelist_sid:" .. inspect(whitelist_sid))
+--     local sid = ngx.var.cookie__slc_web_sid or args.sid
+--     local _info = whitelist_sid and whitelist_sid[sid]
+--     -- _print("sid:" .. sid)
+--     -- _print("_info:" .. inspect(_info))
+--     if sid and _info then
+--         local _partner_id = args.partner_id
+--         local _user_id = args.user_id
 
-        local _info_partner_id = _info.partner_id
-        if not _user_id or not _partner_id or not _info_partner_id or _partner_id ~= _info_partner_id then
-            return {
-                result = false,
-                err_msg = "Arguments not valid"
-            }
-        end
-        args.partner_id = nil
-        return true
-    end
-    return false
-end
+--         local _info_partner_id = _info.partner_id
+--         if not _user_id or not _partner_id or not _info_partner_id or _partner_id ~= _info_partner_id then
+--             return {
+--                 result = false,
+--                 err_msg = "Arguments not valid"
+--             }
+--         end
+--         args.partner_id = nil
+--         return true
+--     end
+--     return false
+-- end
 -- local function _get_geo(ip)
 --     local _api_url = "http://api.ipapi.com/api/" .. ip .. "?access_key=" .. _ipapi_token
 --     -- ngx.log(ngx.ERR, inspect(_api_url))
@@ -186,7 +187,7 @@ end
 --- Register node
 
 function Action:registerAction(args)
-    _print(inspect(args))
+    -- _print(inspect(args))
     args.action = nil
     local _token = args.token
     if not _token then
@@ -213,11 +214,11 @@ function Action:registerAction(args)
     ]]
     local ip = args.geo and args.geo.ip or ngx.var.realip
 
-    _print("ip:" .. ip)
+    -- _print("ip:" .. ip)
 
     local data_url = args.data_url
 
-    _print("data_url:" .. data_url)
+    -- _print("data_url:" .. data_url)
     if not data_url then
         data_url = "http://127.0.0.1:8545"
     end
@@ -232,10 +233,10 @@ function Action:registerAction(args)
         status = 0,
         data_url = data_url
     }
-    _print(_data, true)
+    -- _print(_data, true)
     --local _geo = _get_geo(ip, _config)
 
-    _print("geo:" .. inspect(args.geo))
+    -- _print("geo:" .. inspect(args.geo))
 
     if args.geo then
         _data.geo = args.geo
@@ -254,15 +255,15 @@ function Action:registerAction(args)
         }
     }
     local _ok, _err = jobs:add(job)
-    _print({ok = _ok, err = _err}, true)
+    -- _print({ok = _ok, err = _err}, true)
 
     return {result = true}
 end
 
 function Action:nodeverifyAction(args)
-    _print(inspect(args))
+    -- _print(inspect(args))
     -- local _config = self:getInstanceConfig()
-    _print(args, true)
+    -- _print(args, true)
     local _ip = args.ip
     local _id = args.id
     local _user_id = args.user_id
@@ -286,8 +287,8 @@ function Action:nodeverifyAction(args)
         }
     )
 
-    _print(_res, true)
-    _print(_err, true)
+    -- _print(_res, true)
+    -- _print(_err, true)
     local _ret = {result = false}
     if _res and _res.status == 200 then
         local instance = self:getInstance()
@@ -312,7 +313,7 @@ function Action:nodeverifyAction(args)
 end
 
 function Action:unregisterAction(args)
-    _print(inspect(args))
+    -- _print(inspect(args))
     args.action = nil
     local _token = args.token
     if not _token then
@@ -353,18 +354,19 @@ function Action:unregisterAction(args)
         }
     }
     local _ok, _err = jobs:add(job)
-    _print({ok = _ok, err = _err}, true)
+    -- _print({ok = _ok, err = _err}, true)
     return {result = true}
 end
 
 function Action:createAction(args)
-    _print(inspect(args))
+    -- _print(inspect(args))
     args.action = nil
     -- args.id = nil
 
     local instance = self:getInstance()
-    local _res = _authorize_whitelist(self, args)
-    _print("_authorize_whitelist:" .. inspect(_res))
+    local _config = self:getInstanceConfig()
+    local _res = _authorize_whitelist(_config, args)
+    -- _print("_authorize_whitelist:" .. inspect(_res))
     local user_id
     if _res then
         user_id = args.user_id
@@ -380,7 +382,7 @@ function Action:createAction(args)
         end
     end
 
-    _print("user_id:" .. user_id)
+    -- _print("user_id:" .. user_id)
     local model = Model:new(instance)
 
     local _detail, _err_msg = model:create(args)
@@ -399,7 +401,7 @@ function Action:createAction(args)
 end
 
 function Action:getAction(args)
-    _print(inspect(args))
+    -- _print(inspect(args))
     if not args.id then
         return {
             result = false,
@@ -408,8 +410,9 @@ function Action:getAction(args)
     end
     args.action = nil
     local instance = self:getInstance()
-    local _res = _authorize_whitelist(self, args)
-    _print("_authorize_whitelist:" .. inspect(_res))
+    local _config = self:getInstanceConfig()
+    local _res = _authorize_whitelist(_config, args)
+    -- _print("_authorize_whitelist:" .. inspect(_res))
     local user_id
     if _res then
         user_id = args.user_id
@@ -425,7 +428,7 @@ function Action:getAction(args)
         end
     end
 
-    _print("user_id:" .. user_id)
+    -- _print("user_id:" .. user_id)
     local model = Model:new(instance)
 
     local _v, _err_msg = model:get(args)
@@ -457,7 +460,7 @@ end
 --     }
 -- end
 function Action:adminupdateAction(args)
-    _print(inspect(args))
+    -- _print(inspect(args))
     args.action = nil
     local instance = self:getInstance()
     local model = Model:new(instance)
@@ -466,7 +469,7 @@ function Action:adminupdateAction(args)
         ok = _ok,
         err = _err
     }
-    _print("result:" .. inspect(result))
+    -- _print("result:" .. inspect(result))
     if _ok then
         local jobs = instance:getJobs()
         local job
@@ -531,7 +534,7 @@ end
 -- end
 
 function Action:calljobAction(args)
-    _print(inspect(args))
+    -- _print(inspect(args))
     args.action = nil
     local job_method = args.job
     args.job = nil
@@ -549,7 +552,7 @@ function Action:calljobAction(args)
     }
 end
 function Action:deleteAction(args)
-    _print(inspect(args))
+    -- _print(inspect(args))
     if not args.id then
         return {
             result = false,
@@ -559,8 +562,9 @@ function Action:deleteAction(args)
     args.action = nil
     local instance = self:getInstance()
     local user_id
-    local _res = _authorize_whitelist(self, args)
-    _print("_authorize_whitelist:" .. inspect(_res))
+    local _config = self:getInstanceConfig()
+    local _res = _authorize_whitelist(_config, args)
+    -- _print("_authorize_whitelist:" .. inspect(_res))
     if _res then
         user_id = args.user_id
     else
@@ -586,7 +590,7 @@ function Action:deleteAction(args)
         }
     }
     local _ok, _err = jobs:add(job)
-    _print({ok = _ok, err = _err}, true)
+    -- _print({ok = _ok, err = _err}, true)
     instance:getRedis():setKeepAlive()
     return {
         result = true
@@ -594,7 +598,7 @@ function Action:deleteAction(args)
 end
 
 function Action:updateAction(args)
-    _print(inspect(args))
+    -- _print(inspect(args))
     if not args.id then
         return {
             result = false,
@@ -604,9 +608,10 @@ function Action:updateAction(args)
     args.action = nil
     local instance = self:getInstance()
     local user_id
-    local _res = _authorize_whitelist(self, args)
+    local _config = self:getInstanceConfig()
+    local _res = _authorize_whitelist(_config, args)
 
-    _print("_authorize_whitelist:" .. inspect(_res))
+    -- _print("_authorize_whitelist:" .. inspect(_res))
     if _res then
         user_id = args.user_id
     else
@@ -652,18 +657,19 @@ function Action:updateAction(args)
             err_msg = _err_msg
         }
     end
-    _print("_result:" .. inspect(_result))
+    -- _print("_result:" .. inspect(_result))
     instance:getRedis():setKeepAlive()
     return _result
 end
 
 function Action:listAction(args)
-    _print(inspect(args))
+    -- _print(inspect(args))
     args.action = nil
     local instance = self:getInstance()
     local user_id
-    local _res = _authorize_whitelist(self, args)
-    _print("_authorize_whitelist:" .. inspect(_res))
+    local _config = self:getInstanceConfig()
+    local _res = _authorize_whitelist(_config, args)
+    -- _print("_authorize_whitelist:" .. inspect(_res))
     if _res then
         user_id = args.user_id
     else

@@ -42,3 +42,4 @@ scripts/single-node-test/.env
 /apps/tests/
 /public/
 t/servroot/
+/.cpan/

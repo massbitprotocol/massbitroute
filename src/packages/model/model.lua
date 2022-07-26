@@ -21,8 +21,8 @@ function Model:_getall_key(key)
 end
 
 function Model:_get_key(key, opt)
-    _print("get_key:" .. key)
-    _print(opt, true)
+    -- _print("get_key:" .. key)
+    -- _print(opt, true)
     local _redis = self._redis
     local _ret = _redis:hget(key, opt)
     if not _ret or _ret == _redis.null then
@@ -31,8 +31,8 @@ function Model:_get_key(key, opt)
     return _ret
 end
 function Model:_del_key(key, opt)
-    _print("del_key:" .. key)
-    _print(opt, true)
+    -- _print("del_key:" .. key)
+    -- _print(opt, true)
 
     local _redis = self._redis
     local _ret = _redis:hdel(key, opt)
@@ -43,8 +43,8 @@ function Model:_del_key(key, opt)
 end
 
 function Model:_save_key(key, args)
-    _print("save_key:" .. key)
-    _print(args, true)
+    -- _print("save_key:" .. key)
+    -- _print(args, true)
     -- util.print("key:" .. key)
     -- util.print("opt:" .. inspect(args))
     local _redis = self._redis
@@ -66,15 +66,15 @@ function Model:_save_key(key, args)
 
     -- local _res, _err = _redis:hmset(key, "test", "ok", "test1", "ok1")
     local _res, _err = _redis:hmset(key, table.unpack(_data))
-    _print({res = _res, err = _err}, true)
+    -- _print({res = _res, err = _err}, true)
     -- _redis:commitPipeline()
     -- _print("res:" .. inspect(_res))
     -- _print("err:" .. inspect(_err))
 end
 
 function Model:save(model_type, args)
-    _print("save:" .. model_type)
-    _print(args, true)
+    -- _print("save:" .. model_type)
+    -- _print(args, true)
     local _now = ngx and ngx.time() or os.time()
     args.updated_at = _now
     self:_save_key(model_type .. ":" .. args.id, args)

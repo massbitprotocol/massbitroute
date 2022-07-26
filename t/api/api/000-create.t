@@ -75,9 +75,9 @@ our $config = <<'_EOC_';
     root /massbit/massbitroute/app/src/sites/services/api/sites/../public/admin;
 
 location /_internal_api/v2 {
-    access_log /massbit/massbitroute/app/src/sites/services/api/logs/internal_api_v2-access.log;
-    error_log /massbit/massbitroute/app/src/sites/services/api/logs/internal_api_v2-error.log;
 
+#    access_log /massbit/massbitroute/app/src/sites/services/api/logs/internal_api_v2-access.log;
+#    error_log /massbit/massbitroute/app/src/sites/services/api/logs/internal_api_v2-error.log;
     include /massbit/massbitroute/app/src/sites/services/api/sites/../cors.conf;
     set $app_root /massbit/massbitroute/app/src/sites/services/api/apps/api;
     default_type application/json;
