@@ -738,7 +738,10 @@ local function _remove_item(instance, args)
     local _item = _norm(model:get(args))
     -- _print(inspect(_item))
     if args._is_delete then
-        model:delete({id = args.id, user_id = args.user_id})
+        local _ret = model:delete({id = args.id, user_id = args.user_id})
+        if not _ret then
+            return false
+        end
     -- else
     --     model:update({id = args.id, user_id = args.user_id, status = 0})
     end
@@ -887,7 +890,7 @@ function JobsAction:generateconfAction(job)
     local job_data = job.data or {}
     job_data._domain_name = _domain_name
     _print("job_data: " .. inspect(job_data))
-    _generate_item(instance, job_data)
+    return _generate_item(instance, job_data)
     -- _update_gdnsd(job_data)
 end
 
@@ -905,7 +908,7 @@ function JobsAction:removeconfAction(job)
     -- local _config = self:getInstanceConfig()
     local job_data = job.data or {}
     job_data._domain_name = _domain_name
-    _remove_item(instance, job_data)
+    return _remove_item(instance, job_data)
     -- _update_gdnsd(job_data)
 end
 

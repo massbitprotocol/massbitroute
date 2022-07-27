@@ -483,7 +483,10 @@ local function _remove_item(instance, args)
     local _item = _norm(model:get(args))
     -- _print("stored_item:" .. inspect(_item))
     if args._is_delete then
-        model:delete({id = args.id, user_id = args.user_id})
+        local _ret = model:delete({id = args.id, user_id = args.user_id})
+        if not _ret then
+            return false
+        end
     end
 
     if
@@ -604,7 +607,7 @@ function JobsAction:generateconfAction(job)
     local instance = self:getInstance()
     local job_data = job.data
     job_data._domain_name = _domain_name
-    _generate_item(instance, job_data)
+    return _generate_item(instance, job_data)
 end
 
 --- Job handler for remove conf
@@ -614,7 +617,7 @@ function JobsAction:removeconfAction(job)
 
     local instance = self:getInstance()
     local job_data = job.data
-    _remove_item(instance, job_data)
+    return _remove_item(instance, job_data)
 end
 
 return JobsAction

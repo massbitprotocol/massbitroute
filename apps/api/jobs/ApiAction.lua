@@ -424,25 +424,25 @@ local function _generate_item(instance, args)
     return true
 end
 
-local function _generate_multi_item(instance, args)
-    local _ids = args.ids
-    args.ids = nil
-    if _ids then
-        for _, _id in ipairs(_ids) do
-            _generate_item(instance, table.merge({id = _id}, args))
-        end
-    end
-end
+-- local function _generate_multi_item(instance, args)
+--     local _ids = args.ids
+--     args.ids = nil
+--     if _ids then
+--         for _, _id in ipairs(_ids) do
+--             _generate_item(instance, table.merge({id = _id}, args))
+--         end
+--     end
+-- end
 
-local function _remove_multi_item(instance, args)
-    local _ids = args.ids
-    args.ids = nil
-    if _ids then
-        for _, _id in ipairs(_ids) do
-            _remove_item(instance, table.merge({id = _id}, args))
-        end
-    end
-end
+-- local function _remove_multi_item(instance, args)
+--     local _ids = args.ids
+--     args.ids = nil
+--     if _ids then
+--         for _, _id in ipairs(_ids) do
+--             _remove_item(instance, table.merge({id = _id}, args))
+--         end
+--     end
+-- end
 
 --- Job handler for generate conf
 --
@@ -453,7 +453,7 @@ function JobsAction:generateconfAction(job)
     local job_data = job.data
 
     job_data._domain_name = _domain_name
-    _generate_item(instance, job_data)
+    return _generate_item(instance, job_data)
 end
 
 --- Job handler for remove conf
@@ -463,23 +463,23 @@ function JobsAction:removeconfAction(job)
 
     local instance = self:getInstance()
     local job_data = job.data
-    _remove_item(instance, job_data)
+    return _remove_item(instance, job_data)
 end
 
-function JobsAction:removemulticonfAction(job)
-    print(inspect(job))
+-- function JobsAction:removemulticonfAction(job)
+--     print(inspect(job))
 
-    local instance = self:getInstance()
-    local job_data = job.data
-    _remove_multi_item(instance, job_data)
-end
+--     local instance = self:getInstance()
+--     local job_data = job.data
+--     _remove_multi_item(instance, job_data)
+-- end
 
-function JobsAction:generatemulticonfAction(job)
-    print(inspect(job))
+-- function JobsAction:generatemulticonfAction(job)
+--     print(inspect(job))
 
-    local instance = self:getInstance()
-    local job_data = job.data
-    _generate_multi_item(instance, job_data)
-end
+--     local instance = self:getInstance()
+--     local job_data = job.data
+--     _generate_multi_item(instance, job_data)
+-- end
 
 return JobsAction
