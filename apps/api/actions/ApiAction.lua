@@ -4,43 +4,49 @@ local gbc = cc.import("#gbc")
 local mytype = "api"
 local Session = cc.import("#session")
 
+local ngx_log = ngx.log
+
 local json = cc.import("#json")
-local util = require "mbutil" -- cc.import("#mbrutil")
+local util = require "mbutil"
 local env = require("env")
--- local cjson = require "cjson"
+
 local Action = cc.class(mytype .. "Action", gbc.ActionBase)
 
 local inspect = require "inspect"
 local _opensession
-local _print = util.print
--- local mkdirp = require "mkdirp"
+-- local _print = util.print
+
 local ERROR = {
     NOT_LOGIN = 100
 }
 local Model = cc.import("#" .. mytype)
 
--- local v = require "validation"
 local _domain_name = env.DOMAIN or "massbitroute.com"
 local _authorize_whitelist = util.authorize_whitelist
--- local schema_create =
---     v.is_table {
---     action = v.optional(v.is_string()),
---     allow_methods = v.optional(v.is_table()),
---     app_id = v.optional(v.is_string()),
---     app_key = v.optional(v.is_string()),
---     blockchain = v.in_list {"avax", "bsc", "dot", "eth", "ftm", "hmny", "matic", "near", "sol"},
---     id = v.optional(v.is_string()),
---     limit_rate_per_day = v.optional(v.is_integer()),
---     limit_rate_per_sec = v.optional(v.is_integer()),
---     partner_id = v.optional(v.is_string()),
---     project_id = v.optional(v.is_string()),
---     project_quota = v.optional(v.is_string()),
---     sid = v.optional(v.is_string()),
---     status = v.is_number(),
---     user_id = v.optional(v.is_string()),
---     name = v.is_string(),
---     network = v.is_string()
--- }
+
+local function _run_job(instance, args, option)
+    local jobs = instance:getJobs()
+    if not option then
+        option = {_is_delete = false}
+    end
+    table.merge(
+        option,
+        {
+            id = args.id,
+            user_id = args.user_id
+        }
+    )
+    local job = {
+        action = tonumber(args.status) == 0 and "/jobs/" .. mytype .. ".removeconf" or
+            "/jobs/" .. mytype .. ".generateconf",
+        delay = 0,
+        data = option
+    }
+    ngx_log(ngx.ERR, "[job add]:" .. inspect(job))
+    local _res = jobs:add(job)
+    ngx_log(ngx.ERR, "[job response]:" .. inspect(_res))
+    return _res
+end
 
 local function _norm_schema(args)
     for _, _v in ipairs({"name", "blockchain", "network"}) do
@@ -66,6 +72,7 @@ local function _norm(_v)
 end
 
 function Action:createAction(args)
+    ngx_log(ngx.ERR, "[request]:" .. inspect(args))
     args.action = nil
 
     args.server_name = _domain_name
@@ -99,21 +106,20 @@ function Action:createAction(args)
         limit_rate_per_day = 0
     }
     local model = Model:new(instance)
-    local _detail, _err_msg = model:create(args)
+    local _detail = model:create(args)
 
-    local _result
+    local _result = {
+        result = false
+    }
     if _detail then
+        _run_job(instance, args)
         _result = {
             result = true,
             data = _detail
         }
-    else
-        _result = {
-            result = false,
-            err_msg = _err_msg
-        }
     end
     instance:getRedis():setKeepAlive()
+    ngx_log(ngx.ERR, "[response]:" .. inspect(_result))
     return _result
 end
 
@@ -145,9 +151,9 @@ function Action:getAction(args)
 
     local model = Model:new(instance)
 
-    local _v, _err_msg = model:get(args)
+    local _v = model:get(args)
 
-    local _result
+    local _result = {result = false}
     if _v then
         _v = _norm(_v)
 
@@ -155,47 +161,19 @@ function Action:getAction(args)
             result = true,
             data = _v
         }
-    else
-        _result = {
-            result = false,
-            err_msg = _err_msg
-        }
     end
     instance:getRedis():setKeepAlive()
     return _result
 end
 
 function Action:adminupdateAction(args)
-    -- _print(inspect(args))
     args.action = nil
     local instance = self:getInstance()
     local model = Model:new(instance)
     local _ok, _err = model:update(args)
-    -- _print(
-    --     {
-    --         ok = _ok,
-    --         err = _err
-    --     },
-    --     true
-    -- )
+
     if _ok then
-        local jobs = instance:getJobs()
-        local job
-        if tonumber(args.status) == 0 then
-            args._is_delete = false
-            job = {
-                action = "/jobs/" .. mytype .. ".removeconf",
-                delay = 0,
-                data = args
-            }
-        else
-            job = {
-                action = "/jobs/" .. mytype .. ".generateconf",
-                delay = 0,
-                data = args
-            }
-        end
-        jobs:add(job)
+        _run_job(instance, args)
     end
     return {
         ok = _ok,
@@ -222,7 +200,6 @@ function Action:calljobAction(args)
 end
 
 function Action:updateAction(args)
-    -- _print(inspect(args))
     if not args.id then
         return {
             result = false,
@@ -233,7 +210,7 @@ function Action:updateAction(args)
     local instance = self:getInstance()
     local _config = self:getInstanceConfig()
     local _is_authorized = _authorize_whitelist(_config, args)
-    -- _print("_authorize_whitelist:" .. inspect(_res))
+
     local user_id
     if _is_authorized then
         user_id = args.user_id
@@ -250,131 +227,88 @@ function Action:updateAction(args)
     end
 
     local model = Model:new(instance)
-    local _detail, _err_msg = model:update(args)
-    -- _print(inspect(_detail))
+    local _detail = model:update(args)
 
-    local _result = {result = true}
-    if not _detail then
+    local _result = {
+        result = false
+    }
+
+    if _detail then
+        _run_job(instance, args)
         _result = {
-            result = false,
-            err_msg = _err_msg
+            result = true,
+            data = _detail
         }
-    end
-    local _ok, _err
-    if tonumber(args.status) == 0 then
-        local jobs = instance:getJobs()
-        local job = {
-            action = "/jobs/" .. mytype .. ".removeconf",
-            delay = 0,
-            data = {
-                _is_delete = false,
-                id = args.id,
-                user_id = user_id
-            }
-        }
-        _ok, _err = jobs:add(job)
-    else
-        local jobs = instance:getJobs()
-        local job = {
-            action = "/jobs/" .. mytype .. ".generateconf",
-            delay = 0,
-            data = {
-                id = args.id,
-                user_id = user_id
-            }
-        }
-        _ok, _err = jobs:add(job)
     end
 
-    -- _print({ok = _ok, err = _err}, true)
     instance:getRedis():setKeepAlive()
     return _result
 end
 
-function Action:updatemultiAction(args)
-    -- _print(inspect(args))
-    local _ids
+-- function Action:updatemultiAction(args)
+--     -- _print(inspect(args))
+--     local _ids
 
-    if not args.ids then
-        return {
-            result = false,
-            err_msg = "params 'ids' missing"
-        }
-    else
-        _ids = json.decode(args.ids)
-    end
-    if not _ids then
-        return {
-            result = false,
-            err_msg = "params 'ids' invalid"
-        }
-    end
+--     if not args.ids then
+--         return {
+--             result = false,
+--             err_msg = "params 'ids' missing"
+--         }
+--     else
+--         _ids = json.decode(args.ids)
+--     end
+--     if not _ids then
+--         return {
+--             result = false,
+--             err_msg = "params 'ids' invalid"
+--         }
+--     end
 
-    args.action = nil
-    args.id = nil
-    args.ids = nil
-    local instance = self:getInstance()
-    local _config = self:getInstanceConfig()
-    local _is_authorized = _authorize_whitelist(_config, args)
-    -- _print("_authorize_whitelist:" .. inspect(_res))
-    local user_id
-    if _is_authorized then
-        user_id = args.user_id
-    else
-        local _session = _opensession(instance, args)
+--     args.action = nil
+--     args.id = nil
+--     args.ids = nil
+--     local instance = self:getInstance()
+--     local _config = self:getInstanceConfig()
+--     local _is_authorized = _authorize_whitelist(_config, args)
+--     -- _print("_authorize_whitelist:" .. inspect(_res))
+--     local user_id
+--     if _is_authorized then
+--         user_id = args.user_id
+--     else
+--         local _session = _opensession(instance, args)
 
-        if not _session then
-            return {result = false, err_code = ERROR.NOT_LOGIN}
-        end
-        user_id = _session:get("id")
-        if user_id then
-            args.user_id = user_id
-        end
-    end
+--         if not _session then
+--             return {result = false, err_code = ERROR.NOT_LOGIN}
+--         end
+--         user_id = _session:get("id")
+--         if user_id then
+--             args.user_id = user_id
+--         end
+--     end
 
-    local model = Model:new(instance)
-    for _, _id in ipairs(_ids) do
-        local _arg = table.merge({id = _id}, args)
-        model:update(_arg)
-    end
+--     local model = Model:new(instance)
+--     for _, _id in ipairs(_ids) do
+--         local _arg = {id = _id}
+--         table.merge(_arg, args)
+--         model:update(_arg)
+--     end
 
-    -- local _result = {result = true}
-    -- if not _detail then
-    --     _result = {
-    --         result = false,
-    --         err_msg = _err_msg
-    --     }
-    -- end
-    local _ok, _err
-    if tonumber(args.status) == 0 then
-        local jobs = instance:getJobs()
-        local job = {
-            action = "/jobs/" .. mytype .. ".removemulticonf",
-            delay = 0,
-            data = {
-                _is_delete = false,
-                ids = _ids,
-                user_id = user_id
-            }
-        }
-        _ok, _err = jobs:add(job)
-    else
-        local jobs = instance:getJobs()
-        local job = {
-            action = "/jobs/" .. mytype .. ".generatemulticonf",
-            delay = 0,
-            data = {
-                ids = _ids,
-                user_id = user_id
-            }
-        }
-        _ok, _err = jobs:add(job)
-    end
+--     local jobs = instance:getJobs()
+--     local job = {
+--         action = tonumber(args.status) == 0 and "/jobs/" .. mytype .. ".removemulticonf" or
+--             "/jobs/" .. mytype .. ".generatemulticonf",
+--         delay = 0,
+--         data = {
+--             ids = _ids,
+--             user_id = user_id
+--         }
+--     }
+--     local _ok, _err = jobs:add(job)
 
-    -- _print({ok = _ok, err = _err}, true)
-    instance:getRedis():setKeepAlive()
-    return {result = true}
-end
+--     -- _print({ok = _ok, err = _err}, true)
+--     instance:getRedis():setKeepAlive()
+--     return {result = true}
+-- end
 
 function Action:deleteAction(args)
     if not args.id then
@@ -388,7 +322,7 @@ function Action:deleteAction(args)
     local instance = self:getInstance()
     local _config = self:getInstanceConfig()
     local _is_authorized = _authorize_whitelist(_config, args)
-    -- _print("_authorize_whitelist:" .. inspect(_res))
+
     if _is_authorized then
         user_id = args.user_id
     else
@@ -402,19 +336,9 @@ function Action:deleteAction(args)
             args.user_id = user_id
         end
     end
-    local jobs = instance:getJobs()
-    local job = {
-        action = "/jobs/" .. mytype .. ".removeconf",
-        delay = 0,
-        data = {
-            _is_delete = true,
-            id = args.id,
-            user_id = user_id
-        }
-    }
-    local _ok, _err = jobs:add(job)
+    args.status = 0
+    _run_job(instance, args, {_is_delete = true})
 
-    -- ngx.log(ngx.ERR, inspect({_ok, _err}))
     instance:getRedis():setKeepAlive()
     return {
         result = true
@@ -422,12 +346,11 @@ function Action:deleteAction(args)
 end
 
 function Action:listAction(args)
-    -- _print(inspect(args))
     args.action = nil
     local instance = self:getInstance()
     local _config = self:getInstanceConfig()
     local _is_authorized = _authorize_whitelist(_config, args)
-    -- _print("_authorize_whitelist:" .. inspect(_res))
+
     local user_id
     if _is_authorized then
         user_id = args.user_id
@@ -443,7 +366,6 @@ function Action:listAction(args)
         end
     end
 
-    -- _print("user_id:" .. user_id)
     local model = Model:new(instance)
     local _detail = model:list(args)
     local _ret = {}
@@ -469,14 +391,11 @@ end
 
 _opensession = function(instance, args)
     local sid = ngx.var.cookie__slc_web_sid or args.sid
-    -- local sid = args.sid
-    -- sid = sid or ngx.var.cookie__slc_web_sid
     if not sid then
         -- cc.throw('not set argsument: "sid"')
         return nil
     end
 
-    -- _print("sid:" .. sid)
     local session = Session:new(instance:getRedis())
     if not session:start(sid) then
         -- cc.throw("session is expired, or invalid session id")

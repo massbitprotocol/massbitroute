@@ -5,10 +5,7 @@ local json = cc.import("#json")
 local model_type = "node"
 
 local Model = cc.import("#model")
-local util = require "mbutil" -- cc.import("#mbrutil")
-local inspect = require "inspect"
-local _print = util.print
--- local uuid = require "jit-uuid"
+local util = require "mbutil"
 
 function Node:ctor(instance)
     self._instance = instance
@@ -23,15 +20,14 @@ function Node:create(args)
         return
     end
     local _now = ngx and ngx.time() or os.time()
-    -- uuid.seed(_now)
 
     args.status = 0
-    -- args.id = uuid()
+
     args.id = args.id or util.get_uuid(_now)
     args.created_at = _now
-    self._model:_save_key(user_id .. ":" .. model_type, {[args.id] = json.encode(args)})
+    local _ret = self._model:_save_key(user_id .. ":" .. model_type, {[args.id] = json.encode(args)})
 
-    return args
+    return _ret and args or nil
 end
 
 function Node:update(args)
@@ -56,18 +52,18 @@ function Node:update(args)
     _detail.action = nil
     local _now = ngx and ngx.time() or os.time()
     _detail.updated_at = _now
-    self._model:_save_key(user_id .. ":" .. model_type, {[_detail.id] = json.encode(_detail)})
-    return _detail
+    local _ret = self._model:_save_key(user_id .. ":" .. model_type, {[_detail.id] = json.encode(_detail)})
+    return _ret and _detail or nil
 end
 function Node:delete(args)
     args.action = nil
-    -- _print(inspect(args))
+
     local user_id = args.user_id
     if not user_id then
         return
     end
-    self._model:_del_key(user_id .. ":" .. model_type, args.id)
-    return args
+    local _ret = self._model:_del_key(user_id .. ":" .. model_type, args.id)
+    return _ret ~= nil
 end
 
 function Node:list(args)
@@ -76,19 +72,17 @@ function Node:list(args)
     if not user_id then
         return
     end
-    local _res = self._model:_getall_key(user_id .. ":" .. model_type)
-    return _res
+    local _ret = self._model:_getall_key(user_id .. ":" .. model_type)
+    return _ret
 end
 function Node:get(args)
-    -- _print(args, true)
-    -- args.action = nil
     local user_id = args.user_id
     if not user_id then
         return
     end
-    local _detail = self._model:_get_key(user_id .. ":" .. model_type, args.id)
-    -- _print(_detail, true)
-    return _detail
+    local _ret = self._model:_get_key(user_id .. ":" .. model_type, args.id)
+
+    return _ret
 end
 
 return Node

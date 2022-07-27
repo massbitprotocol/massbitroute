@@ -256,7 +256,10 @@ local function _remove_item(instance, args)
     local _item = _norm(model:get(args))
     _print("_item:" .. inspect(_item))
     if args._is_delete then
-        model:delete({id = args.id, user_id = args.user_id})
+        local _ret = model:delete({id = args.id, user_id = args.user_id})
+        if not _ret then
+            return false
+        end
     end
 
     if not _item.id or not _item.blockchain or not _item.network then
