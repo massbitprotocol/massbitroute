@@ -127,7 +127,7 @@ end
 --
 local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
     _print("rescanconf_blockchain_network:" .. _blockchain .. ":" .. _network)
-    -- _print(inspect(_job_data))
+    _print(inspect(_job_data))
 
     local _datacenters = {}
     local _allnodes = {}
@@ -159,13 +159,14 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
                 local _user_dir = _country_dir .. "/" .. _user_id
                 for _, _id in ipairs(show_folder(_user_dir)) do
                     local _file = _user_dir .. "/" .. _id
-                    -- _print("file:" .. _file)
+                    _print("file:" .. _file)
                     local _item = read_file(_file)
                     if _item then
                         if type(_item) == "string" then
                             _item = json.decode(_item)
                         end
                     end
+                    _print(_item, true)
                     if _item then
                         _item._domain_name = _job_data._domain_name
 
@@ -235,14 +236,16 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
                                 _dc_global1[_geo_continent] = 1
                             end
                         end
+                        _print(_item, true)
                     end
                 end
             end
         end
     end
+    _print(_dc_country, true)
     if _dc_country and next(_dc_country) then
-        -- _print("dc_country:")
-        -- _print(_dc_country, true)
+        _print("dc_country:")
+        _print(_dc_country, true)
         -- _print("dc_continent:")
         -- _print(_dc_continent, true)
 
@@ -429,31 +432,8 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
         table.insert(_dapi_domains, "*." .. _blocknet_id .. " 10/10 DYNA	geoip!mbr-map-" .. _blocknet_id .. "\n")
 
         _write_file(_file_dapi, table.concat(_dapi_domains, "\n"))
-    -- _write_file(_file_dapi, "*." .. _blocknet_id .. " 10/10 DYNA	geoip!mbr-map-" .. _blocknet_id .. "\n")
     end
 
-    -- if _approved and #_approved > 0 then
-    --     local _tmpl = _get_tmpl(rules, {nodes = _approved, _domain_name = _job_data._domain_name})
-    --     local _str_stat = _tmpl("_gw_stat_v1")
-    --     mkdirp(stat_dir .. "/stat_gw")
-    --     local _file_stat = stat_dir .. "/stat_gw/" .. _blocknet_id .. ".yml"
-    --     _write_file(_file_stat, _str_stat)
-    -- endx
-
-    -- if _actives and #_actives > 0 then
-    --     -- _print(_actives, true)
-    --     local _tmpl = _get_tmpl(rules, {nodes = _actives, _domain_name = _job_data._domain_name})
-    --     local _str = _tmpl("_gw_zones")
-    --     -- _print(_str)
-    --     local _file = gwman_dir .. "/zones/" .. mytype .. "/" .. _blocknet_id .. ".zone"
-    --     -- _print(_file)
-    --     _write_file(_file, _str)
-
-    --     local _str_listid = _tmpl("_listids")
-    --     mkdirp(_info_dir .. "/" .. mytype)
-    --     local _file_listid = _info_dir .. "/" .. mytype .. "/listid-" .. _blocknet_id
-    --     _write_file(_file_listid, _str_listid)
-    -- end
     if _allnodes and next(_allnodes) then
         for _t, _v in pairs(_allnodes) do
             local _tmpl = _get_tmpl(rules, {nodes = _v, _domain_name = _job_data._domain_name})
@@ -481,7 +461,6 @@ local function _remove_item(instance, args)
     _print("remove_item:" .. inspect(args))
     local model = Model:new(instance)
     local _item = _norm(model:get(args))
-    -- _print("stored_item:" .. inspect(_item))
     if args._is_delete then
         local _ret = model:delete({id = args.id, user_id = args.user_id})
         if not _ret then
@@ -596,7 +575,9 @@ function JobsAction:rescanconfAction(job)
     -- local instance = self:getInstance()
     local job_data = job.data
     job_data._domain_name = _domain_name
-    _rescanconf(job_data)
+    local _ret = _rescanconf(job_data)
+    print("result:" .. inspect(_ret))
+    return true
 end
 
 --- Job handler for generate conf
@@ -607,7 +588,9 @@ function JobsAction:generateconfAction(job)
     local instance = self:getInstance()
     local job_data = job.data
     job_data._domain_name = _domain_name
-    return _generate_item(instance, job_data)
+    local _ret = _generate_item(instance, job_data)
+    print("result:" .. inspect(_ret))
+    return true
 end
 
 --- Job handler for remove conf
@@ -617,7 +600,9 @@ function JobsAction:removeconfAction(job)
 
     local instance = self:getInstance()
     local job_data = job.data
-    return _remove_item(instance, job_data)
+    local _ret = _remove_item(instance, job_data)
+    print("result:" .. inspect(_ret))
+    return true
 end
 
 return JobsAction
