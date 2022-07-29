@@ -883,33 +883,32 @@ local function _generate_item(instance, args)
 end
 
 function JobsAction:generateconfAction(job)
-    _print("generateconf:" .. inspect(job))
-
+    print(inspect(job))
     local instance = self:getInstance()
-
     local job_data = job.data or {}
     job_data._domain_name = _domain_name
-    _print("job_data: " .. inspect(job_data))
-    return _generate_item(instance, job_data)
-    -- _update_gdnsd(job_data)
+    local _ret = _generate_item(instance, job_data)
+    print("result:" .. inspect(_ret))
+    return true
 end
 
 function JobsAction:rescanconfAction(job)
-    -- local instance = self:getInstance()
+    print(inspect(job))
     local job_data = job.data or {}
     job_data._domain_name = _domain_name
-    _rescanconf(job_data)
+    local _ret = _rescanconf(job_data)
+    print("result:" .. inspect(_ret))
+    return true
 end
 
 function JobsAction:removeconfAction(job)
-    _print("removeconf:" .. inspect(job))
-
+    print(inspect(job))
     local instance = self:getInstance()
-    -- local _config = self:getInstanceConfig()
     local job_data = job.data or {}
     job_data._domain_name = _domain_name
-    return _remove_item(instance, job_data)
-    -- _update_gdnsd(job_data)
+    local _ret = _remove_item(instance, job_data)
+    print("result:" .. inspect(_ret))
+    return true
 end
 
 return JobsAction

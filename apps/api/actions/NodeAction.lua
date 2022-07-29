@@ -15,6 +15,7 @@ local httpc = require("resty.http").new()
 
 local set_var = ndk.set_var
 
+local ngx_log = ngx.log
 local _opensession
 local _print = util.print
 -- local mkdirp = require "mkdirp"
@@ -359,6 +360,7 @@ function Action:unregisterAction(args)
 end
 
 function Action:createAction(args)
+    ngx_log(ngx.ERR, "[request]:" .. inspect(args))
     -- _print(inspect(args))
     args.action = nil
     -- args.id = nil
@@ -397,11 +399,12 @@ function Action:createAction(args)
         }
     end
     instance:getRedis():setKeepAlive()
+    ngx_log(ngx.ERR, "[response]:" .. inspect(_result))
     return _result
 end
 
 function Action:getAction(args)
-    -- _print(inspect(args))
+    ngx_log(ngx.ERR, "[request]:" .. inspect(args))
     if not args.id then
         return {
             result = false,
@@ -446,6 +449,7 @@ function Action:getAction(args)
         }
     end
     instance:getRedis():setKeepAlive()
+    ngx_log(ngx.ERR, "[response]:" .. inspect(_result))
     return _result
 end
 
@@ -552,6 +556,7 @@ function Action:calljobAction(args)
     }
 end
 function Action:deleteAction(args)
+    ngx_log(ngx.ERR, "[request]:" .. inspect(args))
     -- _print(inspect(args))
     if not args.id then
         return {
@@ -592,12 +597,15 @@ function Action:deleteAction(args)
     local _ok, _err = jobs:add(job)
     -- _print({ok = _ok, err = _err}, true)
     instance:getRedis():setKeepAlive()
-    return {
+    local _result = {
         result = true
     }
+    ngx_log(ngx.ERR, "[response]:" .. inspect(_result))
+    return _result
 end
 
 function Action:updateAction(args)
+    ngx_log(ngx.ERR, "[request]:" .. inspect(args))
     -- _print(inspect(args))
     if not args.id then
         return {
@@ -658,6 +666,7 @@ function Action:updateAction(args)
         }
     end
     -- _print("_result:" .. inspect(_result))
+    ngx_log(ngx.ERR, "[response]:" .. inspect(_result))
     instance:getRedis():setKeepAlive()
     return _result
 end
