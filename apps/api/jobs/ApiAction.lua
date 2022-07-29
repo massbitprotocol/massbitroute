@@ -34,8 +34,9 @@ local env = require "env"
 local _domain_name = env.DOMAIN or "massbitroute.com"
 local _service_dir = "/massbit/massbitroute/app/src/sites/services"
 local _portal_dir = _service_dir .. "/api"
-local _deploy_dir = _portal_dir .. "/public/deploy/dapi"
-local _deploy_confdir = _portal_dir .. "/public/deploy/dapiconf"
+local _deploy_dir = _portal_dir .. "/public/deploy"
+local _deploy_apidir = _deploy_dir .. "/dapi"
+local _deploy_confdir = _deploy_dir .. "/dapiconf"
 -- local gwman_dir = _service_dir .. "/gwman"
 
 local PROVIDERS = {
@@ -234,6 +235,9 @@ end
 --- Normalize dapi detail
 --
 local function _norm(_v)
+    if not _v then
+        return _v
+    end
     if type(_v) == "string" then
         _v = json.decode(_v)
     end
@@ -262,10 +266,10 @@ local function _remove_item(instance, args)
         end
     end
 
-    if not _item.id or not _item.blockchain or not _item.network then
+    if not _item or not _item.id or not _item.blockchain or not _item.network then
         return false
     end
-    local _item_path = table_concat({_deploy_dir, _item.blockchain, _item.network, _item.user_id}, "/")
+    local _item_path = table_concat({_deploy_apidir, _item.blockchain, _item.network, _item.user_id}, "/")
 
     local _item_file = _item_path .. "/" .. _item.id
     _print("remove:" .. _item_file)
@@ -289,17 +293,18 @@ end
 --- Generate conf handler
 --
 local function _generate_item(instance, args)
+    _print("[generate_item]")
     local model = Model:new(instance)
 
     -- query dapi from db
     local _item = _norm(model:get(args))
 
-    if not _item.id or not _item.blockchain or not _item.network then
+    if not _item or not _item.id or not _item.blockchain or not _item.network then
         return false
     end
-
+    _print("item:" .. inspect(_item))
     -- path for dump data
-    local _item_path = table_concat({_deploy_dir, _item.blockchain, _item.network, _item.user_id}, "/")
+    local _item_path = table_concat({_deploy_apidir, _item.blockchain, _item.network, _item.user_id}, "/")
 
     -- make sure dir created
     mkdirp(_item_path)
@@ -451,6 +456,11 @@ function JobsAction:generateconfAction(job)
 
     local instance = self:getInstance()
     local job_data = job.data
+    if job_data.deploy_dir then
+        _deploy_dir = job_data.deploy_dir
+        _deploy_apidir = _deploy_dir .. "/dapi"
+        _deploy_confdir = _deploy_dir .. "/dapiconf"
+    end
 
     job_data._domain_name = _domain_name
     return _generate_item(instance, job_data)
@@ -463,6 +473,11 @@ function JobsAction:removeconfAction(job)
 
     local instance = self:getInstance()
     local job_data = job.data
+    if job_data.deploy_dir then
+        _deploy_dir = job_data.deploy_dir
+        _deploy_apidir = _deploy_dir .. "/dapi"
+        _deploy_confdir = _deploy_dir .. "/dapiconf"
+    end
     return _remove_item(instance, job_data)
 end
 
