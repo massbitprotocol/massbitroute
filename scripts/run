@@ -163,7 +163,7 @@ _supervisor() {
 _run_test() {
 	cd $SITE_ROOT
 	export PATH=$PATH:$SITE_ROOT/bin/openresty/nginx/sbin
-	prove -r t/$@
+	prove -r $@
 
 }
 _install_test() {
