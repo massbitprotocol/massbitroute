@@ -94,7 +94,7 @@ run_tests();
 
 __DATA__
 
-=== Api create new
+=== Api update entrypoints
 
 --- main_config eval: $::main_config
 --- http_config eval: $::http_config
@@ -103,27 +103,31 @@ __DATA__
 --- more_headers
 Content-Type: application/json
 --- request
-POST /_internal_api/v2/?action=api.create
+POST /_internal_api/v2/?action=api.update
 {
-  "allow_methods" : {},
-  "app_id" : "c237c346-7a0f-478b-bc0c-e3ca2522948f",
-  "app_key" : "WJaEniHiudjuhLV7diHkDw",
-  "blockchain" : "eth",
   "id" : "c237c346-7a0f-478b-bc0c-e3ca2522948f",
-  "limit_rate_per_day" : 3000,
-  "limit_rate_per_sec" : 100,
-  "name" : "api-6",
-  "network" : "mainnet",
-  "status" : 1,
-  "project_id" : "83260a9e-4e41-4293-abc5-fe47a2219534",
-  "project_quota" : "100000",
   "partner_id" : "fc78b64c5c33f3f270700b0c4d3e7998188035ab",
   "sid" : "403716b0f58a7d6ddec769f8ca6008f2c1c0cea6",
-  "user_id" : "b363ddf4-42cf-4ccf-89c2-8c42c531ac99"
+  "user_id" : "b363ddf4-42cf-4ccf-89c2-8c42c531ac99",
+  "status": 0
 }
+--- error_code: 200
 --- response_body eval
 qr/"result":true/
 --- no_error_log
+
+=== Api get and check if created or not
+
+
+--- main_config eval: $::main_config
+--- http_config eval: $::http_config
+--- config eval: $::config
+--- curl
+--- request
+GET /_internal_api/v2/?action=api.get&id=c237c346-7a0f-478b-bc0c-e3ca2522948f&partner_id=fc78b64c5c33f3f270700b0c4d3e7998188035ab&sid=403716b0f58a7d6ddec769f8ca6008f2c1c0cea6&user_id=b363ddf4-42cf-4ccf-89c2-8c42c531ac99
+--- error_code: 200
+--- response_body eval
+qr/"result":true/ and qr/"status":0/
 
 === Check raw data if created or not
 
@@ -133,9 +137,8 @@ qr/"result":true/
 --- curl
 --- request
 GET /deploy/dapi/eth/mainnet/b363ddf4-42cf-4ccf-89c2-8c42c531ac99/c237c346-7a0f-478b-bc0c-e3ca2522948f
---- error_code: 200
---- response_body eval
-qr/"id":"c237c346-7a0f-478b-bc0c-e3ca2522948f"/
+--- error_code: 404
+--- ignore_response
 --- no_error_log
 
 === Check ID conf if created or not
@@ -146,6 +149,19 @@ qr/"id":"c237c346-7a0f-478b-bc0c-e3ca2522948f"/
 --- curl
 --- request
 GET /deploy/dapiconf/nodes/eth-mainnet/c237c346-7a0f-478b-bc0c-e3ca2522948f.conf
+--- error_code: 404
+--- ignore_response
+--- no_error_log
+
+=== Check blockchain-network conf if created or not
+
+--- main_config eval: $::main_config
+--- http_config eval: $::http_config
+--- config eval: $::config
+--- curl
+--- request
+GET /deploy/dapiconf/eth-mainnet.conf
 --- error_code: 200
---- response_body: 
+--- response_body eval
+not (qr/server_name ws-\~\^\(\?\<myid\>c237c346-7a0f-478b-bc0c-e3ca2522948f/ and qr/server_name \~\^\(\?\<myid\>c237c346-7a0f-478b-bc0c-e3ca2522948f/)
 --- no_error_log
