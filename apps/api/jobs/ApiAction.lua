@@ -463,7 +463,9 @@ function JobsAction:generateconfAction(job)
     end
 
     job_data._domain_name = _domain_name
-    return _generate_item(instance, job_data)
+    local _ret = _generate_item(instance, job_data)
+    print("result:" .. inspect(_ret))
+    return true
 end
 
 --- Job handler for remove conf
@@ -478,7 +480,9 @@ function JobsAction:removeconfAction(job)
         _deploy_apidir = _deploy_dir .. "/dapi"
         _deploy_confdir = _deploy_dir .. "/dapiconf"
     end
-    return _remove_item(instance, job_data)
+    local _ret = _remove_item(instance, job_data)
+    print("result:" .. inspect(_ret))
+    return true
 end
 
 -- function JobsAction:removemulticonfAction(job)
