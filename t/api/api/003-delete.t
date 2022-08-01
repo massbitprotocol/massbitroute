@@ -99,7 +99,6 @@ __DATA__
 --- main_config eval: $::main_config
 --- http_config eval: $::http_config
 --- config eval: $::config
---- curl    
 --- more_headers
 Content-Type: application/json
 --- request
@@ -121,7 +120,6 @@ qr/"result":true/
 --- main_config eval: $::main_config
 --- http_config eval: $::http_config
 --- config eval: $::config
---- curl
 --- request
 GET /_internal_api/v2/?action=api.get&id=c237c346-7a0f-478b-bc0c-e3ca2522948f&partner_id=fc78b64c5c33f3f270700b0c4d3e7998188035ab&sid=403716b0f58a7d6ddec769f8ca6008f2c1c0cea6&user_id=b363ddf4-42cf-4ccf-89c2-8c42c531ac99
 --- error_code: 200
@@ -133,7 +131,6 @@ qr/"result":false/
 --- main_config eval: $::main_config
 --- http_config eval: $::http_config
 --- config eval: $::config
---- curl
 --- request
 GET /deploy/dapi/eth/mainnet/b363ddf4-42cf-4ccf-89c2-8c42c531ac99/c237c346-7a0f-478b-bc0c-e3ca2522948f
 --- error_code: 404
@@ -145,7 +142,6 @@ GET /deploy/dapi/eth/mainnet/b363ddf4-42cf-4ccf-89c2-8c42c531ac99/c237c346-7a0f-
 --- main_config eval: $::main_config
 --- http_config eval: $::http_config
 --- config eval: $::config
---- curl
 --- request
 GET /deploy/dapiconf/nodes/eth-mainnet/c237c346-7a0f-478b-bc0c-e3ca2522948f.conf
 --- error_code: 404
@@ -157,7 +153,6 @@ GET /deploy/dapiconf/nodes/eth-mainnet/c237c346-7a0f-478b-bc0c-e3ca2522948f.conf
 --- main_config eval: $::main_config
 --- http_config eval: $::http_config
 --- config eval: $::config
---- curl
 --- request
 GET /deploy/dapiconf/eth-mainnet.conf
 --- error_code: 200

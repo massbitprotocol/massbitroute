@@ -99,7 +99,6 @@ __DATA__
 --- main_config eval: $::main_config
 --- http_config eval: $::http_config
 --- config eval: $::config
---- curl    
 --- more_headers
 Content-Type: application/json
 --- request
@@ -130,7 +129,6 @@ qr/"result":true/
 --- main_config eval: $::main_config
 --- http_config eval: $::http_config
 --- config eval: $::config
---- curl
 --- request
 GET /deploy/dapi/eth/mainnet/b363ddf4-42cf-4ccf-89c2-8c42c531ac99/c237c346-7a0f-478b-bc0c-e3ca2522948f
 --- error_code: 200
@@ -143,7 +141,6 @@ qr/"id":"c237c346-7a0f-478b-bc0c-e3ca2522948f"/
 --- main_config eval: $::main_config
 --- http_config eval: $::http_config
 --- config eval: $::config
---- curl
 --- request
 GET /deploy/dapiconf/nodes/eth-mainnet/c237c346-7a0f-478b-bc0c-e3ca2522948f.conf
 --- error_code: 200

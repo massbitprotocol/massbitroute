@@ -102,7 +102,6 @@ __DATA__
 --- main_config eval: $::main_config
 --- http_config eval: $::http_config
 --- config eval: $::config
---- curl    
 --- more_headers
 Content-Type: application/json
 --- request
@@ -124,7 +123,6 @@ qr/"result":true/
 --- main_config eval: $::main_config
 --- http_config eval: $::http_config
 --- config eval: $::config
---- curl
 --- request
 GET /_internal_api/v2/?action=gateway.get&id=60173a87-4d2b-469b-b02c-6f212794136c&partner_id=fc78b64c5c33f3f270700b0c4d3e7998188035ab&user_id=89a21b17-1bbe-4a6b-a5b5-9351d3eb8c81&sid=403716b0f58a7d6ddec769f8ca6008f2c1c0cea6
 --- error_code: 200
@@ -136,7 +134,6 @@ qr/"result":true/ and qr/"approved":1/
 --- main_config eval: $::main_config
 --- http_config eval: $::http_config
 --- config eval: $::config
---- curl
 --- request
 GET /gwman/data/conf.d/geolocation.d/maps.d/mbr-map-eth-mainnet
 --- error_code: 200
@@ -149,7 +146,6 @@ qr/eth-mainnet-60173a87-4d2b-469b-b02c-6f212794136c/
 --- main_config eval: $::main_config
 --- http_config eval: $::http_config
 --- config eval: $::config
---- curl
 --- request
 GET /gwman/data/conf.d/geolocation.d/dcmap/eth-mainnet-NA-US
 --- error_code: 200
@@ -162,7 +158,6 @@ qr/60173a87-4d2b-469b-b02c-6f212794136c/
 --- main_config eval: $::main_config
 --- http_config eval: $::http_config
 --- config eval: $::config
---- curl
 --- request
 GET /gwman/data/conf.d/geolocation.d/dcmap/eth-mainnet-60173a87-4d2b-469b-b02c-6f212794136c
 --- error_code: 200
@@ -176,7 +171,6 @@ qr/60173a87-4d2b-469b-b02c-6f212794136c/
 --- main_config eval: $::main_config
 --- http_config eval: $::http_config
 --- config eval: $::config
---- curl
 --- request
 GET /gwman/data/conf.d/geolocation.d/dcmap/eth-mainnet-NA
 --- error_code: 200
@@ -189,7 +183,6 @@ qr/60173a87-4d2b-469b-b02c-6f212794136c/
 --- main_config eval: $::main_config
 --- http_config eval: $::http_config
 --- config eval: $::config
---- curl
 --- request
 GET /gwman/data/zones/dapi/eth-mainnet.zone
 --- error_code: 200
@@ -202,7 +195,6 @@ qr/60173a87-4d2b-469b-b02c-6f212794136c.eth-mainnet/
 --- main_config eval: $::main_config
 --- http_config eval: $::http_config
 --- config eval: $::config
---- curl
 --- request
 GET /deploy/info/gateway/listid-eth-mainnet-NA-1-1
 --- error_code: 200
@@ -215,7 +207,6 @@ qr/89a21b17-1bbe-4a6b-a5b5-9351d3eb8c81 eth mainnet/
 --- main_config eval: $::main_config
 --- http_config eval: $::http_config
 --- config eval: $::config
---- curl
 --- request
 GET /deploy/info/gateway/listid-eth-mainnet-NA-US-1-1
 --- error_code: 200
@@ -228,7 +219,6 @@ qr/89a21b17-1bbe-4a6b-a5b5-9351d3eb8c81 eth mainnet/
 --- main_config eval: $::main_config
 --- http_config eval: $::http_config
 --- config eval: $::config
---- curl
 --- request
 GET /deploy/info/gateway/listid-eth-mainnet-1-1
 --- error_code: 200

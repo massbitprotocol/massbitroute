@@ -99,7 +99,6 @@ __DATA__
 --- main_config eval: $::main_config
 --- http_config eval: $::http_config
 --- config eval: $::config
---- curl    
 --- more_headers
 Content-Type: application/json
 --- request
@@ -136,7 +135,6 @@ qr/"result":true/
 --- main_config eval: $::main_config
 --- http_config eval: $::http_config
 --- config eval: $::config
---- curl
 --- request
 GET /_internal_api/v2/?action=gateway.get&id=60173a87-4d2b-469b-b02c-6f212794136c&partner_id=fc78b64c5c33f3f270700b0c4d3e7998188035ab&user_id=89a21b17-1bbe-4a6b-a5b5-9351d3eb8c81&sid=403716b0f58a7d6ddec769f8ca6008f2c1c0cea6
 --- error_code: 200
