@@ -43,3 +43,4 @@ scripts/single-node-test/.env
 /public/
 t/servroot/
 /.cpan/
+/src/_env.lua
