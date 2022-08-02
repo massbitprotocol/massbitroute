@@ -17,7 +17,7 @@ local set_var = ndk.set_var
 
 local ngx_log = ngx.log
 local _opensession
-local _print = util.print
+-- local _print = util.print
 -- local mkdirp = require "mkdirp"
 local ERROR = {
     NOT_LOGIN = 100
@@ -42,70 +42,28 @@ local function _norm(_v)
     return _v
 end
 
--- local function _authorize_whitelist(self, args)
---     local _config = self:getInstanceConfig()
---     local _appconf = _config.app
---     local whitelist_sid = _appconf.whitelist_sid
---     -- _print("whitelist_sid:" .. inspect(whitelist_sid))
---     local sid = ngx.var.cookie__slc_web_sid or args.sid
---     local _info = whitelist_sid and whitelist_sid[sid]
---     -- _print("sid:" .. sid)
---     -- _print("_info:" .. inspect(_info))
---     if sid and _info then
---         local _partner_id = args.partner_id
---         local _user_id = args.user_id
-
---         local _info_partner_id = _info.partner_id
---         if not _user_id or not _partner_id or not _info_partner_id or _partner_id ~= _info_partner_id then
---             return {
---                 result = false,
---                 err_msg = "Arguments not valid"
---             }
---         end
---         args.partner_id = nil
---         return true
---     end
---     return false
--- end
--- local function _get_geo(ip)
---     local _api_url = "http://api.ipapi.com/api/" .. ip .. "?access_key=" .. _ipapi_token
---     -- ngx.log(ngx.ERR, inspect(_api_url))
---     local _res, _err = httpc:request_uri(_api_url, {method = "GET"})
---     local _resb = _res.body
---     if _res.status == 200 and _resb and type(_resb) == "string" then
---         _resb = json.decode(_resb)
---     end
---     return _resb, _err
--- end
-
 function Action:geonodecountryAction()
     ngx.log(ngx.ERR, "geonodecity")
     local _datacenters = {}
     local instance = self:getInstance()
     local _red = instance:getRedis()
     local _user_gw = _red:keys("*:" .. mytype)
-    -- ngx.log(ngx.ERR, inspect(_user_gw))
+
     for _, _k in ipairs(_user_gw) do
         local _gw_arr = _red:arrayToHash(_red:hgetall(_k))
-        -- ngx.log(ngx.ERR, inspect(_gw_arr))
+
         for _, _gw_str in pairs(_gw_arr) do
             local _gw = json.decode(_gw_str)
-            -- ngx.log(ngx.ERR, inspect(_gw))
-            -- local _dc_id = table.concat({"mbr", "map", _gw.blockchain, _gw.network}, "-")
-            -- local _dc_id = table.concat({_gw.blockchain, _gw.network}, "-")
-            -- _datacenters[_dc_id] = _datacenters[_dc_id] or {}
+
             if _gw.geo and _gw.geo.continent_code then
                 _datacenters[_gw.geo.continent_code] = _datacenters[_gw.geo.continent_code] or {}
                 _datacenters[_gw.geo.continent_code][_gw.geo.country_code] =
                     _datacenters[_gw.geo.continent_code][_gw.geo.country_code] or 0
                 _datacenters[_gw.geo.continent_code][_gw.geo.country_code] =
                     _datacenters[_gw.geo.continent_code][_gw.geo.country_code] + 1
-            -- table.insert(_datacenters[_gw.geo.continent_code][_gw.geo.country_code], _gw)
             end
         end
     end
-
-    -- ngx.log(ngx.ERR, inspect(_datacenters))
 
     local _data = {}
     for _k1, _v1 in pairs(_datacenters) do
@@ -114,7 +72,6 @@ function Action:geonodecountryAction()
             table.insert(_data[_k1], {id = _k2, value = _v2})
         end
     end
-    -- ngx.log(ngx.ERR, inspect(_data))
 
     return {
         result = true,
@@ -134,14 +91,8 @@ function Action:geonodecontinentAction()
         -- ngx.log(ngx.ERR, inspect(_gw_arr))
         for _, _gw_str in pairs(_gw_arr) do
             local _gw = json.decode(_gw_str)
-            -- ngx.log(ngx.ERR, inspect(_gw))
-            -- local _dc_id = table.concat({"mbr", "map", _gw.blockchain, _gw.network}, "-")
-            -- local _dc_id = table.concat({_gw.blockchain, _gw.network}, "-")
-            -- _datacenters[_dc_id] = _datacenters[_dc_id] or {}
             if _gw.geo and _gw.geo.continent_code then
                 _datacenters[_gw.geo.continent_code] = _datacenters[_gw.geo.continent_code] or 0
-                -- _datacenters[_gw.geo.continent_code][_gw.geo.country_code] =
-                --     _datacenters[_gw.geo.continent_code][_gw.geo.country_code] or 0
                 _datacenters[_gw.geo.continent_code] = _datacenters[_gw.geo.continent_code] + 1
             -- table.insert(_datacenters[_gw.geo.continent_code][_gw.geo.country_code], _gw)
             end
@@ -188,6 +139,7 @@ end
 --- Register node
 
 function Action:registerAction(args)
+    ngx_log(ngx.ERR, "[request]:" .. inspect(args))
     -- _print(inspect(args))
     args.action = nil
     local _token = args.token
@@ -195,7 +147,7 @@ function Action:registerAction(args)
         return {result = false, err_msg = "Token missing"}
     end
     local instance = self:getInstance()
-    local _config = self:getInstanceConfig()
+    -- local _config = self:getInstanceConfig()
     local id = args.id
     local user_id = args.user_id
     if not user_id then
@@ -246,6 +198,7 @@ function Action:registerAction(args)
     local model = Model:new(instance)
     model:update(_data)
 
+    local _result = {result = true}
     local jobs = instance:getJobs()
     local job = {
         action = "/jobs/" .. mytype .. ".generateconf",
@@ -256,9 +209,9 @@ function Action:registerAction(args)
         }
     }
     local _ok, _err = jobs:add(job)
-    -- _print({ok = _ok, err = _err}, true)
-
-    return {result = true}
+    ngx.log(ngx.ERR, {ok = _ok, err = _err}, true)
+    ngx_log(ngx.ERR, "[response]:" .. inspect(_result))
+    return _result
 end
 
 function Action:nodeverifyAction(args)
@@ -276,7 +229,7 @@ function Action:nodeverifyAction(args)
         }
     end
 
-    local _res, _err =
+    local _res =
         httpc:request_uri(
         "https://" .. _ip .. "/ping",
         {
@@ -355,7 +308,7 @@ function Action:unregisterAction(args)
         }
     }
     local _ok, _err = jobs:add(job)
-    -- _print({ok = _ok, err = _err}, true)
+    ngx.log(ngx.ERR, {ok = _ok, err = _err}, true)
     return {result = true}
 end
 
@@ -595,7 +548,7 @@ function Action:deleteAction(args)
         }
     }
     local _ok, _err = jobs:add(job)
-    -- _print({ok = _ok, err = _err}, true)
+    ngx.log(ngx.ERR, {ok = _ok, err = _err}, true)
     instance:getRedis():setKeepAlive()
     local _result = {
         result = true
