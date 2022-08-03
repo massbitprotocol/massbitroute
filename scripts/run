@@ -23,7 +23,7 @@ cmd_server=$SITE_ROOT/cmd_server
 _repo() {
 	if [ -e "$SITE_ROOT/cmd_server" ]; then bash $SITE_ROOT/cmd_server _env; fi
 	if [ -f "$SITE_ROOT/.env_raw" ]; then source $SITE_ROOT/.env_raw; fi
-	export MBR_ENV=${MBR_ENV:-dev}
+	export MBR_ENV=${MBR_ENV:-keiko}
 	# export BRANCH=${BRANCH:-$MBR_ENV}
 	# export MBRAPP_BRANCH=${MBRAPP_BRANCH:-$MBR_ENV}
 	export ASDF_BRANCH=${ASDF_BRANCH:-$MBR_ENV}
