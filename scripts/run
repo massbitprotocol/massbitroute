@@ -293,6 +293,7 @@ _git_cmd() {
 			_dir="$_dir_def/gwman/data"
 			;;
 		esac
+		_git="git -C $_dir"
 
 		if [ "$cmd" = "commit" ]; then
 			_mydir="$_dir"
@@ -301,10 +302,10 @@ _git_cmd() {
 		else
 			_git="git -C $_dir"
 			$_git $cmd
-			commit_id=$($_git rev-parse origin/$($_git rev-parse --abbrev-ref HEAD))
-			repo_name=$(basename $($_git remote get-url origin) .git)
-			mkdir -p $SITE_ROOT/public/version
-			echo $commit_id >$SITE_ROOT/public/version/${repo_name}.version
+			# commit_id=$($_git rev-parse origin/$($_git rev-parse --abbrev-ref HEAD))
+			# repo_name=$(basename $($_git remote get-url origin) .git)
+			# mkdir -p $SITE_ROOT/public/version
+			# echo $commit_id >$SITE_ROOT/public/version/${repo_name}.version
 		fi
 	done
 

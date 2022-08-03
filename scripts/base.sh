@@ -54,15 +54,28 @@ _update_sources() {
 		_branch=$(echo $_pathgit | cut -d'|' -f3)
 		if [ -z "$_branch" ]; then _branch=$branch; fi
 		if [ ! -d "$_path/.git" ]; then
+
 			git clone $_url $_path -b $_branch
 			git -C $_path fetch --all
 			git -C $_path branch --set-upstream-to=origin/$_branch
 			_is_reload=1
 		else
 
+			git -C $_path remote -v | grep $_url >/dev/null
+			if [ $? -ne 0 ]; then
+				rm -rf $_path
+				git clone $_url $_path -b $_branch
+			fi
+
 			git -C $_path fetch --all
 			git -C $_path checkout $_branch
-			tmp="$(git -C $_path pull 2>&1)"
+
+			git -C $_path branch | grep $_branch >/dev/null
+			if [ $? -ne 0 ]; then
+				git -C $_path reset --hard
+			fi
+
+			tmp="$(git -C $_path pull origin $_branch 2>&1)"
 
 			echo "$tmp" | grep -i "updating"
 			st=$?
