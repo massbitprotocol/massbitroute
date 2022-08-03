@@ -22,6 +22,10 @@ cmd_server=$SITE_ROOT/cmd_server
 
 _repo() {
 	if [ -e "$SITE_ROOT/cmd_server" ]; then bash $SITE_ROOT/cmd_server _env; fi
+<<<<<<< HEAD
+=======
+
+>>>>>>> bugfix: check env lua existed #5
 	if [ -f "$SITE_ROOT/.env_raw" ]; then source $SITE_ROOT/.env_raw; fi
 	export MBR_ENV=${MBR_ENV:-keiko}
 	# export BRANCH=${BRANCH:-$MBR_ENV}
