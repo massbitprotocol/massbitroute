@@ -5,7 +5,7 @@ repeat_each(1);
 no_shuffle();
 
 # plan tests => blocks() * repeat_each() * 2;
-
+$ENV{TEST_NGINX_HTML_DIR} ||= html_dir();
 $ENV{TEST_NGINX_BINARY} =
 "/massbit/massbitroute/app/src/sites/services/api/bin/openresty/nginx/sbin/nginx";
 our $main_config = <<'_EOC_';
@@ -74,10 +74,12 @@ our $config = <<'_EOC_';
 
     root /massbit/massbitroute/app/src/sites/services/api/sites/../public/admin;
 
+ location /deploy {
+        root /massbit/massbitroute/app/src/sites/services/api/public;
+    }
 location /_internal_api/v2 {
     access_log /massbit/massbitroute/app/src/sites/services/api/logs/internal_api_v2-access.log;
     error_log /massbit/massbitroute/app/src/sites/services/api/logs/internal_api_v2-error.log;
-
     include /massbit/massbitroute/app/src/sites/services/api/sites/../cors.conf;
     set $app_root /massbit/massbitroute/app/src/sites/services/api/apps/api;
     default_type application/json;
@@ -97,7 +99,6 @@ __DATA__
 --- main_config eval: $::main_config
 --- http_config eval: $::http_config
 --- config eval: $::config
-    
 --- more_headers
 Content-Type: application/json
 --- request
@@ -125,86 +126,17 @@ POST /_internal_api/v2/?action=gateway.create
   "zone" : "NA"
 }
 --- response_body eval
+qr/"result":true/
+--- no_error_log
+
+=== Api get and check if created or not
+
+
+--- main_config eval: $::main_config
+--- http_config eval: $::http_config
+--- config eval: $::config
+--- request
+GET /_internal_api/v2/?action=gateway.get&id=60173a87-4d2b-469b-b02c-6f212794136c&partner_id=fc78b64c5c33f3f270700b0c4d3e7998188035ab&user_id=89a21b17-1bbe-4a6b-a5b5-9351d3eb8c81&sid=403716b0f58a7d6ddec769f8ca6008f2c1c0cea6
+--- error_code: 200
+--- response_body eval
 qr/"result":true/ and qr/"status":0/
---- no_error_log
-
-=== Gateway get and check if created or not
-
-
---- main_config eval: $::main_config
---- http_config eval: $::http_config
-
---- config eval: $::config
-
---- request
-GET /_internal_api/v2/?action=gateway.get&id=60173a87-4d2b-469b-b02c-6f212794136c&partner_id=fc78b64c5c33f3f270700b0c4d3e7998188035ab&sid=403716b0f58a7d6ddec769f8ca6008f2c1c0cea6&user_id=89a21b17-1bbe-4a6b-a5b5-9351d3eb8c81
---- response_body eval
-qr/"result":true/  and qr/"status":0/
---- no_error_log
-
-
-
-=== Gateway update "status = 1"
-
---- main_config eval: $::main_config
---- http_config eval: $::http_config
---- config eval: $::config
-    
---- more_headers
-Content-Type: application/json
---- request
-POST /_internal_api/v2/?action=gateway.update
-{
-  "id" : "60173a87-4d2b-469b-b02c-6f212794136c",
-  "partner_id" : "fc78b64c5c33f3f270700b0c4d3e7998188035ab",
-  "sid" : "403716b0f58a7d6ddec769f8ca6008f2c1c0cea6",
-  "status" : 1,
-  "user_id" : "89a21b17-1bbe-4a6b-a5b5-9351d3eb8c81"
-}
---- response_body eval
-qr/"result":true/
---- no_error_log
-
-=== Gateway get and check if status is 1
-
-
---- main_config eval: $::main_config
---- http_config eval: $::http_config
-
---- config eval: $::config
-
---- request
-GET /_internal_api/v2/?action=gateway.get&id=60173a87-4d2b-469b-b02c-6f212794136c&partner_id=fc78b64c5c33f3f270700b0c4d3e7998188035ab&sid=403716b0f58a7d6ddec769f8ca6008f2c1c0cea6&user_id=89a21b17-1bbe-4a6b-a5b5-9351d3eb8c81
---- response_body eval
-qr/"result":true/  and qr/"status":1/
---- no_error_log
-
-
-=== gateway delete
-
-
---- main_config eval: $::main_config
---- http_config eval: $::http_config
-
---- config eval: $::config
-
---- request
-GET /_internal_api/v2/?action=gateway.delete&id=60173a87-4d2b-469b-b02c-6f212794136c&partner_id=fc78b64c5c33f3f270700b0c4d3e7998188035ab&sid=403716b0f58a7d6ddec769f8ca6008f2c1c0cea6&user_id=89a21b17-1bbe-4a6b-a5b5-9351d3eb8c81
---- response_body eval
-qr/"result":true/
---- no_error_log
-
-
-=== Gateway get and check if exists or not
-
-
---- main_config eval: $::main_config
---- http_config eval: $::http_config
-
---- config eval: $::config
-
---- request
-GET /_internal_api/v2/?action=gateway.get&id=60173a87-4d2b-469b-b02c-6f212794136c&partner_id=fc78b64c5c33f3f270700b0c4d3e7998188035ab&sid=403716b0f58a7d6ddec769f8ca6008f2c1c0cea6&user_id=89a21b17-1bbe-4a6b-a5b5-9351d3eb8c81
---- response_body eval
-qr/"result":false/
---- no_error_log

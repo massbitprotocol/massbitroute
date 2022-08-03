@@ -77,6 +77,9 @@ our $config = <<'_EOC_';
  location /deploy {
         root /massbit/massbitroute/app/src/sites/services/api/public;
     }
+ location /gwman {
+        root /massbit/massbitroute/app/src/sites/services;
+    }
 location /_internal_api/v2 {
     access_log /massbit/massbitroute/app/src/sites/services/api/logs/internal_api_v2-access.log;
     error_log /massbit/massbitroute/app/src/sites/services/api/logs/internal_api_v2-error.log;
@@ -94,7 +97,7 @@ run_tests();
 
 __DATA__
 
-=== Api create new
+=== Gateway update
 
 --- main_config eval: $::main_config
 --- http_config eval: $::http_config
@@ -102,26 +105,40 @@ __DATA__
 --- more_headers
 Content-Type: application/json
 --- request
-POST /_internal_api/v2/?action=api.create
+POST /_internal_api/v2/?action=gateway.update
 {
-  "allow_methods" : {},
-  "app_id" : "c237c346-7a0f-478b-bc0c-e3ca2522948f",
-  "app_key" : "WJaEniHiudjuhLV7diHkDw",
-  "blockchain" : "eth",
-  "id" : "c237c346-7a0f-478b-bc0c-e3ca2522948f",
-  "limit_rate_per_day" : 3000,
-  "limit_rate_per_sec" : 100,
-  "name" : "api-6",
-  "network" : "mainnet",
-  "status" : 1,
-  "project_id" : "83260a9e-4e41-4293-abc5-fe47a2219534",
-  "project_quota" : "100000",
+  "id" : "60173a87-4d2b-469b-b02c-6f212794136c",
   "partner_id" : "fc78b64c5c33f3f270700b0c4d3e7998188035ab",
   "sid" : "403716b0f58a7d6ddec769f8ca6008f2c1c0cea6",
-  "user_id" : "b363ddf4-42cf-4ccf-89c2-8c42c531ac99"
+  "user_id" : "89a21b17-1bbe-4a6b-a5b5-9351d3eb8c81",
+  "approved" : 1
 }
 --- response_body eval
 qr/"result":true/
+--- no_error_log
+
+=== Api get and check if created or not
+
+
+--- main_config eval: $::main_config
+--- http_config eval: $::http_config
+--- config eval: $::config
+--- request
+GET /_internal_api/v2/?action=gateway.get&id=60173a87-4d2b-469b-b02c-6f212794136c&partner_id=fc78b64c5c33f3f270700b0c4d3e7998188035ab&user_id=89a21b17-1bbe-4a6b-a5b5-9351d3eb8c81&sid=403716b0f58a7d6ddec769f8ca6008f2c1c0cea6
+--- error_code: 200
+--- response_body eval
+qr/"result":true/ and qr/"approved":1/
+
+=== Check raw data if created or not
+
+--- main_config eval: $::main_config
+--- http_config eval: $::http_config
+--- config eval: $::config
+--- request
+GET /gwman/data/conf.d/geolocation.d/maps.d/mbr-map-eth-mainnet
+--- error_code: 200
+--- response_body eval
+qr/eth-mainnet-60173a87-4d2b-469b-b02c-6f212794136c/
 --- no_error_log
 
 === Check raw data if created or not
@@ -130,19 +147,81 @@ qr/"result":true/
 --- http_config eval: $::http_config
 --- config eval: $::config
 --- request
-GET /deploy/dapi/eth/mainnet/b363ddf4-42cf-4ccf-89c2-8c42c531ac99/c237c346-7a0f-478b-bc0c-e3ca2522948f
+GET /gwman/data/conf.d/geolocation.d/dcmap/eth-mainnet-NA-US
 --- error_code: 200
 --- response_body eval
-qr/"id":"c237c346-7a0f-478b-bc0c-e3ca2522948f"/
+qr/60173a87-4d2b-469b-b02c-6f212794136c/
 --- no_error_log
 
-=== Check ID conf if created or not
+=== Check raw data if created or not
 
 --- main_config eval: $::main_config
 --- http_config eval: $::http_config
 --- config eval: $::config
 --- request
-GET /deploy/dapiconf/nodes/eth-mainnet/c237c346-7a0f-478b-bc0c-e3ca2522948f.conf
+GET /gwman/data/conf.d/geolocation.d/dcmap/eth-mainnet-60173a87-4d2b-469b-b02c-6f212794136c
 --- error_code: 200
---- response_body: 
+--- response_body eval
+qr/60173a87-4d2b-469b-b02c-6f212794136c/
+--- no_error_log
+
+
+=== Check raw data if created or not
+
+--- main_config eval: $::main_config
+--- http_config eval: $::http_config
+--- config eval: $::config
+--- request
+GET /gwman/data/conf.d/geolocation.d/dcmap/eth-mainnet-NA
+--- error_code: 200
+--- response_body eval
+qr/60173a87-4d2b-469b-b02c-6f212794136c/
+--- no_error_log
+
+=== Check raw data if created or not
+
+--- main_config eval: $::main_config
+--- http_config eval: $::http_config
+--- config eval: $::config
+--- request
+GET /gwman/data/zones/dapi/eth-mainnet.zone
+--- error_code: 200
+--- response_body eval
+qr/60173a87-4d2b-469b-b02c-6f212794136c.eth-mainnet/
+--- no_error_log
+
+=== Check raw data if created or not
+
+--- main_config eval: $::main_config
+--- http_config eval: $::http_config
+--- config eval: $::config
+--- request
+GET /deploy/info/gateway/listid-eth-mainnet-NA-1-1
+--- error_code: 200
+--- response_body eval
+qr/89a21b17-1bbe-4a6b-a5b5-9351d3eb8c81 eth mainnet/
+--- no_error_log
+
+=== Check raw data if created or not
+
+--- main_config eval: $::main_config
+--- http_config eval: $::http_config
+--- config eval: $::config
+--- request
+GET /deploy/info/gateway/listid-eth-mainnet-NA-US-1-1
+--- error_code: 200
+--- response_body eval
+qr/89a21b17-1bbe-4a6b-a5b5-9351d3eb8c81 eth mainnet/
+--- no_error_log
+
+=== Check raw data if created or not
+
+--- main_config eval: $::main_config
+--- http_config eval: $::http_config
+--- config eval: $::config
+--- request
+GET /deploy/info/gateway/listid-eth-mainnet-1-1
+--- error_code: 200
+--- response_body eval
+qr/89a21b17-1bbe-4a6b-a5b5-9351d3eb8c81 eth mainnet/
 --- no_error_log

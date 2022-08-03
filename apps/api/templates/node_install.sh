@@ -7,7 +7,7 @@ MBR=$SITE_ROOT/mbr
 export MBR_ENV={{env}}
 SCRIPTS_RUN="$SITE_ROOT/scripts/run"
 mkdir -p $(dirname $SITE_ROOT)
-
+curl="/usr/bin/curl -skSfL"
 _ubuntu() {
 	apt-get update
 	apt-get install -y \
@@ -39,7 +39,7 @@ else
 	exit 1
 fi
 
-IP="$(curl -ssSfL http://ipv4.icanhazip.com)"
+IP="$($curl http://ipv4.icanhazip.com)"
 
 if [ -z "$IP" ]; then
 	echo "Your IP is unknown"
@@ -53,7 +53,7 @@ if [ -z "$IP" ]; then
 fi
 
 tmp=$(mktemp)
-curl -ssSfL "{*portal_url*}/mbr/$TYPE/{{id}}/geo?ip=$IP" --header 'Authorization: {{app_key}}' -o $tmp >/dev/null
+$curl "{*portal_url*}/mbr/$TYPE/{{id}}/geo?ip=$IP" --header 'Authorization: {{app_key}}' -o $tmp >/dev/null
 if [ $? -eq 0 ]; then
 	zone=$(cat $tmp | jq .continent_code | sed 's/\"//g')
 	if [ "$zone" != "{{zone}}" ]; then

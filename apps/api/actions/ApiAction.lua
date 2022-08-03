@@ -25,10 +25,15 @@ local _domain_name = env.DOMAIN or "massbitroute.com"
 local _authorize_whitelist = util.authorize_whitelist
 
 local function _run_job(instance, args, option)
+    ngx_log(ngx.ERR, "[run_job]:" .. inspect(args))
     local jobs = instance:getJobs()
     if not option then
         option = {_is_delete = false}
     end
+    if ngx.var.deploy_dir then
+        option.deploy_dir = ngx.var.deploy_dir
+    end
+
     table.merge(
         option,
         {
@@ -51,23 +56,30 @@ end
 local function _norm_schema(args)
     for _, _v in ipairs({"name", "blockchain", "network"}) do
         -- _print(_v)
-        args[_v] = args[_v]:trim()
+        if args[_v] then
+            args[_v] = args[_v]:trim()
+        end
     end
     return args
 end
 
 local function _norm(_v)
+    ngx_log(ngx.ERR, "[norm]:" .. inspect(_v))
+    _v = _norm_schema(_v)
     if type(_v) == "string" then
         _v = json.decode(_v)
     end
 
     if _v.entrypoints and type(_v.entrypoints) == "string" then
+        ngx_log(ngx.ERR, "[norm_entry]:" .. inspect(_v.entrypoints))
         _v.entrypoints = json.decode(_v.entrypoints)
+        ngx_log(ngx.ERR, "[norm_entry1]:" .. inspect(_v.entrypoints))
         setmetatable(_v.entrypoints, json.empty_array_mt)
     end
     if _v.security and type(_v.security) == "string" then
         _v.security = json.decode(_v.security)
     end
+    ngx_log(ngx.ERR, "[norm1]:" .. inspect(_v))
     return _v
 end
 
@@ -112,11 +124,13 @@ function Action:createAction(args)
         result = false
     }
     if _detail then
-        _run_job(instance, args)
-        _result = {
-            result = true,
-            data = _detail
-        }
+        local _job_id = _run_job(instance, args)
+        if _job_id and tonumber(_job_id) > 0 then
+            _result = {
+                result = true,
+                data = _detail
+            }
+        end
     end
     instance:getRedis():setKeepAlive()
     ngx_log(ngx.ERR, "[response]:" .. inspect(_result))
@@ -124,6 +138,7 @@ function Action:createAction(args)
 end
 
 function Action:getAction(args)
+    ngx_log(ngx.ERR, "[request]:" .. inspect(args))
     if not args.id then
         return {
             result = false,
@@ -162,6 +177,7 @@ function Action:getAction(args)
             data = _v
         }
     end
+    ngx_log(ngx.ERR, "[response]:" .. inspect(_result))
     instance:getRedis():setKeepAlive()
     return _result
 end
@@ -185,6 +201,7 @@ function Action:calljobAction(args)
     args.action = nil
     local job_method = args.job
     args.job = nil
+
     local instance = self:getInstance()
     local jobs = instance:getJobs()
     local job = {
@@ -192,6 +209,9 @@ function Action:calljobAction(args)
         delay = 0,
         data = args
     }
+    if ngx.var.deploy_dir then
+        job.deploy_dir = ngx.var.deploy_dir
+    end
     local _ok, _err = jobs:add(job)
     return {
         ok = _ok,
@@ -200,6 +220,7 @@ function Action:calljobAction(args)
 end
 
 function Action:updateAction(args)
+    ngx_log(ngx.ERR, "[request]:" .. inspect(args))
     if not args.id then
         return {
             result = false,
@@ -207,6 +228,7 @@ function Action:updateAction(args)
         }
     end
     args.action = nil
+    args = _norm(args)
     local instance = self:getInstance()
     local _config = self:getInstanceConfig()
     local _is_authorized = _authorize_whitelist(_config, args)
@@ -242,6 +264,7 @@ function Action:updateAction(args)
     end
 
     instance:getRedis():setKeepAlive()
+    ngx_log(ngx.ERR, "[request]:" .. inspect(_result))
     return _result
 end
 
@@ -311,6 +334,7 @@ end
 -- end
 
 function Action:deleteAction(args)
+    ngx_log(ngx.ERR, "[request]:" .. inspect(args))
     if not args.id then
         return {
             result = false,
@@ -340,9 +364,11 @@ function Action:deleteAction(args)
     _run_job(instance, args, {_is_delete = true})
 
     instance:getRedis():setKeepAlive()
-    return {
+    local _result = {
         result = true
     }
+    ngx_log(ngx.ERR, "[response]:" .. inspect(_result))
+    return _result
 end
 
 function Action:listAction(args)

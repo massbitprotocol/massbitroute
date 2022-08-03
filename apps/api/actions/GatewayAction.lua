@@ -12,6 +12,8 @@ local Action = cc.class(mytype .. "Action", gbc.ActionBase)
 local httpc = require("resty.http").new()
 local inspect = require "inspect"
 
+local ngx_log = ngx.log
+
 local _opensession
 -- local set_var = ndk.set_var
 
@@ -224,6 +226,7 @@ function Action:unregisterAction(args)
 end
 
 function Action:createAction(args)
+    ngx_log(ngx.ERR, "[request]:" .. inspect(args))
     -- _print(inspect(args))
     args.action = nil
     -- args.id = nil
@@ -246,6 +249,10 @@ function Action:createAction(args)
             args.user_id = user_id
         end
     end
+    if args and (not args.ip) and args.geo and args.geo.ip then
+        args.ip = args.geo.ip
+    end
+
     -- _print("user_id:" .. user_id)
     local model = Model:new(instance)
     local _detail, _err_msg = model:create(args)
@@ -262,6 +269,7 @@ function Action:createAction(args)
         }
     end
     instance:getRedis():setKeepAlive()
+    ngx_log(ngx.ERR, "[response]:" .. inspect(_result))
     return _result
 end
 
@@ -437,6 +445,7 @@ end
 --     }
 -- end
 function Action:updateAction(args)
+    ngx_log(ngx.ERR, "[request]:" .. inspect(args))
     -- _print(inspect(args))
     -- ngx.log(ngx.ERR, "updateAction" .. inspect(args))
     if not args.id then
@@ -465,6 +474,9 @@ function Action:updateAction(args)
         end
     end
 
+    if args and (not args.ip) and args.geo and args.geo.ip then
+        args.ip = args.geo.ip
+    end
     -- _print("user_id:" .. user_id)
     -- args._is_approved = args._is_approved and tonumber(args._is_approved) == 1
 
@@ -500,10 +512,12 @@ function Action:updateAction(args)
         }
     end
     instance:getRedis():setKeepAlive()
+    ngx_log(ngx.ERR, "[response]:" .. inspect(_result))
     return _result
 end
 
 function Action:deleteAction(args)
+    ngx_log(ngx.ERR, "[request]:" .. inspect(args))
     -- _print(inspect(args))
     if not args.id then
         return {
@@ -546,7 +560,6 @@ function Action:deleteAction(args)
     -- ngx.log(ngx.ERR, inspect({_ok, _err}))
 
     instance:getRedis():setKeepAlive()
-
     return {
         result = true
     }

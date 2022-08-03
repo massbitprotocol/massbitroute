@@ -22,6 +22,12 @@ cmd_server=$SITE_ROOT/cmd_server
 
 _repo() {
 	if [ -e "$SITE_ROOT/cmd_server" ]; then bash $SITE_ROOT/cmd_server _env; fi
+	sleep 1
+	if [ ! -f "$SITE_ROOT/src/env.lua" ]; then
+		echo "$SITE_ROOT/src/env.lua not exists"
+		exit 1
+	fi
+
 	if [ -f "$SITE_ROOT/.env_raw" ]; then source $SITE_ROOT/.env_raw; fi
 	export MBR_ENV=${MBR_ENV:-dev}
 	# export BRANCH=${BRANCH:-$MBR_ENV}
@@ -163,7 +169,7 @@ _supervisor() {
 _run_test() {
 	cd $SITE_ROOT
 	export PATH=$PATH:$SITE_ROOT/bin/openresty/nginx/sbin
-	prove -r t/$@
+	prove -r $@
 
 }
 _install_test() {

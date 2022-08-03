@@ -153,6 +153,32 @@ server {
 }
 
 ]],
+    ["_gw_upstream_backup_name_bsc-mainnet"] = [[ unix:/tmp/bsc-mainnet-getblock-1.sock ]],
+    ["_gw_upstream_backup_name_ws_bsc-mainnet"] = [[ unix:/tmp/bsc-mainnet-getblock-ws-1.sock ]],
+    ["_gw_upstream_backup_bsc-mainnet"] = [[
+server {
+    listen unix:/tmp/bsc-mainnet-getblock-1.sock;
+    location / {
+        add_header X-Mbr-Node-Id bsc-mainnet-getblock-1;
+        proxy_set_header X-Api-Key 6c4ddad0-7646-403e-9c10-744f91d37ccf;
+        proxy_pass https://bsc.getblock.io/mainnet/;
+
+  include /massbit/massbitroute/app/src/sites/services/gateway/etc/_provider_server.conf;
+    }
+}
+ ]],
+    ["_gw_upstream_backup_ws_bsc-mainnet"] = [[
+server {
+    listen unix:/tmp/bsc-mainnet-getblock-ws-1.sock;
+    location / {
+        add_header X-Mbr-Node-Id bsc-mainnet-getblock-1;
+        proxy_set_header X-Api-Key 6c4ddad0-7646-403e-9c10-744f91d37ccf;
+        proxy_pass https://bsc.getblock.io/mainnet/;
+
+  include /massbit/massbitroute/app/src/sites/services/gateway/etc/_provider_server_ws.conf;
+    }
+}
+ ]],
     ["_gw_upstream_backup_name_dot-mainnet"] = [[ unix:/tmp/dot-mainnet-getblock-1.sock ]],
     ["_gw_upstream_backup_name_ws_dot-mainnet"] = [[ unix:/tmp/dot-mainnet-getblock-ws-1.sock ]],
     ["_gw_upstream_backup_dot-mainnet"] = [[
@@ -883,33 +909,32 @@ local function _generate_item(instance, args)
 end
 
 function JobsAction:generateconfAction(job)
-    _print("generateconf:" .. inspect(job))
-
+    print(inspect(job))
     local instance = self:getInstance()
-
     local job_data = job.data or {}
     job_data._domain_name = _domain_name
-    _print("job_data: " .. inspect(job_data))
-    return _generate_item(instance, job_data)
-    -- _update_gdnsd(job_data)
+    local _ret = _generate_item(instance, job_data)
+    print("result:" .. inspect(_ret))
+    return true
 end
 
 function JobsAction:rescanconfAction(job)
-    -- local instance = self:getInstance()
+    print(inspect(job))
     local job_data = job.data or {}
     job_data._domain_name = _domain_name
-    _rescanconf(job_data)
+    local _ret = _rescanconf(job_data)
+    print("result:" .. inspect(_ret))
+    return true
 end
 
 function JobsAction:removeconfAction(job)
-    _print("removeconf:" .. inspect(job))
-
+    print(inspect(job))
     local instance = self:getInstance()
-    -- local _config = self:getInstanceConfig()
     local job_data = job.data or {}
     job_data._domain_name = _domain_name
-    return _remove_item(instance, job_data)
-    -- _update_gdnsd(job_data)
+    local _ret = _remove_item(instance, job_data)
+    print("result:" .. inspect(_ret))
+    return true
 end
 
 return JobsAction
