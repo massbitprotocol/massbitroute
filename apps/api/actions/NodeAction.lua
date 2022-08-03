@@ -165,40 +165,44 @@ function Action:registerAction(args)
         return {result = false, err_msg = "Token not correct"}
     end
     ]]
-    local ip = args.geo and args.geo.ip or ngx.var.realip
+    -- local ip = args.geo and args.geo.ip or ngx.var.realip
 
     -- _print("ip:" .. ip)
 
-    local data_url = args.data_url
+    -- local data_url = args.data_url
 
     -- _print("data_url:" .. data_url)
-    if not data_url then
-        data_url = "http://127.0.0.1:8545"
-    end
+    -- if not data_url then
+    --     data_url = "http://127.0.0.1:8545"
+    -- end
 
     -- ip = "34.124.167.144"
-    local _data = {
-        approved = 0,
-        id = id,
-        token = _token,
-        user_id = user_id,
-        ip = ip,
-        status = 0,
-        data_url = data_url
-    }
+    -- local _data = {
+    --     approved = 0,
+    --     id = id,
+    --     token = _token,
+    --     user_id = user_id,
+    --     ip = ip,
+    --     status = 0,
+    --     data_url = data_url
+    -- }
     -- _print(_data, true)
     --local _geo = _get_geo(ip, _config)
 
     -- _print("geo:" .. inspect(args.geo))
 
-    if args.geo then
-        _data.geo = args.geo
-    end
+    -- if args.geo then
+    --     _data.geo = args.geo
+    -- end
+    args.status = 0
+    args.approved = 0
 
     local model = Model:new(instance)
-    model:update(_data)
+    ngx_log(ngx.ERR, "[args]:" .. inspect(args))
+    local _ret = model:update(args)
+    ngx_log(ngx.ERR, "[ret]:" .. inspect(_ret))
 
-    local _result = {result = true}
+    local _result = {result = false}
     local jobs = instance:getJobs()
     local job = {
         action = "/jobs/" .. mytype .. ".generateconf",
@@ -208,63 +212,68 @@ function Action:registerAction(args)
             user_id = user_id
         }
     }
-    local _ok, _err = jobs:add(job)
-    ngx.log(ngx.ERR, {ok = _ok, err = _err}, true)
+    local _job_id = jobs:add(job)
+    ngx_log(ngx.ERR, "[job_id]:" .. inspect(_job_id))
+    if _job_id and tonumber(_job_id) > 0 then
+        _result = {
+            result = true
+        }
+    end
     ngx_log(ngx.ERR, "[response]:" .. inspect(_result))
     return _result
 end
 
-function Action:nodeverifyAction(args)
-    -- _print(inspect(args))
-    -- local _config = self:getInstanceConfig()
-    -- _print(args, true)
-    local _ip = args.ip
-    local _id = args.id
-    local _user_id = args.user_id
+-- function Action:nodeverifyAction(args)
+--     -- _print(inspect(args))
+--     -- local _config = self:getInstanceConfig()
+--     -- _print(args, true)
+--     local _ip = args.ip
+--     local _id = args.id
+--     local _user_id = args.user_id
 
-    if not _ip then
-        return {
-            result = false,
-            err_msg = "IP not defined"
-        }
-    end
+--     if not _ip then
+--         return {
+--             result = false,
+--             err_msg = "IP not defined"
+--         }
+--     end
 
-    local _res =
-        httpc:request_uri(
-        "https://" .. _ip .. "/ping",
-        {
-            method = "GET",
-            headers = {
-                ["Host"] = "node.mbr." .. _server_name
-            },
-            ssl_verify = false
-        }
-    )
+--     local _res =
+--         httpc:request_uri(
+--         "https://" .. _ip .. "/ping",
+--         {
+--             method = "GET",
+--             headers = {
+--                 ["Host"] = "node.mbr." .. _server_name
+--             },
+--             ssl_verify = false
+--         }
+--     )
 
-    -- _print(_res, true)
-    -- _print(_err, true)
-    local _ret = {result = false}
-    if _res and _res.status == 200 then
-        local instance = self:getInstance()
-        local model = Model:new(instance)
-        model:update({id = _id, user_id = _user_id, status = 1})
+--     -- _print(_res, true)
+--     -- _print(_err, true)
+--     local _ret = {result = false}
+--     if _res and _res.status == 200 then
+--         local instance = self:getInstance()
+--         local model = Model:new(instance)
+--         model:update({id = _id, user_id = _user_id, status = 1})
 
-        local jobs = instance:getJobs()
-        local job = {
-            action = "/jobs/" .. mytype .. ".generateconf",
-            delay = 0,
-            data = {
-                id = _id,
-                user_id = _user_id
-            }
-        }
-        jobs:add(job)
-        _ret = {result = true}
-    end
+--         local jobs = instance:getJobs()
+--         local job = {
+--             action = "/jobs/" .. mytype .. ".generateconf",
+--             delay = 0,
+--             data = {
+--                 id = _id,
+--                 user_id = _user_id
+--             }
+--         }
+--         jobs:add(job)
+--         _ret = {result = true}
+--     end
 
-    return _ret
-    --{result = _res and _res.status == 200}
-end
+--     return _ret
+--     --{result = _res and _res.status == 200}
+-- end
 
 function Action:unregisterAction(args)
     -- _print(inspect(args))
@@ -322,6 +331,19 @@ function Action:createAction(args)
     local _config = self:getInstanceConfig()
     local _res = _authorize_whitelist(_config, args)
     -- _print("_authorize_whitelist:" .. inspect(_res))
+    local ip = args.geo and args.geo.ip or ngx.var.realip
+    if ip then
+        args.ip = ip
+    end
+
+    if not args.data_url then
+        args.data_url = "http://127.0.0.1:8545"
+    end
+
+    if not args.data_ws then
+        args.data_ws = "http://127.0.0.1:8546"
+    end
+
     local user_id
     if _res then
         user_id = args.user_id
@@ -339,6 +361,9 @@ function Action:createAction(args)
 
     -- _print("user_id:" .. user_id)
     local model = Model:new(instance)
+
+    args.status = 0
+    args.approved = 0
 
     local _detail, _err_msg = model:create(args)
     local _result = {
