@@ -29,9 +29,8 @@ end
 local _service_dir = "/massbit/massbitroute/app/src/sites/services"
 local _portal_dir = _service_dir .. "/api"
 
-local _info_dir = _portal_dir .. "/public/deploy/info"
-
 local _deploy_confdir = _portal_dir .. "/public/deploy"
+local _info_dir = _deploy_confdir .. "/info"
 local _deploy_dir = _deploy_confdir .. "/node"
 local _deploy_nodeconfdir = _deploy_confdir .. "/nodeconf"
 local _deploy_gatewayconfdir = _deploy_confdir .. "/gatewayconf"
@@ -476,6 +475,7 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data, 
 
     if _provider then
         _deploy_confdir = _portal_dir .. "/public/deploy/" .. _provider
+        _info_dir = _deploy_confdir .. "/info"
         _deploy_dir = _deploy_confdir .. "/node"
         _deploy_nodeconfdir = _deploy_confdir .. "/nodeconf"
         _deploy_gatewayconfdir = _deploy_confdir .. "/gatewayconf"
@@ -788,6 +788,7 @@ local function _remove_item(instance, args)
     end
     if _item.provider then
         _deploy_confdir = _portal_dir .. "/public/deploy/" .. _item.provider
+        _info_dir = _deploy_confdir .. "/info"
         _deploy_dir = _deploy_confdir .. "/node"
         _deploy_nodeconfdir = _deploy_confdir .. "/nodeconf"
         _deploy_gatewayconfdir = _deploy_confdir .. "/gatewayconf"
@@ -883,6 +884,7 @@ local function _generate_item(instance, args)
     _print("rm old:" .. _old_file .. ":" .. inspect(_res))
     if _item.provider then
         _deploy_confdir = _portal_dir .. "/public/deploy/" .. _item.provider
+        _info_dir = _deploy_confdir .. "/info"
         _deploy_dir = _deploy_confdir .. "/node"
         _deploy_nodeconfdir = _deploy_confdir .. "/nodeconf"
         _deploy_gatewayconfdir = _deploy_confdir .. "/gatewayconf"
