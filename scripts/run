@@ -22,8 +22,9 @@ cmd_server=$SITE_ROOT/cmd_server
 
 _repo() {
 	if [ -e "$SITE_ROOT/cmd_server" ]; then bash $SITE_ROOT/cmd_server _env; fi
+
 	if [ -f "$SITE_ROOT/.env_raw" ]; then source $SITE_ROOT/.env_raw; fi
-	export MBR_ENV=${MBR_ENV:-dev}
+	export MBR_ENV=${MBR_ENV:-keiko}
 	# export BRANCH=${BRANCH:-$MBR_ENV}
 	# export MBRAPP_BRANCH=${MBRAPP_BRANCH:-$MBR_ENV}
 	export ASDF_BRANCH=${ASDF_BRANCH:-$MBR_ENV}
@@ -43,7 +44,7 @@ _repo() {
 	export MKAGENT_BRANCH=${MKAGENT_BRANCH:-$MBR_ENV}
 	export MONITOR_BRANCH=${MONITOR_BRANCH:-$MBR_ENV}
 	export SESSION_BRANCH=${SESSION_BRANCH:-$MBR_ENV}
-
+	# $service_dir/api|$GIT_PUBLIC_URL/massbitprotocol/massbitroute.git|$API_BRANCH \
 	REPOS="\
 $SITE_ROOT/env|$GIT_PRIVATE_READ_URL/massbitroute/env.git|$MBR_ENV \
  $mbr_root/gbc|https://github.com/massbitprotocol/massbitroute_gbc|$GBC_BRANCH \
@@ -51,7 +52,6 @@ $SITE_ROOT/env|$GIT_PRIVATE_READ_URL/massbitroute/env.git|$MBR_ENV \
  $mbr_root/gbc/bin/.asdf|https://github.com/massbitprotocol/massbitroute_asdf|$ASDF_BRANCH \
   $service_dir/gwman|$GIT_PUBLIC_URL/massbitprotocol/massbitroute_gwman.git|$GWMAN_BRANCH \
   $service_dir/gwman/data|http://$GIT_GWMANDEPLOY_WRITE@$GIT_PRIVATE_DOMAIN/massbitroute/gwmandeploy.git|$GWMANDEPLOY_BRANCH \
-  $service_dir/api|$GIT_PUBLIC_URL/massbitprotocol/massbitroute.git|$API_BRANCH \
   $service_dir/api/public/deploy|http://$GIT_APIDEPLOY_WRITE@$GIT_PRIVATE_DOMAIN/massbitroute/apideploy.git|$APIDEPLOY_BRANCH \
   $service_dir/mkagent|$GIT_PUBLIC_URL/massbitprotocol/massbitroute_mkagent.git|$MKAGENT_BRANCH \
   $service_dir/node|$GIT_PUBLIC_URL/massbitprotocol/massbitroute_node.git|$NODE_BRANCH \
@@ -293,6 +293,7 @@ _git_cmd() {
 			_dir="$_dir_def/gwman/data"
 			;;
 		esac
+		_git="git -C $_dir"
 
 		if [ "$cmd" = "commit" ]; then
 			_mydir="$_dir"
@@ -301,10 +302,10 @@ _git_cmd() {
 		else
 			_git="git -C $_dir"
 			$_git $cmd
-			commit_id=$($_git rev-parse origin/$($_git rev-parse --abbrev-ref HEAD))
-			repo_name=$(basename $($_git remote get-url origin) .git)
-			mkdir -p $SITE_ROOT/public/version
-			echo $commit_id >$SITE_ROOT/public/version/${repo_name}.version
+			# commit_id=$($_git rev-parse origin/$($_git rev-parse --abbrev-ref HEAD))
+			# repo_name=$(basename $($_git remote get-url origin) .git)
+			# mkdir -p $SITE_ROOT/public/version
+			# echo $commit_id >$SITE_ROOT/public/version/${repo_name}.version
 		fi
 	done
 
@@ -530,8 +531,8 @@ EOF
 	_st_update=0
 	# $0 _git_cmd push
 
-	_update_repos
-	_st_update=$?
+	# _update_repos
+	# _st_update=$?
 	#_update_listid
 
 	return $_st_update
