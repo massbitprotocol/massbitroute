@@ -94,7 +94,7 @@ run_tests();
 
 __DATA__
 
-=== Node register
+=== Node create new with provider
 
 --- main_config eval: $::main_config
 --- http_config eval: $::http_config
@@ -102,7 +102,7 @@ __DATA__
 --- more_headers
 Content-Type: application/json
 --- request
-POST /_internal_api/v2/?action=node.register
+POST /_internal_api/v2/?action=node.create
 {
   "blockchain" : "eth",
   "data_url" : "https://eth-mainnet.alchemyapi.io/v2/S11tNeGBJhpOfEJODJKghuGtTfpUG2RT",
@@ -118,7 +118,8 @@ POST /_internal_api/v2/?action=node.register
     "longitude" : -95.87735748291
   },
   "status": 0,
-  "id" : "fd6d64f8-70fb-4c12-aa8a-bdc2805a38a4",
+  "id" : "fd6d64f8-70fb-4c12-aa8a-bdc2805a38a5",
+"provider":"MASSBIT",
   "name" : "baysao-node-1",
   "network" : "mainnet",
    "zone" : "EU",
@@ -131,40 +132,15 @@ POST /_internal_api/v2/?action=node.register
 qr/"result":true/
 --- no_error_log
 
-=== Node get and check if created or not
+=== Node get with provider and check if created or not
 
 
 --- main_config eval: $::main_config
 --- http_config eval: $::http_config
 --- config eval: $::config
 --- request
-GET /_internal_api/v2/?action=node.get&id=fd6d64f8-70fb-4c12-aa8a-bdc2805a38a4&partner_id=fc78b64c5c33f3f270700b0c4d3e7998188035ab&user_id=b363ddf4-42cf-4ccf-89c2-8c42c531ac99&sid=403716b0f58a7d6ddec769f8ca6008f2c1c0cea6
+GET /_internal_api/v2/?action=node.get&id=fd6d64f8-70fb-4c12-aa8a-bdc2805a38a5&partner_id=fc78b64c5c33f3f270700b0c4d3e7998188035ab&user_id=b363ddf4-42cf-4ccf-89c2-8c42c531ac99&sid=403716b0f58a7d6ddec769f8ca6008f2c1c0cea6
 --- error_code: 200
 --- response_body eval
 qr/"result":true/ and qr/"status":0/ and qr/"approved":0/
 
-=== Check raw data if created or not
-
---- main_config eval: $::main_config
---- http_config eval: $::http_config
---- config eval: $::config
---- curl
---- request
-GET /deploy/node/eth/mainnet/NA/US/b363ddf4-42cf-4ccf-89c2-8c42c531ac99/fd6d64f8-70fb-4c12-aa8a-bdc2805a38a4
---- error_code: 200
---- response_body eval
-qr/"id":"fd6d64f8-70fb-4c12-aa8a-bdc2805a38a4"/
---- no_error_log
-
-=== Check raw data if created or not
-
---- main_config eval: $::main_config
---- http_config eval: $::http_config
---- config eval: $::config
---- curl
---- request
-GET /deploy/nodeconf/fd6d64f8-70fb-4c12-aa8a-bdc2805a38a4.conf
---- error_code: 200
---- response_body eval
-qr/server_name ws-fd6d64f8-70fb-4c12-aa8a-bdc2805a38a4.node.mbr.massbitroute.net/ and qr/server_name fd6d64f8-70fb-4c12-aa8a-bdc2805a38a4.node.mbr.massbitroute.net/
---- no_error_log

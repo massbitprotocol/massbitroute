@@ -94,7 +94,7 @@ run_tests();
 
 __DATA__
 
-=== Node create new
+=== Node create new without provider
 
 --- main_config eval: $::main_config
 --- http_config eval: $::http_config
@@ -119,8 +119,7 @@ POST /_internal_api/v2/?action=node.create
   },
   "status": 0,
   "id" : "fd6d64f8-70fb-4c12-aa8a-bdc2805a38a4",
-  "provider" : "MASSBIT",
-  "name" : "baysao-node-1",
+  "name" : "baysao-node-MASSBIT",
   "network" : "mainnet",
    "zone" : "EU",
   "token" : "J5RuUMaa2R5ouT67-aHKXg",
@@ -132,7 +131,7 @@ POST /_internal_api/v2/?action=node.create
 qr/"result":true/
 --- no_error_log
 
-=== Node get and check if created or not
+=== Node get without provider and check if created or not
 
 
 --- main_config eval: $::main_config

@@ -28,18 +28,19 @@ local function is_dir(path)
 end
 local _service_dir = "/massbit/massbitroute/app/src/sites/services"
 local _portal_dir = _service_dir .. "/api"
-local _deploy_dir = _portal_dir .. "/public/deploy/node"
 
 local _info_dir = _portal_dir .. "/public/deploy/info"
 
-local _deploy_nodeconfdir = _portal_dir .. "/public/deploy/nodeconf"
-local _deploy_gatewayconfdir = _portal_dir .. "/public/deploy/gatewayconf"
+local _deploy_confdir = _portal_dir .. "/public/deploy"
+local _deploy_dir = _deploy_confdir .. "/node"
+local _deploy_nodeconfdir = _deploy_confdir .. "/nodeconf"
+local _deploy_gatewayconfdir = _deploy_confdir .. "/gatewayconf"
 
 local Model = cc.import("#" .. mytype)
-local _domain_name = env.DOMAIN or "massbitroute.com"
+local _domain_name = env.DOMAIN or "massbitroute.net"
 local mkdirp = require "mkdirp"
-local _gwman_dir = _service_dir .. "/gwman/data"
-local _stat_dir = _service_dir .. "/stat/etc/conf"
+-- local _gwman_dir = _service_dir .. "/gwman/data"
+-- local _stat_dir = _service_dir .. "/stat/etc/conf"
 
 local rules = {
     _listid = [[${id} ${user_id} ${blockchain} ${network} ${ip} ${geo.continent_code} ${geo.country_code} ${token} ${status} ${approved} ${updated_at}]],
@@ -470,8 +471,15 @@ local function _gen_upstream_block(
     return _str
 end
 
-local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
+local function _rescanconf_blockchain_network(_blockchain, _network, _job_data, _provider)
     _print("rescanconf_blockchain_network:" .. _blockchain .. ":" .. _network)
+
+    if _provider then
+        _deploy_confdir = _portal_dir .. "/public/deploy/" .. _provider
+        _deploy_dir = _deploy_confdir .. "/node"
+        _deploy_nodeconfdir = _deploy_confdir .. "/nodeconf"
+        _deploy_gatewayconfdir = _deploy_confdir .. "/gatewayconf"
+    end
 
     local _allnodes = {}
     local _nodes = {}
@@ -778,6 +786,12 @@ local function _remove_item(instance, args)
      then
         return nil, "invalid data"
     end
+    if _item.provider then
+        _deploy_confdir = _portal_dir .. "/public/deploy/" .. _item.provider
+        _deploy_dir = _deploy_confdir .. "/node"
+        _deploy_nodeconfdir = _deploy_confdir .. "/nodeconf"
+        _deploy_gatewayconfdir = _deploy_confdir .. "/gatewayconf"
+    end
     local _item_path =
         table.concat(
         {
@@ -805,7 +819,7 @@ local function _remove_item(instance, args)
         _write_file(_deploy_file, json.encode(_item))
     end
 
-    _rescanconf_blockchain_network(_item.blockchain, _item.network, args)
+    _rescanconf_blockchain_network(_item.blockchain, _item.network, args, _item.provider)
 
     return true
 end
@@ -867,7 +881,12 @@ local function _generate_item(instance, args)
 
     -- local _res = shell.run(_cmd)
     _print("rm old:" .. _old_file .. ":" .. inspect(_res))
-
+    if _item.provider then
+        _deploy_confdir = _portal_dir .. "/public/deploy/" .. _item.provider
+        _deploy_dir = _deploy_confdir .. "/node"
+        _deploy_nodeconfdir = _deploy_confdir .. "/nodeconf"
+        _deploy_gatewayconfdir = _deploy_confdir .. "/gatewayconf"
+    end
     local _item_path =
         table.concat(
         {
@@ -904,7 +923,7 @@ local function _generate_item(instance, args)
     -- _print(_file_main)
     _write_file(_file_main, _str_tmpl)
 
-    _rescanconf_blockchain_network(_item.blockchain, _item.network, args)
+    _rescanconf_blockchain_network(_item.blockchain, _item.network, args, _item.provider)
     return true
 end
 
