@@ -19,12 +19,32 @@ gwman_dir=/massbit/massbitroute/app/src/sites/services/gwman
 gw_dir=/massbit/massbitroute/app/src/sites/services/gateway
 
 cmd_server=$SITE_ROOT/cmd_server
+export GIT_PUBLIC_URL=${GIT_PUBLIC_URL:-"https://github.com"}
 
 _repo() {
+	if [ -z "$GIT_PRIVATE_READ_URL" ]; then
+		echo "Need GIT_PRIVATE_READ_URL"
+		exit 1
+	fi
+
+	if [ \( -z "$MBR_ENV" \) -a \( -f "$SITE_ROOT/.env" \) ]; then
+		source $SITE_ROOT/.env
+	fi
+
+	if [ -z "$MBR_ENV" ]; then
+		echo "Need MBR_ENV"
+		exit 1
+	fi
+
+	if [ ! -d "$SITE_ROOT/env" ]; then
+		_git_clone $GIT_PRIVATE_READ_URL/massbitroute/env.git $SITE_ROOT/env $MBR_ENV
+	fi
+
 	if [ -e "$SITE_ROOT/cmd_server" ]; then bash $SITE_ROOT/cmd_server _env; fi
 
 	if [ -f "$SITE_ROOT/.env_raw" ]; then source $SITE_ROOT/.env_raw; fi
 	export MBR_ENV=${MBR_ENV:-keiko}
+	export ENV_BRANCH=${ENV_BRANCH:-$MBR_ENV}
 	# export BRANCH=${BRANCH:-$MBR_ENV}
 	# export MBRAPP_BRANCH=${MBRAPP_BRANCH:-$MBR_ENV}
 	export ASDF_BRANCH=${ASDF_BRANCH:-$MBR_ENV}
@@ -34,33 +54,33 @@ _repo() {
 	export GWMANDEPLOY_BRANCH=${GWMANDEPLOY_BRANCH:-$MBR_ENV}
 	export NODE_BRANCH=${NODE_BRANCH:-$MBR_ENV}
 	export GATEWAY_BRANCH=${GATEWAY_BRANCH:-$MBR_ENV}
-	export STAT_BRANCH=${STAT_BRANCH:-$MBR_ENV}
-	export STATDEPLOY_BRANCH=${STATDEPLOY_BRANCH:-$MBR_ENV}
-	export MONITOR_BRANCH=${MONITOR_BRANCH:-$MBR_ENV}
+	# export STAT_BRANCH=${STAT_BRANCH:-$MBR_ENV}
+	# export STATDEPLOY_BRANCH=${STATDEPLOY_BRANCH:-$MBR_ENV}
+	# export MONITOR_BRANCH=${MONITOR_BRANCH:-$MBR_ENV}
 	export API_BRANCH=${API_BRANCH:-$MBR_ENV}
 	export APIDEPLOY_BRANCH=${APIDEPLOY_BRANCH:-$MBR_ENV}
-	export SESSION_BRANCH=${SESSION_BRANCH:-$MBR_ENV}
+	# export SESSION_BRANCH=${SESSION_BRANCH:-$MBR_ENV}
 	export GIT_BRANCH=${GIT_BRANCH:-$MBR_ENV}
 	export MKAGENT_BRANCH=${MKAGENT_BRANCH:-$MBR_ENV}
-	export MONITOR_BRANCH=${MONITOR_BRANCH:-$MBR_ENV}
-	export SESSION_BRANCH=${SESSION_BRANCH:-$MBR_ENV}
+	# export MONITOR_BRANCH=${MONITOR_BRANCH:-$MBR_ENV}
+	# export SESSION_BRANCH=${SESSION_BRANCH:-$MBR_ENV}
 
 	REPOS="\
-$SITE_ROOT/env|$GIT_PRIVATE_READ_URL/massbitroute/env.git|$MBR_ENV \
- $mbr_root/gbc|https://github.com/massbitprotocol/massbitroute_gbc|$GBC_BRANCH \
+$SITE_ROOT/env|$GIT_PRIVATE_READ_URL/massbitroute/env.git|$ENV_BRANCH \
 /etc/letsencrypt|$GIT_PRIVATE_READ_URL/massbitroute/ssl.git|$SSL_BRANCH \
+ $mbr_root/gbc|https://github.com/massbitprotocol/massbitroute_gbc|$GBC_BRANCH \
  $mbr_root/gbc/bin/.asdf|https://github.com/massbitprotocol/massbitroute_asdf|$ASDF_BRANCH \
-
-  $service_dir/gwman|$GIT_PUBLIC_URL/massbitprotocol/massbitroute_gwman.git|$GWMAN_BRANCH \
-  $service_dir/gwman/data|http://$GIT_GWMANDEPLOY_WRITE@$GIT_PRIVATE_DOMAIN/massbitroute/gwmandeploy.git|$GWMANDEPLOY_BRANCH \
-  $service_dir/api/public/deploy|http://$GIT_APIDEPLOY_WRITE@$GIT_PRIVATE_DOMAIN/massbitroute/apideploy.git|$APIDEPLOY_BRANCH \
   $service_dir/mkagent|$GIT_PUBLIC_URL/massbitprotocol/massbitroute_mkagent.git|$MKAGENT_BRANCH \
+  $service_dir/gwman|$GIT_PUBLIC_URL/massbitprotocol/massbitroute_gwman.git|$GWMAN_BRANCH \
+  $service_dir/api|$GIT_PUBLIC_URL/massbitprotocol/massbitroute.git|$API_BRANCH \
   $service_dir/node|$GIT_PUBLIC_URL/massbitprotocol/massbitroute_node.git|$NODE_BRANCH \
   $service_dir/gateway|$GIT_PUBLIC_URL/massbitprotocol/massbitroute_gateway.git|$GATEWAY_BRANCH \
-"
-	# $service_dir/stat|$GIT_PUBLIC_URL/massbitprotocol/massbitroute_stat.git|$STAT_BRANCH \
-	# $service_dir/stat/etc/conf|http://$GIT_STATDEPLOY_WRITE@$GIT_PRIVATE_DOMAIN/massbitroute/statdeploy.git|$STATDEPLOY_BRANCH \
 
+  $service_dir/gwman/data|http://$GIT_GWMANDEPLOY_WRITE@$GIT_PRIVATE_DOMAIN/massbitroute/gwmandeploy.git|$GWMANDEPLOY_BRANCH \
+  $service_dir/api/public/deploy|http://$GIT_APIDEPLOY_WRITE@$GIT_PRIVATE_DOMAIN/massbitroute/apideploy.git|$APIDEPLOY_BRANCH \
+
+
+"
 }
 _repo
 
@@ -112,36 +132,37 @@ _install_repos() {
 		_git_clone $_url $_path $_branch
 	done
 }
-_init() {
-	if [ -z "$GIT_PRIVATE_READ_URL" ]; then
-		echo "Need GIT_PRIVATE_READ_URL"
-		exit 1
-	fi
-	# if [ ! -f "$SITE_ROOT/.env" ]; then
-	cat <<EOF >$SITE_ROOT/.env
-export GIT_PUBLIC_URL="https://github.com"
-export MBR_ENV=$MBR_ENV
-EOF
-	# fi
+# _init() {
+# 	if [ -z "$GIT_PRIVATE_READ_URL" ]; then
+# 		echo "Need GIT_PRIVATE_READ_URL"
+# 		exit 1
+# 	fi
+# 	# if [ ! -f "$SITE_ROOT/.env" ]; then
+# 	cat <<EOF >$SITE_ROOT/.env
+# export GIT_PUBLIC_URL="https://github.com"
+# export MBR_ENV=$MBR_ENV
+# EOF
+# 	# fi
 
-	source $SITE_ROOT/.env
+# 	if [ \( -z "$MBR_ENV" \) -a \( -f "$SITE_ROOT/.env" \) ]; then
+# 		source $SITE_ROOT/.env
+# 	fi
+# 	# _repo
+# 	_git_clone $GIT_PRIVATE_READ_URL/massbitroute/env.git $SITE_ROOT/env $MBR_ENV
+# 	#_git_clone $GIT_PUBLIC_URL/massbitprotocol/massbitroute_gbc.git /massbit/massbitroute/app/gbc
 
-	_repo
-	_git_clone $GIT_PRIVATE_READ_URL/massbitroute/env.git $SITE_ROOT/env $MBR_ENV
-	_git_clone $GIT_PUBLIC_URL/massbitprotocol/massbitroute_gbc.git /massbit/massbitroute/app/gbc
+# 	_repo
+# 	# if [ -e "$SITE_ROOT/cmd_server" ]; then bash $SITE_ROOT/cmd_server _env; fi
+# 	# if [ -f "$SITE_ROOT/.env_raw" ]; then source $SITE_ROOT/.env_raw; fi
+# 	# _git_clone $GIT_PUBLIC_URL/massbitprotocol/mbr-app.git $SITE_ROOT/public/mbr-app-prod $MBRAPP_BRANCH
 
-	_repo
-	# if [ -e "$SITE_ROOT/cmd_server" ]; then bash $SITE_ROOT/cmd_server _env; fi
-	# if [ -f "$SITE_ROOT/.env_raw" ]; then source $SITE_ROOT/.env_raw; fi
-	# _git_clone $GIT_PUBLIC_URL/massbitprotocol/mbr-app.git $SITE_ROOT/public/mbr-app-prod $MBRAPP_BRANCH
+# 	# bash $SITE_ROOT/cmd_server _env
+# 	# source $SITE_ROOT/.env_raw
+# 	# _repo
+# 	# cat $SITE_ROOT/.env_raw
+# 	# source $SITE_ROOT/.env_raw
 
-	# bash $SITE_ROOT/cmd_server _env
-	# source $SITE_ROOT/.env_raw
-	# _repo
-	# cat $SITE_ROOT/.env_raw
-	# source $SITE_ROOT/.env_raw
-
-}
+# }
 
 _supervisor() {
 	ln -sf /massbit/massbitroute/app/gbc /massbit/massbitroute/app/src/gbc
@@ -178,14 +199,15 @@ _install_test() {
 	done
 }
 
-_install_one() {
-	_init
-	_prepare
-	_install_repos
-}
+# _install_one() {
+# 	# _init
+# 	_prepare
+# 	_install_repos
+# }
 
 _install() {
-	_install_one
+	_prepare
+	_install_repos
 	_supervisor
 }
 _test_node() {
@@ -256,8 +278,8 @@ _git_cmd_commit() {
 _git_cmd() {
 	cmd=$1
 	shift
-	list_push="apideploy gwmandeploy statdeploy"
-	list_pull="api gwman stat $list_push"
+	list_push="apideploy gwmandeploy"
+	list_pull="api gwman $list_push"
 	list_all="$list_pull gateway node mkagent"
 	if [ -z "$cmd" ]; then cmd=push; fi
 
@@ -469,12 +491,12 @@ _cleanupmeforsure() {
 		# $SITE_ROOT/../gwman/scripts/run _prepare
 		$SITE_ROOT/../gwman/scripts/run _rebuild_conf
 
-		for d in stat_gw stat_node; do
-			if [ -d "$SITE_ROOT/../stat/etc/conf/$d" ]; then
-				find $SITE_ROOT/../stat/etc/conf/$d -type f -delete
-			fi
-		done
-		$SITE_ROOT/../stat/scripts/run _rebuild_conf
+		# for d in stat_gw stat_node; do
+		# 	if [ -d "$SITE_ROOT/../stat/etc/conf/$d" ]; then
+		# 		find $SITE_ROOT/../stat/etc/conf/$d -type f -delete
+		# 	fi
+		# done
+		# $SITE_ROOT/../stat/scripts/run _rebuild_conf
 		_update_listid
 		_git_cmd commit
 
@@ -548,13 +570,15 @@ _reload() {
 	$cmd_server status | grep worker- | awk '{print $1}' >$tmp
 	n=$(cat $tmp | wc -l)
 	cat $tmp | while read f; do
-		echo $cmd_server restart $f
-	done | parallel -j$n
+		$cmd_server restart $f
+	done
+	#| parallel -j$n
 
 	rm $tmp
 }
 
 _monitor() {
+	_repo
 	_update
 	is_reload=$?
 	if [ $is_reload -ne 0 ]; then
