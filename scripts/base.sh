@@ -13,11 +13,11 @@ EOF
 _env() {
 	if [ -z "$MBR_ENV" ]; then
 		echo "MBR_ENV missing"
-		exit 1
+		return 1
 	fi
 	if [ -z "$GIT_PRIVATE_READ_URL" ]; then
 		echo "GIT_PRIVATE_READ_URL missing"
-		exit 1
+		return 1
 	fi
 	export ENV_BRANCH=${ENV_BRANCH:-$MBR_ENV}
 	if [ ! -d "$SITE_ROOT/env/.git" ]; then
