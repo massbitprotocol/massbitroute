@@ -45,7 +45,7 @@ _git_clone() {
 	# echo "========================="
 	# 	$_dir/scripts/run _prepare
 	# fi
-	return _clone_status
+	return $_clone_status
 
 }
 
