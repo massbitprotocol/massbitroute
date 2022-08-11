@@ -125,6 +125,7 @@ EOF
 _install_repos() {
 	_git_config
 
+	_init
 	for _pathgit in $REPOS; do
 		# _repo
 		# _env
@@ -446,6 +447,7 @@ _update_repos() {
 		echo "Need GIT_PRIVATE_READ_URL"
 		exit 1
 	fi
+	_init
 	_update_sources $REPOS_PRIVATE
 	_st_repo=$?
 	return $_st_repo
