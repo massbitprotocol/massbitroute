@@ -112,6 +112,7 @@ _commit_sources() {
 		_branch=$(echo $_pathgit | cut -d'|' -f3)
 		if [ -z "$_branch" ]; then _branch=$MBR_ENV; fi
 		cd $_dir
+		git pull origin $_branch
 		git add .
 		git commit -m "$(date)"
 		git push origin $_branch

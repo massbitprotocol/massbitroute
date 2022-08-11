@@ -62,11 +62,13 @@ _repo() {
 	# export MONITOR_BRANCH=${MONITOR_BRANCH:-$MBR_ENV}
 	# export SESSION_BRANCH=${SESSION_BRANCH:-$MBR_ENV}
 	# $service_dir/api|$GIT_PUBLIC_URL/massbitprotocol/massbitroute.git|$API_BRANCH \
+	REPOS_RUNTIME="\
+  $service_dir/gwman/data|http://$GIT_GWMANDEPLOY_WRITE@$GIT_PRIVATE_DOMAIN/massbitroute/gwmandeploy.git|$GWMANDEPLOY_BRANCH \
+  $service_dir/api/public/deploy|http://$GIT_APIDEPLOY_WRITE@$GIT_PRIVATE_DOMAIN/massbitroute/apideploy.git|$APIDEPLOY_BRANCH \
+"
 	REPOS_PRIVATE="\
 $SITE_ROOT/env|$GIT_PRIVATE_READ_URL/massbitroute/env.git|$ENV_BRANCH \
 /etc/letsencrypt|$GIT_PRIVATE_READ_URL/massbitroute/ssl.git|$SSL_BRANCH \
-  $service_dir/gwman/data|http://$GIT_GWMANDEPLOY_WRITE@$GIT_PRIVATE_DOMAIN/massbitroute/gwmandeploy.git|$GWMANDEPLOY_BRANCH \
-  $service_dir/api/public/deploy|http://$GIT_APIDEPLOY_WRITE@$GIT_PRIVATE_DOMAIN/massbitroute/apideploy.git|$APIDEPLOY_BRANCH \
 "
 	REPOS="\
   $service_dir/gwman|$GIT_PUBLIC_URL/massbitprotocol/massbitroute_gwman.git|$GWMAN_BRANCH \
@@ -443,7 +445,7 @@ _commit_repos() {
 		exit 1
 	fi
 	_repo
-	_commit_sources $REPOS_PRIVATE
+	_commit_sources $REPOS_RUNTIME
 	_commit_status=$?
 	return $_commit_status
 }
