@@ -19,6 +19,7 @@ gwman_dir=/massbit/massbitroute/app/src/sites/services/gwman
 gw_dir=/massbit/massbitroute/app/src/sites/services/gateway
 
 cmd_server=$SITE_ROOT/cmd_server
+
 _reload() {
 	$cmd_server _update
 	$cmd_server status | grep worker- | awk '{print $1}' | while read f; do
