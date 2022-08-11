@@ -31,7 +31,7 @@ _repo() {
 		echo "MBR_ENV missing"
 		exit 1
 	fi
-	_env
+	# _env
 	# if [ -e "$SITE_ROOT/cmd_server" ]; then bash $SITE_ROOT/cmd_server _env; fi
 
 	# if [ -f "$SITE_ROOT/.env_raw" ]; then source $SITE_ROOT/.env_raw; fi
@@ -415,7 +415,7 @@ _install_repos() {
 	# 	echo "Need GIT_PRIVATE_READ_URL"
 	# 	exit 1
 	# fi
-	# _repo
+	_repo
 	_install_sources $REPOS
 	_install_status=$?
 	return $_install_status
