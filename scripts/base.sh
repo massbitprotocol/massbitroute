@@ -122,7 +122,7 @@ _commit_sources() {
 		if [ -z "$_branch" ]; then _branch=$MBR_ENV; fi
 		cd $_path
 		git add .
-		git commit -m $(date)
+		git commit -m "$(date)"
 		git push origin $_branch
 		_st=$?
 
