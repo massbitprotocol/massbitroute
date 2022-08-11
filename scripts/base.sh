@@ -99,7 +99,7 @@ _update_sources() {
 		# 	fi
 
 		# fi
-
+		_env
 	done
 	return $_update_status
 }
