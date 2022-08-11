@@ -86,7 +86,7 @@ _install_sources() {
 		_git_clone $_url $_dir $_branch 1
 		_st=$?
 
-		if [ $_update_sources_status -eq 0 ]; then
+		if [ $_install_sources_status -eq 0 ]; then
 			_install_sources_status=$_st
 		fi
 		_env
