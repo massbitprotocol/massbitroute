@@ -62,7 +62,7 @@ _git_clone() {
 
 _install_sources() {
 	_git_config
-	_env
+	# _env
 	_install_sources_status=0
 	for _pathgit in $@; do
 		# _repo
