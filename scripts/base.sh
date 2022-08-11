@@ -16,7 +16,9 @@ _env() {
 		exit 1
 	fi
 	export ENV_BRANCH=${ENV_BRANCH:-$MBR_ENV}
-	_git_clone $GIT_PRIVATE_READ_URL/massbitroute/env.git $SITE_ROOT/env $ENV_BRANCH
+	if [ ! -d "$SITE_ROOT/env/.git" ]; then
+		_git_clone $GIT_PRIVATE_READ_URL/massbitroute/env.git $SITE_ROOT/env $ENV_BRANCH
+	fi
 	if [ -f "$SITE_ROOT/env/env.sh" ]; then
 		source $SITE_ROOT/env/env.sh
 	fi
