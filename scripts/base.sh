@@ -62,6 +62,7 @@ _git_clone() {
 
 _install_sources() {
 	_git_config
+	_env
 	_install_sources_status=0
 	for _pathgit in $@; do
 		# _repo
@@ -82,6 +83,7 @@ _install_sources() {
 }
 _update_sources() {
 	_git_config
+	_env
 	_update_sources_status=0
 	for _pathgit in $@; do
 		_dir=$(echo $_pathgit | cut -d'|' -f1)
@@ -101,6 +103,7 @@ _update_sources() {
 }
 _commit_sources() {
 	_git_config
+	_env
 	_commit_sources_status=0
 	for _pathgit in $@; do
 		_dir=$(echo $_pathgit | cut -d'|' -f1)
