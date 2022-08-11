@@ -1,6 +1,6 @@
 #!/bin/bash
 SITE_ROOT=$(realpath $(dirname $(realpath $0))/..)
-
+export HOME=$SITE_ROOT
 _git_config() {
 	cat >$HOME/.gitconfig <<EOF
    [http]

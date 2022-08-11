@@ -411,10 +411,10 @@ _install_repos() {
 		echo "MBR_ENV missing"
 		exit 1
 	fi
-	if [ -z "$GIT_PRIVATE_READ_URL" ]; then
-		echo "Need GIT_PRIVATE_READ_URL"
-		exit 1
-	fi
+	# if [ -z "$GIT_PRIVATE_READ_URL" ]; then
+	# 	echo "Need GIT_PRIVATE_READ_URL"
+	# 	exit 1
+	# fi
 	_repo
 	_install_sources $REPOS
 	_install_status=$?
