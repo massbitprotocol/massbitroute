@@ -53,13 +53,6 @@ _repo_private() {
 		exit 1
 	fi
 
-	# _env
-	# if [ -e "$SITE_ROOT/cmd_server" ]; then bash $SITE_ROOT/cmd_server _env; fi
-
-	# if [ -f "$SITE_ROOT/.env_raw" ]; then source $SITE_ROOT/.env_raw; fi
-	# export MBR_ENV=${MBR_ENV:-keiko}
-	# export BRANCH=${BRANCH:-$MBR_ENV}
-	# export MBRAPP_BRANCH=${MBRAPP_BRANCH:-$MBR_ENV}
 	export ENV_BRANCH=${ENV_BRANCH:-$MBR_ENV}
 
 	export MKAGENT_BRANCH=${MKAGENT_BRANCH:-$MBR_ENV}
@@ -73,17 +66,12 @@ _repo_private() {
 
 	export NODE_BRANCH=${NODE_BRANCH:-$MBR_ENV}
 	export GATEWAY_BRANCH=${GATEWAY_BRANCH:-$MBR_ENV}
-	# export STAT_BRANCH=${STAT_BRANCH:-$MBR_ENV}
-	# export STATDEPLOY_BRANCH=${STATDEPLOY_BRANCH:-$MBR_ENV}
-	# export MONITOR_BRANCH=${MONITOR_BRANCH:-$MBR_ENV}
+
 	export API_BRANCH=${API_BRANCH:-$MBR_ENV}
 	export APIDEPLOY_BRANCH=${APIDEPLOY_BRANCH:-$MBR_ENV}
-	# export SESSION_BRANCH=${SESSION_BRANCH:-$MBR_ENV}
-	# export GIT_BRANCH=${GIT_BRANCH:-$MBR_ENV}
 
-	# export MONITOR_BRANCH=${MONITOR_BRANCH:-$MBR_ENV}
-	# export SESSION_BRANCH=${SESSION_BRANCH:-$MBR_ENV}
-	# $service_dir/api|$GIT_PUBLIC_URL/massbitprotocol/massbitroute.git|$API_BRANCH \
+	_env
+
 	REPOS_RUNTIME="\
   $service_dir/gwman/data|http://$GIT_GWMANDEPLOY_WRITE@$GIT_PRIVATE_DOMAIN/massbitroute/gwmandeploy.git|$GWMANDEPLOY_BRANCH \
   $service_dir/api/public/deploy|http://$GIT_APIDEPLOY_WRITE@$GIT_PRIVATE_DOMAIN/massbitroute/apideploy.git|$APIDEPLOY_BRANCH \
@@ -93,16 +81,7 @@ $SITE_ROOT/env|$GIT_PRIVATE_READ_URL/massbitroute/env.git|$ENV_BRANCH \
 /etc/letsencrypt|$GIT_PRIVATE_READ_URL/massbitroute/ssl.git|$SSL_BRANCH \
 "
 
-	# $service_dir/stat|$GIT_PUBLIC_URL/massbitprotocol/massbitroute_stat.git|$STAT_BRANCH \
-	# $service_dir/stat/etc/conf|http://$GIT_STATDEPLOY_WRITE@$GIT_PRIVATE_DOMAIN/massbitroute/statdeploy.git|$STATDEPLOY_BRANCH \
-
 }
-# _repo
-
-#  $service_dir/api/public/mbr-app-prod|$GIT_PUBLIC_URL/massbitprotocol/mbr-app.git|$MBRAPP_BRANCH \
-#  $service_dir/monitor|$GIT_PUBLIC_URL/massbitprotocol/massbitroute_monitor.git|$MONITOR_BRANCH \
-#  $service_dir/session|$GIT_PUBLIC_URL/massbitprotocol/massbitroute_session.git|$SESSION_BRANCH \
-# _repo
 
 # _tune_os() {
 # 	#dns

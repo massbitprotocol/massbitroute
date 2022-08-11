@@ -13,9 +13,12 @@ EOF
 _env() {
 	if [ -z "$MBR_ENV" ]; then
 		echo "MBR_ENV missing"
-		return
+		exit 1
 	fi
-	if [ -z "$GIT_PRIVATE_READ_URL" ]; then return; fi
+	if [ -z "$GIT_PRIVATE_READ_URL" ]; then
+		echo "GIT_PRIVATE_READ_URL missing"
+		exit 1
+	fi
 	export ENV_BRANCH=${ENV_BRANCH:-$MBR_ENV}
 	if [ ! -d "$SITE_ROOT/env/.git" ]; then
 		_git_clone $GIT_PRIVATE_READ_URL/massbitroute/env.git $SITE_ROOT/env $ENV_BRANCH
