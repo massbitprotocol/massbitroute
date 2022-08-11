@@ -26,7 +26,7 @@ _reload() {
 	done
 
 }
-_init() {
+_repo() {
 	if [ -z "$MBR_ENV" ]; then
 		echo "MBR_ENV missing"
 		exit 1
@@ -101,39 +101,6 @@ _prepare() {
 	if [ ! -f "$SITE_ROOT/data/geoip/GeoIP2-City.mmdb" ]; then
 		tar -xvJf $SITE_ROOT/data/geoip/GeoIP2-City.mmdb.tar.xz -C $SITE_ROOT/data/geoip
 	fi
-	cat <<EOF >$HOME/.gitconfig
-[http]
-        sslverify = false
-[user]
-	email = baysao@gmail.com
-	name = Baysao
-[safe]
-	directory = /massbit/massbitroute/app/env
-	directory = /massbit/massbitroute/app/gbc
-	directory = /massbit/massbitroute/app/gbc/bin/.asdf
-	directory = /etc/letsencrypt
-	directory = /massbit/massbitroute/app/src/sites/services/api
-	directory = /massbit/massbitroute/app/src/sites/services/api/public/deploy
-	directory = /massbit/massbitroute/app/src/sites/services/node
-	directory = /massbit/massbitroute/app/src/sites/services/gateway
-	directory = /massbit/massbitroute/app/src/sites/services/mkagent
-	directory = /massbit/massbitroute/app/src/sites/services/gwman
-	directory = /massbit/massbitroute/app/src/sites/services/gwman/data
-EOF
-}
-
-_install_repos() {
-	_git_config
-
-	_init
-	for _pathgit in $REPOS; do
-		# _repo
-		# _env
-		_path=$(echo $_pathgit | cut -d'|' -f1)
-		_url=$(echo $_pathgit | cut -d'|' -f2)
-		_branch=$(echo $_pathgit | cut -d'|' -f3)
-		_git_clone $_url $_path $_branch
-	done
 }
 
 _supervisor() {
@@ -172,7 +139,6 @@ _install_test() {
 }
 
 _install_one() {
-	_init
 	_prepare
 	_install_repos
 }
@@ -438,6 +404,21 @@ _update_listid() {
 	mkdir -p $info_dir
 	awk -v domain="$DOMAIN" '{print $5,$1".gw.mbr."domain}' $info_dir/listid >>$portal_dir/public/deploy/info/hosts
 }
+_install_repos() {
+	if [ -z "$MBR_ENV" ]; then
+		echo "MBR_ENV missing"
+		exit 1
+	fi
+	if [ -z "$GIT_PRIVATE_READ_URL" ]; then
+		echo "Need GIT_PRIVATE_READ_URL"
+		exit 1
+	fi
+	_repo
+	_install_sources $REPOS
+	_install_status=$?
+	return $_install_status
+}
+
 _update_repos() {
 	if [ -z "$MBR_ENV" ]; then
 		echo "MBR_ENV missing"
@@ -447,10 +428,10 @@ _update_repos() {
 		echo "Need GIT_PRIVATE_READ_URL"
 		exit 1
 	fi
-	_init
+	_repo
 	_update_sources $REPOS_PRIVATE
-	_st_repo=$?
-	return $_st_repo
+	_update_status=$?
+	return $_update_status
 }
 
 _cleanupmeforsure() {
@@ -497,7 +478,6 @@ _sync_redis_conf() {
 }
 _update() {
 	echo "Update"
-	_init
 	_prepare
 	_st_update=0
 	# $0 _git_cmd push

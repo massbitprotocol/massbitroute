@@ -31,14 +31,21 @@ _git_clone() {
 	_url=$1
 	_dir=$2
 	_branch=$3
+	_force=$4
 	if [ -z "$_branch" ]; then _branch=$MBR_ENV; fi
 	_clone_status=0
 	# if [ -d "$_dir" ]; then rm -rf $_dir; fi
+
+	if [ $_force -eq 1 ]; then
+		if [ -d "$_dir" ]; then
+			if [ -d "${_dir}.backup" ]; then rm -rf ${_dir}.backup; fi
+			mv $_dir ${_dir}.backup
+		fi
+	fi
+
 	mkdir -p $_dir
 	#	git config --global --add safe.directory $_dir
-	if [ ! -d "$_dir" ]; then
-		if [ -d "${_dir}.backup" ]; then rm -rf ${_dir}.backup; fi
-		mv $_dir ${_dir}.backup
+	if [ -d "$_dir" ]; then
 		git clone --depth 1 -b $_branch $_url $_dir
 		_clone_status=1
 		# if [ ! -d "$_dir/.git" ]; then
@@ -46,16 +53,15 @@ _git_clone() {
 
 		# git -C $_dir fetch --all
 		# git -C $_dir branch --set-upstream-to=origin/$_branch
-
-	else
-		# git -C $_dir remote -v | grep 'git@' >/dev/null
-		# if [ $? -ne 0 ]; then
-		# 	git -C $_dir fetch --all
-		git -C $_dir pull origin $_branch | grep -i "updating" >/dev/null
-		if [ $? -eq 0 ]; then
-			_clone_status=1
-		fi
 	fi
+	# git -C $_dir remote -v | grep 'git@' >/dev/null
+	# if [ $? -ne 0 ]; then
+	# 	git -C $_dir fetch --all
+	git -C $_dir pull origin $_branch | grep -i "updating" >/dev/null
+	if [ $? -eq 0 ]; then
+		_clone_status=1
+	fi
+
 	# if [ -f "$_dir/scripts/run" ]; then
 	# echo "========================="
 	# echo "$_dir/scripts/run _prepare"
@@ -66,13 +72,33 @@ _git_clone() {
 
 }
 
+_install_sources() {
+	_git_config
+	_install_sources_status=0
+	for _pathgit in $@; do
+		# _repo
+		# _env
+		_path=$(echo $_pathgit | cut -d'|' -f1)
+		_url=$(echo $_pathgit | cut -d'|' -f2)
+		_branch=$(echo $_pathgit | cut -d'|' -f3)
+		if [ -z "$_branch" ]; then _branch=$MBR_ENV; fi
+		_git_clone $_url $_path $_branch 1
+		_st=$?
+
+		if [ $_update_status -eq 0 ]; then
+			_install_sources_status=$_st
+		fi
+		_env
+	done
+	return $_install_sources_status
+}
 _update_sources() {
 	_git_config
-	_update_status=0
+	_update_sources_status=0
 	# branch=$MBR_ENV
 	for _pathgit in $@; do
 		_path=$(echo $_pathgit | cut -d'|' -f1)
-		git config --global --add safe.directory $_path
+		# git config --global --add safe.directory $_path
 		_url=$(echo $_pathgit | cut -d'|' -f2)
 		_branch=$(echo $_pathgit | cut -d'|' -f3)
 		if [ -z "$_branch" ]; then _branch=$MBR_ENV; fi
@@ -80,7 +106,7 @@ _update_sources() {
 		_st=$?
 
 		if [ $_update_status -eq 0 ]; then
-			_update_status=$_st
+			_update_sources_status=$_st
 		fi
 
 		# if [ -z "$_branch" ]; then _branch=$branch; fi
@@ -118,7 +144,7 @@ _update_sources() {
 		# fi
 		_env
 	done
-	return $_update_status
+	return $_update_sources_status
 }
 loop() {
 	while true; do
