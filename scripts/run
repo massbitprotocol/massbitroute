@@ -19,7 +19,13 @@ gwman_dir=/massbit/massbitroute/app/src/sites/services/gwman
 gw_dir=/massbit/massbitroute/app/src/sites/services/gateway
 
 cmd_server=$SITE_ROOT/cmd_server
+_reload() {
+	$cmd_server _update
+	$cmd_server status | grep worker- | awk '{print $1}' | while read f; do
+		$cmd_server restart $f
+	done
 
+}
 _init() {
 	if [ -z "$MBR_ENV" ]; then
 		echo "MBR_ENV missing"
@@ -92,22 +98,28 @@ $SITE_ROOT/env|$GIT_PRIVATE_READ_URL/massbitroute/env.git|$ENV_BRANCH \
 _prepare() {
 	echo "Prepare"
 	mkdir -p $SITE_ROOT/logs/nginx $SITE_ROOT/db $SITE_ROOT/tmp $SITE_ROOT/db
-
-	# rm -rf $SITE_ROOT/tmp/*
-	# if [ ! -f "/usr/bin/parallel" ]; then
-	# 	apt update
-	# 	apt install -y parallel
-	# fi
-
 	if [ ! -f "$SITE_ROOT/data/geoip/GeoIP2-City.mmdb" ]; then
-		# apt update
-		# apt-get install -y xz-utils
 		tar -xvJf $SITE_ROOT/data/geoip/GeoIP2-City.mmdb.tar.xz -C $SITE_ROOT/data/geoip
 	fi
-	# if [ -n "$DOMAIN" ]; then
-	# 	bash $SITE_ROOT/scripts/mbr_app.sh _build_prod $MBRAPP_BRANCH
-	# fi
-
+	cat <<EOF >$HOME/.gitconfig
+[http]
+        sslverify = false
+[user]
+	email = baysao@gmail.com
+	name = Baysao
+[safe]
+	directory = /massbit/massbitroute/app/env
+	directory = /massbit/massbitroute/app/gbc
+	directory = /massbit/massbitroute/app/gbc/bin/.asdf
+	directory = /etc/letsencrypt
+	directory = /massbit/massbitroute/app/src/sites/services/api
+	directory = /massbit/massbitroute/app/src/sites/services/api/public/deploy
+	directory = /massbit/massbitroute/app/src/sites/services/node
+	directory = /massbit/massbitroute/app/src/sites/services/gateway
+	directory = /massbit/massbitroute/app/src/sites/services/mkagent
+	directory = /massbit/massbitroute/app/src/sites/services/gwman
+	directory = /massbit/massbitroute/app/src/sites/services/gwman/data
+EOF
 }
 
 _install_repos() {
@@ -121,36 +133,6 @@ _install_repos() {
 		_branch=$(echo $_pathgit | cut -d'|' -f3)
 		_git_clone $_url $_path $_branch
 	done
-}
-_init1() {
-	if [ -z "$GIT_PRIVATE_READ_URL" ]; then
-		echo "Need GIT_PRIVATE_READ_URL"
-		exit 1
-	fi
-	# if [ ! -f "$SITE_ROOT/.env" ]; then
-	cat <<EOF >$SITE_ROOT/.env
-export GIT_PUBLIC_URL="https://github.com"
-export MBR_ENV=$MBR_ENV
-EOF
-	# fi
-
-	source $SITE_ROOT/.env
-
-	# _repo
-	_git_clone $GIT_PRIVATE_READ_URL/massbitroute/env.git $SITE_ROOT/env $MBR_ENV
-	_git_clone $GIT_PUBLIC_URL/massbitprotocol/massbitroute_gbc.git /massbit/massbitroute/app/gbc
-
-	# _repo
-	# if [ -e "$SITE_ROOT/cmd_server" ]; then bash $SITE_ROOT/cmd_server _env; fi
-	# if [ -f "$SITE_ROOT/.env_raw" ]; then source $SITE_ROOT/.env_raw; fi
-	# _git_clone $GIT_PUBLIC_URL/massbitprotocol/mbr-app.git $SITE_ROOT/public/mbr-app-prod $MBRAPP_BRANCH
-
-	# bash $SITE_ROOT/cmd_server _env
-	# source $SITE_ROOT/.env_raw
-	# _repo
-	# cat $SITE_ROOT/.env_raw
-	# source $SITE_ROOT/.env_raw
-
 }
 
 _supervisor() {
@@ -464,9 +446,6 @@ _update_repos() {
 		echo "Need GIT_PRIVATE_READ_URL"
 		exit 1
 	fi
-	# _git_config
-	_init
-	# _repo
 	_update_sources $REPOS_PRIVATE
 	_st_repo=$?
 	return $_st_repo
@@ -515,62 +494,16 @@ _sync_redis_conf() {
 	done
 }
 _update() {
-	if [ ! -f "$SITE_ROOT/data/geoip/GeoIP2-City.mmdb" ]; then
-		tar -xvJf $SITE_ROOT/data/geoip/GeoIP2-City.mmdb.tar.xz -C $SITE_ROOT/data/geoip
-	fi
-
-	# if [ ! -f "$HOME/.gitconfig" ]; then
-	cat <<EOF >$HOME/.gitconfig
-[http]
-        sslverify = false
-[user]
-	email = baysao@gmail.com
-	name = Baysao
-[safe]
-	directory = /massbit/massbitroute/app/env
-	directory = /massbit/massbitroute/app/gbc
-	directory = /massbit/massbitroute/app/gbc/bin/.asdf
-	directory = /etc/letsencrypt
-	directory = /massbit/massbitroute/app/src/sites/services/api
-	directory = /massbit/massbitroute/app/src/sites/services/api/public/deploy
-	directory = /massbit/massbitroute/app/src/sites/services/node
-	directory = /massbit/massbitroute/app/src/sites/services/gateway
-	directory = /massbit/massbitroute/app/src/sites/services/mkagent
-	directory = /massbit/massbitroute/app/src/sites/services/gwman
-	directory = /massbit/massbitroute/app/src/sites/services/gwman/data
-EOF
-	# fi
-	if [ ! -f "$SITE_ROOT/.env" ]; then
-		cat <<EOF >$SITE_ROOT/.env
-export GIT_PUBLIC_URL="https://github.com"
-export MBR_ENV=$MBR_ENV
-EOF
-	fi
-
 	echo "Update"
+	_prepare
 	_st_update=0
 	# $0 _git_cmd push
 
-	# _update_repos
-	# _st_update=$?
+	_update_repos
+	_st_update=$?
 	#_update_listid
 
 	return $_st_update
-}
-
-_reload() {
-	truncate -s 0 $SITE_ROOT/logs/nginx/*
-	truncate -s 0 $SITE_ROOT/logs/*
-	$cmd_server _update
-	# $cmd_server update
-	tmp=$(mktemp)
-	$cmd_server status | grep worker- | awk '{print $1}' >$tmp
-	n=$(cat $tmp | wc -l)
-	cat $tmp | while read f; do
-		echo $cmd_server restart $f
-	done | parallel -j$n
-
-	rm $tmp
 }
 
 _monitor() {
