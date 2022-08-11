@@ -120,7 +120,7 @@ _commit_sources() {
 		_url=$(echo $_pathgit | cut -d'|' -f2)
 		_branch=$(echo $_pathgit | cut -d'|' -f3)
 		if [ -z "$_branch" ]; then _branch=$MBR_ENV; fi
-		cd $_dir
+		cd $_path
 		git add .
 		git commit -m $(date)
 		git push origin $_branch
