@@ -32,10 +32,9 @@ _git_clone() {
 	_dir=$2
 	_branch=$3
 	_force=$4
-	if [ -z $_force ]; then _force=0; fi
+	if [ -z "$_force" ]; then _force=0; fi
 	if [ -z "$_branch" ]; then _branch=$MBR_ENV; fi
 	_clone_status=0
-	# if [ -d "$_dir" ]; then rm -rf $_dir; fi
 
 	if [ $_force -eq 1 ]; then
 		if [ -d "$_dir" ]; then
@@ -45,30 +44,18 @@ _git_clone() {
 	fi
 
 	mkdir -p $_dir
-	#	git config --global --add safe.directory $_dir
+
 	if [ -d "$_dir" ]; then
 		git clone --depth 1 -b $_branch $_url $_dir
 		_clone_status=1
-		# if [ ! -d "$_dir/.git" ]; then
-		# 	git clone --depth 1 -b $_branch $_url $_dir
 
-		# git -C $_dir fetch --all
-		# git -C $_dir branch --set-upstream-to=origin/$_branch
 	fi
-	# git -C $_dir remote -v | grep 'git@' >/dev/null
-	# if [ $? -ne 0 ]; then
-	# 	git -C $_dir fetch --all
+
 	git -C $_dir pull origin $_branch | grep -i "updating" >/dev/null
 	if [ $? -eq 0 ]; then
 		_clone_status=1
 	fi
 
-	# if [ -f "$_dir/scripts/run" ]; then
-	# echo "========================="
-	# echo "$_dir/scripts/run _prepare"
-	# echo "========================="
-	# 	$_dir/scripts/run _prepare
-	# fi
 	return $_clone_status
 
 }
