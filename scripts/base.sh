@@ -2,7 +2,6 @@
 SITE_ROOT=$(realpath $(dirname $(realpath $0))/..)
 
 _git_config() {
-	# if [ ! -f "$HOME/.gitconfig" ]; then
 	cat >$HOME/.gitconfig <<EOF
    [http]
         sslverify = false
@@ -10,8 +9,6 @@ _git_config() {
 	email = baysao@gmail.com
 	name = Baysao
 EOF
-	# fi
-
 }
 _git_clone() {
 	_url=$1
@@ -20,26 +17,30 @@ _git_clone() {
 	if [ -z "$_branch" ]; then _branch=$MBR_ENV; fi
 	# if [ -d "$_dir" ]; then rm -rf $_dir; fi
 	mkdir -p $_dir
-	git config --global --add safe.directory $_dir
-	if [ ! -d "$_dir/.git" ]; then
-		git clone $_url $_dir -b $_branch
+	#	git config --global --add safe.directory $_dir
+	if [ ! -d "$_dir" ]; then
+		if [ -d "${_dir}.backup" ]; then rm -rf ${_dir}.backup; fi
+		mv $_dir ${_dir}.backup
+		git clone --depth 1 -b $_branch $_url $_dir
 
-		git -C $_dir fetch --all
-		git -C $_dir branch --set-upstream-to=origin/$_branch
+		# if [ ! -d "$_dir/.git" ]; then
+		# 	git clone --depth 1 -b $_branch $_url $_dir
+
+		# git -C $_dir fetch --all
+		# git -C $_dir branch --set-upstream-to=origin/$_branch
 
 	else
-		git -C $_dir remote -v | grep 'git@' >/dev/null
-		if [ $? -ne 0 ]; then
-			git -C $_dir fetch --all
-			git -C $_dir pull origin $_branch
-		fi
+		# git -C $_dir remote -v | grep 'git@' >/dev/null
+		# if [ $? -ne 0 ]; then
+		# 	git -C $_dir fetch --all
+		git -C $_dir pull origin $_branch
 	fi
-	if [ -f "$_dir/scripts/run" ]; then
-		echo "========================="
-		echo "$_dir/scripts/run _prepare"
-		echo "========================="
-		$_dir/scripts/run _prepare
-	fi
+	# if [ -f "$_dir/scripts/run" ]; then
+	# echo "========================="
+	# echo "$_dir/scripts/run _prepare"
+	# echo "========================="
+	# 	$_dir/scripts/run _prepare
+	# fi
 
 }
 
