@@ -455,7 +455,7 @@ _update_repos() {
 		echo "Need GIT_PRIVATE_READ_URL"
 		exit 1
 	fi
-	_git_config
+	# _git_config
 	_init
 	# _repo
 	_update_sources $REPOS_PRIVATE
