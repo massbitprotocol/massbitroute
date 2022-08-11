@@ -10,6 +10,21 @@ _git_config() {
 	name = Baysao
 EOF
 }
+_env() {
+	if [ -z "$MBR_ENV" ]; then
+		echo "MBR_ENV missing"
+		exit 1
+	fi
+	export ENV_BRANCH=${ENV_BRANCH:-$MBR_ENV}
+	_git_clone $GIT_PRIVATE_READ_URL/massbitroute/env.git $SITE_ROOT/env $ENV_BRANCH
+	if [ -f "$SITE_ROOT/env/env.sh" ]; then
+		source $SITE_ROOT/env/env.sh
+	fi
+	if [ -f "$SITE_ROOT/env/env.lua" ]; then
+		cp $SITE_ROOT/env/env.lua $SITE_ROOT/src/
+	fi
+
+}
 _git_clone() {
 	_url=$1
 	_dir=$2
