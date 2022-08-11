@@ -85,7 +85,7 @@ _install_sources() {
 		_git_clone $_url $_path $_branch 1
 		_st=$?
 
-		if [ $_update_status -eq 0 ]; then
+		if [ $_update_sources_status -eq 0 ]; then
 			_install_sources_status=$_st
 		fi
 		_env
@@ -95,7 +95,6 @@ _install_sources() {
 _update_sources() {
 	_git_config
 	_update_sources_status=0
-	# branch=$MBR_ENV
 	for _pathgit in $@; do
 		_path=$(echo $_pathgit | cut -d'|' -f1)
 		# git config --global --add safe.directory $_path
@@ -105,46 +104,34 @@ _update_sources() {
 		_git_clone $_url $_dir $_branch
 		_st=$?
 
-		if [ $_update_status -eq 0 ]; then
+		if [ $_update_sources_status -eq 0 ]; then
 			_update_sources_status=$_st
 		fi
-
-		# if [ -z "$_branch" ]; then _branch=$branch; fi
-		# if [ ! -d "$_path/.git" ]; then
-
-		# 	git clone $_url $_path -b $_branch
-		# 	git -C $_path fetch --all
-		# 	git -C $_path branch --set-upstream-to=origin/$_branch
-		# 	_is_reload=1
-		# else
-
-		# 	git -C $_path remote -v | grep $_url >/dev/null
-		# 	if [ $? -ne 0 ]; then
-		# 		rm -rf $_path
-		# 		git clone $_url $_path -b $_branch
-		# 	fi
-
-		# 	git -C $_path fetch --all
-		# 	git -C $_path checkout $_branch
-
-		# 	git -C $_path branch | grep $_branch >/dev/null
-		# 	if [ $? -ne 0 ]; then
-		# 		git -C $_path reset --hard
-		# 	fi
-
-		# 	tmp="$(git -C $_path pull origin $_branch 2>&1)"
-
-		# 	echo "$tmp" | grep -i "updating"
-		# 	st=$?
-		# 	echo $_path $st
-		# 	if [ $st -eq 0 ]; then
-		# 		_is_reload=1
-		# 	fi
-
-		# fi
 		_env
 	done
 	return $_update_sources_status
+}
+_commit_sources() {
+	_git_config
+	_commit_sources_status=0
+	for _pathgit in $@; do
+		_path=$(echo $_pathgit | cut -d'|' -f1)
+		# git config --global --add safe.directory $_path
+		_url=$(echo $_pathgit | cut -d'|' -f2)
+		_branch=$(echo $_pathgit | cut -d'|' -f3)
+		if [ -z "$_branch" ]; then _branch=$MBR_ENV; fi
+		cd $_dir
+		git add .
+		git commit -m $(date)
+		git push origin $_branch
+		_st=$?
+
+		if [ $_commit_sources_status -eq 0 ]; then
+			_commit_sources_status=$_st
+		fi
+		_env
+	done
+	return $_commit_sources_status
 }
 loop() {
 	while true; do
