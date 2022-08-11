@@ -32,6 +32,7 @@ _git_clone() {
 	_dir=$2
 	_branch=$3
 	_force=$4
+	if [ -z $_force ]; then _force=0; fi
 	if [ -z "$_branch" ]; then _branch=$MBR_ENV; fi
 	_clone_status=0
 	# if [ -d "$_dir" ]; then rm -rf $_dir; fi
@@ -78,11 +79,11 @@ _install_sources() {
 	for _pathgit in $@; do
 		# _repo
 		# _env
-		_path=$(echo $_pathgit | cut -d'|' -f1)
+		_dir=$(echo $_pathgit | cut -d'|' -f1)
 		_url=$(echo $_pathgit | cut -d'|' -f2)
 		_branch=$(echo $_pathgit | cut -d'|' -f3)
 		if [ -z "$_branch" ]; then _branch=$MBR_ENV; fi
-		_git_clone $_url $_path $_branch 1
+		_git_clone $_url $_dir $_branch 1
 		_st=$?
 
 		if [ $_update_sources_status -eq 0 ]; then
@@ -96,7 +97,7 @@ _update_sources() {
 	_git_config
 	_update_sources_status=0
 	for _pathgit in $@; do
-		_path=$(echo $_pathgit | cut -d'|' -f1)
+		_dir=$(echo $_pathgit | cut -d'|' -f1)
 		# git config --global --add safe.directory $_path
 		_url=$(echo $_pathgit | cut -d'|' -f2)
 		_branch=$(echo $_pathgit | cut -d'|' -f3)
@@ -115,12 +116,12 @@ _commit_sources() {
 	_git_config
 	_commit_sources_status=0
 	for _pathgit in $@; do
-		_path=$(echo $_pathgit | cut -d'|' -f1)
+		_dir=$(echo $_pathgit | cut -d'|' -f1)
 		# git config --global --add safe.directory $_path
 		_url=$(echo $_pathgit | cut -d'|' -f2)
 		_branch=$(echo $_pathgit | cut -d'|' -f3)
 		if [ -z "$_branch" ]; then _branch=$MBR_ENV; fi
-		cd $_path
+		cd $_dir
 		git add .
 		git commit -m "$(date)"
 		git push origin $_branch
