@@ -45,7 +45,7 @@ _git_clone() {
 
 	mkdir -p $_dir
 
-	if [ -d "$_dir" ]; then
+	if [ ! -d "$_dir/.git" ]; then
 		git clone --depth 1 -b $_branch $_url $_dir
 		_clone_status=1
 
