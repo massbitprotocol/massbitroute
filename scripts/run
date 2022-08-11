@@ -512,6 +512,7 @@ _monitor() {
 	if [ $is_reload -ne 0 ]; then
 		$0 _reload
 	fi
+
 	# $0 _git_cmd all
 	# $0 _git_cmd commit
 
@@ -519,7 +520,7 @@ _monitor() {
 
 _run() {
 	rm -rf $SITE_ROOT/tmp/*
-
+	_update
 	$SITE_ROOT/start_server
 }
 $@
