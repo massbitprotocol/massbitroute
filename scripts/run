@@ -415,7 +415,7 @@ _install_repos() {
 	# 	echo "Need GIT_PRIVATE_READ_URL"
 	# 	exit 1
 	# fi
-	_repo
+	# _repo
 	_install_sources $REPOS
 	_install_status=$?
 	return $_install_status
