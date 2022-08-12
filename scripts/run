@@ -21,11 +21,12 @@ gw_dir=/massbit/massbitroute/app/src/sites/services/gateway
 cmd_server=$SITE_ROOT/cmd_server
 
 _reload() {
-	$cmd_server _update
 	$cmd_server status | grep worker- | awk '{print $1}' | while read f; do
 		$cmd_server restart $f
 	done
-
+	$SITE_ROOT/cmd_server _update
+	$SITE_ROOT/cmd_server update
+	$SITE_ROOT/cmd_server start all
 }
 _repo() {
 	if [ -z "$MBR_ENV" ]; then
@@ -176,10 +177,9 @@ EOF
 	cat $_conf >>http.d/${_id}.conf
 	# cat http.d/${_id}.conf
 
-	./cmd_server _updateconf
-	./cmd_server nginx -t
+	$cmd_server _updateconf
+	$cmd_server nginx -t
 	st=$?
-	# ./cmd_server nginx -T
 	rm -rf $_dir
 	return $st
 
@@ -409,10 +409,6 @@ _install_repos() {
 		echo "MBR_ENV missing"
 		exit 1
 	fi
-	# if [ -z "$GIT_PRIVATE_READ_URL" ]; then
-	# 	echo "Need GIT_PRIVATE_READ_URL"
-	# 	exit 1
-	# fi
 	_repo
 	_install_sources $REPOS
 	_install_status=$?
@@ -495,14 +491,10 @@ _update() {
 	echo "Update"
 	_prepare
 	_st_update=0
-	# $0 _git_cmd push
 
 	_update_repos
 	_st_update=$?
 	_commit_repos
-
-	#_update_listid
-
 	return $_st_update
 }
 
@@ -512,9 +504,6 @@ _monitor() {
 	if [ $is_reload -ne 0 ]; then
 		$0 _reload
 	fi
-
-	# $0 _git_cmd all
-	# $0 _git_cmd commit
 
 }
 
