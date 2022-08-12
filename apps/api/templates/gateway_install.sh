@@ -62,7 +62,7 @@ fi
 rm $tmp
 
 _c_type=node
-_c_conf=/etc/supervisor/conf.d/mbr_${_c_type}.conf
+_c_conf=/etc/supervisor/conf.d/${_c_type}.conf
 _c_dir=$SERVICE_DIR/$_c_type
 if [ \( -f "$_c_conf" \) -o \( -d "$_c_dir" \) ]; then
 	echo "Detect conflict folder $_c_dir or $_c_conf . Please remove it before install."
@@ -70,33 +70,45 @@ if [ \( -f "$_c_conf" \) -o \( -d "$_c_dir" \) ]; then
 fi
 
 git config --global http.sslVerify false
-git clone https://github.com/massbitprotocol/massbitroute_$TYPE $SITE_ROOT -b ${MBR_ENV}
-sleep 1
+git clone --depth 1 -b ${MBR_ENV} https://github.com/massbitprotocol/massbitroute_$TYPE $SITE_ROOT
 
 cd $SITE_ROOT
 rm -f $SITE_ROOT/vars/* $SITE_ROOT/.env*-
 
 #create environment variables
 
-cat >$SITE_ROOT/.env <<EOF
-export GIT_PUBLIC_URL="https://github.com"
-export MBR_ENV=${MBR_ENV}
-EOF
+# cat >$SITE_ROOT/.env <<EOF
+# export GIT_PUBLIC_URL="https://github.com"
+# export MBR_ENV=${MBR_ENV}
+# EOF
 
-cp $SITE_ROOT/.env $SITE_ROOT/.env_raw
+# cp $SITE_ROOT/.env $SITE_ROOT/.env_raw
+VARS=$SITE_ROOT/vars
+_set() {
+	key="$1"
+	val="$2"
+	echo "$val" >"$VARS/$key"
+	#node_apply
+
+}
+export PORTAL_URL={*portal_url*}
+if [ -z "$DOMAIN" ]; then
+	export DOMAIN=$(echo $PORTAL_URL | cut -d'.' -f2-)
+fi
 
 #create environment variables
-./mbr node set ENV {{env}}
-./mbr node set MBR_ENV {{env}}
-./mbr node set PORTAL_URL {*portal_url*}
-./mbr gw set USER_ID {{user_id}}
-./mbr gw set ID {{id}}
-./mbr gw set IP $IP
+# _set ENV {{env}}
+_set MBR_ENV {{env}}
+_set PORTAL_URL {*portal_url*}
+_set USER_ID {{user_id}}
+_set ID {{id}}
+_set IP $IP
 # ./mbr gw set TOKEN {{token}}
-./mbr gw set BLOCKCHAIN {{blockchain}}
-./mbr gw set NETWORK {{network}}
-./mbr gw set APP_KEY {{app_key}}
-./mbr gw set SITE_ROOT "$SITE_ROOT"
+_set BLOCKCHAIN {{blockchain}}
+_set NETWORK {{network}}
+_set APP_KEY {{app_key}}
+_set SITE_ROOT "$SITE_ROOT"
+_set DOMAIN "$DOMAIN"
 
 log_install=$SITE_ROOT/logs/install.log
 bash -x $SCRIPTS_RUN _install 2>&1 >>$log_install

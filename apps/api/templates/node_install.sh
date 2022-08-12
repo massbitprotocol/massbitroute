@@ -65,7 +65,7 @@ fi
 rm $tmp
 
 _c_type=gateway
-_c_conf=/etc/supervisor/conf.d/mbr_${_c_type}.conf
+_c_conf=/etc/supervisor/conf.d/${_c_type}.conf
 _c_dir=$SERVICE_DIR/$_c_type
 if [ \( -f "$_c_conf" \) -o \( -d "$_c_dir" \) ]; then
 	echo "Detect conflict folder $_c_dir or $_c_conf . Please remove it before install."
@@ -78,27 +78,42 @@ sleep 1
 cd $SITE_ROOT
 rm -f $SITE_ROOT/vars/* $SITE_ROOT/.env*-
 
+VARS=$SITE_ROOT/vars
+_set() {
+	key="$1"
+	val="$2"
+	echo "$val" >"$VARS/$key"
+	#node_apply
+
+}
+
+export PORTAL_URL={*portal_url*}
+if [ -z "$DOMAIN" ]; then
+	export DOMAIN=$(echo $PORTAL_URL | cut -d'.' -f2-)
+fi
+
 #create environment variables
 
-cat >$SITE_ROOT/.env <<EOF
-export GIT_PUBLIC_URL="https://github.com"
-export MBR_ENV=${MBR_ENV}
-EOF
+# cat >$SITE_ROOT/.env <<EOF
+# export GIT_PUBLIC_URL="https://github.com"
+# export MBR_ENV=${MBR_ENV}
+# EOF
 
-cp $SITE_ROOT/.env $SITE_ROOT/.env_raw
+# cp $SITE_ROOT/.env $SITE_ROOT/.env_raw
 
-$MBR node set MBR_ENV {{env}}
+_set MBR_ENV {{env}}
 
-$MBR node set PORTAL_URL {*portal_url*}
-$MBR node set DATA_URI {*data_url*}
-$MBR node set USER_ID {{user_id}}
-$MBR node set ID {{id}}
-$MBR node set IP $IP
-# $MBR node set TOKEN {{token}}
-$MBR node set BLOCKCHAIN {{blockchain}}
-$MBR node set NETWORK {{network}}
-$MBR node set APP_KEY {{app_key}}
-$MBR node set SITE_ROOT "$SITE_ROOT"
+_set PORTAL_URL {*portal_url*}
+_set DATA_URI {*data_url*}
+_set USER_ID {{user_id}}
+_set ID {{id}}
+_set IP $IP
+# _set TOKEN {{token}}
+_set BLOCKCHAIN {{blockchain}}
+_set NETWORK {{network}}
+_set APP_KEY {{app_key}}
+_set SITE_ROOT "$SITE_ROOT"
+_set DOMAIN "$DOMAIN"
 
 log_install=$SITE_ROOT/logs/install.log
 bash -x $SCRIPTS_RUN _install 2>&1 >>$log_install
