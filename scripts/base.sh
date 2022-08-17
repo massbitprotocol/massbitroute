@@ -74,9 +74,11 @@ _install_sources() {
 		_dir=$(echo $_pathgit | cut -d'|' -f1)
 		_url=$(echo $_pathgit | cut -d'|' -f2)
 		_branch=$(echo $_pathgit | cut -d'|' -f3)
+
 		if [ -z "$_branch" ]; then _branch=$MBR_ENV; fi
 		_git_clone $_url $_dir $_branch 1
 		_st=$?
+
 
 		if [ $_install_sources_status -eq 0 ]; then
 			_install_sources_status=$_st
