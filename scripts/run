@@ -29,7 +29,6 @@ _reload() {
 	$SITE_ROOT/cmd_server start all
 }
 _repo() {
-
 	if [ -z "$MBR_ENV" ]; then
 		echo "MBR_ENV missing"
 		exit 1
@@ -62,7 +61,6 @@ _repo_private() {
 
 	export MKAGENT_BRANCH=${MKAGENT_BRANCH:-$MBR_ENV}
 
-
 	export GBC_BRANCH=${GBC_BRANCH:-$MBR_ENV}
 	export ASDF_BRANCH=${ASDF_BRANCH:-$MBR_ENV}
 	export GWMAN_BRANCH=${GWMAN_BRANCH:-$MBR_ENV}
@@ -75,7 +73,6 @@ _repo_private() {
 	export NODE_BRANCH=${NODE_BRANCH:-$MBR_ENV}
 	export GATEWAY_BRANCH=${GATEWAY_BRANCH:-$MBR_ENV}
 	export API_BRANCH=${API_BRANCH:-$MBR_ENV}
-
 
 	_env
 
@@ -130,14 +127,48 @@ _supervisor() {
 _run_test() {
 	cd $SITE_ROOT
 	export PATH=$PATH:$SITE_ROOT/bin/openresty/nginx/sbin
-	prove -r $@
+	if [ ! -f "$SITE_ROOT/src/env.lua" ]; then
+		cat >$SITE_ROOT/src/env.lua <<EOF
+return {
+["DOMAIN"]="massbitroute.net",
+["GATEWAY_DOMAIN_SSL"]='#listen 443 ssl;ssl_certificate /etc/letsencrypt/live/gw.mbr.massbitroute.net/fullchain.pem;ssl_certificate_key /etc/letsencrypt/live/gw.mbr.massbitroute.net/privkey.pem;',
+["GIT_APIDEPLOY_WRITE"]='apideploy:Lc5_o_5CvqAriU1RYZjuvt1Zdb-hEbU9',
+["GIT_AUTH"]='',
+["GIT_ENV_WRITE"]='env:QEI8T9YkSF9ClqiwPcL8eqVI64S1gc9m',
+["GIT_GATEWAYDEPLOY_WRITE"]='gatewaydeploy:jkpzRB611k7U_kBEWyzAHGx8N8VWN_0x',
+["GIT_GWMANDEPLOY_WRITE"]='gwmandeploy:1ZHidrzHPLQrRgggneryYh6Z0KaGLyJU',
+["GIT_MONITORDEPLOY_WRITE"]='monitordeploy:M7kdTEa8ZPFgfRCmwQYG-8o02H7_nfd7',
+["GIT_NODEDEPLOY_WRITE"]='nodedeploy:hu601zNKxuEiexoEGwFSQ96SASJ47UcC',
+["GIT_PRIVATE_DOMAIN"]='git.massbitroute.net',
+["GIT_PRIVATE_READ"]='massbit:BOA5esD3FguaD3FWkoKHTmjKyScZLbI1',
+["GIT_PRIVATE_READ_URL"]='http://massbit:BOA5esD3FguaD3FWkoKHTmjKyScZLbI1@git.massbitroute.net',
+["GIT_PUBLIC_URL"]='https://github.com',
+["GIT_SSL_WRITE"]='ssl:GQWRdXuMU2Ly6CHq_6IziXI0UZbwBd8A',
+["GIT_STATDEPLOY_WRITE"]='statdeploy:IeClR-QMAr7TsBoDBH_O7myH7MRGQA40',
+["NODE_DOMAIN_SSL"]='#listen 443 ssl;ssl_certificate /etc/letsencrypt/live/node.mbr.massbitroute.net/fullchain.pem;ssl_certificate_key /etc/letsencrypt/live/node.mbr.massbitroute.net/privkey.pem;',
+["STAT_DOMAIN_SSL"]='#listen 443 ssl;ssl_certificate /etc/letsencrypt/live/stat.mbr.massbitroute.net/fullchain.pem;ssl_certificate_key /etc/letsencrypt/live/stat.mbr.massbitroute.net/privkey.pem;',
+["PARTNER_ID"]='fc78b64c5c33f3f270700b0c4d3e7998188035ab',
+["SID"]='403716b0f58a7d6ddec769f8ca6008f2c1c0cea6',
+}
+EOF
+	fi
+	$cmd_server update
+	$cmd_server start all
+
+	if [ $# -ne 0 ]; then
+		prove -r $@
+	else
+		prove -r t
+	fi
 
 }
+
 _install_test() {
 	apt update
 	apt install -y make
-	cpan -i Test::Nginx
-	ls -d .cpan/build/* | while read d; do
+	yes | cpan -i Test::Nginx
+	cd $SITE_ROOT
+	ls -d $SITE_ROOT/.cpan/build/* /root/.cpan/build/* | while read d; do
 		cd $d
 		make install
 		cd -
@@ -190,7 +221,194 @@ EOF
 
 }
 
+# _git_cmd_commit() {
+# 	_cdir=$1
+# 	_git="git -C $_cdir"
+# 	shift
+# 	if [ $# -gt 0 ]; then
+# 		_time=$(date -u)
+# 		_git_config $_cdir
+# 		for _fdir in $@; do
+# 			$_git add $_fdir
+# 		done
+# 		mid=$(cat /etc/machine-id)
+# 		ip=$(curl ipv4.icanhazip.com)
+# 		$_git pull
+# 		$_git commit -m "${ip}: ${mid}: ${HOSTNAME}: $_fdir at $_time"
+# 		$_git push
+# 		# commit_id=$($_git rev-parse origin/$($_git rev-parse --abbrev-ref HEAD))
+# 		# mkdir -p $SITE_ROOT/public/deploy/version
+# 		# repo_name=$(basename $($_git remote get-url origin) .git)
+# 		# echo $commit_id >$SITE_ROOT/public/deploy/version/${repo_name}.version
+# 		# 		mkdir -p $SITE_ROOT/public/deploy/version/${repo_name}
+# 		# 		cat >$SITE_ROOT/public/deploy/version/${repo_name}/${commit_id}.sh <<EOF
+# 		# #!/bin/bash
+# 		# echo "Update for $commit_id"
+# 		# EOF
+# 	fi
+# }
 
+# _git_cmd() {
+# 	cmd=$1
+# 	shift
+# 	list_push="apideploy gwmandeploy statdeploy"
+# 	list_pull="api gwman stat $list_push"
+# 	list_all="$list_pull gateway node mkagent"
+# 	if [ -z "$cmd" ]; then cmd=push; fi
+
+# 	list=""
+# 	case "$cmd" in
+# 	all)
+# 		list="$list_all"
+# 		cmd="pull"
+# 		;;
+
+# 	pull)
+# 		list="$list_pull"
+# 		;;
+# 	push)
+# 		list="$list_push"
+# 		;;
+# 	commit)
+# 		list="$list_push"
+# 		;;
+# 	esac
+
+# 	_dir_def=$service_dir
+# 	for _service in $list; do
+# 		_dir="$_dir_def/$_service"
+
+# 		case "$_service" in
+# 		statdeploy)
+# 			_dir="$_dir_def/stat/etc/conf"
+# 			;;
+# 		apideploy)
+# 			_dir="$_dir_def/api/public/deploy"
+# 			;;
+# 		gwmandeploy)
+# 			_dir="$_dir_def/gwman/data"
+# 			;;
+# 		esac
+# 		_git="git -C $_dir"
+
+# 		if [ "$cmd" = "commit" ]; then
+# 			_mydir="$_dir"
+# 			_git_cmd_commit $_dir $_mydir
+
+# 		else
+# 			_git="git -C $_dir"
+# 			$_git $cmd
+# 			# commit_id=$($_git rev-parse origin/$($_git rev-parse --abbrev-ref HEAD))
+# 			# repo_name=$(basename $($_git remote get-url origin) .git)
+# 			# mkdir -p $SITE_ROOT/public/version
+# 			# echo $commit_id >$SITE_ROOT/public/version/${repo_name}.version
+# 		fi
+# 	done
+
+# }
+
+# _scan_monitor_type() {
+# 	dir=$1
+# 	type=$2
+# 	format=$3
+# 	if [ ! -d "$dir/$type" ]; then return 1; fi
+# 	cd $dir/$type
+
+# 	find . -type f | sed 's/^\.\///g' | while read f; do
+# 		id=$(basename $f)
+# 		group=$type-$(dirname $f | sed 's/\//-/g')
+# 		name=$group-$id
+# 		if [ "$type" = "gateway" ]; then
+# 			group=$(echo $group | cut -d'-' -f1-3)
+# 			name=$group-$id
+# 		else
+# 			group=$type
+# 		fi
+
+# 		ip=$(cat $f | jq .ip | sed 's/\"//g')
+
+# 		if [ "$format" = "address" ]; then
+# 			echo "\"$name\": \"$ip\","
+# 		elif [ "$format" = "host" ]; then
+# 			echo "\"$name\","
+# 			# echo "\"$name|$group\","
+# 		elif [ "$format" = "token" ]; then
+# 			export TOKEN=$(echo -n ${name} | sha1sum | cut -d' ' -f1)
+# 			echo "$TOKEN $name"
+# 		fi
+# 	done
+# 	return 0
+# }
+
+# _update_dapi_list() {
+# 	_type=dapi
+# 	_dir=$portal_dir/public/deploy/$_type
+# 	if [ ! -d "$_dir" ]; then return 1; fi
+# 	info_dir=$portal_dir/public/deploy/info/$_type
+# 	if [ ! -d "$info_dir" ]; then return; fi
+# 	mkdir -p $info_dir /tmp/info/$_type
+# 	rm /tmp/info/$_type/*
+# 	find $_dir -type f | while read f; do
+# 		gateway_domain=$(cat $f | jq .gateway_domain | sed 's/\"//g')
+# 		api_key=$(cat $f | jq .api_key | sed 's/\"//g')
+# 		block=$(cat $f | jq .blockchain | sed 's/\"//g')
+# 		net=$(cat $f | jq .network | sed 's/\"//g')
+# 		user_id=$(cat $f | jq .user_id | sed 's/\"//g')
+# 		status=$(cat $f | jq .status | sed 's/\"//g')
+# 		name=$(basename $f)
+# 		if [ -n "$block" ]; then
+# 			mesg="$name $user_id $block $net $gateway_domain $api_key $status"
+# 			echo $mesg >>/tmp/info/$_type/listid
+# 			echo $mesg >>/tmp/info/$_type/listid-$block-$net
+# 		fi
+# 	done
+# 	rm $info_dir/*
+# 	mv /tmp/info/$_type/* $info_dir/
+# }
+# _update_user_list() {
+# 	_type=user
+# 	_dir=$portal_dir/public/deploy/$_type
+# 	if [ ! -d "$info_dir" ]; then return; fi
+# 	if [ ! -d "$_dir" ]; then return 1; fi
+# 	info_dir=$portal_dir/public/deploy/info/$_type
+# 	mkdir -p $info_dir
+# 	tmp=$(mktemp)
+
+# 	find $_dir -type f | while read f; do
+# 		username=$(cat $f | jq .username | sed 's/\"//g')
+# 		email=$(cat $f | jq .email | sed 's/\"//g')
+# 		confirmed=$(cat $f | jq .confirmed | sed 's/\"//g')
+# 		name=$(basename $f)
+# 		echo "$name $username $email $confirmed" >>$tmp
+
+# 	done
+# 	mv $tmp $info_dir/listid
+# 	chmod 755 $info_dir/listid
+# }
+# _update_gateway_list() {
+# 	_type=gateway
+# 	info_dir=$portal_dir/public/deploy/info/$_type
+# 	if [ ! -d "$info_dir" ]; then return; fi
+# 	tmp=$(mktemp)
+# 	find $info_dir -type f -iname 'listid-*' | while read f; do
+# 		cat $f >>$tmp
+# 		echo >>$tmp
+# 	done
+# 	mv $tmp $info_dir/listid
+
+# }
+# _update_node_list() {
+# 	_type=node
+# 	info_dir=$portal_dir/public/deploy/info/$_type
+# 	if [ ! -d "$info_dir" ]; then return; fi
+# 	tmp=$(mktemp)
+# 	find $info_dir -type f -iname 'listid-*' | while read f; do
+# 		cat $f >>$tmp
+# 		echo >>$tmp
+# 	done
+# 	mv $tmp $info_dir/listid
+
+# }
 
 _rescan_conf() {
 	svr=$1
@@ -203,7 +421,25 @@ _rescan_conf() {
 	fi
 
 }
-
+# _update_listid() {
+# 	_update_gateway_list
+# 	_update_dapi_list
+# 	_update_node_list
+# 	mkdir -p $portal_dir/public/deploy/info
+# 	# _update_user_list
+# 	if [ -f "$portal_dir/public/deploy/hosts" ]; then
+# 		cat $portal_dir/public/deploy/hosts >$portal_dir/public/deploy/info/hosts
+# 		echo >>$portal_dir/public/deploy/info/hosts
+# 	else
+# 		>$portal_dir/public/deploy/info/hosts
+# 	fi
+# 	info_dir=$portal_dir/public/deploy/info/node
+# 	mkdir -p $info_dir
+# 	awk -v domain="$DOMAIN" '{print $5,$1".node.mbr."domain}' $info_dir/listid >>$portal_dir/public/deploy/info/hosts
+# 	info_dir=$portal_dir/public/deploy/info/gateway
+# 	mkdir -p $info_dir
+# 	awk -v domain="$DOMAIN" '{print $5,$1".gw.mbr."domain}' $info_dir/listid >>$portal_dir/public/deploy/info/hosts
+# }
 _install_repos() {
 	if [ -z "$MBR_ENV" ]; then
 		echo "MBR_ENV missing"
@@ -292,11 +528,9 @@ _update() {
 	_prepare
 	_st_update=0
 
-
 	_update_repos
 	_st_update=$?
 	_commit_repos
-
 	return $_st_update
 }
 
