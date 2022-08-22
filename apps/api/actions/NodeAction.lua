@@ -153,70 +153,36 @@ function Action:registerAction(args)
     if not user_id then
         return {result = false, err_msg = "User ID missing"}
     end
-    --[[
-      --22 March 15
-      --Trust token from portal backend
-      local token = set_var.set_decode_base32(_token)
-      local id = set_var.set_decrypt_session(token)
 
-    _print("id:" .. id)
-
-    if not id or id ~= args.id then
-        return {result = false, err_msg = "Token not correct"}
-    end
-    ]]
-    -- local ip = args.geo and args.geo.ip or ngx.var.realip
-
-    -- _print("ip:" .. ip)
-
-    -- local data_url = args.data_url
-
-    -- _print("data_url:" .. data_url)
-    -- if not data_url then
-    --     data_url = "http://127.0.0.1:8545"
-    -- end
-
-    -- ip = "34.124.167.144"
-    -- local _data = {
-    --     approved = 0,
-    --     id = id,
-    --     token = _token,
-    --     user_id = user_id,
-    --     ip = ip,
-    --     status = 0,
-    --     data_url = data_url
-    -- }
-    -- _print(_data, true)
-    --local _geo = _get_geo(ip, _config)
-
-    -- _print("geo:" .. inspect(args.geo))
-
-    -- if args.geo then
-    --     _data.geo = args.geo
-    -- end
-    args.status = 0
+    args.status = 1
     args.approved = 0
-
-    local model = Model:new(instance)
+    args._is_delete = false
     ngx_log(ngx.ERR, "[args]:" .. inspect(args))
-    local _ret = model:update(args)
-    ngx_log(ngx.ERR, "[ret]:" .. inspect(_ret))
+    local model = Model:new(instance)
 
-    local _result = {result = false}
-    local jobs = instance:getJobs()
-    local job = {
-        action = "/jobs/" .. mytype .. ".generateconf",
-        delay = 0,
-        data = {
-            id = id,
-            user_id = user_id
-        }
+    local _detail, _err_msg = model:update(args)
+    ngx_log(ngx.ERR, "[item]:" .. inspect(_detail))
+    local _result = {
+        result = true
     }
-    local _job_id = jobs:add(job)
-    ngx_log(ngx.ERR, "[job_id]:" .. inspect(_job_id))
-    if _job_id and tonumber(_job_id) > 0 then
+    if _detail then
+        -- if _job_id and tonumber(_job_id) > 0 then
+        --     _result = {
+        --         result = true
+        --     }
+        -- end
+        local jobs = instance:getJobs()
+        local job = {
+            action = "/jobs/" .. mytype .. ".generateconf",
+            delay = 0,
+            data = args
+        }
+        local _job_id = jobs:add(job)
+        ngx_log(ngx.ERR, "[job_id]:" .. inspect(_job_id))
+    else
         _result = {
-            result = true
+            result = false,
+            err_msg = _err_msg
         }
     end
     ngx_log(ngx.ERR, "[response]:" .. inspect(_result))
