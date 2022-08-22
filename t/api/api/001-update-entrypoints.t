@@ -114,8 +114,8 @@ POST /_internal_api/v2/?action=api.update
      "createdAt" : "2022-07-28T09:33:04.037Z",
       "id" : "fad208d8-8c1a-4a9d-840d-d1180eb17a36",      
       "priority" : 1,      
-      "provider" : "MASSBIT",
       "providerConfig" : {},      
+      "provider":"MASSBIT",
       "status" : 1, 
       "updatedAt" : "2022-07-28T09:33:04.037Z" 
    }

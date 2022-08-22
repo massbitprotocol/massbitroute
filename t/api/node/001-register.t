@@ -119,7 +119,6 @@ POST /_internal_api/v2/?action=node.register
   },
   "status": 0,
   "id" : "fd6d64f8-70fb-4c12-aa8a-bdc2805a38a4",
-  "provider" : "MASSBIT",
   "name" : "baysao-node-1",
   "network" : "mainnet",
    "zone" : "EU",

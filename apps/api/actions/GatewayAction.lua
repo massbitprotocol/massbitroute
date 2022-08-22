@@ -166,19 +166,34 @@ function Action:registerAction(args)
         _data.geo = args.geo
     end
 
+    args.status = 1
+    args.approved = 0
+    args._is_delete = false
+    ngx_log(ngx.ERR, "[args]:" .. inspect(args))
+
     local model = Model:new(instance)
-    model:update(_data)
-    local jobs = instance:getJobs()
-    local job = {
-        action = "/jobs/" .. mytype .. ".generateconf",
-        delay = 0,
-        data = {
-            id = id,
-            user_id = user_id
-        }
+    local _detail, _err_msg = model:update(_data)
+    ngx_log(ngx.ERR, "[item]:" .. inspect(_detail))
+    local _result = {
+        result = true
     }
-    jobs:add(job)
-    return {result = true}
+    if _detail then
+        local jobs = instance:getJobs()
+        local job = {
+            action = "/jobs/" .. mytype .. ".generateconf",
+            delay = 0,
+            data = args
+        }
+        local _job_id = jobs:add(job)
+        ngx_log(ngx.ERR, "[job_id]:" .. inspect(_job_id))
+    else
+        _result = {
+            result = false,
+            err_msg = _err_msg
+        }
+    end
+    ngx_log(ngx.ERR, "[response]:" .. inspect(_result))
+    return _result
 end
 
 function Action:unregisterAction(args)
