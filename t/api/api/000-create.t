@@ -113,7 +113,6 @@ POST /_internal_api/v2/?action=api.create
   "limit_rate_per_sec" : 100,
   "name" : "api-6",
   "network" : "mainnet",
-  "provider":"MASSBIT",
   "status" : 1,
   "project_id" : "83260a9e-4e41-4293-abc5-fe47a2219534",
   "project_quota" : "100000",
