@@ -614,6 +614,7 @@ function Action:updateAction(args)
 
     local model = Model:new(instance)
     local _detail, _err_msg = model:update(args)
+    ngx_log(ngx.ERR, "[_detail]:" .. inspect(_detail))
     -- _export_data(model, args)
     local _result = {
         result = true
