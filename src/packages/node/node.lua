@@ -35,11 +35,11 @@ function Node:update(args)
     local user_id = args.user_id
     local id = args.id
     if not id or not user_id then
-        return
+        return nil, "id or user_id not found"
     end
     local _detail = self._model:_get_key(user_id .. ":" .. model_type, id)
     if not _detail then
-        return
+        return nil, "data not found"
     end
 
     if _detail then
