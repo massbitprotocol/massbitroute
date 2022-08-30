@@ -1,5 +1,6 @@
 # Coding Standards
 
+
 This specification includes naming conventions, conventions, and more. It includes the following aspects:
 
 - Application directory structure
