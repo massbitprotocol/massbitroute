@@ -135,11 +135,9 @@ _run_test() {
 	sed '/}/i ["PARTNER_ID"]="fc78b64c5c33f3f270700b0c4d3e7998188035ab",' -i $env_src
 	sed '/}/i ["SID"]="403716b0f58a7d6ddec769f8ca6008f2c1c0cea6"' -i $env_src
 
-	$cmd_server _update
-	$cmd_server update
-	$cmd_server start all
-	$SITE_ROOT/scripts/run _reload
 	cp $env_src $SITE_ROOT/src/env.lua
+	_reload
+
 	if [ $# -ne 0 ]; then
 		prove -r $@
 	else
