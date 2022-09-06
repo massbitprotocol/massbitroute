@@ -6,7 +6,7 @@ local _config = {
     whitelist_sid = {},
     whitelist_test = {},
     sessionExpiredTime = 60 * 30,
-    numOfJobWorkers = 10
+    numOfJobWorkers = 1
 }
 if env.MBR_API then
     _config.portal_domain = env.MBR_API
