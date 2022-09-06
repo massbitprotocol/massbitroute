@@ -139,7 +139,7 @@ _run_test() {
 	$cmd_server update
 	$cmd_server start all
 	$SITE_ROOT/scripts/run _reload
-
+	cp $env_src $SITE_ROOT/src/env.lua
 	if [ $# -ne 0 ]; then
 		prove -r $@
 	else
