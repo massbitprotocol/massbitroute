@@ -127,33 +127,18 @@ _supervisor() {
 _run_test() {
 	cd $SITE_ROOT
 	export PATH=$PATH:$SITE_ROOT/bin/openresty/nginx/sbin
-	if [ ! -f "$SITE_ROOT/src/env.lua" ]; then
-		cat >$SITE_ROOT/src/env.lua <<EOF
-return {
-["DOMAIN"]="massbitroute.net",
-["GATEWAY_DOMAIN_SSL"]='#listen 443 ssl;ssl_certificate /etc/letsencrypt/live/gw.mbr.massbitroute.net/fullchain.pem;ssl_certificate_key /etc/letsencrypt/live/gw.mbr.massbitroute.net/privkey.pem;',
-["GIT_APIDEPLOY_WRITE"]='apideploy:Lc5_o_5CvqAriU1RYZjuvt1Zdb-hEbU9',
-["GIT_AUTH"]='',
-["GIT_ENV_WRITE"]='env:QEI8T9YkSF9ClqiwPcL8eqVI64S1gc9m',
-["GIT_GATEWAYDEPLOY_WRITE"]='gatewaydeploy:jkpzRB611k7U_kBEWyzAHGx8N8VWN_0x',
-["GIT_GWMANDEPLOY_WRITE"]='gwmandeploy:1ZHidrzHPLQrRgggneryYh6Z0KaGLyJU',
-["GIT_MONITORDEPLOY_WRITE"]='monitordeploy:M7kdTEa8ZPFgfRCmwQYG-8o02H7_nfd7',
-["GIT_NODEDEPLOY_WRITE"]='nodedeploy:hu601zNKxuEiexoEGwFSQ96SASJ47UcC',
-["GIT_PRIVATE_DOMAIN"]='git.massbitroute.net',
-["GIT_PRIVATE_READ"]='massbit:BOA5esD3FguaD3FWkoKHTmjKyScZLbI1',
-["GIT_PRIVATE_READ_URL"]='http://massbit:BOA5esD3FguaD3FWkoKHTmjKyScZLbI1@git.massbitroute.net',
-["GIT_PUBLIC_URL"]='https://github.com',
-["GIT_SSL_WRITE"]='ssl:GQWRdXuMU2Ly6CHq_6IziXI0UZbwBd8A',
-["GIT_STATDEPLOY_WRITE"]='statdeploy:IeClR-QMAr7TsBoDBH_O7myH7MRGQA40',
-["NODE_DOMAIN_SSL"]='#listen 443 ssl;ssl_certificate /etc/letsencrypt/live/node.mbr.massbitroute.net/fullchain.pem;ssl_certificate_key /etc/letsencrypt/live/node.mbr.massbitroute.net/privkey.pem;',
-["STAT_DOMAIN_SSL"]='#listen 443 ssl;ssl_certificate /etc/letsencrypt/live/stat.mbr.massbitroute.net/fullchain.pem;ssl_certificate_key /etc/letsencrypt/live/stat.mbr.massbitroute.net/privkey.pem;',
-["PARTNER_ID"]='fc78b64c5c33f3f270700b0c4d3e7998188035ab',
-["SID"]='403716b0f58a7d6ddec769f8ca6008f2c1c0cea6',
-}
-EOF
-	fi
+
+	rm $SITE_ROOT/src/env.lua
+	env_src=$SITE_ROOT/env/env.lua
+	sed /PARTNER_ID/d -i $env_src
+	sed /SID/d -i $env_src
+	sed '/}/i ["PARTNER_ID"]="fc78b64c5c33f3f270700b0c4d3e7998188035ab",' -i $env_src
+	sed '/}/i ["SID"]="403716b0f58a7d6ddec769f8ca6008f2c1c0cea6"' -i $env_src
+
+	$cmd_server _update
 	$cmd_server update
 	$cmd_server start all
+	$SITE_ROOT/scripts/run _reload
 
 	if [ $# -ne 0 ]; then
 		prove -r $@
