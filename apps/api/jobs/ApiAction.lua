@@ -65,6 +65,9 @@ upstream upstream_ws_${api_key} {
     include /massbit/massbitroute/app/src/sites/services/gateway/etc/_upstream_server_ws.conf;
 }
 ]],
+    _api_method_provider = [[
+    add_header X-Accel-Expires $http_x_mbr_method_ttl;
+]],
     _api_method1 = "",
     _api_method = [[
 #       access_by_lua_file /massbit/massbitroute/app/src/sites/services/gateway/src/jsonrpc-access.lua;
@@ -186,7 +189,7 @@ server {
 server {
     listen unix:/tmp/${server_name}.sock;
     location / {
-       ${_api_method1()}
+       ${_api_method_provider()}
         proxy_pass http://${blockchain}-${network}.node.mbr.]] ..
         _domain_name ..
             [[;
