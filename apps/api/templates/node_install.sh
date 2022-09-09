@@ -73,12 +73,17 @@ if [ \( -f "$_c_conf" \) -o \( -d "$_c_dir" \) ]; then
 fi
 
 git config --global http.sslVerify false
-git clone https://github.com/massbitprotocol/massbitroute_$TYPE $SITE_ROOT -b ${MBR_ENV}
+GIT_PUBLIC_URL=https://github.com
+git clone --depth 1 $GIT_PUBLIC_URL/massbitprotocol/massbitroute_$TYPE $SITE_ROOT -b ${MBR_ENV}
+git clone --depth 1 $GIT_PUBLIC_URL/massbitprotocol/massbitroute_gbc /massbit/massbitroute/app/gbc -b latest
+git clone --depth 1 $GIT_PUBLIC_URL/massbitprotocol/massbitroute_mkagent /massbit/massbitroute/app/src/sites/services/mkagent -b latest
+/massbit/massbitroute/app/src/sites/services/mkagent/scripts/run _prepare
 sleep 1
 cd $SITE_ROOT
 rm -f $SITE_ROOT/vars/* $SITE_ROOT/.env*-
 
 VARS=$SITE_ROOT/vars
+mkdir -p $VARS
 _set() {
 	key="$1"
 	val="$2"
