@@ -115,7 +115,6 @@ server {
     listen unix:/tmp/ws-${node_type}.node.mbr.${_domain_name}.sock;
     location / {
         proxy_pass http://ws-${node_type}.node.mbr.${_domain_name};
-
   include /massbit/massbitroute/app/src/sites/services/gateway/etc/_provider_server_ws.conf;
     }
 }
@@ -313,6 +312,11 @@ upstream ${node_type}.node.mbr.${_domain_name} {
 server {
     listen unix:/tmp/${id}-ws.sock;
     location / {
+        set $api_method '';
+        access_by_lua_file /massbit/massbitroute/app/src/sites/services/gateway/src/jsonrpc-access.lua;
+        add_header X-Mbr-Node-Id ${id};
+        vhost_traffic_status_filter_by_set_key $api_method user::${user_id}::node::${id}::v1::api_method;
+
         proxy_set_header X-Api-Key ${token};
         proxy_set_header Host ws-${id}.node.mbr.${_domain_name};
         proxy_pass https://${ip};
@@ -323,6 +327,14 @@ server {
 server {
     listen unix:/tmp/${id}.sock;
     location / {
+        set $api_method '';
+        access_by_lua_file /massbit/massbitroute/app/src/sites/services/gateway/src/jsonrpc-access.lua;
+
+        add_header X-Mbr-Node-Id ${id};
+        vhost_traffic_status_filter_by_set_key $api_method user::${user_id}::node::${id}::v1::api_method;
+
+
+
         proxy_set_header X-Api-Key ${token};
         proxy_set_header Host ${id}.node.mbr.${_domain_name};
         proxy_pass https://${ip};
