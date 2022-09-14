@@ -4,7 +4,12 @@ SERVICE_DIR=/massbit/massbitroute/app/src/sites/services
 TYPE=gateway
 SITE_ROOT=$SERVICE_DIR/$TYPE
 MBR=$SITE_ROOT/mbr
-export MBR_ENV={{env}}
+export MBR_ENV=$(git ls-remote --tags --sort='v:refname' https://github.com/massbitprotocol/massbitroute_${TYPE}.git | tail -n1 | cut -d/ -f3)
+if [ -z "$MBR_ENV" ]; then
+	echo "MBR_ENV not set."
+	exit 1
+fi
+
 SCRIPTS_RUN="$SITE_ROOT/scripts/run"
 mkdir -p $(dirname $SITE_ROOT)
 curl="/usr/bin/curl -skSfL"
