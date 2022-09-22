@@ -62,7 +62,6 @@ _repo_private() {
 
 	export MKAGENT_BRANCH=${MKAGENT_BRANCH:-$MBR_ENV}
 
-
 	export GBC_BRANCH=${GBC_BRANCH:-$MBR_ENV}
 	export ASDF_BRANCH=${ASDF_BRANCH:-$MBR_ENV}
 	export GWMAN_BRANCH=${GWMAN_BRANCH:-$MBR_ENV}
@@ -75,7 +74,6 @@ _repo_private() {
 	export NODE_BRANCH=${NODE_BRANCH:-$MBR_ENV}
 	export GATEWAY_BRANCH=${GATEWAY_BRANCH:-$MBR_ENV}
 	export API_BRANCH=${API_BRANCH:-$MBR_ENV}
-
 
 	_env
 
@@ -210,7 +208,6 @@ EOF
 
 }
 
-
 _rescan_conf() {
 	svr=$1
 	if [ -n "$svr" ]; then
@@ -306,19 +303,25 @@ _sync_redis_conf() {
 
 	done
 }
+_update_ssl() {
+	if [ -f "/etc/letsencrypt/gateway_ssl.tar.gz" ]; then
+		mkdir -p $SITE_ROOT/public/deploy/ssl
+		cp /etc/letsencrypt/gateway_ssl.tar.gz $SITE_ROOT/public/deploy/ssl
+	fi
+
+}
 _update() {
 	echo "Update"
 	_prepare
+	_update_ssl
 	_st_update=0
 
 	_update_repos
 	_st_update=$?
 	_commit_repos
 
-
 	return $_st_update
 }
-
 
 _monitor() {
 	_update
