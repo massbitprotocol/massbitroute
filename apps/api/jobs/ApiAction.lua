@@ -66,6 +66,12 @@ upstream upstream_ws_${api_key} {
 }
 ]],
     _api_method1 = "",
+    _api_method2 = [[
+        set $api_method '';
+        set $api_method_ttl 0;
+        access_by_lua_file /massbit/massbitroute/app/src/sites/services/gateway/src/jsonrpc-access.lua;
+        add_header X-Accel-Expires $api_method_ttl;
+]],
     _api_method = [[
 #       access_by_lua_file /massbit/massbitroute/app/src/sites/services/gateway/src/jsonrpc-access.lua;
         vhost_traffic_status_filter_by_set_key $api_method ${server_name}::dapi::api_method;
@@ -186,10 +192,11 @@ server {
 server {
     listen unix:/tmp/${server_name}.sock;
     location / {
-       ${_api_method1()}
+
         proxy_pass http://${blockchain}-${network}.node.mbr.]] ..
         _domain_name ..
             [[;
+  include /massbit/massbitroute/app/src/sites/services/gateway/etc/_cache_ttl.conf;
   include /massbit/massbitroute/app/src/sites/services/gateway/etc/_proxy_server.conf;
   include /massbit/massbitroute/app/src/sites/services/gateway/etc/_provider_server.conf;
     }
@@ -197,10 +204,11 @@ server {
 server {
     listen unix:/tmp/${server_name}_ws.sock;
     location / {
-       ${_api_method1()}
+
         proxy_pass http://ws-${blockchain}-${network}.node.mbr.]] ..
                 _domain_name ..
                     [[;
+  include /massbit/massbitroute/app/src/sites/services/gateway/etc/_cache_ttl.conf;
   include /massbit/massbitroute/app/src/sites/services/gateway/etc/_proxy_server_ws.conf;
   include /massbit/massbitroute/app/src/sites/services/gateway/etc/_provider_server_ws.conf;
     }
