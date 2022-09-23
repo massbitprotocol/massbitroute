@@ -309,13 +309,23 @@ upstream ${node_type}.node.mbr.${_domain_name} {
   include /massbit/massbitroute/app/src/sites/services/gateway/etc/_upstream_server.conf;
 }
 ]],
+    _api_method = [[
+        set $api_method '';
+        set $api_method_ttl 0;
+        access_by_lua_file /massbit/massbitroute/app/src/sites/services/gateway/src/jsonrpc-access.lua;
+        vhost_traffic_status_filter_by_set_key $api_method ${id}::api_method;
+        add_header X-Accel-Expires $api_method_ttl;
+]],
     _gw_node = [[
 server {
     listen unix:/tmp/${id}-ws.sock;
     location / {
+       ${_api_method()}
         proxy_set_header X-Api-Key ${token};
         proxy_set_header Host ws-${id}.node.mbr.${_domain_name};
+        #proxy_pass ${source_ws};
         proxy_pass https://${ip};
+        
 
   include /massbit/massbitroute/app/src/sites/services/gateway/etc/_provider_server_ws.conf;
     }
@@ -323,8 +333,10 @@ server {
 server {
     listen unix:/tmp/${id}.sock;
     location / {
+       ${_api_method()}
         proxy_set_header X-Api-Key ${token};
         proxy_set_header Host ${id}.node.mbr.${_domain_name};
+        #proxy_pass ${source_url};
         proxy_pass https://${ip};
 
   include /massbit/massbitroute/app/src/sites/services/gateway/etc/_provider_server.conf;
@@ -382,11 +394,6 @@ upstream eth-mainnet.node.mbr.${_domain_name} {
 ${_upstream_server}
   include /massbit/massbitroute/app/src/sites/services/gateway/etc/_upstream_server.conf;
 }
-]],
-    _api_method = [[
-        set $api_method '';
-        access_by_lua_file /massbit/massbitroute/app/src/sites/services/node/src/jsonrpc-access.lua;
-        vhost_traffic_status_filter_by_set_key $api_method ${id}::api_method;
 ]],
     _node = [[
 server {
@@ -543,6 +550,25 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
 
                                                 _nodes2[_blocknet_id][_blocknet_continent][_blocknet_country] =
                                                     _nodes2[_blocknet_id][_blocknet_continent][_blocknet_country] or {}
+                                                if not _item.data_scheme then
+                                                    _item.data_scheme = "http"
+                                                end
+                                                -- if not _item.data_scheme_ws then
+                                                --     _item.data_scheme_ws = "ws"
+                                                -- end
+
+                                                if _item.data_url then
+                                                    _item.source_url = _item.data_url
+                                                else
+                                                    _item.source_url = _item.data_scheme .. "://" .. _item.ip
+                                                end
+
+                                                if _item.data_ws then
+                                                    _item.source_ws = _item.data_ws
+                                                else
+                                                    _item.source_ws = _item.data_scheme .. "://" .. _item.ip
+                                                end
+
                                                 table.insert(_nodes[_blocknet_id], _item)
                                                 table.insert(_nodes1[_blocknet_id][_blocknet_continent], _item)
                                                 table.insert(
