@@ -244,6 +244,9 @@ _update_repos() {
 	_update_sources $REPOS_PRIVATE
 	_update_status=$?
 	_update_sources $REPOS_RUNTIME
+	if [ $_update_status -eq 0 ]; then
+		_update_status=$?
+	fi
 	return $_update_status
 }
 _commit_repos() {
