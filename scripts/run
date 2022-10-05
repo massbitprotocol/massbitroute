@@ -21,9 +21,11 @@ gw_dir=/massbit/massbitroute/app/src/sites/services/gateway
 cmd_server=$SITE_ROOT/cmd_server
 
 _reload() {
+
 	$cmd_server status | grep worker- | awk '{print $1}' | while read f; do
 		$cmd_server restart $f
 	done
+	rm /tmp/updateconfig.lock
 	$SITE_ROOT/cmd_server _update
 	$SITE_ROOT/cmd_server update
 	$SITE_ROOT/cmd_server start all
@@ -346,7 +348,7 @@ _monitor() {
 }
 
 _run() {
-	rm -rf $SITE_ROOT/tmp/*
+	rm -rf $SITE_ROOT/tmp/* /tmp/updateconfig.lock
 	_update
 	$SITE_ROOT/start_server
 }
