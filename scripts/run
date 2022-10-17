@@ -310,6 +310,7 @@ _sync_redis_conf() {
 }
 _update_ssl() {
 
+
 	if [ -f "/etc/letsencrypt/gateway_ssl.tar.gz" ]; then
 		_f=/etc/letsencrypt/gateway_ssl.tar.gz
 		md51=$(md5sum $_f | cut -d' ' -f1)
@@ -351,6 +352,7 @@ _update_tag() {
 
 	return $_tag_update
 
+
 }
 _update() {
 	echo "Update"
@@ -360,6 +362,7 @@ _update() {
 
 	_update_repos
 	_st_update=$?
+
 
 	_update_tag
 	if [ "$_st_update" -eq 0 ]; then
