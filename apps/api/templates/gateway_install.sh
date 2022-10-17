@@ -107,6 +107,7 @@ if [ -z "$DOMAIN" ]; then
 fi
 
 #create environment variables
+
 # _set ENV {{env}}
 _set TYPE $TYPE
 _set MBR_ENV {{env}}
