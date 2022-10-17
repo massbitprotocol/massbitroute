@@ -112,6 +112,7 @@ fi
 
 # cp $SITE_ROOT/.env $SITE_ROOT/.env_raw
 
+_set TYPE $TYPE
 _set MBR_ENV {{env}}
 
 _set PORTAL_URL {*portal_url*}
