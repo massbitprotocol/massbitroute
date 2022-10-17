@@ -21,9 +21,11 @@ gw_dir=/massbit/massbitroute/app/src/sites/services/gateway
 cmd_server=$SITE_ROOT/cmd_server
 
 _reload() {
+
 	$cmd_server status | grep worker- | awk '{print $1}' | while read f; do
 		$cmd_server restart $f
 	done
+	rm /tmp/updateconfig.lock
 	$SITE_ROOT/cmd_server _update
 	$SITE_ROOT/cmd_server update
 	$SITE_ROOT/cmd_server start all
@@ -244,6 +246,9 @@ _update_repos() {
 	_update_sources $REPOS_PRIVATE
 	_update_status=$?
 	_update_sources $REPOS_RUNTIME
+	if [ $_update_status -eq 0 ]; then
+		_update_status=$?
+	fi
 	return $_update_status
 }
 _commit_repos() {
@@ -304,10 +309,49 @@ _sync_redis_conf() {
 	done
 }
 _update_ssl() {
+
+
 	if [ -f "/etc/letsencrypt/gateway_ssl.tar.gz" ]; then
-		mkdir -p $SITE_ROOT/public/deploy/ssl
-		cp /etc/letsencrypt/gateway_ssl.tar.gz $SITE_ROOT/public/deploy/ssl
+		_f=/etc/letsencrypt/gateway_ssl.tar.gz
+		md51=$(md5sum $_f | cut -d' ' -f1)
+		if [ -f "$SITE_ROOT/public/deploy/ssl/gateway_ssl.tar.gz" ]; then
+			_f=$SITE_ROOT/public/deploy/ssl/gateway_ssl.tar.gz
+			md52=$(md5sum $_f | cut -d' ' -f1)
+			if [ "$md51" != "$md52" ]; then
+				mkdir -p $SITE_ROOT/public/deploy/ssl
+				cp /etc/letsencrypt/gateway_ssl.tar.gz $SITE_ROOT/public/deploy/ssl
+			fi
+		fi
+
 	fi
+
+}
+
+_update_tag() {
+	PORTAL_DOMAIN=portal.$DOMAIN
+	git="git -C $SITE_ROOT"
+	_v=$($git config --get remote.origin.url | awk -F'/' '{print $NF}')
+	tmp=$(mktemp)
+	curl -skL http://$PORTAL_DOMAIN/deploy/info/version/$_v >$tmp
+	if [ $? -ne 0 ]; then
+		rm $tmp
+		return 0
+	fi
+
+	_tag=$(cat $tmp)
+
+	rm $tmp
+
+	_my_tag=$($git describe --tags)
+	_tag_update=0
+	if [ "$_tag" != "$_my_tag" ]; then
+		$git fetch --all --tags --prune
+		$git checkout $_tag
+		_tag_update=1
+	fi
+
+	return $_tag_update
+
 
 }
 _update() {
@@ -318,6 +362,13 @@ _update() {
 
 	_update_repos
 	_st_update=$?
+
+
+	_update_tag
+	if [ "$_st_update" -eq 0 ]; then
+		_st_update=$?
+	fi
+
 	_commit_repos
 
 	return $_st_update
@@ -333,8 +384,9 @@ _monitor() {
 }
 
 _run() {
-	rm -rf $SITE_ROOT/tmp/*
+	rm -rf $SITE_ROOT/tmp/* /tmp/updateconfig.lock
 	_update
+	chmod +x $SITE_ROOT/scripts/run
 	$SITE_ROOT/start_server
 }
 $@

@@ -107,7 +107,9 @@ if [ -z "$DOMAIN" ]; then
 fi
 
 #create environment variables
+
 # _set ENV {{env}}
+_set TYPE $TYPE
 _set MBR_ENV {{env}}
 _set PORTAL_URL {*portal_url*}
 _set USER_ID {{user_id}}
