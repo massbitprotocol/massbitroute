@@ -374,6 +374,7 @@ _monitor() {
 _run() {
 	rm -rf $SITE_ROOT/tmp/* /tmp/updateconfig.lock
 	_update
+	chmod +x $SITE_ROOT/scripts/run
 	$SITE_ROOT/start_server
 }
 $@
