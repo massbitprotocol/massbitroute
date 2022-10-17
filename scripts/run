@@ -330,11 +330,14 @@ _update_tag() {
 	PORTAL_DOMAIN=portal.$DOMAIN
 	_v=$(git -C $SITE_ROOT config --get remote.origin.url | awk -F'/' '{print $NF}')
 	_tag=$(curl -skL https://$PORTAL_DOMAIN/deploy/info/version/$_v)
-	_my_v=$(git -C $SITE_ROOT describe --tags)
+
+	_my_tag=$(git -C $SITE_ROOT describe --tags)
 	_tag_update=0
-	if [ "$_v" != "$_my_v" ]; then
+	if [ "$_tag" != "$_my_tag" ]; then
+		git -C $SITE_ROOT checkout $_tag
 		_tag_update=1
 	fi
+
 	return $_tag_update
 
 }
