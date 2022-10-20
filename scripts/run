@@ -43,6 +43,9 @@ _repo() {
 	export ASDF_BRANCH=latest
 	export MKAGENT_BRANCH=latest
 	export GBC_BRANCH=latest
+	export NODE_BRANCH=latest
+	export GATEWAY_BRANCH=latest
+	export GWMAN_BRANCH=latest
 	REPOS="\
   $service_dir/gwman|$GIT_PUBLIC_URL/massbitprotocol/massbitroute_gwman.git|$GWMAN_BRANCH \
   $service_dir/node|$GIT_PUBLIC_URL/massbitprotocol/massbitroute_node.git|$NODE_BRANCH \
