@@ -44,3 +44,4 @@ scripts/single-node-test/.env
 t/servroot/
 /.cpan/
 /src/_env.lua
+/vars/ID
