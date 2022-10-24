@@ -387,6 +387,13 @@ _update() {
 
 	_commit_repos
 
+	_update_tag
+	if [ "$_st_update" -eq 0 ]; then
+		_st_update=$?
+	fi
+
+	_commit_repos
+
 	return $_st_update
 }
 
