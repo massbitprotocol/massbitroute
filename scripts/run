@@ -254,18 +254,24 @@ _update_repos() {
 		exit 1
 	fi
 	_repo
+	_update_status=0
 	_update_sources $REPOS
-	_update_status=$?
+	_st=$?
+	if [ $_update_status -eq 0 ]; then
+		_update_status=$_st
+	fi
 
 	_repo_private
 	_update_sources $REPOS_PRIVATE
+	_st=$?
 	if [ $_update_status -eq 0 ]; then
-		_update_status=$?
+		_update_status=$_st
 	fi
 
 	_update_sources $REPOS_RUNTIME
+	_st=$?
 	if [ $_update_status -eq 0 ]; then
-		_update_status=$?
+		_update_status=$_st
 	fi
 	return $_update_status
 }
@@ -378,18 +384,15 @@ _update() {
 	_st_update=0
 
 	_update_repos
-	_st_update=$?
-
-	_update_tag
+	_st=$?
 	if [ $_st_update -eq 0 ]; then
-		_st_update=$?
+		_st_update=$_st
 	fi
 
-	_commit_repos
-
 	_update_tag
-	if [ "$_st_update" -eq 0 ]; then
-		_st_update=$?
+	_st=$?
+	if [ $_st_update -eq 0 ]; then
+		_st_update=$_st
 	fi
 
 	_commit_repos

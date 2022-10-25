@@ -19,7 +19,11 @@ _env() {
 		echo "GIT_PRIVATE_READ_URL missing"
 		return 1
 	fi
-	export ENV_BRANCH=${ENV_BRANCH:-$MBR_ENV}
+	if [ -z "$GIT_PRIVATE_BRANCH" ]; then
+		echo "GIT_PRIVATE_BRANCH missing"
+		exit 1
+	fi
+	export ENV_BRANCH=${ENV_BRANCH:-$GIT_PRIVATE_BRANCH}
 	if [ ! -d "$SITE_ROOT/env/.git" ]; then
 		_git_clone $GIT_PRIVATE_READ_URL/massbitroute/env.git $SITE_ROOT/env $ENV_BRANCH
 	fi
@@ -55,9 +59,11 @@ _git_clone() {
 
 	fi
 
-	git -C $_dir pull origin $_branch | grep -i "updating" >/dev/null
+	git -C $_dir remote update
+	git -C $_dir status -uno | grep -i "Your branch is behind" >/dev/null
 	if [ $? -eq 0 ]; then
 		_clone_status=1
+		git -C $_dir pull origin $_branch
 	fi
 
 	return $_clone_status
@@ -70,28 +76,27 @@ _install_sources() {
 	_install_sources_status=0
 	for _pathgit in $@; do
 		# _repo
-		# _env
+		_env
 		_dir=$(echo $_pathgit | cut -d'|' -f1)
 		_url=$(echo $_pathgit | cut -d'|' -f2)
 		_branch=$(echo $_pathgit | cut -d'|' -f3)
-
 		if [ -z "$_branch" ]; then _branch=$MBR_ENV; fi
 		_git_clone $_url $_dir $_branch 1
 		_st=$?
 
-
 		if [ $_install_sources_status -eq 0 ]; then
 			_install_sources_status=$_st
 		fi
-		_env
+
 	done
 	return $_install_sources_status
 }
 _update_sources() {
 	_git_config
-	_env
+	# _env
 	_update_sources_status=0
 	for _pathgit in $@; do
+		_env
 		_dir=$(echo $_pathgit | cut -d'|' -f1)
 		# git config --global --add safe.directory $_path
 		_url=$(echo $_pathgit | cut -d'|' -f2)
@@ -103,7 +108,7 @@ _update_sources() {
 		if [ $_update_sources_status -eq 0 ]; then
 			_update_sources_status=$_st
 		fi
-		_env
+
 	done
 	return $_update_sources_status
 }
