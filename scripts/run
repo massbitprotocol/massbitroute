@@ -18,6 +18,8 @@ deploy_dir=$portal_dir/public/deploy
 gwman_dir=/massbit/massbitroute/app/src/sites/services/gwman
 gw_dir=/massbit/massbitroute/app/src/sites/services/gateway
 
+chmod +x $SITE_ROOT/scripts/run
+
 cmd_server=$SITE_ROOT/cmd_server
 
 _reload() {
@@ -304,14 +306,14 @@ _cleanupmeforsure() {
 		find $SITE_ROOT/../gwman/data/conf.d/geolocation.d -type f -not -iname "_*" -delete
 		find $SITE_ROOT/../gwman/data/zones -not -name "$DOMAIN" -not -name ".gitkeep" -type f -delete
 		# $SITE_ROOT/../gwman/scripts/run _prepare
-		$SITE_ROOT/../gwman/scripts/run _rebuild_conf
+		bash $SITE_ROOT/../gwman/scripts/run _rebuild_conf
 
 		for d in stat_gw stat_node; do
 			if [ -d "$SITE_ROOT/../stat/etc/conf/$d" ]; then
 				find $SITE_ROOT/../stat/etc/conf/$d -type f -delete
 			fi
 		done
-		$SITE_ROOT/../stat/scripts/run _rebuild_conf
+		bash $SITE_ROOT/../stat/scripts/run _rebuild_conf
 		_update_listid
 		_git_cmd commit
 
@@ -404,7 +406,7 @@ _monitor() {
 	_update
 	is_reload=$?
 	if [ $is_reload -ne 0 ]; then
-		$0 _reload
+		bash $0 _reload
 	fi
 
 }
@@ -412,7 +414,7 @@ _monitor() {
 _run() {
 	rm -rf $SITE_ROOT/tmp/* /tmp/updateconfig.lock
 	_update
-	chmod +x $SITE_ROOT/scripts/run
+
 	$SITE_ROOT/start_server
 }
 $@
