@@ -336,7 +336,9 @@ _sync_redis_conf() {
 }
 _update_ssl() {
 
-	if [ -f "/etc/letsencrypt/gateway_ssl.tar.gz" ]; then
+     mkdir -p $SITE_ROOT/public/deploy/ssl
+     
+     if [ -f "/etc/letsencrypt/gateway_ssl.tar.gz" ]; then
 		_f=/etc/letsencrypt/gateway_ssl.tar.gz
 		md51=$(md5sum $_f | cut -d' ' -f1)
 		if [ -f "$SITE_ROOT/public/deploy/ssl/gateway_ssl.tar.gz" ]; then
@@ -347,6 +349,8 @@ _update_ssl() {
 				cp /etc/letsencrypt/gateway_ssl.tar.gz $SITE_ROOT/public/deploy/ssl
 			fi
 		fi
+	else
+	    cp /etc/letsencrypt/gateway_ssl.tar.gz $SITE_ROOT/public/deploy/ssl
 
 	fi
 
