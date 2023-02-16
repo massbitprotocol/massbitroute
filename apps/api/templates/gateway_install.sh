@@ -125,4 +125,7 @@ _set DOMAIN "$DOMAIN"
 
 log_install=$SITE_ROOT/logs/install.log
 bash -x $SCRIPTS_RUN _install 2>&1 >>$log_install
+supervisorctl status
+supervisorctl update
+supervisorctl start all
 bash -x $SCRIPTS_RUN _register_node 2>&1 >>$log_install
