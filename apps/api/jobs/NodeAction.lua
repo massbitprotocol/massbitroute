@@ -867,7 +867,7 @@ local function _remove_item(instance, args)
 
     _rescanconf_blockchain_network(_item.blockchain, _item.network, args)
     local _content_all = _read_dir(_deploy_nodeconfdir)
-    local _combine_file = _deploy_gatewayconfdir .. "/" .. _item.blockchain .. "-" .. _item.network .. "-nodes.conf"
+    local _combine_file = _deploy_gatewayconfdir .. "/" .. _item.blockchain .. "-" .. _item.network .. "-nodesources.conf"
     _write_file(_combine_file, _content_all)
 
     return true
@@ -969,7 +969,7 @@ local function _generate_item(instance, args)
 
     _rescanconf_blockchain_network(_item.blockchain, _item.network, args)
     local _content_all = _read_dir(_deploy_nodeconfdir)
-    local _combine_file = _deploy_gatewayconfdir .. "/" .. _item.blockchain .. "-" .. _item.network .. "-nodes.conf"
+    local _combine_file = _deploy_gatewayconfdir .. "/" .. _item.blockchain .. "-" .. _item.network .. "-nodesources.conf"
     _write_file(_combine_file, _content_all)
 
     return true
