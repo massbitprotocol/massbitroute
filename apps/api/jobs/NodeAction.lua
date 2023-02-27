@@ -388,6 +388,39 @@ server {
     include /massbit/massbitroute/app/src/sites/services/node/etc/_location_server.conf;
 }
 ]],
+    _local_gw = [[
+server {
+listen 80;
+client_body_buffer_size 512K;
+client_max_body_size 1G;
+set $api_method '';
+set $jsonrpc_whitelist '';
+    server_name ws-${id}.node.mbr.${_domain_name};
+    location / {
+        access_by_lua_file /massbit/massbitroute/app/src/sites/services/gateway/src/node-jsonrpc-access.lua;
+        add_header X-Mbr-Node-Id ${id};
+        vhost_traffic_status_filter_by_set_key $api_method user::${user_id}::node::${id}::v1::api_method;
+        proxy_pass ${data_ws};
+    }
+ 
+}
+
+server {
+listen 80;
+client_body_buffer_size 512K;
+client_max_body_size 1G;
+set $api_method '';
+set $jsonrpc_whitelist '';
+    server_name ${id}.node.mbr.${_domain_name};
+    location / {
+        access_by_lua_file /massbit/massbitroute/app/src/sites/services/gateway/src/node-jsonrpc-access.lua;
+        add_header X-Mbr-Node-Id ${id};
+        vhost_traffic_status_filter_by_set_key $api_method user::${user_id}::node::${id}::v1::api_method;
+        proxy_pass ${data_url};
+
+    }
+}
+]],
     _upstream_server = [[server unix:/tmp/${id}.sock max_fails=1 fail_timeout=3s;]],
     _upstream = [[
 upstream eth-mainnet.node.mbr.${_domain_name} {
@@ -832,6 +865,9 @@ local function _remove_item(instance, args)
     end
 
     _rescanconf_blockchain_network(_item.blockchain, _item.network, args)
+    local _content_all = _read_dir(_deploy_nodeconfdir)
+    local _combine_file = _deploy_gatewayconfdir .. "/" .. _item.blockchain .. "-" .. _item.network .. "-nodes.conf"
+    _write_file(_combine_file, _content_all)
 
     return true
 end
@@ -923,7 +959,7 @@ local function _generate_item(instance, args)
     _item._domain_name = args._domain_name
     local _tmpl = _get_tmpl(rules, _item)
 
-    local _str_tmpl = _tmpl("_local")
+    local _str_tmpl = _tmpl("_local_gw")
 
     local _file_main = _deploy_nodeconfdir .. "/" .. _item.id .. ".conf"
 
@@ -931,6 +967,10 @@ local function _generate_item(instance, args)
     _write_file(_file_main, _str_tmpl)
 
     _rescanconf_blockchain_network(_item.blockchain, _item.network, args)
+    local _content_all = _read_dir(_deploy_nodeconfdir)
+    local _combine_file = _deploy_gatewayconfdir .. "/" .. _item.blockchain .. "-" .. _item.network .. "-nodes.conf"
+    _write_file(_combine_file, _content_all)
+
     return true
 end
 
