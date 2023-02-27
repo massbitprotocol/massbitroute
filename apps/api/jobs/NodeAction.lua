@@ -324,8 +324,6 @@ server {
        ${_api_method()}
         proxy_set_header X-Api-Key ${token};
         proxy_set_header Host ws-${id}.node.mbr.${_domain_name};
-        #proxy_pass ${source_ws};
-        #proxy_pass https://${ip};
         proxy_pass http://127.0.0.1;
         
 
@@ -353,12 +351,7 @@ ${nodes/_gw_node()}
 ${_gw_nodes()}
 ${_gw_node_upstreams()}
 ]],
-    _local = [[
-map $http_x_api_key $api_realm {
-    default '';
-    ${token} mbr_node_admin;
-}
-
+_local_ws = [[
 server {
     include /massbit/massbitroute/app/src/sites/services/node/etc/_pre_server_ws.conf;
     include /massbit/massbitroute/app/src/sites/services/node/etc/_ssl_node.mbr.${_domain_name}.conf;
@@ -374,7 +367,13 @@ server {
     }
     include /massbit/massbitroute/app/src/sites/services/node/etc/_location_server_ws.conf;
 }
-
+]],
+    _local = [[
+map $http_x_api_key $api_realm {
+    default '';
+    ${token} mbr_node_admin;
+}
+${data_ws?_local_ws()}
 server {
     include /massbit/massbitroute/app/src/sites/services/node/etc/_pre_server.conf;
     include /massbit/massbitroute/app/src/sites/services/node/etc/_ssl_node.mbr.${_domain_name}.conf;
@@ -391,7 +390,7 @@ server {
     include /massbit/massbitroute/app/src/sites/services/node/etc/_location_server.conf;
 }
 ]],
-    _local_gw = [[
+_local_gw_ws = [[
 server {
 listen 80;
 client_body_buffer_size 512K;
@@ -407,7 +406,9 @@ set $jsonrpc_whitelist '';
     }
  
 }
-
+]],
+    _local_gw = [[
+${data_ws?_local_gw_ws()}
 server {
 listen 80;
 client_body_buffer_size 512K;
@@ -600,10 +601,14 @@ local function _rescanconf_blockchain_network(_blockchain, _network, _job_data)
                                                     _item.source_url = _item.data_scheme .. "://" .. _item.ip
                                                 end
 
-                                                if _item.data_ws then
-                                                    _item.source_ws = _item.data_ws
-                                                else
-                                                    _item.source_ws = _item.data_scheme .. "://" .. _item.ip
+                                                if
+                                                    _item.data_ws and type(_item.data_ws) == "string" and
+                                                        string.len(_item.data_ws) == 0
+                                                 then
+                                                    _item.data_ws = nil
+                                                --  _item.source_ws = _item.data_ws
+                                                -- else
+                                                --     _item.source_ws = _item.data_scheme .. "://" .. _item.ip
                                                 end
 
                                                 table.insert(_nodes[_blocknet_id], _item)
@@ -870,7 +875,8 @@ local function _remove_item(instance, args)
 
     _rescanconf_blockchain_network(_item.blockchain, _item.network, args)
     local _content_all = _read_dir(_deploy_nodeconfdir)
-    local _combine_file = _deploy_gatewayconfdir .. "/" .. _item.blockchain .. "-" .. _item.network .. "-nodesources.conf"
+    local _combine_file =
+        _deploy_gatewayconfdir .. "/" .. _item.blockchain .. "-" .. _item.network .. "-nodesources.conf"
     _write_file(_combine_file, _content_all)
 
     return true
@@ -889,19 +895,28 @@ local function _generate_item(instance, args)
         _item.data_ws = string.trim(_item.data_ws)
     end
 
-    if
-        _item and
-            (not _item.data_ws or type(_item.data_ws) ~= "string" or string.len(_item.data_ws) == 0 or
-                _item.data_ws == "null")
-     then
-        _item.data_ws = _item.data_url
-    end
+    -- if
+    --     _item and
+    --         (not _item.data_ws or type(_item.data_ws) ~= "string" or string.len(_item.data_ws) == 0 or
+    --             _item.data_ws == "null")
+    --  then
+    --     -- _item.data_ws = _item.data_url
+    --     _item.data_ws = nil
+    -- end
 
     if _item and _item.data_ws and type(_item.data_ws) == "string" then
-        _item.data_ws = _item.data_ws:gsub("ws:", "http:"):gsub("wss:", "https:")
+        if string.len(_item.data_ws) > 0 then
+	   _item.data_ws = _item.data_ws:gsub("ws:", "http:"):gsub("wss:", "https:")
+	else
+	   _item.data_ws = nil
+	end
     end
     if args and args.data_ws and type(args.data_ws) == "string" then
-        args.data_ws = args.data_ws:gsub("ws:", "http:"):gsub("wss:", "https:")
+        if string.len(args.data_ws) > 0 then
+            args.data_ws = args.data_ws:gsub("ws:", "http:"):gsub("wss:", "https:")
+        else
+            args.data_ws = nil
+        end
     end
 
     if
@@ -972,7 +987,8 @@ local function _generate_item(instance, args)
 
     _rescanconf_blockchain_network(_item.blockchain, _item.network, args)
     local _content_all = _read_dir(_deploy_nodeconfdir)
-    local _combine_file = _deploy_gatewayconfdir .. "/" .. _item.blockchain .. "-" .. _item.network .. "-nodesources.conf"
+    local _combine_file =
+        _deploy_gatewayconfdir .. "/" .. _item.blockchain .. "-" .. _item.network .. "-nodesources.conf"
     _write_file(_combine_file, _content_all)
 
     return true
