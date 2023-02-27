@@ -436,7 +436,8 @@ server {
        ${_api_method()}
         proxy_set_header X-Api-Key ${token};
         proxy_set_header Host ${id}.node.mbr.${_domain_name};
-        proxy_pass https://${ip};
+        proxy_pass http://127.0.0.1;
+        #proxy_pass https://${ip};
 
         include /massbit/massbitroute/app/src/sites/services/gateway/etc/_provider_server.conf;
     }
