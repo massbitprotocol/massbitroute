@@ -6,6 +6,7 @@ local mytype = "node"
 local JobsAction = cc.class(mytype .. "JobsAction", gbc.ActionBase)
 
 local mbrutil = require "mbutil" -- cc.import("#mbrutil")
+local _read_dir = mbrutil.read_dir
 local env = require("env")
 -- local read_dir = mbrutil.read_dir
 local read_file = mbrutil.read_file
